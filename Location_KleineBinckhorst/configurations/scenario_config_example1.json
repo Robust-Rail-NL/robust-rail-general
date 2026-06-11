@@ -1,7 +1,7 @@
 {
     "location": "KleineBinckhorst",
     "start_time": 0,
-    "end_time": 3600,
+    "end_time": 4800,
     "track_ids_used": false,
     "use_default_material": true,
     "trains_given": true,
