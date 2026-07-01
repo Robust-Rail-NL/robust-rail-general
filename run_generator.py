@@ -2,12 +2,14 @@
 """Run the generator docker image on all scenario_config_*.json files."""
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-DOCKER_IMAGE = "ghcr.io/robust-rail-nl/generator:latest"
+#DOCKER_IMAGE = "ghcr.io/robust-rail-nl/generator:latest"
+DOCKER_IMAGE = "generator:latest"
 CONTAINER_DB = "/app/database"
 
 
@@ -19,6 +21,7 @@ def _run_config(location_dir: Path, config: Path, dry_run: bool) -> bool:
     name = _config_name(config)
     cmd = [
         "docker", "run", "--rm",
+        *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         DOCKER_IMAGE,
         "--config", config.name,

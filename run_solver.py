@@ -2,6 +2,7 @@
 """Run the HIP solver docker image on all scenario_solver_*.json files."""
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -90,6 +91,7 @@ def _run_scenario(location_dir: Path, scenario: Path, dry_run: bool) -> bool:
 
     cmd = [
         "docker", "run", "--rm",
+        *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         DOCKER_IMAGE,
         f"--config={CONTAINER_DB}/{TEMP_CONFIG}",

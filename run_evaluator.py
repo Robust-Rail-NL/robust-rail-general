@@ -2,6 +2,7 @@
 """Run the TORS evaluator docker image on all plan files that have a matching scenario."""
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -29,6 +30,7 @@ def _run_plan(location_dir: Path, plan: Path, dry_run: bool) -> bool:
 
     cmd = [
         "docker", "run", "--rm",
+        *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         DOCKER_IMAGE,
         "--mode", "EVAL_AND_STORE",
