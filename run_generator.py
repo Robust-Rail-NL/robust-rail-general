@@ -8,8 +8,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-#DOCKER_IMAGE = "ghcr.io/robust-rail-nl/generator:latest"
-DOCKER_IMAGE = "generator:latest"
+#DOCKER_IMAGE = "ghcr.io/robust-rail-nl/generator:1.2.0"  # Protobuf
+DOCKER_IMAGE = "ghcr.io/robust-rail-nl/generator:2.0.0-alpha.2"  # Pydantic
 CONTAINER_DB = "/app/database"
 
 

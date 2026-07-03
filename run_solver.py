@@ -8,7 +8,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-DOCKER_IMAGE = "ghcr.io/robust-rail-nl/hip:latest"
+#DOCKER_IMAGE = "ghcr.io/robust-rail-nl/hip:1.4.0"  # Protobuf
+DOCKER_IMAGE = "ghcr.io/robust-rail-nl/hip:2.0.0-alpha.1"  # Pydantic
 CONTAINER_DB = "/app/database"
 TEMP_CONFIG = "config_solver_run.yaml"
 
@@ -91,7 +92,7 @@ def _run_scenario(location_dir: Path, scenario: Path, dry_run: bool) -> bool:
 
     cmd = [
         "docker", "run", "--rm",
-        *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
+        #*(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         DOCKER_IMAGE,
         f"--config={CONTAINER_DB}/{TEMP_CONFIG}",
