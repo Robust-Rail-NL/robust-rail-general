@@ -8,8 +8,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-#DOCKER_IMAGE = "ghcr.io/robust-rail-nl/generator:1.2.0"  # Protobuf
-DOCKER_IMAGE = "ghcr.io/robust-rail-nl/generator:2.0.0-alpha.2"  # Pydantic
+DOCKER_IMAGE_VERSIONS = {
+    "protobuf": "ghcr.io/robust-rail-nl/generator:1.2.0",
+    "pydantic": "ghcr.io/robust-rail-nl/generator:2.0.0-alpha.2",
+}
 CONTAINER_DB = "/app/database"
 
 
@@ -17,13 +19,13 @@ def _config_name(config: Path) -> str:
     return config.stem.removeprefix("scenario_config_")
 
 
-def _run_config(location_dir: Path, config: Path, dry_run: bool) -> bool:
+def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bool) -> bool:
     name = _config_name(config)
     cmd = [
         "docker", "run", "--rm",
         *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
-        DOCKER_IMAGE,
+        docker_image,
         "--config", config.name,
         "--path", CONTAINER_DB,
     ]
@@ -54,6 +56,8 @@ def main() -> None:
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
+    parser.add_argument("--version", choices=['protobuf', 'pydantic'], default='pydantic',
+                        help="Pick a docker image version.")
     args = parser.parse_args()
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
@@ -69,7 +73,7 @@ def main() -> None:
         print(f"\n{loc.name} ({len(configs)} config(s))")
         for config in configs:
             total += 1
-            if not _run_config(loc, config, args.dry_run):
+            if not _run_config(DOCKER_IMAGE_VERSIONS[args.version], loc, config, args.dry_run):
                 errors += 1
 
     print(f"\nDone: {total - errors}/{total} succeeded.")

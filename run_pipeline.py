@@ -33,6 +33,8 @@ def main() -> None:
                         help="Pass --dry-run to each step.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
+    parser.add_argument("--version", choices=['protobuf', 'pydantic'], default='pydantic',
+                        help="Pick a docker image version.")
     parser.add_argument("--steps", metavar="STEPS",
                         default=",".join(ALL_STEPS),
                         help=f"Comma-separated list of steps to run (default: {','.join(ALL_STEPS)}).")
@@ -47,6 +49,8 @@ def main() -> None:
     extra: list[str] = []
     if args.dry_run:
         extra.append("--dry-run")
+    if args.version:
+        extra += ["--version", args.version]
     if args.location:
         extra += ["--location", args.location]
 

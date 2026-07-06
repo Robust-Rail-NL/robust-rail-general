@@ -8,8 +8,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-#DOCKER_IMAGE = "ghcr.io/robust-rail-nl/hip:1.4.0"  # Protobuf
-DOCKER_IMAGE = "ghcr.io/robust-rail-nl/hip:2.0.0-alpha.1"  # Pydantic
+DOCKER_IMAGE_VERSIONS = {
+    "protobuf": "ghcr.io/robust-rail-nl/hip:1.4.0",
+    "pydantic": "ghcr.io/robust-rail-nl/hip:2.0.0-alpha.1",
+}
 CONTAINER_DB = "/app/database"
 TEMP_CONFIG = "config_solver_run.yaml"
 
@@ -84,7 +86,7 @@ def _plan_name(scenario: Path) -> str:
     return f"plan_{suffix}.json"
 
 
-def _run_scenario(location_dir: Path, scenario: Path, dry_run: bool) -> bool:
+def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run: bool) -> bool:
     plan_name = _plan_name(scenario)
     config_path = location_dir / TEMP_CONFIG
     params = _parse_config(location_dir / "config_solver.yaml")
@@ -94,7 +96,7 @@ def _run_scenario(location_dir: Path, scenario: Path, dry_run: bool) -> bool:
         "docker", "run", "--rm",
         #*(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
-        DOCKER_IMAGE,
+        docker_image,
         f"--config={CONTAINER_DB}/{TEMP_CONFIG}",
     ]
 
@@ -127,6 +129,8 @@ def main() -> None:
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory (e.g. Location_SimpleService).")
+    parser.add_argument("--version", choices=['protobuf', 'pydantic'], default='pydantic',
+                        help="Pick a docker image version.")
     args = parser.parse_args()
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
@@ -143,7 +147,7 @@ def main() -> None:
         print(f"\n{loc.name} ({len(scenarios)} scenario(s))")
         for scenario in scenarios:
             total += 1
-            if not _run_scenario(loc, scenario, args.dry_run):
+            if not _run_scenario(DOCKER_IMAGE_VERSIONS[args.version], loc, scenario, args.dry_run):
                 errors += 1
 
     print(f"\nDone: {total - errors}/{total} succeeded.")
