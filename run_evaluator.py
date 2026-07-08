@@ -9,8 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
-    "protobuf": "ghcr.io/robust-rail-nl/tors:0.2",
-    "pydantic": "ghcr.io/robust-rail-nl/tors:2.0.0-alpha.1",
+    "protobuf": "ghcr.io/robust-rail-nl/tors:1.3.0",
+    #"pydantic": "ghcr.io/robust-rail-nl/tors:2.0.0-alpha.1",
 }
 CONTAINER_DB = "/app/database"
 
@@ -70,7 +70,7 @@ def main() -> None:
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
-    parser.add_argument("--version", choices=['protobuf', 'pydantic'], default='pydantic',
+    parser.add_argument("--version", choices=['protobuf', 'pydantic'], default='protobuf',
                         help="Pick a docker image version.")
     args = parser.parse_args()
 

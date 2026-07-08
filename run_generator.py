@@ -56,7 +56,7 @@ def main() -> None:
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
-    parser.add_argument("--version", choices=['protobuf', 'pydantic'], default='pydantic',
+    parser.add_argument("--version", choices=['protobuf', 'pydantic'], default='protobuf',
                         help="Pick a docker image version.")
     args = parser.parse_args()
 

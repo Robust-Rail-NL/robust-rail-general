@@ -9,8 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
-    "protobuf": "ghcr.io/robust-rail-nl/hip:1.4.0",
-    "pydantic": "ghcr.io/robust-rail-nl/hip:2.0.0-alpha.1",
+    "protobuf": "ghcr.io/robust-rail-nl/hip:1.4.1",
+    "pydantic": "ghcr.io/robust-rail-nl/hip:2.0.0-alpha.2",
 }
 CONTAINER_DB = "/app/database"
 TEMP_CONFIG = "config_solver_run.yaml"
@@ -94,7 +94,7 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run
 
     cmd = [
         "docker", "run", "--rm",
-        #*(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
+        *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         docker_image,
         f"--config={CONTAINER_DB}/{TEMP_CONFIG}",
@@ -129,7 +129,7 @@ def main() -> None:
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory (e.g. Location_SimpleService).")
-    parser.add_argument("--version", choices=['protobuf', 'pydantic'], default='pydantic',
+    parser.add_argument("--version", choices=['protobuf', 'pydantic'], default='protobuf',
                         help="Pick a docker image version.")
     args = parser.parse_args()
 
