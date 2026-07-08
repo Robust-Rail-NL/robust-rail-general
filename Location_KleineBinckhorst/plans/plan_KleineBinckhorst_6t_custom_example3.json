@@ -1,8 +1,8 @@
 {
 	"actions": [
 		{
-			"startTime": "0",
-			"endTime": "0",
+			"startTime": "300",
+			"endTime": "300",
 			"taskType": {
 				"predefined": "Arrive"
 			},
@@ -10,7 +10,7 @@
 				"id": "0",
 				"members": [
 					{
-						"id": "2901",
+						"id": "2401",
 						"type": {
 							"displayName": "SLT",
 							"carriages": 4,
@@ -25,25 +25,25 @@
 				],
 				"parentIDs": [],
 				"childIDs": [],
-				"standingType": "InStanding"
+				"standingType": ""
 			},
-			"location": "1",
+			"location": "42",
 			"resources": [
 				{
-					"name": "58",
-					"trackPartId": "58"
+					"name": "15",
+					"trackPartId": "15"
 				}
 			],
 			"trainUnitIds": []
 		},
 		{
 			"startTime": "300",
-			"endTime": "450",
+			"endTime": "540",
 			"taskType": {
 				"predefined": "Move"
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": "0",
 				"members": [
 					{
 						"id": "2401",
@@ -70,15 +70,70 @@
 					"trackPartId": "59"
 				},
 				{
-					"name": "41",
-					"trackPartId": "41"
+					"name": "24",
+					"trackPartId": "24"
+				},
+				{
+					"name": "58",
+					"trackPartId": "58"
+				},
+				{
+					"name": "23",
+					"trackPartId": "23"
+				},
+				{
+					"name": "57",
+					"trackPartId": "57"
+				},
+				{
+					"name": "22",
+					"trackPartId": "22"
+				},
+				{
+					"name": "56",
+					"trackPartId": "56"
+				},
+				{
+					"name": "3",
+					"trackPartId": "3"
 				}
 			],
 			"trainUnitIds": []
 		},
 		{
-			"startTime": "300",
-			"endTime": "300",
+			"startTime": "540",
+			"endTime": "1290",
+			"taskType": {
+				"predefined": "Wait"
+			},
+			"shuntingUnit": {
+				"id": "0",
+				"members": [
+					{
+						"id": "2401",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
+						}
+					}
+				],
+				"parentIDs": [],
+				"childIDs": [],
+				"standingType": ""
+			},
+			"location": "3",
+			"resources": [],
+			"trainUnitIds": []
+		},
+		{
+			"startTime": "600",
+			"endTime": "600",
 			"taskType": {
 				"predefined": "Arrive"
 			},
@@ -86,7 +141,20 @@
 				"id": "1",
 				"members": [
 					{
-						"id": "2401",
+						"id": "2402",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
+						}
+					},
+					{
+						"id": "2403",
 						"type": {
 							"displayName": "SLT",
 							"carriages": 4,
@@ -119,19 +187,32 @@
 				"predefined": "Move"
 			},
 			"shuntingUnit": {
-				"id": "2",
+				"id": "1",
 				"members": [
 					{
-						"id": "2601",
+						"id": "2402",
 						"type": {
 							"displayName": "SLT",
-							"carriages": 6,
+							"carriages": 4,
 							"reversalDuration": "0",
-							"length": 100.54,
+							"length": 69.36,
 							"combineDuration": "180",
 							"splitDuration": "120",
 							"backNormTime": "120",
-							"backAdditionTime": "15"
+							"backAdditionTime": "16"
+						}
+					},
+					{
+						"id": "2403",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
 						}
 					}
 				],
@@ -217,8 +298,8 @@
 			"trainUnitIds": []
 		},
 		{
-			"startTime": "600",
-			"endTime": "600",
+			"startTime": "900",
+			"endTime": "900",
 			"taskType": {
 				"predefined": "Arrive"
 			},
@@ -226,16 +307,16 @@
 				"id": "2",
 				"members": [
 					{
-						"id": "2601",
+						"id": "2404",
 						"type": {
 							"displayName": "SLT",
-							"carriages": 6,
+							"carriages": 4,
 							"reversalDuration": "0",
-							"length": 100.54,
+							"length": 69.36,
 							"combineDuration": "180",
 							"splitDuration": "120",
 							"backNormTime": "120",
-							"backAdditionTime": "15"
+							"backAdditionTime": "16"
 						}
 					}
 				],
@@ -248,155 +329,6 @@
 				{
 					"name": "15",
 					"trackPartId": "15"
-				}
-			],
-			"trainUnitIds": []
-		},
-		{
-			"startTime": "1110",
-			"endTime": "1800",
-			"taskType": {
-				"predefined": "Move"
-			},
-			"shuntingUnit": {
-				"id": "3",
-				"members": [
-					{
-						"id": "2801",
-						"type": {
-							"displayName": "SNG",
-							"carriages": 3,
-							"reversalDuration": "0",
-							"length": 59.5,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "0",
-							"backAdditionTime": "0"
-						}
-					},
-					{
-						"id": "2802",
-						"type": {
-							"displayName": "SNG",
-							"carriages": 4,
-							"reversalDuration": "0",
-							"length": 75.7,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "0",
-							"backAdditionTime": "0"
-						}
-					}
-				],
-				"parentIDs": [],
-				"childIDs": [],
-				"standingType": ""
-			},
-			"location": "15",
-			"resources": [
-				{
-					"name": "59",
-					"trackPartId": "59"
-				},
-				{
-					"name": "24",
-					"trackPartId": "24"
-				},
-				{
-					"name": "58",
-					"trackPartId": "58"
-				},
-				{
-					"name": "23",
-					"trackPartId": "23"
-				},
-				{
-					"name": "57",
-					"trackPartId": "57"
-				},
-				{
-					"name": "2",
-					"trackPartId": "2"
-				},
-				{
-					"name": "54",
-					"trackPartId": "54"
-				},
-				{
-					"name": "18",
-					"trackPartId": "18"
-				},
-				{
-					"name": "53",
-					"trackPartId": "53"
-				},
-				{
-					"name": "19",
-					"trackPartId": "19"
-				},
-				{
-					"name": "71",
-					"trackPartId": "71"
-				},
-				{
-					"name": "39",
-					"trackPartId": "39"
-				},
-				{
-					"name": "48",
-					"trackPartId": "48"
-				},
-				{
-					"name": "36",
-					"trackPartId": "36"
-				},
-				{
-					"name": "51",
-					"trackPartId": "51"
-				},
-				{
-					"name": "0",
-					"trackPartId": "0"
-				},
-				{
-					"name": "50",
-					"trackPartId": "50"
-				},
-				{
-					"name": "14",
-					"trackPartId": "14"
-				},
-				{
-					"name": "50",
-					"trackPartId": "50"
-				},
-				{
-					"name": "0",
-					"trackPartId": "0"
-				},
-				{
-					"name": "51",
-					"trackPartId": "51"
-				},
-				{
-					"name": "36",
-					"trackPartId": "36"
-				},
-				{
-					"name": "48",
-					"trackPartId": "48"
-				},
-				{
-					"name": "39",
-					"trackPartId": "39"
-				},
-				{
-					"name": "71",
-					"trackPartId": "71"
-				},
-				{
-					"name": "1",
-					"trackPartId": "1"
 				}
 			],
 			"trainUnitIds": []
@@ -408,32 +340,19 @@
 				"predefined": "Wait"
 			},
 			"shuntingUnit": {
-				"id": "3",
+				"id": "2",
 				"members": [
 					{
-						"id": "2801",
+						"id": "2404",
 						"type": {
-							"displayName": "SNG",
-							"carriages": 3,
-							"reversalDuration": "0",
-							"length": 59.5,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "0",
-							"backAdditionTime": "0"
-						}
-					},
-					{
-						"id": "2802",
-						"type": {
-							"displayName": "SNG",
+							"displayName": "SLT",
 							"carriages": 4,
 							"reversalDuration": "0",
-							"length": 75.7,
+							"length": 69.36,
 							"combineDuration": "180",
 							"splitDuration": "120",
-							"backNormTime": "0",
-							"backAdditionTime": "0"
+							"backNormTime": "120",
+							"backAdditionTime": "16"
 						}
 					}
 				],
@@ -446,57 +365,8 @@
 			"trainUnitIds": []
 		},
 		{
-			"startTime": "900",
-			"endTime": "900",
-			"taskType": {
-				"predefined": "Arrive"
-			},
-			"shuntingUnit": {
-				"id": "3",
-				"members": [
-					{
-						"id": "2801",
-						"type": {
-							"displayName": "SNG",
-							"carriages": 3,
-							"reversalDuration": "0",
-							"length": 59.5,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "0",
-							"backAdditionTime": "0"
-						}
-					},
-					{
-						"id": "2802",
-						"type": {
-							"displayName": "SNG",
-							"carriages": 4,
-							"reversalDuration": "0",
-							"length": 75.7,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "0",
-							"backAdditionTime": "0"
-						}
-					}
-				],
-				"parentIDs": [],
-				"childIDs": [],
-				"standingType": ""
-			},
-			"location": "42",
-			"resources": [
-				{
-					"name": "15",
-					"trackPartId": "15"
-				}
-			],
-			"trainUnitIds": []
-		},
-		{
-			"startTime": "1800",
-			"endTime": "2790",
+			"startTime": "1110",
+			"endTime": "1290",
 			"taskType": {
 				"predefined": "Move"
 			},
@@ -504,16 +374,16 @@
 				"id": "2",
 				"members": [
 					{
-						"id": "2601",
+						"id": "2404",
 						"type": {
 							"displayName": "SLT",
-							"carriages": 6,
+							"carriages": 4,
 							"reversalDuration": "0",
-							"length": 100.54,
+							"length": 69.36,
 							"combineDuration": "180",
 							"splitDuration": "120",
 							"backNormTime": "120",
-							"backAdditionTime": "15"
+							"backAdditionTime": "16"
 						}
 					}
 				],
@@ -521,89 +391,9 @@
 				"childIDs": [],
 				"standingType": ""
 			},
-			"location": "11",
+			"location": "15",
 			"resources": [
 				{
-					"name": "68",
-					"trackPartId": "68"
-				},
-				{
-					"name": "32",
-					"trackPartId": "32"
-				},
-				{
-					"name": "49",
-					"trackPartId": "49"
-				},
-				{
-					"name": "33",
-					"trackPartId": "33"
-				},
-				{
-					"name": "69",
-					"trackPartId": "69"
-				},
-				{
-					"name": "27",
-					"trackPartId": "27"
-				},
-				{
-					"name": "67",
-					"trackPartId": "67"
-				},
-				{
-					"name": "8",
-					"trackPartId": "8"
-				},
-				{
-					"name": "66",
-					"trackPartId": "66"
-				},
-				{
-					"name": "21",
-					"trackPartId": "21"
-				},
-				{
-					"name": "55",
-					"trackPartId": "55"
-				},
-				{
-					"name": "20",
-					"trackPartId": "20"
-				},
-				{
-					"name": "56",
-					"trackPartId": "56"
-				},
-				{
-					"name": "22",
-					"trackPartId": "22"
-				},
-				{
-					"name": "57",
-					"trackPartId": "57"
-				},
-				{
-					"name": "23",
-					"trackPartId": "23"
-				},
-				{
-					"name": "58",
-					"trackPartId": "58"
-				},
-				{
-					"name": "24",
-					"trackPartId": "24"
-				},
-				{
-					"name": "59",
-					"trackPartId": "59"
-				},
-				{
-					"name": "15",
-					"trackPartId": "15"
-				},
-				{
 					"name": "59",
 					"trackPartId": "59"
 				},
@@ -616,65 +406,10 @@
 					"trackPartId": "58"
 				},
 				{
-					"name": "23",
-					"trackPartId": "23"
-				},
-				{
-					"name": "57",
-					"trackPartId": "57"
-				},
-				{
-					"name": "22",
-					"trackPartId": "22"
-				},
-				{
-					"name": "56",
-					"trackPartId": "56"
-				},
-				{
-					"name": "20",
-					"trackPartId": "20"
-				},
-				{
-					"name": "55",
-					"trackPartId": "55"
-				},
-				{
-					"name": "4",
-					"trackPartId": "4"
+					"name": "1",
+					"trackPartId": "1"
 				}
 			],
-			"trainUnitIds": []
-		},
-		{
-			"startTime": "1710",
-			"endTime": "1800",
-			"taskType": {
-				"predefined": "Wait"
-			},
-			"shuntingUnit": {
-				"id": "2",
-				"members": [
-					{
-						"id": "2601",
-						"type": {
-							"displayName": "SLT",
-							"carriages": 6,
-							"reversalDuration": "0",
-							"length": 100.54,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "120",
-							"backAdditionTime": "15"
-						}
-					}
-				],
-				"parentIDs": [],
-				"childIDs": [],
-				"standingType": ""
-			},
-			"location": "11",
-			"resources": [],
 			"trainUnitIds": []
 		},
 		{
@@ -684,19 +419,32 @@
 				"other": "Reinigingsperron"
 			},
 			"shuntingUnit": {
-				"id": "2",
+				"id": "1",
 				"members": [
 					{
-						"id": "2601",
+						"id": "2402",
 						"type": {
 							"displayName": "SLT",
-							"carriages": 6,
+							"carriages": 4,
 							"reversalDuration": "0",
-							"length": 100.54,
+							"length": 69.36,
 							"combineDuration": "180",
 							"splitDuration": "120",
 							"backNormTime": "120",
-							"backAdditionTime": "15"
+							"backAdditionTime": "16"
+						}
+					},
+					{
+						"id": "2403",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
 						}
 					}
 				],
@@ -714,421 +462,13 @@
 			"trainUnitIds": []
 		},
 		{
-			"startTime": "0",
-			"endTime": "3420",
-			"taskType": {
-				"predefined": "Wait"
-			},
-			"shuntingUnit": {
-				"id": "0",
-				"members": [
-					{
-						"id": "2901",
-						"type": {
-							"displayName": "SLT",
-							"carriages": 4,
-							"reversalDuration": "0",
-							"length": 69.36,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "120",
-							"backAdditionTime": "16"
-						}
-					}
-				],
-				"parentIDs": [],
-				"childIDs": [],
-				"standingType": ""
-			},
-			"location": "1",
-			"resources": [],
-			"trainUnitIds": []
-		},
-		{
-			"startTime": "3420",
-			"endTime": "3600",
+			"startTime": "1290",
+			"endTime": "2224",
 			"taskType": {
 				"predefined": "Move"
 			},
 			"shuntingUnit": {
 				"id": "0",
-				"members": [
-					{
-						"id": "2901",
-						"type": {
-							"displayName": "SLT",
-							"carriages": 4,
-							"reversalDuration": "0",
-							"length": 69.36,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "120",
-							"backAdditionTime": "16"
-						}
-					}
-				],
-				"parentIDs": [],
-				"childIDs": [],
-				"standingType": ""
-			},
-			"location": "1",
-			"resources": [
-				{
-					"name": "58",
-					"trackPartId": "58"
-				},
-				{
-					"name": "24",
-					"trackPartId": "24"
-				},
-				{
-					"name": "59",
-					"trackPartId": "59"
-				},
-				{
-					"name": "15",
-					"trackPartId": "15"
-				}
-			],
-			"trainUnitIds": []
-		},
-		{
-			"startTime": "3600",
-			"endTime": "3600",
-			"taskType": {
-				"predefined": "Exit"
-			},
-			"shuntingUnit": {
-				"id": "0",
-				"members": [
-					{
-						"id": "2901",
-						"type": {
-							"displayName": "SLT",
-							"carriages": 4,
-							"reversalDuration": "0",
-							"length": 69.36,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "120",
-							"backAdditionTime": "16"
-						}
-					}
-				],
-				"parentIDs": [],
-				"childIDs": [],
-				"standingType": ""
-			},
-			"location": "15",
-			"resources": [
-				{
-					"name": "42",
-					"trackPartId": "42"
-				}
-			],
-			"trainUnitIds": []
-		},
-		{
-			"startTime": "2790",
-			"endTime": "3630",
-			"taskType": {
-				"predefined": "Wait"
-			},
-			"shuntingUnit": {
-				"id": "2",
-				"members": [
-					{
-						"id": "2601",
-						"type": {
-							"displayName": "SLT",
-							"carriages": 6,
-							"reversalDuration": "0",
-							"length": 100.54,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "120",
-							"backAdditionTime": "15"
-						}
-					}
-				],
-				"parentIDs": [],
-				"childIDs": [],
-				"standingType": ""
-			},
-			"location": "4",
-			"resources": [],
-			"trainUnitIds": []
-		},
-		{
-			"startTime": "3630",
-			"endTime": "3900",
-			"taskType": {
-				"predefined": "Move"
-			},
-			"shuntingUnit": {
-				"id": "2",
-				"members": [
-					{
-						"id": "2601",
-						"type": {
-							"displayName": "SLT",
-							"carriages": 6,
-							"reversalDuration": "0",
-							"length": 100.54,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "120",
-							"backAdditionTime": "15"
-						}
-					}
-				],
-				"parentIDs": [],
-				"childIDs": [],
-				"standingType": ""
-			},
-			"location": "4",
-			"resources": [
-				{
-					"name": "55",
-					"trackPartId": "55"
-				},
-				{
-					"name": "20",
-					"trackPartId": "20"
-				},
-				{
-					"name": "56",
-					"trackPartId": "56"
-				},
-				{
-					"name": "22",
-					"trackPartId": "22"
-				},
-				{
-					"name": "57",
-					"trackPartId": "57"
-				},
-				{
-					"name": "23",
-					"trackPartId": "23"
-				},
-				{
-					"name": "58",
-					"trackPartId": "58"
-				},
-				{
-					"name": "24",
-					"trackPartId": "24"
-				},
-				{
-					"name": "59",
-					"trackPartId": "59"
-				},
-				{
-					"name": "15",
-					"trackPartId": "15"
-				}
-			],
-			"trainUnitIds": []
-		},
-		{
-			"startTime": "3900",
-			"endTime": "3900",
-			"taskType": {
-				"predefined": "Exit"
-			},
-			"shuntingUnit": {
-				"id": "2",
-				"members": [
-					{
-						"id": "2601",
-						"type": {
-							"displayName": "SLT",
-							"carriages": 6,
-							"reversalDuration": "0",
-							"length": 100.54,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "120",
-							"backAdditionTime": "15"
-						}
-					}
-				],
-				"parentIDs": [],
-				"childIDs": [],
-				"standingType": ""
-			},
-			"location": "15",
-			"resources": [
-				{
-					"name": "42",
-					"trackPartId": "42"
-				}
-			],
-			"trainUnitIds": []
-		},
-		{
-			"startTime": "1800",
-			"endTime": "4020",
-			"taskType": {
-				"predefined": "Wait"
-			},
-			"shuntingUnit": {
-				"id": "3",
-				"members": [
-					{
-						"id": "2801",
-						"type": {
-							"displayName": "SNG",
-							"carriages": 3,
-							"reversalDuration": "0",
-							"length": 59.5,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "0",
-							"backAdditionTime": "0"
-						}
-					},
-					{
-						"id": "2802",
-						"type": {
-							"displayName": "SNG",
-							"carriages": 4,
-							"reversalDuration": "0",
-							"length": 75.7,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "0",
-							"backAdditionTime": "0"
-						}
-					}
-				],
-				"parentIDs": [],
-				"childIDs": [],
-				"standingType": ""
-			},
-			"location": "1",
-			"resources": [],
-			"trainUnitIds": []
-		},
-		{
-			"startTime": "4020",
-			"endTime": "4200",
-			"taskType": {
-				"predefined": "Move"
-			},
-			"shuntingUnit": {
-				"id": "3",
-				"members": [
-					{
-						"id": "2801",
-						"type": {
-							"displayName": "SNG",
-							"carriages": 3,
-							"reversalDuration": "0",
-							"length": 59.5,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "0",
-							"backAdditionTime": "0"
-						}
-					},
-					{
-						"id": "2802",
-						"type": {
-							"displayName": "SNG",
-							"carriages": 4,
-							"reversalDuration": "0",
-							"length": 75.7,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "0",
-							"backAdditionTime": "0"
-						}
-					}
-				],
-				"parentIDs": [],
-				"childIDs": [],
-				"standingType": ""
-			},
-			"location": "1",
-			"resources": [
-				{
-					"name": "58",
-					"trackPartId": "58"
-				},
-				{
-					"name": "24",
-					"trackPartId": "24"
-				},
-				{
-					"name": "59",
-					"trackPartId": "59"
-				},
-				{
-					"name": "15",
-					"trackPartId": "15"
-				}
-			],
-			"trainUnitIds": []
-		},
-		{
-			"startTime": "4200",
-			"endTime": "4200",
-			"taskType": {
-				"predefined": "Exit"
-			},
-			"shuntingUnit": {
-				"id": "3",
-				"members": [
-					{
-						"id": "2801",
-						"type": {
-							"displayName": "SNG",
-							"carriages": 3,
-							"reversalDuration": "0",
-							"length": 59.5,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "0",
-							"backAdditionTime": "0"
-						}
-					},
-					{
-						"id": "2802",
-						"type": {
-							"displayName": "SNG",
-							"carriages": 4,
-							"reversalDuration": "0",
-							"length": 75.7,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "0",
-							"backAdditionTime": "0"
-						}
-					}
-				],
-				"parentIDs": [],
-				"childIDs": [],
-				"standingType": ""
-			},
-			"location": "15",
-			"resources": [
-				{
-					"name": "42",
-					"trackPartId": "42"
-				}
-			],
-			"trainUnitIds": []
-		},
-		{
-			"startTime": "4200",
-			"endTime": "5044",
-			"taskType": {
-				"predefined": "Move"
-			},
-			"shuntingUnit": {
-				"id": "1",
 				"members": [
 					{
 						"id": "2401",
@@ -1148,8 +488,32 @@
 				"childIDs": [],
 				"standingType": ""
 			},
-			"location": "41",
+			"location": "3",
 			"resources": [
+				{
+					"name": "56",
+					"trackPartId": "56"
+				},
+				{
+					"name": "22",
+					"trackPartId": "22"
+				},
+				{
+					"name": "57",
+					"trackPartId": "57"
+				},
+				{
+					"name": "23",
+					"trackPartId": "23"
+				},
+				{
+					"name": "58",
+					"trackPartId": "58"
+				},
+				{
+					"name": "24",
+					"trackPartId": "24"
+				},
 				{
 					"name": "59",
 					"trackPartId": "59"
@@ -1234,16 +598,16 @@
 			"trainUnitIds": []
 		},
 		{
-			"startTime": "450",
-			"endTime": "4200",
+			"startTime": "1290",
+			"endTime": "3720",
 			"taskType": {
 				"predefined": "Wait"
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": "2",
 				"members": [
 					{
-						"id": "2401",
+						"id": "2404",
 						"type": {
 							"displayName": "SLT",
 							"carriages": 4,
@@ -1260,13 +624,13 @@
 				"childIDs": [],
 				"standingType": ""
 			},
-			"location": "41",
+			"location": "1",
 			"resources": [],
 			"trainUnitIds": []
 		},
 		{
-			"startTime": "5644",
-			"endTime": "6326",
+			"startTime": "1710",
+			"endTime": "2224",
 			"taskType": {
 				"predefined": "Wait"
 			},
@@ -1274,7 +638,20 @@
 				"id": "1",
 				"members": [
 					{
-						"id": "2401",
+						"id": "2402",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
+						}
+					},
+					{
+						"id": "2403",
 						"type": {
 							"displayName": "SLT",
 							"carriages": 4,
@@ -1291,18 +668,95 @@
 				"childIDs": [],
 				"standingType": ""
 			},
-			"location": "10",
+			"location": "11",
 			"resources": [],
 			"trainUnitIds": []
 		},
 		{
-			"startTime": "5044",
-			"endTime": "5644",
+			"startTime": "2224",
+			"endTime": "2494",
+			"taskType": {
+				"predefined": "Move"
+			},
+			"shuntingUnit": {
+				"id": "1",
+				"members": [
+					{
+						"id": "2402",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
+						}
+					},
+					{
+						"id": "2403",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
+						}
+					}
+				],
+				"parentIDs": [],
+				"childIDs": [],
+				"standingType": ""
+			},
+			"location": "11",
+			"resources": [
+				{
+					"name": "68",
+					"trackPartId": "68"
+				},
+				{
+					"name": "32",
+					"trackPartId": "32"
+				},
+				{
+					"name": "49",
+					"trackPartId": "49"
+				},
+				{
+					"name": "33",
+					"trackPartId": "33"
+				},
+				{
+					"name": "69",
+					"trackPartId": "69"
+				},
+				{
+					"name": "27",
+					"trackPartId": "27"
+				},
+				{
+					"name": "67",
+					"trackPartId": "67"
+				},
+				{
+					"name": "8",
+					"trackPartId": "8"
+				}
+			],
+			"trainUnitIds": []
+		},
+		{
+			"startTime": "2224",
+			"endTime": "2824",
 			"taskType": {
 				"other": "Reinigingsperron"
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": "0",
 				"members": [
 					{
 						"id": "2401",
@@ -1332,13 +786,88 @@
 			"trainUnitIds": []
 		},
 		{
-			"startTime": "6326",
-			"endTime": "7200",
+			"startTime": "2494",
+			"endTime": "3900",
+			"taskType": {
+				"predefined": "Wait"
+			},
+			"shuntingUnit": {
+				"id": "1",
+				"members": [
+					{
+						"id": "2402",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
+						}
+					},
+					{
+						"id": "2403",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
+						}
+					}
+				],
+				"parentIDs": [],
+				"childIDs": [],
+				"standingType": ""
+			},
+			"location": "8",
+			"resources": [],
+			"trainUnitIds": []
+		},
+		{
+			"startTime": "2824",
+			"endTime": "3060",
+			"taskType": {
+				"predefined": "Wait"
+			},
+			"shuntingUnit": {
+				"id": "0",
+				"members": [
+					{
+						"id": "2401",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
+						}
+					}
+				],
+				"parentIDs": [],
+				"childIDs": [],
+				"standingType": ""
+			},
+			"location": "10",
+			"resources": [],
+			"trainUnitIds": []
+		},
+		{
+			"startTime": "3060",
+			"endTime": "3600",
 			"taskType": {
 				"predefined": "Move"
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": "0",
 				"members": [
 					{
 						"id": "2401",
@@ -1381,16 +910,24 @@
 					"trackPartId": "69"
 				},
 				{
-					"name": "27",
-					"trackPartId": "27"
+					"name": "7",
+					"trackPartId": "7"
 				},
 				{
-					"name": "67",
-					"trackPartId": "67"
+					"name": "64",
+					"trackPartId": "64"
 				},
 				{
-					"name": "8",
-					"trackPartId": "8"
+					"name": "30",
+					"trackPartId": "30"
+				},
+				{
+					"name": "65",
+					"trackPartId": "65"
+				},
+				{
+					"name": "31",
+					"trackPartId": "31"
 				},
 				{
 					"name": "66",
@@ -1439,34 +976,18 @@
 				{
 					"name": "15",
 					"trackPartId": "15"
-				},
-				{
-					"name": "59",
-					"trackPartId": "59"
-				},
-				{
-					"name": "24",
-					"trackPartId": "24"
-				},
-				{
-					"name": "58",
-					"trackPartId": "58"
-				},
-				{
-					"name": "1",
-					"trackPartId": "1"
 				}
 			],
 			"trainUnitIds": []
 		},
 		{
-			"startTime": "7200",
-			"endTime": "7200",
+			"startTime": "3600",
+			"endTime": "3600",
 			"taskType": {
 				"predefined": "Exit"
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": "0",
 				"members": [
 					{
 						"id": "2401",
@@ -1484,13 +1005,239 @@
 				],
 				"parentIDs": [],
 				"childIDs": [],
-				"standingType": "OutStanding"
+				"standingType": ""
+			},
+			"location": "15",
+			"resources": [
+				{
+					"name": "42",
+					"trackPartId": "42"
+				}
+			],
+			"trainUnitIds": []
+		},
+		{
+			"startTime": "3720",
+			"endTime": "3900",
+			"taskType": {
+				"predefined": "Move"
+			},
+			"shuntingUnit": {
+				"id": "2",
+				"members": [
+					{
+						"id": "2404",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
+						}
+					}
+				],
+				"parentIDs": [],
+				"childIDs": [],
+				"standingType": ""
 			},
 			"location": "1",
 			"resources": [
 				{
 					"name": "58",
 					"trackPartId": "58"
+				},
+				{
+					"name": "24",
+					"trackPartId": "24"
+				},
+				{
+					"name": "59",
+					"trackPartId": "59"
+				},
+				{
+					"name": "15",
+					"trackPartId": "15"
+				}
+			],
+			"trainUnitIds": []
+		},
+		{
+			"startTime": "3900",
+			"endTime": "3900",
+			"taskType": {
+				"predefined": "Exit"
+			},
+			"shuntingUnit": {
+				"id": "2",
+				"members": [
+					{
+						"id": "2404",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
+						}
+					}
+				],
+				"parentIDs": [],
+				"childIDs": [],
+				"standingType": ""
+			},
+			"location": "15",
+			"resources": [
+				{
+					"name": "42",
+					"trackPartId": "42"
+				}
+			],
+			"trainUnitIds": []
+		},
+		{
+			"startTime": "3900",
+			"endTime": "4200",
+			"taskType": {
+				"predefined": "Move"
+			},
+			"shuntingUnit": {
+				"id": "1",
+				"members": [
+					{
+						"id": "2402",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
+						}
+					},
+					{
+						"id": "2403",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
+						}
+					}
+				],
+				"parentIDs": [],
+				"childIDs": [],
+				"standingType": ""
+			},
+			"location": "8",
+			"resources": [
+				{
+					"name": "66",
+					"trackPartId": "66"
+				},
+				{
+					"name": "21",
+					"trackPartId": "21"
+				},
+				{
+					"name": "55",
+					"trackPartId": "55"
+				},
+				{
+					"name": "20",
+					"trackPartId": "20"
+				},
+				{
+					"name": "56",
+					"trackPartId": "56"
+				},
+				{
+					"name": "22",
+					"trackPartId": "22"
+				},
+				{
+					"name": "57",
+					"trackPartId": "57"
+				},
+				{
+					"name": "23",
+					"trackPartId": "23"
+				},
+				{
+					"name": "58",
+					"trackPartId": "58"
+				},
+				{
+					"name": "24",
+					"trackPartId": "24"
+				},
+				{
+					"name": "59",
+					"trackPartId": "59"
+				},
+				{
+					"name": "15",
+					"trackPartId": "15"
+				}
+			],
+			"trainUnitIds": []
+		},
+		{
+			"startTime": "4200",
+			"endTime": "4200",
+			"taskType": {
+				"predefined": "Exit"
+			},
+			"shuntingUnit": {
+				"id": "1",
+				"members": [
+					{
+						"id": "2402",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
+						}
+					},
+					{
+						"id": "2403",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
+						}
+					}
+				],
+				"parentIDs": [],
+				"childIDs": [],
+				"standingType": ""
+			},
+			"location": "15",
+			"resources": [
+				{
+					"name": "42",
+					"trackPartId": "42"
 				}
 			],
 			"trainUnitIds": []

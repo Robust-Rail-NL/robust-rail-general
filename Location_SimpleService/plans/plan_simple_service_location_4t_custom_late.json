@@ -2,6 +2,42 @@
 	"actions": [
 		{
 			"startTime": "1500",
+			"endTime": "1500",
+			"taskType": {
+				"predefined": "Arrive"
+			},
+			"shuntingUnit": {
+				"id": "0",
+				"members": [
+					{
+						"id": "2422",
+						"type": {
+							"displayName": "SLT",
+							"carriages": 4,
+							"reversalDuration": "0",
+							"length": 69.36,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "120",
+							"backAdditionTime": "16"
+						}
+					}
+				],
+				"parentIDs": [],
+				"childIDs": [],
+				"standingType": ""
+			},
+			"location": "13",
+			"resources": [
+				{
+					"name": "4",
+					"trackPartId": "4"
+				}
+			],
+			"trainUnitIds": []
+		},
+		{
+			"startTime": "1500",
 			"endTime": "1650",
 			"taskType": {
 				"predefined": "Move"
@@ -41,46 +77,10 @@
 			"trainUnitIds": []
 		},
 		{
-			"startTime": "1500",
-			"endTime": "1500",
-			"taskType": {
-				"predefined": "Arrive"
-			},
-			"shuntingUnit": {
-				"id": "0",
-				"members": [
-					{
-						"id": "2422",
-						"type": {
-							"displayName": "SLT",
-							"carriages": 4,
-							"reversalDuration": "0",
-							"length": 69.36,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "120",
-							"backAdditionTime": "16"
-						}
-					}
-				],
-				"parentIDs": [],
-				"childIDs": [],
-				"standingType": ""
-			},
-			"location": "13",
-			"resources": [
-				{
-					"name": "4",
-					"trackPartId": "4"
-				}
-			],
-			"trainUnitIds": []
-		},
-		{
 			"startTime": "1650",
-			"endTime": "1650",
+			"endTime": "2150",
 			"taskType": {
-				"predefined": "Wait"
+				"other": "Reinigingsperron"
 			},
 			"shuntingUnit": {
 				"id": "0",
@@ -104,7 +104,48 @@
 				"standingType": ""
 			},
 			"location": "1",
-			"resources": [],
+			"resources": [
+				{
+					"name": "22",
+					"facilityId": "22"
+				}
+			],
+			"trainUnitIds": []
+		},
+		{
+			"startTime": "1900",
+			"endTime": "1900",
+			"taskType": {
+				"predefined": "Arrive"
+			},
+			"shuntingUnit": {
+				"id": "1",
+				"members": [
+					{
+						"id": "2301",
+						"type": {
+							"displayName": "SNG",
+							"carriages": 3,
+							"reversalDuration": "0",
+							"length": 59.5,
+							"combineDuration": "180",
+							"splitDuration": "120",
+							"backNormTime": "0",
+							"backAdditionTime": "0"
+						}
+					}
+				],
+				"parentIDs": [],
+				"childIDs": [],
+				"standingType": ""
+			},
+			"location": "10",
+			"resources": [
+				{
+					"name": "5",
+					"trackPartId": "5"
+				}
+			],
 			"trainUnitIds": []
 		},
 		{
@@ -156,46 +197,10 @@
 			"trainUnitIds": []
 		},
 		{
-			"startTime": "1900",
-			"endTime": "1900",
-			"taskType": {
-				"predefined": "Arrive"
-			},
-			"shuntingUnit": {
-				"id": "1",
-				"members": [
-					{
-						"id": "2301",
-						"type": {
-							"displayName": "SNG",
-							"carriages": 3,
-							"reversalDuration": "0",
-							"length": 59.5,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "0",
-							"backAdditionTime": "0"
-						}
-					}
-				],
-				"parentIDs": [],
-				"childIDs": [],
-				"standingType": ""
-			},
-			"location": "10",
-			"resources": [
-				{
-					"name": "5",
-					"trackPartId": "5"
-				}
-			],
-			"trainUnitIds": []
-		},
-		{
 			"startTime": "2140",
 			"endTime": "2140",
 			"taskType": {
-				"predefined": "Wait"
+				"predefined": "Move"
 			},
 			"shuntingUnit": {
 				"id": "1",
@@ -226,7 +231,7 @@
 			"startTime": "2140",
 			"endTime": "2140",
 			"taskType": {
-				"predefined": "Move"
+				"predefined": "Wait"
 			},
 			"shuntingUnit": {
 				"id": "1",
@@ -285,42 +290,6 @@
 				{
 					"name": "12",
 					"trackPartId": "12"
-				}
-			],
-			"trainUnitIds": []
-		},
-		{
-			"startTime": "1650",
-			"endTime": "2150",
-			"taskType": {
-				"other": "Reinigingsperron"
-			},
-			"shuntingUnit": {
-				"id": "0",
-				"members": [
-					{
-						"id": "2422",
-						"type": {
-							"displayName": "SLT",
-							"carriages": 4,
-							"reversalDuration": "0",
-							"length": 69.36,
-							"combineDuration": "180",
-							"splitDuration": "120",
-							"backNormTime": "120",
-							"backAdditionTime": "16"
-						}
-					}
-				],
-				"parentIDs": [],
-				"childIDs": [],
-				"standingType": ""
-			},
-			"location": "1",
-			"resources": [
-				{
-					"name": "22",
-					"facilityId": "22"
 				}
 			],
 			"trainUnitIds": []

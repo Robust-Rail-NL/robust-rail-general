@@ -1,0 +1,29 @@
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 33334
+| Is Train matched  : Yes
+| Action start time : 2140
+| Action end time   : 2140
+| Trains's departure: 2000
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 11112
+| Is Train matched  : No
+| Action start time : 2140
+| Action end time   : 2140
+| Trains's departure: 2300
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+The plan is not valid

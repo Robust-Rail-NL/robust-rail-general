@@ -1,7 +1,7 @@
 {
     "in": [
         {
-            "time": "300",
+            "time": "600",
             "id": "2000",
             "sideTrackPart": "42",
             "parkingTrackPart": "15",
@@ -15,34 +15,7 @@
                                 "other": "Reinigingsperron"
                             },
                             "priority": 1,
-                            "duration": "600",
-                            "requiredSkills": [
-                                "inwendige_reiniging"
-                            ]
-                        }
-                    ]
-                }
-            ],
-            "canDepartFromAnyTrack": true,
-            "standingIndex": 1.0,
-            "minimumDuration": "60"
-        },
-        {
-            "time": "600",
-            "id": "3000",
-            "sideTrackPart": "42",
-            "parkingTrackPart": "15",
-            "members": [
-                {
-                    "id": "2601",
-                    "typeDisplayName": "SLT-6",
-                    "tasks": [
-                        {
-                            "type": {
-                                "other": "Reinigingsperron"
-                            },
-                            "priority": 1,
-                            "duration": "600",
+                            "duration": "900",
                             "requiredSkills": [
                                 "inwendige_reiniging"
                             ]
@@ -56,19 +29,25 @@
         },
         {
             "time": "900",
-            "id": "4000",
+            "id": "3000",
             "sideTrackPart": "42",
             "parkingTrackPart": "15",
             "members": [
                 {
-                    "id": "2801",
-                    "typeDisplayName": "SNG-3",
-                    "tasks": []
-                },
-                {
-                    "id": "2802",
-                    "typeDisplayName": "SNG-4",
-                    "tasks": []
+                    "id": "2601",
+                    "typeDisplayName": "SLT-6",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "900",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
                 }
             ],
             "canDepartFromAnyTrack": true,
@@ -78,40 +57,8 @@
     ],
     "out": [
         {
-            "time": "3600",
-            "id": "2001",
-            "sideTrackPart": "42",
-            "parkingTrackPart": "15",
-            "members": [
-                {
-                    "id": "****",
-                    "typeDisplayName": "SLT-4",
-                    "tasks": []
-                }
-            ],
-            "standingIndex": 1.0,
-            "minimumDuration": "60",
-            "canDepartFromAnyTrack": false
-        },
-        {
-            "time": "3900",
-            "id": "3001",
-            "sideTrackPart": "42",
-            "parkingTrackPart": "15",
-            "members": [
-                {
-                    "id": "****",
-                    "typeDisplayName": "SLT-6",
-                    "tasks": []
-                }
-            ],
-            "standingIndex": 1.0,
-            "minimumDuration": "60",
-            "canDepartFromAnyTrack": false
-        },
-        {
-            "time": "4200",
-            "id": "4001",
+            "time": "1500",
+            "id": "4000",
             "sideTrackPart": "42",
             "parkingTrackPart": "15",
             "members": [
@@ -131,16 +78,32 @@
             "canDepartFromAnyTrack": false
         }
     ],
-    "endTime": "7200",
+    "endTime": "4800",
     "inStanding": [
         {
-            "id": "2002",
-            "sideTrackPart": "58",
-            "parkingTrackPart": "1",
+            "id": "4002",
+            "sideTrackPart": "56",
+            "parkingTrackPart": "3",
             "members": [
                 {
-                    "id": "2901",
-                    "typeDisplayName": "SLT-4",
+                    "id": "2802",
+                    "typeDisplayName": "SNG-4",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "time": "0"
+        },
+        {
+            "id": "4001",
+            "sideTrackPart": "56",
+            "parkingTrackPart": "2",
+            "members": [
+                {
+                    "id": "2801",
+                    "typeDisplayName": "SNG-3",
                     "tasks": []
                 }
             ],
@@ -152,13 +115,29 @@
     ],
     "outStanding": [
         {
-            "id": "2032",
-            "sideTrackPart": "71",
-            "parkingTrackPart": "1",
+            "id": "2001",
+            "sideTrackPart": "68",
+            "parkingTrackPart": "11",
             "members": [
                 {
                     "id": "****",
                     "typeDisplayName": "SLT-4",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "time": "0"
+        },
+        {
+            "id": "3001",
+            "sideTrackPart": "68",
+            "parkingTrackPart": "10",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "SLT-6",
                     "tasks": []
                 }
             ],
@@ -298,13 +277,13 @@
             "idPrefix": 0
         },
         {
-            "displayName": "SW7-25KV-2+7",
+            "displayName": "ICR-7",
             "carriages": 7,
             "length": 222.6,
             "combineDuration": "180",
             "splitDuration": "120",
             "travelSpeed": "10",
-            "typePrefix": "ICR-TRAXX",
+            "typePrefix": "ICR",
             "needsLoco": true,
             "isLoco": true,
             "needsElectricity": true,
@@ -314,13 +293,13 @@
             "idPrefix": 0
         },
         {
-            "displayName": "SW9-25KV-2+9",
+            "displayName": "ICR-9",
             "carriages": 9,
             "length": 275.4,
             "combineDuration": "180",
             "splitDuration": "120",
             "travelSpeed": "10",
-            "typePrefix": "ICR-TRAXX",
+            "typePrefix": "ICR",
             "needsLoco": true,
             "isLoco": true,
             "needsElectricity": true,

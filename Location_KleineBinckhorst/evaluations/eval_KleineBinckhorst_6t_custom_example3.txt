@@ -1,0 +1,106 @@
+Execute immediate events (6 events queued)
+Next event at T=300: Incoming train
+All shunting units are still active, but still 6 events available at T0.
+Execute immediate events (5 events queued)
+Next event at T=600: Incoming train
+Step done.
+|---------------------------|
+|   State at T300           |
+|---------------------------|
+No shunting units on the yard.
+
+Next event at T600: Incoming train
+5 remaining events.
+
+Arrivals:
+	T300: 	ShuntingUnit-2000 ((2401, SLT-4)) at 906a from Sein70
+	T600: 	ShuntingUnit-3000 ((2403, SLT-4)(2402, SLT-4)) at 906a from Sein70
+	T900: 	ShuntingUnit-4000 ((2404, SLT-4)) at 906a from Sein70
+
+Departures:
+	T3600: 	ShuntingUnit-2001 ((****, SLT-4)) at 906a to Sein70
+	T3900: 	ShuntingUnit-3001 ((****, SLT-4)) at 906a to Sein70
+	T4200: 	ShuntingUnit-4001 ((****, SLT-4)(****, SLT-4)) at 906a to Sein70
+
+**********************************************************ACTION**********************************************************
+Applying action Arrive: [2401] at T300 [300-300]
+**************************************************************************************************************************
+Execute immediate events (6 events queued)
+Next event at T=300: Finish action Arrive ShuntingUnit-2000 at 906a at T300
+	Finishing action Arrive ShuntingUnit-2000 at 906a at T300
+Next event at T=600: Incoming train
+Step done.
+|---------------------------|
+|   State at T300           |
+|---------------------------|
+ShuntingUnit-2000: 
+	waiting		=	0
+	moving		=	0
+	begin moving	=	0
+	in neutral	=	0
+	front train	=	(2401, SLT-4)
+	position	=	906a
+	previous	=	Sein70
+	active actions	=	None
+	> (2401, SLT-4): Tasks: Reinigingsperron
+
+Track occupations:
+	906a	|  A <-- SU-2000( 2401 ) --- [-No action-] -> B --- Front train(2401, SLT-4)
+
+
+Next event at T600: Incoming train
+5 remaining events.
+
+Arrivals:
+	T600: 	ShuntingUnit-3000 ((2403, SLT-4)(2402, SLT-4)) at 906a from Sein70
+	T900: 	ShuntingUnit-4000 ((2404, SLT-4)) at 906a from Sein70
+
+Departures:
+	T3600: 	ShuntingUnit-2001 ((****, SLT-4)) at 906a to Sein70
+	T3900: 	ShuntingUnit-3001 ((****, SLT-4)) at 906a to Sein70
+	T4200: 	ShuntingUnit-4001 ((****, SLT-4)(****, SLT-4)) at 906a to Sein70
+
+**********************************************************ACTION**********************************************************
+Applying action BeginMove: [2401] at T300 [300-300]
+**************************************************************************************************************************
+Execute immediate events (6 events queued)
+Next event at T=300: Finish action BeginMove ShuntingUnit-2000
+	Finishing action BeginMove ShuntingUnit-2000
+Next event at T=600: Incoming train
+Step done.
+|---------------------------|
+|   State at T300           |
+|---------------------------|
+ShuntingUnit-2000: 
+	waiting		=	0
+	moving		=	1
+	begin moving	=	1
+	in neutral	=	0
+	front train	=	(2401, SLT-4)
+	position	=	906a
+	previous	=	Sein70
+	active actions	=	None
+	> (2401, SLT-4): Tasks: Reinigingsperron
+
+Track occupations:
+	906a	|  A <-- SU-2000( 2401 ) --- [-No action-] -> B --- Front train(2401, SLT-4)
+
+
+Next event at T600: Incoming train
+5 remaining events.
+
+Arrivals:
+	T600: 	ShuntingUnit-3000 ((2403, SLT-4)(2402, SLT-4)) at 906a from Sein70
+	T900: 	ShuntingUnit-4000 ((2404, SLT-4)) at 906a from Sein70
+
+Departures:
+	T3600: 	ShuntingUnit-2001 ((****, SLT-4)) at 906a to Sein70
+	T3900: 	ShuntingUnit-3001 ((****, SLT-4)) at 906a to Sein70
+	T4200: 	ShuntingUnit-4001 ((****, SLT-4)(****, SLT-4)) at 906a to Sein70
+
+**********************************************************ACTION**********************************************************
+Applying action Move: [2401] along path 15 - 59 - 24 - 58 - 23 - 57 - 22 - 56 - 3 at T300 [300-540]
+**************************************************************************************************************************
+------------------------------------RESULT------------------------------------
+Scenario failed. Invalid action: The action is invalid. Track Wissel963 is not electrified..
+------------------------------------------------------------------------------

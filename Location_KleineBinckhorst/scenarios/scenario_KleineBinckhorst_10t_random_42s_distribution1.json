@@ -521,13 +521,13 @@
             "idPrefix": 0
         },
         {
-            "displayName": "SW7-25KV-2+7",
+            "displayName": "ICR-7",
             "carriages": 7,
             "length": 222.6,
             "combineDuration": "180",
             "splitDuration": "120",
             "travelSpeed": "10",
-            "typePrefix": "ICR-TRAXX",
+            "typePrefix": "ICR",
             "needsLoco": true,
             "isLoco": true,
             "needsElectricity": true,
@@ -537,13 +537,13 @@
             "idPrefix": 0
         },
         {
-            "displayName": "SW9-25KV-2+9",
+            "displayName": "ICR-9",
             "carriages": 9,
             "length": 275.4,
             "combineDuration": "180",
             "splitDuration": "120",
             "travelSpeed": "10",
-            "typePrefix": "ICR-TRAXX",
+            "typePrefix": "ICR",
             "needsLoco": true,
             "isLoco": true,
             "needsElectricity": true,

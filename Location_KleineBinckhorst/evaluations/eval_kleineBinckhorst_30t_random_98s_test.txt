@@ -1,0 +1,421 @@
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 30
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 3180
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 31
+| Is Train matched  : Yes
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 2640
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 32
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 5040
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 33
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 4860
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 34
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 3540
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 35
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 4320
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 36
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 3900
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 37
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 4500
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 38
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 2760
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 39
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 3360
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 40
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 4620
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 41
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 2700
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 42
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 3000
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 43
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 3480
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 44
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 2880
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 45
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 4380
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 46
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 4440
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 47
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 4200
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 48
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 4980
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 49
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 3960
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 50
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 4800
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 51
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 2820
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 52
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 3660
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 53
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 5160
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 54
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 4740
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 55
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 3600
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 56
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 3420
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 57
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 3720
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 58
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 4080
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 59
+| Is Train matched  : No
+| Action start time : 7620
+| Action end time   : 7620
+| Trains's departure: 4920
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+The plan is not valid
