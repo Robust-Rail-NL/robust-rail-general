@@ -11,6 +11,7 @@ ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
     "protobuf": "ghcr.io/robust-rail-nl/generator:1.2.0",
     "pydantic": "ghcr.io/robust-rail-nl/generator:2.0.0-alpha.2",
+    "local": "generator:latest",
 }
 CONTAINER_DB = "/app/database"
 
@@ -56,7 +57,7 @@ def main() -> None:
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
-    parser.add_argument("--version", choices=['protobuf', 'pydantic'], default='protobuf',
+    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='protobuf',
                         help="Pick a docker image version.")
     args = parser.parse_args()
 
