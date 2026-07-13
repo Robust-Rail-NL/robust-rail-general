@@ -65,7 +65,10 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool) 
         f.write(f"--- exit: {returncode if returncode is not None else 'error'}\n")
     out_lines = len(out_file.read_text().splitlines()) if out_file.exists() else 0
     err_lines = len(err_file.read_text().splitlines()) if err_file.exists() else 0
-    err_part = f"  stderr: {err_lines}L" if (err_lines > 1 or not ok) else ""
+    if ok and err_lines <= 1:
+        err_file.unlink(missing_ok=True)
+        err_lines = 0
+    err_part = f"  stderr: {err_lines}L" if err_lines else ""
     print(f"    stdout: {out_lines}L{err_part}  (exit {returncode})")
 
     if not ok and returncode is not None:
