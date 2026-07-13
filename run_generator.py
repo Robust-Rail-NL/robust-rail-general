@@ -36,13 +36,27 @@ def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bo
         print(f"    [dry-run] {' '.join(cmd)}")
         return True
 
+    scenarios_dir = location_dir / "scenarios"
+    scenarios_dir.mkdir(exist_ok=True)
+    out_file = scenarios_dir / f"scenario_{name}.out"
+    err_file = scenarios_dir / f"scenario_{name}.err"
+
     returncode = None
+    ok = False
     try:
-        returncode = subprocess.run(cmd).returncode
+        with open(out_file, "w") as fout, open(err_file, "w") as ferr:
+            result = subprocess.run(cmd, stdout=fout, stderr=ferr)
+        returncode = result.returncode
         ok = returncode == 0
     except Exception as exc:
         print(f"    ERROR: {exc}", file=sys.stderr)
-        ok = False
+
+    with open(err_file, "a") as f:
+        f.write(f"--- exit: {returncode if returncode is not None else 'error'}\n")
+    out_lines = len(out_file.read_text().splitlines()) if out_file.exists() else 0
+    err_lines = len(err_file.read_text().splitlines()) if err_file.exists() else 0
+    err_part = f"  stderr: {err_lines}L" if (err_lines > 1 or not ok) else ""
+    print(f"    stdout: {out_lines}L{err_part}  (exit {returncode})")
 
     if not ok and returncode is not None:
         print(f"    FAILED (exit {returncode})", file=sys.stderr)

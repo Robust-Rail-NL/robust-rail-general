@@ -91,7 +91,6 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run
     plan_name = _plan_name(scenario)
     config_path = location_dir / TEMP_CONFIG
     params = _parse_config(location_dir / "config_solver.yaml")
-    _write_config(config_path, scenario.name, plan_name, params)
 
     cmd = [
         "docker", "run", "--rm",
@@ -104,18 +103,33 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run
     print(f"  {scenario.name}  ->  {plan_name}")
     if dry_run:
         print(f"    [dry-run] {' '.join(cmd)}")
-        config_path.unlink(missing_ok=True)
         return True
 
+    plans_dir = location_dir / "plans"
+    plans_dir.mkdir(exist_ok=True)
+    plan_stem = Path(plan_name).stem
+    out_file = plans_dir / f"{plan_stem}.out"
+    err_file = plans_dir / f"{plan_stem}.err"
+
+    _write_config(config_path, scenario.name, plan_name, params)
     returncode = None
+    ok = False
     try:
-        returncode = subprocess.run(cmd).returncode
+        with open(out_file, "w") as fout, open(err_file, "w") as ferr:
+            result = subprocess.run(cmd, stdout=fout, stderr=ferr)
+        returncode = result.returncode
         ok = returncode == 0
     except Exception as exc:
         print(f"    ERROR: {exc}", file=sys.stderr)
-        ok = False
     finally:
         config_path.unlink(missing_ok=True)
+
+    with open(err_file, "a") as f:
+        f.write(f"--- exit: {returncode if returncode is not None else 'error'}\n")
+    out_lines = len(out_file.read_text().splitlines()) if out_file.exists() else 0
+    err_lines = len(err_file.read_text().splitlines()) if err_file.exists() else 0
+    err_part = f"  stderr: {err_lines}L" if (err_lines > 1 or not ok) else ""
+    print(f"    stdout: {out_lines}L{err_part}  (exit {returncode})")
 
     if not ok and returncode is not None:
         print(f"    FAILED (exit {returncode})", file=sys.stderr)
@@ -144,7 +158,6 @@ def main() -> None:
         scenarios = sorted(loc.glob("scenarios/scenario_solver_*.json"))
         if not scenarios:
             continue
-        (loc / "plans").mkdir(exist_ok=True)
         print(f"\n{loc.name} ({len(scenarios)} scenario(s))")
         for scenario in scenarios:
             total += 1
