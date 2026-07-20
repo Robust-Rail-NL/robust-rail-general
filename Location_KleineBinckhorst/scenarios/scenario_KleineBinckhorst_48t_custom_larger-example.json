@@ -1,0 +1,1531 @@
+{
+    "in": [
+        {
+            "id": "arr-01",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u01",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "u02",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "time": "0"
+        },
+        {
+            "time": "600",
+            "id": "arr-02",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u03",
+                    "typeDisplayName": "SLT-6",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "u04",
+                    "typeDisplayName": "SLT-6",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "1200",
+            "id": "arr-03",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u05",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                },
+                {
+                    "id": "u06",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "1800",
+            "id": "arr-04",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u07",
+                    "typeDisplayName": "SNG-4",
+                    "tasks": []
+                },
+                {
+                    "id": "u08",
+                    "typeDisplayName": "SNG-4",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "2400",
+            "id": "arr-05",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u09",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "u10",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "3000",
+            "id": "arr-06",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u11",
+                    "typeDisplayName": "VIRM-6",
+                    "tasks": []
+                },
+                {
+                    "id": "u12",
+                    "typeDisplayName": "VIRM-6",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "3600",
+            "id": "arr-07",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u13",
+                    "typeDisplayName": "ICM-3",
+                    "tasks": []
+                },
+                {
+                    "id": "u14",
+                    "typeDisplayName": "ICM-3",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "4200",
+            "id": "arr-08",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u15",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                },
+                {
+                    "id": "u16",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "4800",
+            "id": "arr-09",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u17",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "u18",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "5400",
+            "id": "arr-10",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u19",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                },
+                {
+                    "id": "u20",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "6000",
+            "id": "arr-11",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u21",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "u22",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "6600",
+            "id": "arr-12",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u23",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                },
+                {
+                    "id": "u24",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "6900",
+            "id": "arr-13",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u25",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": []
+                },
+                {
+                    "id": "u26",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "7300",
+            "id": "arr-14",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u27",
+                    "typeDisplayName": "SLT-6",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "u28",
+                    "typeDisplayName": "SLT-6",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "7600",
+            "id": "arr-15",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u29",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                },
+                {
+                    "id": "u30",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "8000",
+            "id": "arr-16",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u31",
+                    "typeDisplayName": "SNG-4",
+                    "tasks": []
+                },
+                {
+                    "id": "u32",
+                    "typeDisplayName": "SNG-4",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "8600",
+            "id": "arr-17",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u33",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "u34",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "9100",
+            "id": "arr-18",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u35",
+                    "typeDisplayName": "VIRM-6",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "u36",
+                    "typeDisplayName": "VIRM-6",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "9600",
+            "id": "arr-19",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u37",
+                    "typeDisplayName": "ICM-3",
+                    "tasks": []
+                },
+                {
+                    "id": "u38",
+                    "typeDisplayName": "ICM-3",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "10000",
+            "id": "arr-20",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u39",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                },
+                {
+                    "id": "u40",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "10400",
+            "id": "arr-21",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u41",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "u42",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "11000",
+            "id": "arr-22",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u43",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                },
+                {
+                    "id": "u44",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "11600",
+            "id": "arr-23",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u45",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "u46",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": [
+                        {
+                            "type": {
+                                "other": "Reinigingsperron"
+                            },
+                            "priority": 1,
+                            "duration": "600",
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        },
+        {
+            "time": "12000",
+            "id": "arr-24",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "u47",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                },
+                {
+                    "id": "u48",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                }
+            ],
+            "canDepartFromAnyTrack": true,
+            "standingIndex": 1.0,
+            "minimumDuration": "60"
+        }
+    ],
+    "out": [
+        {
+            "time": "15500",
+            "id": "dep-01",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "16200",
+            "id": "dep-02",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "SLT-6",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "SLT-6",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "16600",
+            "id": "dep-03",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "17000",
+            "id": "dep-04",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "SNG-4",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "SNG-4",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "17600",
+            "id": "dep-05",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "18200",
+            "id": "dep-06",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "VIRM-6",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "VIRM-6",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "18800",
+            "id": "dep-07",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "ICM-3",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "ICM-3",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "19400",
+            "id": "dep-08",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "19800",
+            "id": "dep-09",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "20400",
+            "id": "dep-10",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "20800",
+            "id": "dep-11",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "21200",
+            "id": "dep-12",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "21600",
+            "id": "dep-13",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "22200",
+            "id": "dep-14",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "SLT-6",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "SLT-6",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "22800",
+            "id": "dep-15",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "23400",
+            "id": "dep-16",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "SNG-4",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "SNG-4",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "24000",
+            "id": "dep-17",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "24600",
+            "id": "dep-18",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "VIRM-6",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "VIRM-6",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "25200",
+            "id": "dep-19",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "ICM-3",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "ICM-3",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "25800",
+            "id": "dep-20",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "26400",
+            "id": "dep-21",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "SLT-4",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "27000",
+            "id": "dep-22",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "SNG-3",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "27600",
+            "id": "dep-23",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "VIRM-4",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        },
+        {
+            "time": "28200",
+            "id": "dep-24",
+            "sideTrackPart": "42",
+            "parkingTrackPart": "15",
+            "members": [
+                {
+                    "id": "****",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                },
+                {
+                    "id": "****",
+                    "typeDisplayName": "ICM-4",
+                    "tasks": []
+                }
+            ],
+            "standingIndex": 1.0,
+            "minimumDuration": "60",
+            "canDepartFromAnyTrack": false
+        }
+    ],
+    "endTime": "28800",
+    "trainUnitTypes": [
+        {
+            "displayName": "VIRM-4",
+            "carriages": 4,
+            "length": 108.56,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "backNormTime": "280",
+            "backAdditionTime": "25",
+            "travelSpeed": "10",
+            "typePrefix": "VIRM",
+            "needsElectricity": true,
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        },
+        {
+            "displayName": "VIRM-6",
+            "carriages": 6,
+            "length": 162.06,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "backNormTime": "280",
+            "backAdditionTime": "24",
+            "travelSpeed": "10",
+            "typePrefix": "VIRM",
+            "needsElectricity": true,
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        },
+        {
+            "displayName": "DDZ-4",
+            "carriages": 4,
+            "length": 101.08,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "backNormTime": "261",
+            "backAdditionTime": "30",
+            "travelSpeed": "10",
+            "typePrefix": "DDZ",
+            "needsElectricity": true,
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        },
+        {
+            "displayName": "DDZ-6",
+            "carriages": 6,
+            "length": 154.0,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "backNormTime": "261",
+            "backAdditionTime": "23",
+            "travelSpeed": "10",
+            "typePrefix": "DDZ",
+            "needsElectricity": true,
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        },
+        {
+            "displayName": "SLT-4",
+            "carriages": 4,
+            "length": 69.36,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "backNormTime": "120",
+            "backAdditionTime": "16",
+            "travelSpeed": "10",
+            "typePrefix": "SLT",
+            "needsElectricity": true,
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        },
+        {
+            "displayName": "SLT-6",
+            "carriages": 6,
+            "length": 100.54,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "backNormTime": "120",
+            "backAdditionTime": "15",
+            "travelSpeed": "10",
+            "typePrefix": "SLT",
+            "needsElectricity": true,
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        },
+        {
+            "displayName": "ICM-3",
+            "carriages": 3,
+            "length": 80.6,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "travelSpeed": "10",
+            "typePrefix": "ICM",
+            "needsElectricity": true,
+            "backNormTime": "0",
+            "backAdditionTime": "0",
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        },
+        {
+            "displayName": "ICM-4",
+            "carriages": 4,
+            "length": 107.1,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "travelSpeed": "10",
+            "typePrefix": "ICM",
+            "needsElectricity": true,
+            "backNormTime": "0",
+            "backAdditionTime": "0",
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        },
+        {
+            "displayName": "ICR-7",
+            "carriages": 7,
+            "length": 222.6,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "travelSpeed": "10",
+            "typePrefix": "ICR",
+            "needsLoco": true,
+            "isLoco": true,
+            "needsElectricity": true,
+            "backNormTime": "0",
+            "backAdditionTime": "0",
+            "startUpTime": "0",
+            "idPrefix": 0
+        },
+        {
+            "displayName": "ICR-9",
+            "carriages": 9,
+            "length": 275.4,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "travelSpeed": "10",
+            "typePrefix": "ICR",
+            "needsLoco": true,
+            "isLoco": true,
+            "needsElectricity": true,
+            "backNormTime": "0",
+            "backAdditionTime": "0",
+            "startUpTime": "0",
+            "idPrefix": 0
+        },
+        {
+            "displayName": "FLIRT FFF-3",
+            "carriages": 3,
+            "length": 63.2,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "travelSpeed": "10",
+            "typePrefix": "FFF",
+            "needsElectricity": true,
+            "backNormTime": "0",
+            "backAdditionTime": "0",
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        },
+        {
+            "displayName": "FLIRT FFF-4",
+            "carriages": 4,
+            "length": 80.7,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "travelSpeed": "10",
+            "typePrefix": "FFF",
+            "needsElectricity": true,
+            "backNormTime": "0",
+            "backAdditionTime": "0",
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        },
+        {
+            "displayName": "SNG-3",
+            "carriages": 3,
+            "length": 59.5,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "travelSpeed": "10",
+            "typePrefix": "SNG",
+            "needsElectricity": true,
+            "backNormTime": "0",
+            "backAdditionTime": "0",
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        },
+        {
+            "displayName": "SNG-4",
+            "carriages": 4,
+            "length": 75.7,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "travelSpeed": "10",
+            "typePrefix": "SNG",
+            "needsElectricity": true,
+            "backNormTime": "0",
+            "backAdditionTime": "0",
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        },
+        {
+            "displayName": "SGMM-2",
+            "carriages": 2,
+            "length": 52.2,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "travelSpeed": "10",
+            "typePrefix": "SGMm",
+            "needsElectricity": true,
+            "backNormTime": "0",
+            "backAdditionTime": "0",
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        },
+        {
+            "displayName": "SGMM-3",
+            "carriages": 3,
+            "length": 78.69,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "travelSpeed": "10",
+            "typePrefix": "SGMm",
+            "needsElectricity": true,
+            "backNormTime": "0",
+            "backAdditionTime": "0",
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        },
+        {
+            "displayName": "ICNG-5",
+            "carriages": 5,
+            "length": 109.4,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "travelSpeed": "10",
+            "typePrefix": "ICNG",
+            "needsElectricity": true,
+            "backNormTime": "0",
+            "backAdditionTime": "0",
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        },
+        {
+            "displayName": "ICNG-8",
+            "carriages": 8,
+            "length": 164.9,
+            "combineDuration": "180",
+            "splitDuration": "120",
+            "travelSpeed": "10",
+            "typePrefix": "ICNG",
+            "needsElectricity": true,
+            "backNormTime": "0",
+            "backAdditionTime": "0",
+            "startUpTime": "0",
+            "needsLoco": false,
+            "isLoco": false,
+            "idPrefix": 0
+        }
+    ],
+    "inStanding": [],
+    "outStanding": [],
+    "nonServiceTraffic": [],
+    "disabledTrackPart": [],
+    "workers": [],
+    "startTime": "0"
+}

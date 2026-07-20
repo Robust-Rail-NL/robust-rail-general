@@ -1,0 +1,746 @@
+{
+    "location": "KleineBinckhorst",
+    "start_time": 0,
+    "end_time": 28800,
+    "track_ids_used": false,
+    "use_default_material": true,
+    "trains_given": true,
+    "perform_servicing": true,
+    "partial_matching_given": false,
+    "partial_plan_given": false,
+    "through_traffic_given": false,
+    "custom_servicing_tasks": [
+        {
+            "name": "clean_train",
+            "type": "Reinigingsperron",
+            "priority": 1,
+            "duration": 600,
+            "required_skills": [
+                "inwendige_reiniging"
+            ]
+        }
+    ],
+    "custom_train_units": [
+        {
+            "id": "u01",
+            "type": "SLT-4",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u02",
+            "type": "SLT-4",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u03",
+            "type": "SLT-6",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u04",
+            "type": "SLT-6",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u05",
+            "type": "SNG-3",
+            "services": []
+        },
+        {
+            "id": "u06",
+            "type": "SNG-3",
+            "services": []
+        },
+        {
+            "id": "u07",
+            "type": "SNG-4",
+            "services": []
+        },
+        {
+            "id": "u08",
+            "type": "SNG-4",
+            "services": []
+        },
+        {
+            "id": "u09",
+            "type": "VIRM-4",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u10",
+            "type": "VIRM-4",
+            "services": [
+            ]
+        },
+        {
+            "id": "u11",
+            "type": "VIRM-6",
+            "services": [
+            ]
+        },
+        {
+            "id": "u12",
+            "type": "VIRM-6",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u13",
+            "type": "ICM-3",
+            "services": []
+        },
+        {
+            "id": "u14",
+            "type": "ICM-3",
+            "services": []
+        },
+        {
+            "id": "u15",
+            "type": "ICM-4",
+            "services": []
+        },
+        {
+            "id": "u16",
+            "type": "ICM-4",
+            "services": []
+        },
+        {
+            "id": "u17",
+            "type": "SLT-4",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u18",
+            "type": "SLT-4",
+            "services": [
+            ]
+        },
+        {
+            "id": "u19",
+            "type": "SNG-3",
+            "services": []
+        },
+        {
+            "id": "u20",
+            "type": "SNG-3",
+            "services": []
+        },
+        {
+            "id": "u21",
+            "type": "VIRM-4",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u22",
+            "type": "VIRM-4",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u23",
+            "type": "ICM-4",
+            "services": []
+        },
+        {
+            "id": "u24",
+            "type": "ICM-4",
+            "services": []
+        },
+
+        {
+            "id": "u25",
+            "type": "SLT-4",
+            "services": [
+            ]
+        },
+        {
+            "id": "u26",
+            "type": "SLT-4",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u27",
+            "type": "SLT-6",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u28",
+            "type": "SLT-6",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u29",
+            "type": "SNG-3",
+            "services": []
+        },
+        {
+            "id": "u30",
+            "type": "SNG-3",
+            "services": []
+        },
+        {
+            "id": "u31",
+            "type": "SNG-4",
+            "services": []
+        },
+        {
+            "id": "u32",
+            "type": "SNG-4",
+            "services": []
+        },
+        {
+            "id": "u33",
+            "type": "VIRM-4",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u34",
+            "type": "VIRM-4",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u35",
+            "type": "VIRM-6",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u36",
+            "type": "VIRM-6",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u37",
+            "type": "ICM-3",
+            "services": []
+        },
+        {
+            "id": "u38",
+            "type": "ICM-3",
+            "services": []
+        },
+        {
+            "id": "u39",
+            "type": "ICM-4",
+            "services": []
+        },
+        {
+            "id": "u40",
+            "type": "ICM-4",
+            "services": []
+        },
+        {
+            "id": "u41",
+            "type": "SLT-4",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u42",
+            "type": "SLT-4",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u43",
+            "type": "SNG-3",
+            "services": []
+        },
+        {
+            "id": "u44",
+            "type": "SNG-3",
+            "services": []
+        },
+        {
+            "id": "u45",
+            "type": "VIRM-4",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u46",
+            "type": "VIRM-4",
+            "services": [
+                "clean_train"
+            ]
+        },
+        {
+            "id": "u47",
+            "type": "ICM-4",
+            "services": []
+        },
+        {
+            "id": "u48",
+            "type": "ICM-4",
+            "services": []
+        }
+    ],
+    "custom_trains": [
+        {
+            "id": "arr-01",
+            "members": [
+                "u01",
+                "u02"
+            ],
+            "arrival_time": 0,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-02",
+            "members": [
+                "u03",
+                "u04"
+            ],
+            "arrival_time": 600,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-03",
+            "members": [
+                "u05",
+                "u06"
+            ],
+            "arrival_time": 1200,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-04",
+            "members": [
+                "u07",
+                "u08"
+            ],
+            "arrival_time": 1800,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-05",
+            "members": [
+                "u09",
+                "u10"
+            ],
+            "arrival_time": 2400,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-06",
+            "members": [
+                "u11",
+                "u12"
+            ],
+            "arrival_time": 3000,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-07",
+            "members": [
+                "u13",
+                "u14"
+            ],
+            "arrival_time": 3600,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-08",
+            "members": [
+                "u15",
+                "u16"
+            ],
+            "arrival_time": 4200,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-09",
+            "members": [
+                "u17",
+                "u18"
+            ],
+            "arrival_time": 4800,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-10",
+            "members": [
+                "u19",
+                "u20"
+            ],
+            "arrival_time": 5400,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-11",
+            "members": [
+                "u21",
+                "u22"
+            ],
+            "arrival_time": 6000,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-12",
+            "members": [
+                "u23",
+                "u24"
+            ],
+            "arrival_time": 6600,
+            "arrival_track": "906a"
+        },
+
+        {
+            "id": "arr-13",
+            "members": [
+                "u25",
+                "u26"
+            ],
+            "arrival_time": 6900,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-14",
+            "members": [
+                "u27",
+                "u28"
+            ],
+            "arrival_time": 7300,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-15",
+            "members": [
+                "u29",
+                "u30"
+            ],
+            "arrival_time": 7600,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-16",
+            "members": [
+                "u31",
+                "u32"
+            ],
+            "arrival_time": 8000,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-17",
+            "members": [
+                "u33",
+                "u34"
+            ],
+            "arrival_time": 8600,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-18",
+            "members": [
+                "u35",
+                "u36"
+            ],
+            "arrival_time": 9100,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-19",
+            "members": [
+                "u37",
+                "u38"
+            ],
+            "arrival_time": 9600,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-20",
+            "members": [
+                "u39",
+                "u40"
+            ],
+            "arrival_time": 10000,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-21",
+            "members": [
+                "u41",
+                "u42"
+            ],
+            "arrival_time": 10400,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-22",
+            "members": [
+                "u43",
+                "u44"
+            ],
+            "arrival_time": 11000,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-23",
+            "members": [
+                "u45",
+                "u46"
+            ],
+            "arrival_time": 11600,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "arr-24",
+            "members": [
+                "u47",
+                "u48"
+            ],
+            "arrival_time": 12000,
+            "arrival_track": "906a"
+        },
+        {
+            "id": "dep-01",
+            "member_types": [
+                "SLT-4",
+                "SLT-4"
+            ],
+            "departure_time": 15500,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-02",
+            "member_types": [
+                "SLT-6",
+                "SLT-6"
+            ],
+            "departure_time": 16200,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-03",
+            "member_types": [
+                "SNG-3",
+                "SNG-3"
+            ],
+            "departure_time": 16600,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-04",
+            "member_types": [
+                "SNG-4",
+                "SNG-4"
+            ],
+            "departure_time": 17000,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-05",
+            "member_types": [
+                "VIRM-4",
+                "VIRM-4"
+            ],
+            "departure_time": 17600,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-06",
+            "member_types": [
+                "VIRM-6",
+                "VIRM-6"
+            ],
+            "departure_time": 18200,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-07",
+            "member_types": [
+                "ICM-3",
+                "ICM-3"
+            ],
+            "departure_time": 18800,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-08",
+            "member_types": [
+                "ICM-4",
+                "ICM-4"
+            ],
+            "departure_time": 19400,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-09",
+            "member_types": [
+                "SLT-4",
+                "SLT-4"
+            ],
+            "departure_time": 19800,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-10",
+            "member_types": [
+                "SNG-3",
+                "SNG-3"
+            ],
+            "departure_time": 20400,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-11",
+            "member_types": [
+                "VIRM-4",
+                "VIRM-4"
+            ],
+            "departure_time": 20800,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-12",
+            "member_types": [
+                "ICM-4",
+                "ICM-4"
+            ],
+            "departure_time": 21200,
+            "departure_track": "906a"
+        },
+
+        {
+            "id": "dep-13",
+            "member_types": [
+                "SLT-4",
+                "SLT-4"
+            ],
+            "departure_time": 21600,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-14",
+            "member_types": [
+                "SLT-6",
+                "SLT-6"
+            ],
+            "departure_time": 22200,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-15",
+            "member_types": [
+                "SNG-3",
+                "SNG-3"
+            ],
+            "departure_time": 22800,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-16",
+            "member_types": [
+                "SNG-4",
+                "SNG-4"
+            ],
+            "departure_time": 23400,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-17",
+            "member_types": [
+                "VIRM-4",
+                "VIRM-4"
+            ],
+            "departure_time": 24000,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-18",
+            "member_types": [
+                "VIRM-6",
+                "VIRM-6"
+            ],
+            "departure_time": 24600,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-19",
+            "member_types": [
+                "ICM-3",
+                "ICM-3"
+            ],
+            "departure_time": 25200,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-20",
+            "member_types": [
+                "ICM-4",
+                "ICM-4"
+            ],
+            "departure_time": 25800,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-21",
+            "member_types": [
+                "SLT-4",
+                "SLT-4"
+            ],
+            "departure_time": 26400,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-22",
+            "member_types": [
+                "SNG-3",
+                "SNG-3"
+            ],
+            "departure_time": 27000,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-23",
+            "member_types": [
+                "VIRM-4",
+                "VIRM-4"
+            ],
+            "departure_time": 27600,
+            "departure_track": "906a"
+        },
+        {
+            "id": "dep-24",
+            "member_types": [
+                "ICM-4",
+                "ICM-4"
+            ],
+            "departure_time": 28200,
+            "departure_track": "906a"
+        }
+    ]
+}
