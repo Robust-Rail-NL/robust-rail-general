@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-ALL_STEPS = ["generator", "planner", "evaluator"]
+ALL_STEPS = ["generator", "solver", "evaluator"]
 SCRIPTS = {
     "generator": ROOT / "run_generator.py",
     "solver": ROOT / "run_solver.py",
