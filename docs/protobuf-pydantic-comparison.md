@@ -199,6 +199,17 @@ Results are in `Location_*/evaluations-{protobuf,pydantic}/`.
 8 pairs compared across `Location_KleineBinckhorst` (7) and `Location_SimpleService` (1).
 No case yields a clean pass in either version.
 
+| Case | Protobuf outcome | Pydantic outcome | Same? |
+|---|---|---|---|
+| `distribution1` | exit 1 — pre-eval abort: arrival train too long for track | exit 1 — same abort | ✓ |
+| `distribution2` | exit 1 — pre-eval abort: departure train too long for track | exit 1 — same abort | ✓ |
+| `48t_larger-example` | exit 139 — TORS crash (`std::exception`) | exit 139 — same crash | ✓ |
+| `30t_random_98s` | exit 0 — "Plan not valid": 30 departure time mismatches | exit 0 — one simulation step; no verdict | ✗ |
+| `simple_service_4t_late` | exit 0 — "Plan not valid": departure time mismatch | exit 0 — one simulation step (0 events); no verdict | ✗ |
+| `6t_example3` | exit 0 — "Invalid action: Track Wissel963 not electrified" | exit 0 — `EvaluatePlan` stuck at T300 for 100 iterations; aborted | ✗ |
+| `7t_example1` | exit 0 — "Invalid action: shunting unit 2801 not found" | exit 0 — `EvaluatePlan` stuck at T0 for 100 iterations; aborted | ✗ |
+| `8t_example2` | exit 0 — "Invalid action: shunting unit 2901 not found" | exit 0 — `EvaluatePlan` stuck at T0 for 100 iterations; aborted | ✗ |
+
 #### Group A — Identical outcome in both versions (3 cases)
 
 | Case | Outcome | Root cause |
