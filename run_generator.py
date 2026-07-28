@@ -9,8 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
-    "protobuf": "ghcr.io/robust-rail-nl/generator:1.2.0",
-    "pydantic": "ghcr.io/robust-rail-nl/generator:2.0.0-alpha.2",
+    "protobuf": "ghcr.io/robust-rail-nl/generator:1.2.1",
+    "pydantic": "ghcr.io/robust-rail-nl/generator:2.0.0-alpha.3",
     "local": "generator:latest",
 }
 CONTAINER_DB = "/app/database"
