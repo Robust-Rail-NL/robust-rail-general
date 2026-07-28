@@ -148,7 +148,7 @@ def main() -> None:
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory (e.g. Location_SimpleService).")
     parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='protobuf',
-                        help="Pick a docker image version.")
+                        help="Pick a docker image version ('local' is reserved for locally built images).")
     args = parser.parse_args()
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))

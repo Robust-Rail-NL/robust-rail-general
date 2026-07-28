@@ -34,7 +34,7 @@ def main() -> None:
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
     parser.add_argument("--version", choices=['protobuf', 'pydantic', 'local'], default='protobuf',
-                        help="Pick a docker image version.")
+                        help="Pick a docker image version ('local' is reserved for locally built images).")
     parser.add_argument("--steps", metavar="STEPS",
                         default=",".join(ALL_STEPS),
                         help=f"Comma-separated list of steps to run (default: {','.join(ALL_STEPS)}).")
