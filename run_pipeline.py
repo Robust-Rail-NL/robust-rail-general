@@ -11,6 +11,7 @@ ALL_STEPS = ["generator", "solver", "evaluator"]
 SCRIPTS = {
     "generator": ROOT / "run_generator.py",
     "solver": ROOT / "run_solver.py",
+    "planner": ROOT / "run_planner.py",
     "evaluator": ROOT / "run_evaluator.py",
 }
 
