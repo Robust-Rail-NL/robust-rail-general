@@ -186,7 +186,7 @@ Results are in `Location_*/evaluations-{protobuf,pydantic}/`.
 | Solver (HIP) | `ghcr.io/robust-rail-nl/hip:1.4.1` |
 | Evaluator (TORS) | `ghcr.io/robust-rail-nl/tors:1.3.0` |
 
-### Pydantic versions used
+### Pydantic versions used (run 1 — tors:2.0.0-alpha.3)
 
 | Tool | Image |
 |---|---|
@@ -194,10 +194,12 @@ Results are in `Location_*/evaluations-{protobuf,pydantic}/`.
 | Solver (HIP) | `ghcr.io/robust-rail-nl/hip:2.0.0-alpha.2` |
 | Evaluator (TORS) | `ghcr.io/robust-rail-nl/tors:2.0.0-alpha.3` |
 
-### Results
+### Results (run 1)
 
-8 pairs compared across `Location_KleineBinckhorst` (7) and `Location_SimpleService` (1).
-No case yields a clean pass in either version.
+The pydantic evaluator failed to make progress on 5 of 8 cases — it could not consume
+plan actions at all, either spinning for 100 iterations or exiting after a single step.
+This confirmed that `tors:2.0.0-alpha.3` was incompatible with the pydantic pipeline output.
+The evaluator was subsequently fixed; see run 2 below.
 
 | Case | Protobuf outcome | Pydantic outcome | Same? |
 |---|---|---|---|
@@ -210,45 +212,40 @@ No case yields a clean pass in either version.
 | `7t_example1` | exit 0 — "Invalid action: shunting unit 2801 not found" | exit 0 — `EvaluatePlan` stuck at T0 for 100 iterations; aborted | ✗ |
 | `8t_example2` | exit 0 — "Invalid action: shunting unit 2901 not found" | exit 0 — `EvaluatePlan` stuck at T0 for 100 iterations; aborted | ✗ |
 
-#### Group A — Identical outcome in both versions (3 cases)
+---
 
-| Case | Outcome | Root cause |
-|---|---|---|
-| `distribution1` | Both exit 1, empty eval file | Pre-eval abort: arrival train length (270.6 m) exceeds track [15] length (255 m) |
-| `distribution2` | Both exit 1, empty eval file | Pre-eval abort: departure train length (270.6 m) exceeds track [15] length (255 m) |
-| `48t_larger-example` | Both exit 139, empty eval file | TORS crash: `terminate called after throwing std::exception` (SIGSEGV) |
+### Pydantic versions used (run 2 — tors:2.0.0-alpha.4)
 
-These failures are pre-existing data or evaluator issues unrelated to the migration.
+| Tool | Image |
+|---|---|
+| Generator | `ghcr.io/robust-rail-nl/generator:2.0.0-alpha.2` |
+| Solver (HIP) | `ghcr.io/robust-rail-nl/hip:2.0.0-alpha.2` |
+| Evaluator (TORS) | `ghcr.io/robust-rail-nl/tors:2.0.0-alpha.4` |
 
-#### Group B — Different failure mode (5 cases)
+### Results (run 2)
 
-All five fail in both versions, but the pydantic evaluator fails in a qualitatively different way.
+7 of 8 cases produce identical output to the protobuf run. The one difference is in
+`8t_example2`, where the pydantic solver produced a slightly different plan (a wait
+action of duration 3154 s vs 3420 s), leading to a different line in the evaluation
+trace — but the same end result ("shunting unit 2901 not found"). This is expected
+non-determinism in the solver, not a format issue, and is the encouraging signal that
+the pydantic pipeline is genuinely running different code.
 
-| Case | Protobuf outcome | Pydantic outcome |
-|---|---|---|
-| `30t_random_98s` | "Plan not valid" — 30 departure time mismatch errors | Evaluator exits after one simulation step; no verdict written |
-| `simple_service_4t_late` | "Plan not valid" — departure time mismatch | Evaluator exits after one step (0 events queued); no verdict |
-| `6t_example3` | "Invalid action: Track Wissel963 not electrified" | `EvaluatePlan` stuck at T300 for 100 iterations; aborted |
-| `7t_example1` | "Invalid action: shunting unit 2801 not found" | `EvaluatePlan` stuck at T0 for 100 iterations; aborted |
-| `8t_example2` | "Invalid action: shunting unit 2901 not found" | `EvaluatePlan` stuck at T0 for 100 iterations; aborted |
+The remaining identical failures are all pre-existing issues unrelated to the migration:
 
-The protobuf evaluator can read the plan, execute actions, and report specific failures.
-The pydantic evaluator either exits immediately after setting up the simulation or spins
-unable to advance the plan iterator — it cannot consume plan actions at all.
+| Case | Protobuf outcome | Pydantic outcome | Same? |
+|---|---|---|---|
+| `distribution1` | exit 1 — pre-eval abort: arrival train too long for track | exit 1 — same abort | ✓ |
+| `distribution2` | exit 1 — pre-eval abort: departure train too long for track | exit 1 — same abort | ✓ |
+| `48t_larger-example` | exit 139 — TORS crash (`std::exception`) | exit 139 — same crash | ✓ |
+| `30t_random_98s` | exit 0 — "Plan not valid": 30 departure time mismatches | exit 0 — same result | ✓ |
+| `simple_service_4t_late` | exit 0 — "Plan not valid": departure time mismatch | exit 0 — same result | ✓ |
+| `6t_example3` | exit 0 — "Invalid action: Track Wissel963 not electrified" | exit 0 — same result | ✓ |
+| `7t_example1` | exit 0 — "Invalid action: shunting unit 2801 not found" | exit 0 — same result | ✓ |
+| `8t_example2` | exit 0 — "Invalid action: shunting unit 2901 not found" | exit 0 — same failure, different wait duration in trace | ≈ |
 
-### Analysis
-
-The evaluator (TORS) reads two inputs: the regular scenario (`scenario_<X>.json`,
-affected by categories 1–3) and the plan (`plan_<X>.json`, produced by the HIP solver).
-Categories 1–3 are low-impact and do not explain the "no progress" failure pattern.
-
-The most likely root cause is that **the pydantic solver produces plans in a different
-format** that TORS 2.0.0-alpha.3 cannot interpret. This is a downstream effect of
-Category 4: the structural changes in the solver scenario format (`scenario_solver_<X>.json`)
-feed into the solver, which may have changed what it writes into `plan_<X>.json`.
-The comparison document does not yet cover solver plan output format — that is the
-key missing piece.
-
-Category 3b (`priority`: 1 → `null`) remains a declared concern but could not be
-confirmed or ruled out from these results, as the evaluator never reaches task
-scheduling in any of the Group B cases.
+The "identical" failures all fail for reasons that make the version irrelevant:
+`distribution1/2` abort before the evaluation loop (scenario data constraint);
+`48t` crashes the evaluator (pre-existing TORS bug); `30t`, `simple_service`, `6t`,
+`7t`, and `8t` have invalid plans regardless of which solver version produced them.
+A clean pass on any case would be the meaningful signal; none exists yet in either version.

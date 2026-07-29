@@ -2,6 +2,7 @@
 """Run the full generator → solver → evaluator pipeline."""
 
 import argparse
+import importlib.util
 import subprocess
 import sys
 from pathlib import Path
@@ -14,6 +15,14 @@ SCRIPTS = {
     "planner": ROOT / "run_planner.py",
     "evaluator": ROOT / "run_evaluator.py",
 }
+
+
+def _load_versions(step: str, version_key: str) -> str:
+    script = SCRIPTS[step]
+    spec = importlib.util.spec_from_file_location(f"_{step}", script)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.DOCKER_IMAGE_VERSIONS.get(version_key, "?")
 
 
 def _run_step(step: str, extra_args: list[str]) -> bool:
@@ -54,12 +63,20 @@ def main() -> None:
     if args.location:
         extra += ["--location", args.location]
 
+    steps_str = " → ".join(steps)
+    images = {step: _load_versions(step, args.version) for step in steps}
+    version_summary = "  |  ".join(f"{step}: {images[step]}" for step in steps)
+
+    print(f"\nPipeline starting: {steps_str}")
+    print(f"  {version_summary}")
+
     for step in steps:
         if not _run_step(step, extra):
             print(f"\nPipeline aborted: step '{step}' failed.", file=sys.stderr)
             sys.exit(1)
 
-    print(f"\nPipeline complete: {' → '.join(steps)}")
+    print(f"\nPipeline complete: {steps_str}")
+    print(f"  {version_summary}")
 
 
 if __name__ == "__main__":
