@@ -1,0 +1,32 @@
+Execute immediate events (8 events queued)
+Next event at T=0: Incoming train
+Next event at T=0: Outgoing train
+Next event at T=300: Incoming train
+Step done.
+|---------------------------|
+|   State at T0             |
+|---------------------------|
+No shunting units on the yard.
+
+Next event at T300: Incoming train
+6 remaining events.
+
+Arrivals:
+	T300: 	ShuntingUnit-2000 ((2401, SLT-4)) at 906a from Sein70
+	T600: 	ShuntingUnit-3000 ((2601, SLT-6)) at 906a from Sein70
+	T900: 	ShuntingUnit-4000 ((2802, SNG-4)(2801, SNG-3)) at 906a from Sein70
+	T0: 	ShuntingUnit-2002 ((2901, SLT-4)) at 52 from Wissel961 (instanding)
+
+Departures:
+	T3600: 	ShuntingUnit-2001 ((****, SLT-4)) at 906a to Sein70
+	T3900: 	ShuntingUnit-3001 ((****, SLT-6)) at 906a to Sein70
+	T4200: 	ShuntingUnit-4001 ((****, SNG-4)(****, SNG-3)) at 906a to Sein70
+	T0: 	ShuntingUnit-2032 ((****, SLT-4)) at 52 to Wissel961 (outstanding)
+
+**********************************************************ACTION**********************************************************
+Applying action Wait: [2901] at T0 [0-3420]
+**************************************************************************************************************************
+Error in generating action (Wait: [2901]): The action is invalid. Shunting unit with trains 2901 not found
+------------------------------------RESULT------------------------------------
+Scenario failed. Invalid action: The action is invalid. Error in generating action (Wait: [2901]): The action is invalid. Shunting unit with trains 2901 not found.
+------------------------------------------------------------------------------
