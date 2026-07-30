@@ -169,7 +169,7 @@ this with a single `typeDisplayName` string (e.g. `"SLT-4"`).
 | 4a | `in`/`out` wrapper dict removed | High — likely breaking for HIP | Confirmed broken |
 | 4b | Member type object → `typeDisplayName` | High — structural change | Confirmed broken |
 | 4c | New top-level fields added | Low — additive | Acceptable |
-| 5 | Pydantic plan output format (undocumented) | High — evaluator cannot execute plan actions | Needs investigation |
+| 5 | Pydantic plan output format (undocumented) | High — evaluator cannot execute plan actions | Fixed in tors:2.0.0-alpha.4 |
 
 ---
 
@@ -249,3 +249,48 @@ The "identical" failures all fail for reasons that make the version irrelevant:
 `48t` crashes the evaluator (pre-existing TORS bug); `30t`, `simple_service`, `6t`,
 `7t`, and `8t` have invalid plans regardless of which solver version produced them.
 A clean pass on any case would be the meaningful signal; none exists yet in either version.
+
+---
+
+## Run 3 — unified location.json
+
+The third run uses the pydantic pipeline with a single unified `location.json` shared
+between the generator and solver (previously they used separate files). Results are in
+`Location_*/{plans,evaluations}/` (no version suffix).
+
+### Versions used
+
+| Tool | Image |
+|---|---|
+| Generator | `ghcr.io/robust-rail-nl/generator:2.0.0-alpha.3` |
+| Solver (HIP) | `ghcr.io/robust-rail-nl/hip:2.0.0-alpha.2` |
+| Evaluator (TORS) | `ghcr.io/robust-rail-nl/tors:2.0.0-alpha.4` |
+
+Baseline for comparison: `plans-pydantic/` and `evaluations-pydantic/` (run 2).
+
+### Evaluations
+
+All 8 evaluation files are byte-for-byte identical to run 2. The unified location has
+no effect on evaluation outcomes; all pre-existing failures remain unchanged.
+
+### Plans
+
+| Case | vs pydantic (run 2) |
+|---|---|
+| `distribution1` | Identical |
+| `distribution2` | Identical |
+| `30t_random_98s` | Identical |
+| `6t_example3` | Identical |
+| `7t_example1` | Identical |
+| `8t_example2` | Identical |
+| `48t_larger-example` | **New** — no run 2 equivalent; solver now produces a plan |
+| `simple_service_4t_late` | **Differs** — same 11 actions, but 3 consecutive actions reordered (`wait`→`exit`→`move` vs `move`→`wait`→`exit`); resources move with their action |
+
+The `48t` plan appearing for the first time is a positive signal: the unified location
+enables the solver to handle the largest scenario, which it previously could not.
+The evaluator still crashes on `48t` (pre-existing TORS bug, unrelated to the location change).
+
+The `simple_service` reordering is a different but equivalent scheduling decision by the
+solver — the same actions with the same resources, in a different sequence. This is
+consistent with the unified location slightly changing the track/resource data the
+solver uses for scheduling.
