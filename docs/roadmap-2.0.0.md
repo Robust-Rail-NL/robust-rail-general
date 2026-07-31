@@ -27,7 +27,7 @@ These are judgment calls that block schema work. Resolve them in the design doc 
 |---|---|---|
 | 0a | ~~Is `TrainUnitType.reversalDuration` computed from `backNormTime`/`backAdditionTime`, or a separate concept?~~ | **Confirmed computed** — drop from wire format; HIP C# derives it locally |
 | 0b | Confirm `displayName` cleanup: `"SLT"` + `carriages: 4` instead of `"SLT4"` | Generator, HIP, TORS all read this field |
-| 0c | `TaskSpec.priority`: confirm it can be dropped everywhere | Generator output; HIP C# has a TODO comment |
+| 0c | ~~`TaskSpec.priority`: confirm it can be dropped everywhere~~ | **Resolved: rename to `mandatory: bool`** — TORS uses it as a binary 0/non-zero flag only; HIP drops it entirely |
 | 0d | `Resource` discriminator: keep "exactly one of three nullables" or introduce an explicit `kind` field? | Wire-format decision; conservative choice = keep current shape |
 | 0e | ~~Does `trainUnitTypes` stay on `Scenario`, referenced by name from `TrainUnit`?~~ | **Confirmed** — already the case in pydantic output |
 | 0f | ~~`Plan`: same schema file as Scenario/Location, or separate? And remove `Plan.trackParts`?~~ | **Resolved** — `plan.py` is already separate; TORS never reads `trackParts` (uses `--path_location`); drop field from schema and stop emitting it in HIP |
@@ -114,12 +114,14 @@ Per `unified-schema-design.md`, the unified model adopts the HIP field names.
   - `TrainUnit.Type` (embedded object) → `TypeDisplayName` (string reference); drop `Type`
   - `ShuntingUnit.Members` (embedded) → `MemberIDs` (string list); drop `Members`
   - Extend `PredefinedTaskType` enum: add `StandIn`, `StandOut`, `Walking`, `Break`, `NonService`
-  - Drop `TaskSpec.Priority` (once 0c confirmed)
+  - Drop `TaskSpec.Priority` (field unused; confirmed deprecated)
   - `displayName` cleanup (once 0b confirmed)
 - Bump to `hip:2.0.0`
 
 **`robust-rail-evaluator` (TORS, C++)**
 - Retire `EvaluatorScenario` (legacy non-HIP shape); update reader to unified field names
+- `Task::priority` (int) → `Task::mandatory` (bool); simplify `mandatory_service_task_rule`
+  and `optional_service_task_rule` to check `task.mandatory` / `!task.mandatory`
 - No `Plan.trackParts` work needed — TORS already ignores this field entirely; all
   infrastructure is loaded from `--path_location` via `LocationEngine`
 - Bump to `tors:2.0.0`
