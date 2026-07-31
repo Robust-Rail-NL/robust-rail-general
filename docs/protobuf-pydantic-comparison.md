@@ -286,8 +286,8 @@ no effect on evaluation outcomes; all pre-existing failures remain unchanged.
 | `48t_larger-example` | **New** — no run 2 equivalent; solver now produces a plan |
 | `simple_service_4t_late` | **Differs** — same 11 actions, but 3 consecutive actions reordered (`wait`→`exit`→`move` vs `move`→`wait`→`exit`); resources move with their action |
 
-The `48t` plan appearing for the first time is a positive signal: the unified location
-enables the solver to handle the largest scenario, which it previously could not.
+The `48t` plan has no run 2 equivalent because the `plans-pydantic/` directory predates
+the addition of that scenario — not because the unified location changed solver behaviour.
 The evaluator still crashes on `48t` (pre-existing TORS bug, unrelated to the location change).
 
 The `simple_service` reordering is a different but equivalent scheduling decision by the
