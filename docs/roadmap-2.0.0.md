@@ -36,7 +36,7 @@ These are judgment calls that block schema work. Resolve them in the design doc 
 
 ---
 
-## Phase 1a — `schemaVersion` field
+## Phase 1a — `schemaVersion` field ✓ COMPLETE
 
 ### Decisions
 
