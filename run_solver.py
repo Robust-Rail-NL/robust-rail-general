@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
-    "protobuf": "ghcr.io/robust-rail-nl/hip:1.4.1",
+    "protobuf": "ghcr.io/robust-rail-nl/hip:1.4.2",
     "pydantic": "ghcr.io/robust-rail-nl/hip:2.0.0-alpha.2",
     "local": "hip:latest",
 }
