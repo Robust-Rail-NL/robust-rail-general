@@ -68,7 +68,7 @@ def _write_config(config_path: Path, scenario_name: str, plan_name: str, params:
         "IntensifyOnImprovement": "false",
     })
     content = (
-        f'LocationPath: "{CONTAINER_DB}/location_unified.json"\n'
+        f'LocationPath: "{CONTAINER_DB}/location.json"\n'
         f'ScenarioPath: "{CONTAINER_DB}/scenarios/{scenario_name}"\n'
         f'PlanPath: "{CONTAINER_DB}/plans/{plan_name}"\n'
         f'Mode: "{params.get("Mode", "Standard")}"\n'

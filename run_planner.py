@@ -39,7 +39,7 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner
         *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         docker_image,
-        "--location", f"{CONTAINER_DB}/location_solver.json",
+        "--location", f"{CONTAINER_DB}/location.json",
         "--scenario", f"{CONTAINER_DB}/scenarios/{scenario.name}",
         "--planner", planner,
         "--output", f"{CONTAINER_DB}/plans/{plan_name}",
