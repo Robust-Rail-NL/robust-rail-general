@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the HIP solver docker image on all scenario_solver_*.json files."""
+"""Run the HIP solver docker image on all scenario_*.json files."""
 
 import argparse
 import os
@@ -68,7 +68,7 @@ def _write_config(config_path: Path, scenario_name: str, plan_name: str, params:
         "IntensifyOnImprovement": "false",
     })
     content = (
-        f'LocationPath: "{CONTAINER_DB}/location_solver.json"\n'
+        f'LocationPath: "{CONTAINER_DB}/location_unified.json"\n'
         f'ScenarioPath: "{CONTAINER_DB}/scenarios/{scenario_name}"\n'
         f'PlanPath: "{CONTAINER_DB}/plans/{plan_name}"\n'
         f'Mode: "{params.get("Mode", "Standard")}"\n'
@@ -83,7 +83,7 @@ def _write_config(config_path: Path, scenario_name: str, plan_name: str, params:
 
 
 def _plan_name(scenario: Path) -> str:
-    suffix = scenario.stem.removeprefix("scenario_solver_")
+    suffix = scenario.stem.removeprefix("scenario_")
     return f"plan_{suffix}.json"
 
 
@@ -141,7 +141,7 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Run the HIP solver on all scenario_solver_*.json files."
+        description="Run the HIP solver on all scenario_*.json files."
     )
     parser.add_argument("--dry-run", action="store_true",
                         help="Print docker commands without executing them.")
@@ -158,7 +158,7 @@ def main() -> None:
         if not loc.is_dir():
             print(f"WARNING: {loc} not found, skipping.", file=sys.stderr)
             continue
-        scenarios = sorted(loc.glob("scenarios/scenario_solver_*.json"))
+        scenarios = sorted(loc.glob("scenarios/scenario_*.json"))
         if not scenarios:
             continue
         print(f"\n{loc.name} ({len(scenarios)} scenario(s))")
