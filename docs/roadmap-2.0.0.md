@@ -26,7 +26,7 @@ These are judgment calls that block schema work. Resolve them in the design doc 
 | # | Question | Where it matters |
 |---|---|---|
 | 0a | ~~Is `TrainUnitType.reversalDuration` computed from `backNormTime`/`backAdditionTime`, or a separate concept?~~ | **Confirmed computed** — drop from wire format; HIP C# derives it locally |
-| 0b | Confirm `displayName` cleanup: `"SLT"` + `carriages: 4` instead of `"SLT4"` | Generator, HIP, TORS all read this field |
+| 0b | ~~Confirm `displayName` cleanup: `"SLT"` + `carriages: 4` instead of `"SLT4"`~~ | **Confirmed** — `displayName` is type family only; `carriages` is separate; consumers key on `(displayName, carriages)` pair |
 | 0c | ~~`TaskSpec.priority`: confirm it can be dropped everywhere~~ | **Resolved: rename to `optional: bool`** — TORS uses it as a binary 0/non-zero flag only; HIP drops it entirely |
 | 0d | ~~`Resource` discriminator: keep "exactly one of three nullables" or introduce an explicit `kind` field?~~ | **Resolved: `{ "kind": "trackPart"\|"facility"\|"staff", "id": <int> }`** — part of schemaVersion 1; `name` field dropped; evaluator hard-errors on unrecognised `kind` |
 | 0e | ~~Does `trainUnitTypes` stay on `Scenario`, referenced by name from `TrainUnit`?~~ | **Confirmed** — already the case in pydantic output |

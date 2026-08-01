@@ -18,7 +18,17 @@
         "departure": ["15"]
     },
     "train_unit_distribution": {
-        "train_unit_types": ["VIRM4-4", "VIRM6-6", "VIRM5-5", "VIRM7-7", "VIRM8-8", "VIRM9-9", "DDZ4-4", "DDZ6-6", "DDZ5-5", "DDZ7-7", "DDZ8-8", "DDZ9-9", "SLT4-4", "SLT5-5", "SLT7-7", "SLT8-8", "SLT9-9", "SLT10-10", "SLT11-11", "SLT6-6", "ICM3-3", "ICM4-4", "ICM5-5", "ICR7-7", "ICR9-9", "FLIRT FFF3-3", "FLIRT FFF4-4", "SNG3-3", "SNG4-4", "SGMM2-2", "SGMM3-3", "ICNG5-5", "ICNG8-8"],
+        "train_unit_types": [
+            "VIRM-4", "VIRM-6",
+            "DDZ-4", "DDZ-6",
+            "SLT-4", "SLT-6",
+            "ICM-3", "ICM-4",
+            "ICR-7", "ICR-9",
+            "FLIRT FFF-3", "FLIRT FFF-4",
+            "SNG-3", "SNG-4",
+            "SGMM-2", "SGMM-3",
+            "ICNG-5", "ICNG-8"
+        ],
         "units_per_composition": [1],
         "super_type_ratio": 1.0,
         "inStanding_ratio": 0.0,
@@ -26,7 +36,7 @@
     },
     "custom_train_unit_types": [
         {
-            "name": "VIRM4-4",
+            "name": "VIRM-4",
             "carriages": 4,
             "length": 10000,
             "combineDuration": 180,
@@ -42,7 +52,7 @@
             "backAdditionTime": 25
         },
         {
-            "name": "VIRM6-6",
+            "name": "VIRM-6",
             "carriages": 6,
             "length": 10000,
             "combineDuration": 180,
@@ -58,71 +68,7 @@
             "backAdditionTime": 24
         },
         {
-            "name": "VIRM5-5",
-            "carriages": 4,
-            "length": 10000,
-            "combineDuration": 180,
-            "splitDuration": 120,
-            "reversalBaseTime": 0,
-            "reversalCarriageTime": 0,
-            "needsElectricity": true,
-            "typePrefix": "VIRM5",
-            "noDeparturePreparationLimit": 7200,
-            "needsLoco": false,
-            "isLoco": false,
-            "backNormTime": 280,
-            "backAdditionTime": 25
-        },
-        {
-            "name": "VIRM7-7",
-            "carriages": 4,
-            "length": 10000,
-            "combineDuration": 180,
-            "splitDuration": 120,
-            "reversalBaseTime": 0,
-            "reversalCarriageTime": 0,
-            "needsElectricity": true,
-            "typePrefix": "VIRM7",
-            "noDeparturePreparationLimit": 7200,
-            "needsLoco": false,
-            "isLoco": false,
-            "backNormTime": 280,
-            "backAdditionTime": 25
-        },
-        {
-            "name": "VIRM8-8",
-            "carriages": 4,
-            "length": 10000,
-            "combineDuration": 180,
-            "splitDuration": 120,
-            "reversalBaseTime": 0,
-            "reversalCarriageTime": 0,
-            "needsElectricity": true,
-            "typePrefix": "VIRM8",
-            "noDeparturePreparationLimit": 7200,
-            "needsLoco": false,
-            "isLoco": false,
-            "backNormTime": 280,
-            "backAdditionTime": 25
-        },
-        {
-            "name": "VIRM9-9",
-            "carriages": 4,
-            "length": 10000,
-            "combineDuration": 180,
-            "splitDuration": 120,
-            "reversalBaseTime": 0,
-            "reversalCarriageTime": 0,
-            "needsElectricity": true,
-            "typePrefix": "VIRM9",
-            "noDeparturePreparationLimit": 7200,
-            "needsLoco": false,
-            "isLoco": false,
-            "backNormTime": 280,
-            "backAdditionTime": 25
-        },
-        {
-            "name": "DDZ4-4",
+            "name": "DDZ-4",
             "carriages": 4,
             "length": 10000,
             "combineDuration": 180,
@@ -138,7 +84,7 @@
             "backAdditionTime": 30
         },
         {
-            "name": "DDZ6-6",
+            "name": "DDZ-6",
             "carriages": 6,
             "length": 10000,
             "combineDuration": 180,
@@ -154,71 +100,7 @@
             "backAdditionTime": 23
         },
         {
-            "name": "DDZ5-5",
-            "carriages": 4,
-            "length": 10000,
-            "combineDuration": 180,
-            "splitDuration": 120,
-            "reversalBaseTime": 0,
-            "reversalCarriageTime": 0,
-            "needsElectricity": true,
-            "typePrefix": "DDZ5",
-            "noDeparturePreparationLimit": 7200,
-            "needsLoco": false,
-            "isLoco": false,
-            "backNormTime": 261,
-            "backAdditionTime": 30
-        },
-        {
-            "name": "DDZ7-7",
-            "carriages": 4,
-            "length": 10000,
-            "combineDuration": 180,
-            "splitDuration": 120,
-            "reversalBaseTime": 0,
-            "reversalCarriageTime": 0,
-            "needsElectricity": true,
-            "typePrefix": "DDZ7",
-            "noDeparturePreparationLimit": 7200,
-            "needsLoco": false,
-            "isLoco": false,
-            "backNormTime": 261,
-            "backAdditionTime": 30
-        },
-        {
-            "name": "DDZ8-8",
-            "carriages": 4,
-            "length": 10000,
-            "combineDuration": 180,
-            "splitDuration": 120,
-            "reversalBaseTime": 0,
-            "reversalCarriageTime": 0,
-            "needsElectricity": true,
-            "typePrefix": "DDZ8",
-            "noDeparturePreparationLimit": 7200,
-            "needsLoco": false,
-            "isLoco": false,
-            "backNormTime": 261,
-            "backAdditionTime": 30
-        },
-        {
-            "name": "DDZ9-9",
-            "carriages": 4,
-            "length": 10000,
-            "combineDuration": 180,
-            "splitDuration": 120,
-            "reversalBaseTime": 0,
-            "reversalCarriageTime": 0,
-            "needsElectricity": true,
-            "typePrefix": "DDZ9",
-            "noDeparturePreparationLimit": 7200,
-            "needsLoco": false,
-            "isLoco": false,
-            "backNormTime": 261,
-            "backAdditionTime": 30
-        },
-        {
-            "name": "SLT4-4",
+            "name": "SLT-4",
             "carriages": 4,
             "length": 10000,
             "combineDuration": 180,
@@ -234,103 +116,7 @@
             "backAdditionTime": 16
         },
         {
-            "name": "SLT5-5",
-            "carriages": 4,
-            "length": 10000,
-            "combineDuration": 180,
-            "splitDuration": 120,
-            "reversalBaseTime": 0,
-            "reversalCarriageTime": 0,
-            "needsElectricity": true,
-            "typePrefix": "SLT5",
-            "noDeparturePreparationLimit": 7200,
-            "needsLoco": false,
-            "isLoco": false,
-            "backNormTime": 120,
-            "backAdditionTime": 16
-        },
-        {
-            "name": "SLT7-7",
-            "carriages": 4,
-            "length": 10000,
-            "combineDuration": 180,
-            "splitDuration": 120,
-            "reversalBaseTime": 0,
-            "reversalCarriageTime": 0,
-            "needsElectricity": true,
-            "typePrefix": "SLT7",
-            "noDeparturePreparationLimit": 7200,
-            "needsLoco": false,
-            "isLoco": false,
-            "backNormTime": 120,
-            "backAdditionTime": 16
-        },
-        {
-            "name": "SLT8-8",
-            "carriages": 4,
-            "length": 10000,
-            "combineDuration": 180,
-            "splitDuration": 120,
-            "reversalBaseTime": 0,
-            "reversalCarriageTime": 0,
-            "needsElectricity": true,
-            "typePrefix": "SLT8",
-            "noDeparturePreparationLimit": 7200,
-            "needsLoco": false,
-            "isLoco": false,
-            "backNormTime": 120,
-            "backAdditionTime": 16
-        },
-        {
-            "name": "SLT9-9",
-            "carriages": 4,
-            "length": 10000,
-            "combineDuration": 180,
-            "splitDuration": 120,
-            "reversalBaseTime": 0,
-            "reversalCarriageTime": 0,
-            "needsElectricity": true,
-            "typePrefix": "SLT9",
-            "noDeparturePreparationLimit": 7200,
-            "needsLoco": false,
-            "isLoco": false,
-            "backNormTime": 120,
-            "backAdditionTime": 16
-        },
-        {
-            "name": "SLT10-10",
-            "carriages": 4,
-            "length": 10000,
-            "combineDuration": 180,
-            "splitDuration": 120,
-            "reversalBaseTime": 0,
-            "reversalCarriageTime": 0,
-            "needsElectricity": true,
-            "typePrefix": "SLT10",
-            "noDeparturePreparationLimit": 7200,
-            "needsLoco": false,
-            "isLoco": false,
-            "backNormTime": 120,
-            "backAdditionTime": 16
-        },
-        {
-            "name": "SLT11-11",
-            "carriages": 4,
-            "length": 10000,
-            "combineDuration": 180,
-            "splitDuration": 120,
-            "reversalBaseTime": 0,
-            "reversalCarriageTime": 0,
-            "needsElectricity": true,
-            "typePrefix": "SLT11",
-            "noDeparturePreparationLimit": 7200,
-            "needsLoco": false,
-            "isLoco": false,
-            "backNormTime": 120,
-            "backAdditionTime": 16
-        },
-        {
-            "name": "SLT6-6",
+            "name": "SLT-6",
             "carriages": 6,
             "length": 10000,
             "combineDuration": 180,
@@ -346,7 +132,7 @@
             "backAdditionTime": 15
         },
         {
-            "name": "ICM3-3",
+            "name": "ICM-3",
             "carriages": 3,
             "length": 10000,
             "combineDuration": 180,
@@ -360,7 +146,7 @@
             "isLoco": false
         },
         {
-            "name": "ICM4-4",
+            "name": "ICM-4",
             "carriages": 4,
             "length": 10000,
             "combineDuration": 180,
@@ -374,21 +160,7 @@
             "isLoco": false
         },
         {
-            "name": "ICM5-5",
-            "carriages": 4,
-            "length": 10000,
-            "combineDuration": 180,
-            "splitDuration": 120,
-            "reversalBaseTime": 0,
-            "reversalCarriageTime": 0,
-            "needsElectricity": true,
-            "typePrefix": "ICM5",
-            "noDeparturePreparationLimit": 7200,
-            "needsLoco": false,
-            "isLoco": false
-        },
-        {
-            "name": "ICR7-7",
+            "name": "ICR-7",
             "fullName": "SW7-25KV-2+7",
             "carriages": 7,
             "length": 10000,
@@ -404,7 +176,7 @@
             "isLoco": true
         },
         {
-            "name": "ICR9-9",
+            "name": "ICR-9",
             "fullName": "SW9-25KV-2+9",
             "carriages": 9,
             "length": 10000,
@@ -420,7 +192,7 @@
             "isLoco": true
         },
         {
-            "name": "FLIRT FFF3-3",
+            "name": "FLIRT FFF-3",
             "carriages": 3,
             "length": 10000,
             "combineDuration": 180,
@@ -434,7 +206,7 @@
             "isLoco": false
         },
         {
-            "name": "FLIRT FFF4-4",
+            "name": "FLIRT FFF-4",
             "carriages": 4,
             "length": 10000,
             "combineDuration": 180,
@@ -448,7 +220,7 @@
             "isLoco": false
         },
         {
-            "name": "SNG3-3",
+            "name": "SNG-3",
             "carriages": 3,
             "length": 10000,
             "combineDuration": 180,
@@ -462,7 +234,7 @@
             "isLoco": false
         },
         {
-            "name": "SNG4-4",
+            "name": "SNG-4",
             "carriages": 4,
             "length": 10000,
             "combineDuration": 180,
@@ -476,7 +248,7 @@
             "isLoco": false
         },
         {
-            "name": "SGMM2-2",
+            "name": "SGMM-2",
             "carriages": 2,
             "length": 10000,
             "combineDuration": 180,
@@ -490,7 +262,7 @@
             "isLoco": false
         },
         {
-            "name": "SGMM3-3",
+            "name": "SGMM-3",
             "carriages": 3,
             "length": 10000,
             "combineDuration": 180,
@@ -504,7 +276,7 @@
             "isLoco": false
         },
         {
-            "name": "ICNG5-5",
+            "name": "ICNG-5",
             "carriages": 5,
             "length": 10000,
             "combineDuration": 180,
@@ -518,7 +290,7 @@
             "isLoco": false
         },
         {
-            "name": "ICNG8-8",
+            "name": "ICNG-8",
             "carriages": 8,
             "length": 10000,
             "combineDuration": 180,
