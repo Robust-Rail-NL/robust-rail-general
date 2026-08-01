@@ -28,7 +28,7 @@ These are judgment calls that block schema work. Resolve them in the design doc 
 | 0a | ~~Is `TrainUnitType.reversalDuration` computed from `backNormTime`/`backAdditionTime`, or a separate concept?~~ | **Confirmed computed** — drop from wire format; HIP C# derives it locally |
 | 0b | Confirm `displayName` cleanup: `"SLT"` + `carriages: 4` instead of `"SLT4"` | Generator, HIP, TORS all read this field |
 | 0c | ~~`TaskSpec.priority`: confirm it can be dropped everywhere~~ | **Resolved: rename to `optional: bool`** — TORS uses it as a binary 0/non-zero flag only; HIP drops it entirely |
-| 0d | `Resource` discriminator: keep "exactly one of three nullables" or introduce an explicit `kind` field? | Wire-format decision; conservative choice = keep current shape |
+| 0d | ~~`Resource` discriminator: keep "exactly one of three nullables" or introduce an explicit `kind` field?~~ | **Resolved: `{ "kind": "trackPart"\|"facility"\|"staff", "id": <int> }`** — part of schemaVersion 1; `name` field dropped; evaluator hard-errors on unrecognised `kind` |
 | 0e | ~~Does `trainUnitTypes` stay on `Scenario`, referenced by name from `TrainUnit`?~~ | **Confirmed** — already the case in pydantic output |
 | 0f | ~~`Plan`: same schema file as Scenario/Location, or separate? And remove `Plan.trackParts`?~~ | **Resolved** — `plan.py` is already separate; TORS never reads `trackParts` (uses `--path_location`); drop field from schema and stop emitting it in HIP |
 | 0g | ~~Schema versioning: add `schemaVersion` to `Location`, `Scenario`, and `Plan` top level?~~ | **Decided** — see Phase 1a below |
