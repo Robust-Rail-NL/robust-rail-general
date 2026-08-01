@@ -150,7 +150,7 @@ Still needed — delta from evaluator Phase 1 findings and subsequent design dec
    (lines 707, 745, 827). After the rename, build it keyed by
    `(tut.TypePrefix, tut.Carriages)` and look up by `(unit.TypePrefix, unit.Carriages)`.
 
-- Bump to `hip:2.0.0`
+- Bump to `hip:2.0.0-beta.1`
 
 **`robust-rail-evaluator` (TORS, C++)**
 - Retire `EvaluatorScenario` (legacy non-HIP shape); update reader to unified field names
@@ -158,7 +158,11 @@ Still needed — delta from evaluator Phase 1 findings and subsequent design dec
   and `optional_service_task_rule` to check `!task.optional` / `task.optional`
 - No `Plan.trackParts` work needed — TORS already ignores this field entirely; all
   infrastructure is loaded from `--path_location` via `LocationEngine`
-- Bump to `tors:2.0.0`
+- Bump to `tors:2.0.0-beta.1`
+
+After all three repos complete Phase 1, tag coordinated beta releases:
+`generator:2.0.0-beta.1`, `hip:2.0.0-beta.1`, `tors:2.0.0-beta.1`.
+The stable `2.0.0` release follows once integration tests pass (Phase 3).
 
 ---
 
@@ -205,7 +209,7 @@ Update `docs/protobuf-pydantic-comparison.md` with final run results.
 
 ---
 
-## Phase 4 — Release
+## Phase 4 — Stable release
 
 - Tag `generator:2.0.0`, `hip:2.0.0`, `tors:2.0.0` once integration tests pass
 - Archive the `*-protobuf` and `*-pydantic` versioned directories in this repo
