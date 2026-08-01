@@ -102,20 +102,54 @@ Per `unified-schema-design.md`, the unified model adopts the HIP field names.
 
 ### Changes by repo
 
-**`robust-rail-generator`**
-- Update Pydantic models to the unified (HIP) field names
-- Stop emitting `scenario_solver_*.json`; emit one `scenario_*.json` per case
-- Bump to `generator:2.0.0`
+**`robust-rail-generator`** — Phase 1 complete for scenario unification; Phase 2 cleanup pending
 
-**`robust-rail-solver` (HIP, C#)**
-- Switch to reading `scenario_*.json` (currently reads `scenario_solver_*.json`)
-- Field names already match HIP naming — mainly a path change
-- Additional breaking changes driven by Phase 0 decisions:
-  - `TrainUnit.Type` (embedded object) → `TypeDisplayName` (string reference); drop `Type`
-  - `ShuntingUnit.Members` (embedded) → `MemberIDs` (string list); drop `Members`
-  - Extend `PredefinedTaskType` enum: add `StandIn`, `StandOut`, `Walking`, `Break`, `NonService`
-  - Drop `TaskSpec.Priority` (field unused; confirmed deprecated)
-  - `displayName` cleanup (once 0b confirmed)
+Completed (branch `pydantic`):
+- ✓ Emits one unified `scenario_*.json` (HIP field names); `scenario_solver_*.json` retired
+- ✓ `scenario-planning-inputs/run_solver.py` updated to read `scenario_*.json`
+- ✓ `location_unified.json` renamed to `location.json`
+
+Remaining work (Phase 2 — see below).
+
+**`robust-rail-solver` (HIP, C#)** — Phase 1 partially complete; delta below
+
+Completed (commits `96ad4ce`–`14ccfe4` on `noproto`):
+- ✓ Retired legacy `DeepLook` mode, `Converter.cs`, and all protobuf-shaped classes
+- ✓ `ShuntingUnit.Members` (embedded) → `MemberIDs` (string list); `Members` dropped
+- ✓ `PredefinedTaskType` extended: `Walking`, `Break`, `NonService`, `StandIn`, `StandOut` added
+- ✓ `TaskSpec.Priority` dropped
+- ✓ `Resource` switched to `{ kind, id }` discriminator
+- ✓ `schemaVersion` added to `Location`, `Scenario`, `Plan`
+- ✓ JSON numbers unquoted (dropped `WriteAsString` protobuf holdover)
+- ✓ `IncomingTrain.StandingIndex` already present
+
+Still needed — delta from evaluator Phase 1 findings and subsequent design decisions:
+
+1. **Fix enum serialization to PascalCase.** `ProblemInstance.cs` line 97 and
+   `Extensions.cs` line 18 both configure
+   `new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)` — this emits
+   `"move"`, `"standIn"` etc. Change to `new JsonStringEnumConverter()` (no
+   naming policy) so C# PascalCase enum names are emitted as-is: `"Move"`,
+   `"StandIn"`. This is now a schema requirement, not a preference.
+
+2. **`TrainUnitType`: rename `DisplayName` → `TypePrefix` on the wire.**
+   `TrainUnitType` already has both `DisplayName` and `TypePrefix` properties;
+   `TypePrefix` is the correct identity field (family name only: `"SLT"`,
+   `"VIRM"`). Make `TypePrefix` required; drop `DisplayName` from the record.
+   Update `Equals`/`GetHashCode` (currently keying on `DisplayName`/`Carriages`)
+   to key on `TypePrefix`/`Carriages`.
+
+3. **`TrainUnit`: replace `TypeDisplayName` with `(TypePrefix, Carriages)` pair.**
+   `TrainUnit` and `IncomingTrainUnit` currently reference their type via
+   `TypeDisplayName: string`. Replace with `TypePrefix: string` + `Carriages: uint`
+   — the same fields that identify a `TrainUnitType`, so the lookup is unambiguous
+   when two variants share a family name (e.g. SLT-4 and SLT-6).
+
+4. **Fix `traintypemap` in `ProblemInstance.cs`.** The map is currently built
+   keyed by `tut.DisplayName` (line 509) and looked up by `unit.TypeDisplayName`
+   (lines 707, 745, 827). After the rename, build it keyed by
+   `(tut.TypePrefix, tut.Carriages)` and look up by `(unit.TypePrefix, unit.Carriages)`.
+
 - Bump to `hip:2.0.0`
 
 **`robust-rail-evaluator` (TORS, C++)**
@@ -130,12 +164,20 @@ Per `unified-schema-design.md`, the unified model adopts the HIP field names.
 
 ## Phase 2 — Generator schema cleanup
 
-These are generator-internal changes with no consumer impact, and can proceed in parallel
-with Phase 1 once Phase 0 decisions are in:
+These are generator-internal changes. All Phase 0 decisions are now resolved,
+so this phase is unblocked.
 
 - Drop protobuf dependency (`py_protobuf/`, `google-protobuf` package)
-- Finalise `displayName` (if 0b confirmed: `"SLT"` + `carriages: 4`)
-- Drop `TaskSpec.priority` from Pydantic models (if 0c confirmed)
+- Implement `typePrefix`/`carriages` identity in Pydantic models:
+  - Rename `display_name` → `type_prefix` on `TrainUnitType`
+  - Add `type_prefix: str` + `carriages: int` to `TrainUnit` as the type reference
+  - `typeDisplayName()` becomes a derived helper: `type_prefix + "-" + str(carriages)`
+  - Fix `add_custom_train_unit_types`: read `unit_type["typePrefix"]` (camelCase),
+    not `unit_type.get("type_prefix", None)` (was always reading `None`)
+  - Fix `create_train_unit_type`: actually store `type_prefix` on the model object
+    (currently accepted as a parameter but silently dropped)
+- Drop `TaskSpec.priority` from Pydantic models; use `optional: bool = False`
+- Enforce PascalCase enum values in Pydantic (`Move = "Move"`, not `Move = "move"`)
 - Export JSON Schema from the Pydantic models → published as a build artefact
 
 ---
@@ -157,7 +199,7 @@ Run the full pipeline in this repo against all scenarios and compare to the prot
 **Acceptance criteria:**
 - All 8 evaluation files identical (or equivalent) to the protobuf baseline
 - No `scenario_solver_*.json` files produced or consumed
-- `location_unified.json` used throughout; `location.json` / `location_solver.json` retired
+- `location.json` used throughout; `location_unified.json` and `location_solver.json` retired ✓ (already done on `pydantic` branch)
 
 Update `docs/protobuf-pydantic-comparison.md` with final run results.
 
