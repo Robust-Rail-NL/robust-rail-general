@@ -111,9 +111,9 @@ Completed (branch `pydantic`):
 
 Remaining work (Phase 2 — see below).
 
-**`robust-rail-solver` (HIP, C#)** — Phase 1 partially complete; delta below
+**`robust-rail-solver` (HIP, C#)** — Phase 1 ✓ COMPLETE
 
-Completed (commits `96ad4ce`–`14ccfe4` on `noproto`):
+Completed (commits `96ad4ce`–`6ca108b` on `noproto`):
 - ✓ Retired legacy `DeepLook` mode, `Converter.cs`, and all protobuf-shaped classes
 - ✓ `ShuntingUnit.Members` (embedded) → `MemberIDs` (string list); `Members` dropped
 - ✓ `PredefinedTaskType` extended: `Walking`, `Break`, `NonService`, `StandIn`, `StandOut` added
@@ -122,46 +122,43 @@ Completed (commits `96ad4ce`–`14ccfe4` on `noproto`):
 - ✓ `schemaVersion` added to `Location`, `Scenario`, `Plan`
 - ✓ JSON numbers unquoted (dropped `WriteAsString` protobuf holdover)
 - ✓ `IncomingTrain.StandingIndex` already present
+- ✓ Enum serialization fixed to PascalCase (`c05bbf4`) — `JsonStringEnumConverter()`
+  with no naming policy, replacing `JsonNamingPolicy.CamelCase` in both
+  `ProblemInstance.cs` and `Extensions.cs`
+- ✓ `TrainUnitType`/`TrainUnit`/`IncomingTrainUnit`: `TypePrefix`+`Carriages` identity
+  (`0c03b79`) — `DisplayName`/`TypeDisplayName` dropped; `Equals`/`GetHashCode` and
+  `traintypemap` all key on `(TypePrefix, Carriages)`
+- ✓ Fixed action-sort collision (Move sorting after Exit) and a `NullReferenceException`
+  logging optional InStanding/OutStanding (`dc607cd`, `0015e73`)
+- ✓ Bumped to `hip:2.0.0-beta.1` (`1d695b7`) — **tag already cut**
+- ✓ `TestData/setting_A` fixtures refreshed with real unified-format data (`6ca108b`)
 
-Still needed — delta from evaluator Phase 1 findings and subsequent design decisions:
+**`robust-rail-evaluator` (TORS, C++)** — Phase 1 ✓ COMPLETE (tag pending)
 
-1. **Fix enum serialization to PascalCase.** `ProblemInstance.cs` line 97 and
-   `Extensions.cs` line 18 both configure
-   `new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)` — this emits
-   `"move"`, `"standIn"` etc. Change to `new JsonStringEnumConverter()` (no
-   naming policy) so C# PascalCase enum names are emitted as-is: `"Move"`,
-   `"StandIn"`. This is now a schema requirement, not a preference.
-
-2. **`TrainUnitType`: rename `DisplayName` → `TypePrefix` on the wire.**
-   `TrainUnitType` already has both `DisplayName` and `TypePrefix` properties;
-   `TypePrefix` is the correct identity field (family name only: `"SLT"`,
-   `"VIRM"`). Make `TypePrefix` required; drop `DisplayName` from the record.
-   Update `Equals`/`GetHashCode` (currently keying on `DisplayName`/`Carriages`)
-   to key on `TypePrefix`/`Carriages`.
-
-3. **`TrainUnit`: replace `TypeDisplayName` with `(TypePrefix, Carriages)` pair.**
-   `TrainUnit` and `IncomingTrainUnit` currently reference their type via
-   `TypeDisplayName: string`. Replace with `TypePrefix: string` + `Carriages: uint`
-   — the same fields that identify a `TrainUnitType`, so the lookup is unambiguous
-   when two variants share a family name (e.g. SLT-4 and SLT-6).
-
-4. **Fix `traintypemap` in `ProblemInstance.cs`.** The map is currently built
-   keyed by `tut.DisplayName` (line 509) and looked up by `unit.TypeDisplayName`
-   (lines 707, 745, 827). After the rename, build it keyed by
-   `(tut.TypePrefix, tut.Carriages)` and look up by `(unit.TypePrefix, unit.Carriages)`.
-
-- Bump to `hip:2.0.0-beta.1`
-
-**`robust-rail-evaluator` (TORS, C++)**
-- Retire `EvaluatorScenario` (legacy non-HIP shape); update reader to unified field names
-- `Task::priority` (int) → `Task::optional` (bool); simplify `mandatory_service_task_rule`
-  and `optional_service_task_rule` to check `!task.optional` / `task.optional`
+Completed (commits `989806c`–`dbebb71` on `noproto`):
+- ✓ `HIP_Scenario`/`HIP_Location` protos extended to the unified schema shape
+- ✓ Scenario read path migrated to the unified (HIP) schema; `Task::priority` (int)
+  → `Task::optional` (bool); `mandatory_service_task_rule`/`optional_service_task_rule`
+  simplified accordingly (`033076e`)
+- ✓ `PredefinedTaskType`: dropped `allow_alias`/lowercase names, PascalCase only (`4494db2`)
+- ✓ Fixed `Scenario.in`/`out`/`inStanding`/`outStanding` wire shape mismatch (`5ce2ba0`,
+  documented in `910b82d`)
+- ✓ `TrainUnitType`/`TrainUnit` identity: HIP read path keyed on `(typePrefix, carriages)`
+  (`fb6d3b3`); fixed carriage-blind type matching in `CheckScenarioCorrectness`/`ShuntingUnit`
+  (`220215d`)
+- ✓ `schemaVersion` parsed from `Location`, `Scenario`, `Plan` (warn-and-continue)
 - No `Plan.trackParts` work needed — TORS already ignores this field entirely; all
   infrastructure is loaded from `--path_location` via `LocationEngine`
-- Bump to `tors:2.0.0-beta.1`
+- Env-var-gated EngineTest/CompatibilityTest cases documented as deferred (`dbebb71`)
 
-After all three repos complete Phase 1, tag coordinated beta releases:
-`generator:2.0.0-beta.1`, `hip:2.0.0-beta.1`, `tors:2.0.0-beta.1`.
+Solver and evaluator have both completed Phase 1; generator completed Phase 1 in an
+earlier session (scenario unification, `location.json` rename). All three repos have
+now finished Phase 1 scope. Remaining before the coordinated beta tag:
+- `tors:2.0.0-beta.1` and `hip:2.0.0-beta.1` already tagged
+- `generator` is still `2.0.0-alpha.3` — **decided:** tag `generator:2.0.0-beta.1` once
+  Phase 2 cleanup (below) lands, not on Phase 1 scope alone, since Phase 2 is generator-
+  internal and already unblocked
+
 The stable `2.0.0` release follows once integration tests pass (Phase 3).
 
 ---
