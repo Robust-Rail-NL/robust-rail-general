@@ -2,10 +2,11 @@
 
 ## Context
 
-The pydantic pipeline (generator:2.0.0-alpha.3, hip:2.0.0-alpha.2, tors:2.0.0-alpha.4) now
-runs end-to-end on a single `location_unified.json`. Evaluations are equivalent to the protobuf
-baseline (see `docs/protobuf-pydantic-comparison.md`). The remaining work before stable 2.0.0
-releases falls into four areas:
+The pydantic pipeline (generator, hip, tors — all now at `2.0.0-beta.1`, tagged and pushed to
+ghcr.io) runs end-to-end on a single `location.json`. Evaluations were equivalent to the protobuf
+baseline as of the last alpha comparison (see `docs/protobuf-pydantic-comparison.md`); that
+comparison still needs a re-run against the beta images (Phase 3). The remaining work before
+stable 2.0.0 releases falls into four areas:
 
 1. **Scenario unification** — the generator currently emits two files per scenario:
    `scenario_*.json` (non-HIP field names, for the evaluator) and `scenario_solver_*.json`
@@ -102,14 +103,16 @@ Per `unified-schema-design.md`, the unified model adopts the HIP field names.
 
 ### Changes by repo
 
-**`robust-rail-generator`** — Phase 1 complete for scenario unification; Phase 2 cleanup pending
+**`robust-rail-generator`** — Phase 1 ✓ COMPLETE, Phase 2 ✓ COMPLETE
 
 Completed (branch `pydantic`):
 - ✓ Emits one unified `scenario_*.json` (HIP field names); `scenario_solver_*.json` retired
 - ✓ `scenario-planning-inputs/run_solver.py` updated to read `scenario_*.json`
 - ✓ `location_unified.json` renamed to `location.json`
-
-Remaining work (Phase 2 — see below).
+- ✓ Phase 2 cleanup (commits `d65d1ec`–`b54080c`): protobuf dependency dropped
+  (`bf99964`), `typePrefix`/`carriages` identity + `TaskSpec.optional` (`0fda86f`),
+  JSON Schema exported (`fd553e8`), pytest suite added (`c9e2a84`)
+- ✓ Bumped to `generator:2.0.0-beta.1` (`b54080c`)
 
 **`robust-rail-solver` (HIP, C#)** — Phase 1 ✓ COMPLETE
 
@@ -151,35 +154,71 @@ Completed (commits `989806c`–`dbebb71` on `noproto`):
   infrastructure is loaded from `--path_location` via `LocationEngine`
 - Env-var-gated EngineTest/CompatibilityTest cases documented as deferred (`dbebb71`)
 
-Solver and evaluator have both completed Phase 1; generator completed Phase 1 in an
-earlier session (scenario unification, `location.json` rename). All three repos have
-now finished Phase 1 scope. Remaining before the coordinated beta tag:
-- `tors:2.0.0-beta.1` and `hip:2.0.0-beta.1` already tagged
-- `generator` is still `2.0.0-alpha.3` — **decided:** tag `generator:2.0.0-beta.1` once
-  Phase 2 cleanup (below) lands, not on Phase 1 scope alone, since Phase 2 is generator-
-  internal and already unblocked
+All three repos have finished Phase 1 and Phase 2, and all three are tagged and
+released as Docker images to ghcr.io:
+- ✓ `generator:2.0.0-beta.1`
+- ✓ `hip:2.0.0-beta.1`
+- ✓ `tors:2.0.0-beta.1`
 
-The stable `2.0.0` release follows once integration tests pass (Phase 3).
+Phase 3 (integration testing, below) is now unblocked.
 
 ---
 
-## Phase 2 — Generator schema cleanup
+## Phase 2 — Generator schema cleanup ✓ COMPLETE
 
-These are generator-internal changes. All Phase 0 decisions are now resolved,
-so this phase is unblocked.
+These were generator-internal changes, unblocked once Phase 0 decisions were resolved.
+See the generator Phase 1/2 summary above (commits `d65d1ec`–`b54080c`) for what landed:
 
-- Drop protobuf dependency (`py_protobuf/`, `google-protobuf` package)
-- Implement `typePrefix`/`carriages` identity in Pydantic models:
-  - Rename `display_name` → `type_prefix` on `TrainUnitType`
-  - Add `type_prefix: str` + `carriages: int` to `TrainUnit` as the type reference
-  - `typeDisplayName()` becomes a derived helper: `type_prefix + "-" + str(carriages)`
-  - Fix `add_custom_train_unit_types`: read `unit_type["typePrefix"]` (camelCase),
-    not `unit_type.get("type_prefix", None)` (was always reading `None`)
-  - Fix `create_train_unit_type`: actually store `type_prefix` on the model object
-    (currently accepted as a parameter but silently dropped)
-- Drop `TaskSpec.priority` from Pydantic models; use `optional: bool = False`
-- Enforce PascalCase enum values in Pydantic (`Move = "Move"`, not `Move = "move"`)
-- Export JSON Schema from the Pydantic models → published as a build artefact
+- ✓ Drop protobuf dependency (`py_protobuf/`, `google-protobuf` package)
+- ✓ Implement `typePrefix`/`carriages` identity in Pydantic models (rename
+  `display_name` → `type_prefix` on `TrainUnitType`; add `type_prefix`/`carriages`
+  to `TrainUnit`; `typeDisplayName()` derived; both known key bugs in
+  `add_custom_train_unit_types`/`create_train_unit_type` fixed)
+- ✓ Drop `TaskSpec.priority` from Pydantic models; use `optional: bool = False`
+- ✓ Enforce PascalCase enum values in Pydantic
+- ✓ Export JSON Schema from the Pydantic models → published as a build artefact
+- ✓ **Follow-up (2026-08-02, `16dc053`):** `Resource` had not actually been
+  migrated to the `kind`/`id` discriminator decided in Phase 0 (0d) — it still
+  had the old three-nullable-`int`-fields shape (`trackPartId`/`facilityId`/
+  `staffId`), missed because it wasn't called out in this checklist even
+  though the design doc's per-consumer list always included it. Found while
+  investigating the Plan.cpp `Resource` wire-shape bug on the evaluator side
+  (see Phase 3 below); fixed to match what solver/evaluator already emit/expect,
+  and the exported JSON Schema regenerated.
+- ✓ **Follow-up (2026-08-02): `TrainUnit.id`/`IncomingTrainUnit.id`: `string` → `int`.**
+  Investigation (prompted by the non-numeric-ID fixture fix above) established
+  that every real train unit id on the wire is numeric, and the `"****"`
+  placeholder used for "unmatched" departing units was dead code in the
+  generator — real unmatched units are built directly with `id=None`, which
+  already carries the intended semantics and never went through the code path
+  that invented `"****"`. Implemented across all three repos:
+  - **Generator** (`4115c7f`): `TrainUnit.id: Optional[int]`,
+    `IncomingTrainUnit.id: int` (required), `ShuntingUnit.members`/
+    `Action.train_unit_ids: list[int]`; `from_train_unit()`'s `"****"` fallback
+    deleted rather than ported.
+  - **Solver** (`718a531`): `TrainUnit.Id: uint?`, `IncomingTrainUnit.Id: required uint`,
+    `ShuntingUnit.MemberIDs`/`Action.TrainUnitIds: IList<uint>` — same
+    nullable/`required` pattern already used for `Carriages`.
+  - **Evaluator** (`bf2fcf8`): `HIP_Scenario.proto`/`HIP_Plan.proto` fields
+    `string` → `uint64`/`optional uint64`; `stoi()`/`"****"`/`.empty()` guards
+    dropped from the two HIP `Train` constructors (kept as-is on the untouched
+    legacy `PBTrainUnit` path).
+  - Composite/shunting-unit-level ids (`IncomingTrain.id`, `TrainRequest.displayName`,
+    `ShuntingUnit.id`/`parentIDs`/`childIDs`) are a separate concept, unaffected,
+    still strings.
+  - **Two bugs found and fixed along the way**, both on the evaluator: a stale
+    test assertion from the earlier `displayName` fix (`6e0aefa`), and dead
+    debug scaffolding in `RunResult::CreateRunResult` that re-parsed the
+    scenario file into the legacy (still-string) proto shape purely to write
+    a JSON dump to a hardcoded, nonexistent developer path — harmless before
+    this change (silently mismatched types were tolerated in unrelated ways),
+    hard-failing after it, so removed rather than fixed (`eaa7dad`).
+  - Verified end-to-end against all 8 real scenario/plan files (locally built
+    images) with no crashes and no new evaluator-side diffs against the
+    protobuf baseline beyond the already-known solver-plan-dependent ones.
+  - **Not yet done:** none of the three `2.0.0-beta.1` images have been
+    re-tagged/re-pushed with these commits yet — same outstanding step as the
+    `Resource` fix above.
 
 ---
 
@@ -187,22 +226,149 @@ so this phase is unblocked.
 
 Run the full pipeline in this repo against all scenarios and compare to the protobuf baseline.
 
-**Script updates needed:**
+**Script updates:** ✓ done
+- `run_generator.py`/`run_solver.py`/`run_evaluator.py` `DOCKER_IMAGE_VERSIONS["pydantic"]`
+  bumped to the `2.0.0-beta.1` ghcr.io tags
+- `run_solver.py` and `run_evaluator.py` already glob/read `scenario_*.json` (unified);
+  no `scenario_solver_*.json` references remain in any script
+- `location.json` already in use throughout
 
-| Script | Change |
+**Run status against `2.0.0-beta.1` images (2026-08-02):**
+
+- ✓ Also cleaned up 9 obsolete `scenario_solver_*.json` fixtures + 1 lowercase-`k`
+  duplicate (tracked since `cbc4231`, obsolete since Phase 1 retired the two-file
+  scheme) — they were colliding with `run_solver.py`'s `scenario_*.json` glob
+  (18 matches instead of 8)
+- ✓ `run_generator.py --version pydantic`: 8/8 succeeded, clean unified `scenario_*.json`
+  output, no `scenario_solver_*.json` produced
+- ✓ `run_solver.py --version pydantic`: 8/8 succeeded
+- ✗ **`run_evaluator.py --version pydantic`: 1/9 (only the harmless stale-fixture SKIP);
+  all 8 real runs crash — BLOCKING**
+
+**Evaluator crashes found and fixed on `robust-rail-evaluator` (`noproto`) — 3 bugs, 3 fixes:**
+
+1. **`d3d32a3`** — Scenario parsing crashed 8/8 (reported as SIGSEGV, actually an
+   uncaught `std::out_of_range` sliced to a bare `std::exception` by `throw e;`
+   instead of `throw;`, then `std::terminate`). Root cause: `HIP_Scenario.proto`'s
+   `IncomingTrainUnit` wrapped member identity fields in a nested `trainUnit`
+   submessage; the real generator output is flat (`{id, typePrefix, carriages,
+   tasks}`, same shape `TrainRequest.trainUnits` already used correctly). With
+   `ignore_unknown_fields=true` the parser silently dropped the real fields and
+   defaulted `typePrefix`/`carriages`, which then failed the
+   `(typePrefix, carriages)` lookup. Fixed by flattening the proto to match.
+2. **`dc16f21` + `492ddbc`** — After (1), 5/8 files still crashed (2 SIGABRT, 3
+   SIGSEGV) further downstream in `Plan.cpp`'s `RunResult::CreateRunResult`.
+   Root cause: `HIP_Location.proto`'s `Resource` modeled track/facility refs as
+   a proto3 `oneof`, but the solver's real Plan JSON emits `{"kind":
+   "trackPart"|"facility", "id": N}` — neither key matched, both silently
+   dropped to `0`, which then hit `GetTrackByID("0")` (throws → SIGABRT) or
+   `GetFacilityByID(0)` (null deref → SIGSEGV). One root cause, two symptoms;
+   fixed by giving `Resource` explicit `kind`/`id` fields matching the real
+   wire shape. Also fixed the same exception-slicing bug as (1) in
+   `Scenario::Init`, and wrapped `main.cpp`'s scenario load in try/catch so
+   load failures fail cleanly instead of crashing.
+3. **`38da47d`** — Byte-diff against the protobuf baseline (see run below)
+   showed 3 files differing only in truncated type names in human-readable
+   output (`"SLT"` instead of `"SLT-4"`). Root cause: the `PB_HIP_TrainUnitType`
+   constructor in `Train.h:47` forwarded `typeprefix()` as both the
+   `displayName` and `typePrefix` constructor arguments, so `displayName` never
+   got the derived `prefix-carriages` form. Fixed by composing it explicitly.
+
+**Resolved, not a code fix — fixture had non-numeric IDs.** 1 of 8 files
+(`KleineBinckhorst_48t_custom_larger-example`) used a `"uNN"` prefix for train unit
+IDs and `"arr-NN"`/`"dep-NN"` prefixes for shunting-unit-level IDs; both paths hit an
+unguarded `stoi()` in the evaluator (`Train.cpp`, `TrainGoal.cpp`) with no non-numeric
+fallback, causing a crash. **Confirmed this is not a migration regression** — the
+protobuf-era baseline (`evaluations-protobuf/`) crashed identically on this same
+scenario. Rather than adding string-ID support to the C++ engine (a real, broader
+change — train/shunting-unit IDs are used as `int`/map keys throughout), fixed the
+fixture itself: `scenario_config_larger-example.json` (`7dfd203`) now uses plain
+numeric-looking ID strings — `"1"`-`"48"` for train units, `"1001"`-`"1024"` /
+`"2001"`-`"2024"` for shunting units — matching the convention every other scenario
+config in this repo already follows. The scenario now loads and evaluates cleanly,
+rejecting only on a legitimate, unrelated data issue (train `1006` longer than its
+arrival track) — the same class of clean rejection as the two `random_distribution`
+files. No remaining open question here.
+
+**Comparison run (2026-08-02) against `evaluations-protobuf/` baseline**, using a
+locally rebuilt `tors:latest` image (includes all 3 fixes above; `2.0.0-beta.1` on
+ghcr.io does **not** yet include them — re-tag/re-push still needed):
+
+| File | Result |
 |---|---|
-| `run_generator.py` | No longer produce `scenario_solver_*.json` |
-| `run_solver.py` | Point `--path_scenario` at `scenario_*.json` (unified), not `scenario_solver_*.json` |
-| `run_evaluator.py` | No change expected; already reads `scenario_*.json` |
+| `KleineBinckhorst_10t_random_42s_distribution1` | ✓ byte-identical (correctly rejected, both empty) |
+| `KleineBinckhorst_10t_random_42s_distribution2` | ✓ byte-identical (correctly rejected, both empty) |
+| `KleineBinckhorst_48t_custom_larger-example` | ✓ byte-identical (both empty — see fixture-fix note above; now a clean scenario-correctness rejection instead of a crash) |
+| `KleineBinckhorst_6t_custom_example3` | ✓ byte-identical |
+| `KleineBinckhorst_7t_custom_example1` | ✓ byte-identical |
+| `simple_service_location_4t_custom_late` | ✓ byte-identical |
+| `KleineBinckhorst_30t_random_98s_test` | ~ differs (same verdict, "plan not valid", both sides — differing internal action timings/train-matching, consistent with legitimate solver-side scheduling changes, e.g. the action-sort-collision fix `dc607cd`) |
+| `KleineBinckhorst_8t_custom_example2` | ~ differs (same verdict, "Scenario failed: Invalid action" on both sides — one `Wait` action's end timestamp differs, 3420 vs 3154, same solver-side cause as above) |
 
-`location_unified.json` is already in use throughout. ✓
+6/8 byte-identical, 2/8 differ only in solver-plan-dependent details while agreeing on
+the top-level pass/fail verdict — not evaluator bugs.
+
+**Still to do before Phase 3 is complete:**
+- Rebuild and re-push all three `2.0.0-beta.1` images to ghcr.io: `tors` with
+  `d3d32a3`, `dc16f21`, `492ddbc`, `38da47d`, `bf2fcf8`, `6e0aefa`, `eaa7dad`;
+  `hip` with `718a531`; `generator` with `16dc053`, `4115c7f`
+- Re-run the full pipeline against the re-pushed images (not just local builds)
+  to confirm parity
+- Decide whether the `KleineBinckhorst_30t`/`6t`/`8t` solver-plan differences
+  (route/timing choices that vary by random seed) need deeper solver-side
+  diffing to confirm they're benign, or can be accepted as-is
+
+**Pre-existing solver robustness issue found (2026-08-02), not caused by anything
+in this session, not fixed — flagging for later:** `KleineBinckhorst_10t_random_42s_distribution2`
+intermittently crashes the solver (roughly 1-in-3 runs) with a seed-dependent internal
+error — observed as both a `PlanGraph.CheckGraphStructure` `Debug.Assert` failure and,
+separately, an unhandled `System.ArgumentException` in `Parking.Deque.Remove`. Confirmed
+this is **not** a regression from today's `TrainUnit.id` change: reproduced the *same*
+intermittent failure (different stack trace, same file) against the unpatched
+`ghcr.io/robust-rail-nl/hip:2.0.0-beta.1` image using the pre-existing string-ID scenario
+JSON. This is a real heuristic/local-search robustness gap in
+`ServiceSiteScheduling.Solutions.PlanGraph`/`Parking.TrackOccupation`, worth a dedicated
+solver-side debugging session at some point, but out of scope for the schema migration work.
 
 **Acceptance criteria:**
-- All 8 evaluation files identical (or equivalent) to the protobuf baseline
-- No `scenario_solver_*.json` files produced or consumed
+- All 8 evaluation files identical (or equivalent) to the protobuf baseline — ✓ 6/8
+  identical, 2/8 equivalent (same verdict, differing solver-plan details)
+- No `scenario_solver_*.json` files produced or consumed ✓
 - `location.json` used throughout; `location_unified.json` and `location_solver.json` retired ✓ (already done on `pydantic` branch)
 
-Update `docs/protobuf-pydantic-comparison.md` with final run results.
+Update `docs/protobuf-pydantic-comparison.md` with these results once `tors:2.0.0-beta.1`
+is re-pushed and the pipeline is re-run against the real ghcr.io image.
+
+---
+
+## Phase 3b — Loose ends
+
+Things I (LP) noticed and want to write down so we won't forget:
+
+Generator:
+- Cleaning up the generator's README.md: it has a TODO that should be dealt
+  with
+- Make sure the planner can also speak the new schema
+- Figure out what to do with the regression-baseline files in the generator
+  repo (just delete?).  See also src/generate-scenarios.sh.
+- Write a script to validate the various JSON files
+- Clean up the generator repo: do (automated) code formatting using
+  pre-commit, Ruff etc.
+- Decide what to do with unified-schema-design.md.  At least remove
+  in-progress bits?
+
+Solver / HIP:
+- Fixing the bug occuring in ~1/3 of the cases and noticed by Claude.  Is
+  this the same one I opened an issue for?
+- Ask Claude for a way to reproduce this bug
+- The "merge coinciding Wait actions" commit (e545f33) seems to have
+  partially lost its effectiveness: see differences between current (beta.2)
+  and legacy (1.4.2) plan versions.
+- Look through git diff with main / dev.
+
+Evaluator / TORS:
+- Look through git diff with main / dev.
+- See if we can get pyTORS to work?  Probably not.
 
 ---
 
