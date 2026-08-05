@@ -2,11 +2,12 @@
 
 ## Context
 
-The pydantic pipeline (generator, hip, tors — all now at `2.0.0-beta.1`, tagged and pushed to
-ghcr.io) runs end-to-end on a single `location.json`. Evaluations were equivalent to the protobuf
-baseline as of the last alpha comparison (see `docs/protobuf-pydantic-comparison.md`); that
-comparison still needs a re-run against the beta images (Phase 3). The remaining work before
-stable 2.0.0 releases falls into four areas:
+The pydantic pipeline (generator, hip, tors) runs end-to-end on a single `location.json`.
+Protobuf-vs-pydantic comparison results are recorded directly in Phase 3 below (the
+standalone `docs/protobuf-pydantic-comparison.md` was retired once that became the
+single source of truth for parity results — see git history if the old alpha-era
+category-by-category diff catalog is ever needed). The remaining work before stable
+2.0.0 releases falls into four areas:
 
 1. **Scenario unification** — the generator currently emits two files per scenario:
    `scenario_*.json` (non-HIP field names, for the evaluator) and `scenario_solver_*.json`
@@ -336,8 +337,10 @@ solver-side debugging session at some point, but out of scope for the schema mig
 - No `scenario_solver_*.json` files produced or consumed ✓
 - `location.json` used throughout; `location_unified.json` and `location_solver.json` retired ✓ (already done on `pydantic` branch)
 
-Update `docs/protobuf-pydantic-comparison.md` with these results once `tors:2.0.0-beta.1`
-is re-pushed and the pipeline is re-run against the real ghcr.io image.
+Results above are from local builds. Once the `hip` solver's pre-existing intermittent
+crash (flagged just above) is fixed and `2.0.0-beta.2` images are built and pushed for
+all three repos, re-run the pipeline against the real ghcr.io images and update this
+section with the confirmed results.
 
 ---
 
