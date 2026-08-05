@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
     "protobuf": "ghcr.io/robust-rail-nl/hip:1.4.2",
-    "pydantic": "ghcr.io/robust-rail-nl/hip:2.0.0-alpha.2",
+    "pydantic": "ghcr.io/robust-rail-nl/hip:2.0.0-beta.1",
     "local": "hip:latest",
 }
 CONTAINER_DB = "/app/database"
