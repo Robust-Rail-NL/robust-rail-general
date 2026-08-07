@@ -372,6 +372,33 @@ Solver / HIP:
 Evaluator / TORS:
 - Look through git diff with main / dev.
 - See if we can get pyTORS to work?  Probably not.
+- **Do a focused session on TORS's own search mode.**  TORS does not only
+  replay and evaluate a plan; it can also generate one itself, and that looks
+  to be what it was originally built for, with plan replay added later.  Worth
+  understanding properly: what the search can actually do, whether it is
+  usable or useful to us, and where else the two modes' assumptions diverge.
+
+  This matters beyond curiosity.  Nearly every evaluator bug found on
+  2026-08-07 was a search-mode primitive behaving wrongly under replay, not a
+  bug in its own right:
+    - `legal_on_parking_track_rule` rejected a movement ending on a
+      non-parking track.  Harmless for the search, which emits step-by-step
+      moves that the rule exempts; fatal for replay, where every movement is a
+      `MultiMove` and a departure's last movement lands on the gateway.
+    - `Wait` runs until the next queued event.  Correct for the search, which
+      has no plan and re-decides at every event; wrong for replay, where it
+      discards the duration the plan supplied and eats the time reserved for
+      whatever follows.
+    - `ArriveActionGenerator` hardcodes a zero duration, so a plan cannot
+      express a train occupying the gateway while it waits for a route in
+      (Robust-Rail-NL/robust-rail-solver#13).
+    - `out_correct_time_rule` demanded an exact departure time that an
+      outStanding request (time 0) could never satisfy, while the generator
+      only offers that exit at the end of the scenario.
+
+  So the two modes share primitives whose contracts only hold in one of them.
+  A survey of where else that is true would probably predict the next round of
+  bugs rather than waiting to trip over them.
 
 ---
 
