@@ -31,6 +31,31 @@ generator `0597a6a`, solver `c913c91`, evaluator `e8c3c91`, solver
 | location | configuration | seeds | feasible | infeasible | unknown |
 |---|---|---|---|---|---|
 | KleineBinckhorst | `feasible_small` | 1–20 | 20 (100%) | 0 | 0 |
+| KleineBinckhorst | `marginal_length` | 1–20 | 12 (60%) | 8 (40%) | 0 |
+| KleineBinckhorst | `marginal_congestion` | 1–20 | 7 (35%) | 0 | 13 (65%) |
+
+The two marginal configurations fail in quite different ways, and the
+difference is the point.
+
+`marginal_length` varies one thing: whether the drawn compositions fit the
+255 m gateway. Its material is a single super type with two sub types of very
+different length, so a two-unit train fits only if both draws are the shorter
+one. Every failure is therefore a scenario-level rejection — a *proof*, with no
+`unknown` verdicts at all. Note the rate was not predicted correctly
+beforehand: a per-train fit probability of about 0.625 suggests roughly 39%
+feasible for two trains, against 60% measured. The arithmetic was close enough
+to pick sensible parameters and not close enough to trust, which is the reason
+these rates are measured rather than derived.
+
+`marginal_congestion` holds length constant and varies arrival pressure. It was
+built expecting trains to be stranded on the gateway, and that is not what
+happens: across seeds 1–20 not one failure was a gateway wait. The solver
+instead overfills track 906b — a 255 m stub behind a buffer stop — and then
+cannot extract the trains again ("exceeds the maximum length", "One side is
+blocked by another train", "Both sides blocked"). That is the ordinary
+difficulty of a dead-end parking track rather than a known bug, which makes the
+fixture more useful than intended. Its failures are `unknown`, not proofs:
+several may well be plannable by a better search.
 
 An earlier run of the same sweep gave 19/20, the exception being seed 13:
 `Shunting unit ShuntingUnit-7 should leave at time 9900`. That turned out not to

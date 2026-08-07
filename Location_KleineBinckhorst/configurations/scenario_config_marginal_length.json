@@ -1,0 +1,44 @@
+{
+    "intent": {
+        "designed_for": "domain",
+        "expectation": "feasible for some seeds only; infeasibility is provable rather than merely unproven",
+        "exercises": "the boundary of what fits the 255 m gateway, so that the seed decides the outcome",
+        "notes": [
+            "The material is restricted to one super type with two sub types of very different length: VIRM-4 at 108.56 m and VIRM-6 at 162.06 m. With units_per_composition [1,2] a train is one unit (always fits) or two, and a pair fits only if both draws are VIRM-4: 4+4 = 217.1 m fits, 4+6 = 270.6 m and 6+6 = 324.1 m do not. So each train fits with probability about 0.625 and the scenario is feasible only when every train does.",
+            "Everything else is deliberately copied from feasible_small — same gateway spacing, same horizon, no servicing — so that the seed varies exactly one thing: whether the drawn compositions fit. Do not tighten min_gap_on_gateway here; that would confound length with congestion, which is what marginal_congestion is for.",
+            "An infeasible outcome here is a proof, not an opinion: the evaluator rejects the scenario before considering any plan, because a train cannot fit on the track it is scheduled to arrive at or depart from."
+        ]
+    },
+    "location": "KleineBinckhorst",
+    "start_time": 0,
+    "end_time": 10800,
+    "use_default_material": true,
+    "trains_given": false,
+    "perform_servicing": false,
+    "seed": 1,
+    "number_of_trains": 2,
+    "min_gap_on_gateway": 900,
+    "min_time_in_yard": 900,
+    "mixed_traffic": false,
+    "matching": 0,
+    "train_unit_distribution": {
+        "train_unit_types": [
+            "VIRM-4",
+            "VIRM-6"
+        ],
+        "super_type_ratio": 1,
+        "units_per_composition": [
+            1,
+            2
+        ],
+        "matching_complexity": 0
+    },
+    "gateway": {
+        "arrival": [
+            "15"
+        ],
+        "departure": [
+            "15"
+        ]
+    }
+}
