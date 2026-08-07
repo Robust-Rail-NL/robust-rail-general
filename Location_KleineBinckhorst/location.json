@@ -642,7 +642,7 @@
             "name": "Sein70",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 43,
@@ -655,7 +655,7 @@
             "name": "Sein436",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 44,
@@ -668,7 +668,7 @@
             "name": "Stootblok63",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 45,
@@ -681,7 +681,7 @@
             "name": "Stootblok64",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 46,
@@ -694,7 +694,7 @@
             "name": "Stootblok104a",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 47,
@@ -707,7 +707,7 @@
             "name": "Stootblok906b",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 48,
@@ -724,7 +724,7 @@
             "name": "Kruis2",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 49,
@@ -741,7 +741,7 @@
             "name": "Kruis1",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 50,
@@ -757,7 +757,7 @@
             "name": "Wissel425",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 51,
@@ -773,7 +773,7 @@
             "name": "Wissel952",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 52,
@@ -789,7 +789,7 @@
             "name": "Wissel953",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 53,
@@ -805,7 +805,7 @@
             "name": "Wissel954",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 54,
@@ -821,7 +821,7 @@
             "name": "Wissel957",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 55,
@@ -837,7 +837,7 @@
             "name": "Wissel958",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 56,
@@ -853,7 +853,7 @@
             "name": "Wissel959",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 57,
@@ -869,7 +869,7 @@
             "name": "Wissel960",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 58,
@@ -885,7 +885,7 @@
             "name": "Wissel961",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 59,
@@ -901,7 +901,7 @@
             "name": "Wissel963",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 60,
@@ -917,7 +917,7 @@
             "name": "Wissel964",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 61,
@@ -933,7 +933,7 @@
             "name": "Wissel965",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 62,
@@ -949,7 +949,7 @@
             "name": "Wissel972",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 63,
@@ -965,7 +965,7 @@
             "name": "Wissel973",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 64,
@@ -981,7 +981,7 @@
             "name": "Wissel976",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 65,
@@ -997,7 +997,7 @@
             "name": "Wissel977",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 66,
@@ -1013,7 +1013,7 @@
             "name": "Wissel978",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 67,
@@ -1029,7 +1029,7 @@
             "name": "Wissel979",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 68,
@@ -1046,7 +1046,7 @@
             "name": "Engels966_967",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 69,
@@ -1063,7 +1063,7 @@
             "name": "Engels968_969",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 70,
@@ -1080,7 +1080,7 @@
             "name": "Engels970_971",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         },
         {
             "id": 71,
@@ -1097,7 +1097,7 @@
             "name": "Engels974_975",
             "sawMovementAllowed": false,
             "parkingAllowed": false,
-            "isElectrified": false
+            "isElectrified": true
         }
     ],
     "facilities": [
