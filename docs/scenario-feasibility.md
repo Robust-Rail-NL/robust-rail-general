@@ -25,17 +25,24 @@ from corrupt state.
 ## Measured rates
 
 Measured 2026-08-07 against locally built images at
-generator `0597a6a`, solver `73ca6ac`, evaluator `4482fa2`, solver
+generator `0597a6a`, solver `c913c91`, evaluator `e8c3c91`, solver
 `MaxDuration: 15`.
 
 | location | configuration | seeds | feasible | infeasible | unknown |
 |---|---|---|---|---|---|
-| KleineBinckhorst | `feasible_small` | 1–20 | 19 (95%) | 0 | 1 (5%) |
+| KleineBinckhorst | `feasible_small` | 1–20 | 20 (100%) | 0 | 0 |
 
-The single `feasible_small` failure, seed 13, is a departure-time mismatch:
-`Shunting unit ShuntingUnit-7 should leave at time 9900`. The evaluator requires
-an `Exit` to occur at exactly the scheduled departure time, and the solver's plan
-missed it. That is a scheduling near-miss rather than a structural problem.
+An earlier run of the same sweep gave 19/20, the exception being seed 13:
+`Shunting unit ShuntingUnit-7 should leave at time 9900`. That turned out not to
+be a property of the scenario at all. The plan was correct — wait until 9720,
+then a 180 s movement landing exactly on the 9900 departure — but the evaluator
+stretched the wait to the next queued event, which was the departure itself, so
+the movement ran 180 s past it. Fixed in evaluator `e8c3c91`; see the notes on
+TORS's two operating modes in `roadmap-2.0.0.md`.
+
+That is worth keeping in mind when reading any rate here: an `unknown` verdict
+says the pipeline could not confirm a valid plan, which is not the same as the
+scenario being hard.
 
 ## Fixed-scenario fixtures
 
@@ -68,10 +75,11 @@ three predate the 2.0.0 migration.
 - **outStanding trains carry no deadline in the solver's cost function**, so a
   plan may schedule work past the end of the scenario at no cost and still be
   reported as unviolating. Blocks `7t_custom_example1`.
-- **Departure times must match exactly.** The evaluator requires an `Exit` at
-  precisely the scheduled time, so a plan that is a few seconds out is rejected
-  outright. This is the single `feasible_small` failure and probably several of
-  the `unknown` verdicts above.
+Departure times must still match exactly — the evaluator requires an `Exit` at
+precisely the scheduled second — but that is no longer known to reject anything
+it should not. The one case that looked like a strictness problem was the wait
+bug above, so a tolerance would have papered over a defect while also starting
+to accept genuinely late departures.
 
 ## Why nothing was feasible before 2026-08-07
 
