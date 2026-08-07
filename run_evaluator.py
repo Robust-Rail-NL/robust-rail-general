@@ -11,6 +11,13 @@ ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
     "protobuf": "ghcr.io/robust-rail-nl/tors:1.3.1",
     "pydantic": "ghcr.io/robust-rail-nl/tors:2.0.0-beta.1",
+    # The evaluator is the oracle the pipeline trusts, and its assertions build
+    # produces byte-identical output to the plain one (verified across all
+    # KleineBinckhorst scenarios) while turning an internal invariant violation
+    # into an abort rather than a verdict computed from corrupt state. A run
+    # that trips one exits 134/139 with the assertion text in the .err file,
+    # which reads very differently from an ordinary "plan is not valid".
+    "pydantic-assert": "ghcr.io/robust-rail-nl/tors:2.0.0-beta.2-assert",
     "local": "tors:latest",
 }
 CONTAINER_DB = "/app/database"

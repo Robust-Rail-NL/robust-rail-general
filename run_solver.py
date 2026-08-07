@@ -11,6 +11,13 @@ ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
     "protobuf": "ghcr.io/robust-rail-nl/hip:1.4.2",
     "pydantic": "ghcr.io/robust-rail-nl/hip:2.0.0-beta.1",
+    # Deliberately the plain image, not an -assert one. The solver is a
+    # wall-clock-bounded local search, so an assertions-enabled build explores
+    # less of the neighbourhood in the same budget and returns different plans
+    # on any scenario that does not converge first — which would break the
+    # comparison against the protobuf baseline. Run the -assert solver image
+    # separately as a soak test (seed sweeps looking for a violation) instead.
+    "pydantic-assert": "ghcr.io/robust-rail-nl/hip:2.0.0-beta.2",
     "local": "hip:latest",
 }
 CONTAINER_DB = "/app/database"

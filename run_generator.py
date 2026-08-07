@@ -11,6 +11,9 @@ ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
     "protobuf": "ghcr.io/robust-rail-nl/generator:1.2.2",
     "pydantic": "ghcr.io/robust-rail-nl/generator:2.0.0-beta.1",
+    # The generator has no assertions build; same image as "pydantic-assert" is
+    # a pipeline configuration, not a per-tool build flag. See run_evaluator.py.
+    "pydantic-assert": "ghcr.io/robust-rail-nl/generator:2.0.0-beta.2",
     "local": "generator:latest",
 }
 CONTAINER_DB = "/app/database"
