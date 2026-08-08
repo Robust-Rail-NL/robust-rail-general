@@ -412,16 +412,28 @@ released version, and each one was invisible to the suites that already existed.
 Two of those suites cannot pass at all (see below), which is the sort of thing
 that only stays broken when nothing runs them.
 
-### Prerequisite: the two dead-weight evaluator tests
+### Prerequisite: the two dead-weight evaluator tests ✓ DONE
 
-`EngineTest` and `CompatibilityTest` require `LOCATION_PATH`, `SCENARIO_PATH` and
-`PLAN_PATH` to be exported, and then fail with `map::at` against the bundled demo
-data. They fail identically at `489a72c`, so this is long-standing rather than
-new. Either give them defaults and working fixtures — `add_test` sets no
-`WORKING_DIRECTORY`, so they also depend on the caller's cwd — or delete them. A
-suite that always fails trains people to ignore the suite, which is plausibly
-part of why these bugs survived so long. Do not wire CI up around them in their
-current state.
+`EngineTest` and `CompatibilityTest` required `LOCATION_PATH`, `SCENARIO_PATH`
+and `PLAN_PATH` to be exported, and then failed with `map::at` against the
+bundled demo data — whose `scenario.json` still uses the pre-unification field
+names this migration replaced, so they could not have passed even with the
+variables set. Resolved 2026-08-08: `ctest` is now 7/7.
+
+`CompatibilityTest` was rebuilt around a committed fixture
+(`data/Demo/hip_plan_evaluation_test`) covering the HIP plan path the pipeline
+actually runs, and demonstrably catches the `4482fa2` defect. `EngineTest` kept
+only its self-contained scenario-unification case; its two environment-driven
+cases were deleted.
+
+**Coverage this leaves open.** The deleted `EngineTest` "Plan test" was the only
+test naming the cTORS-native plan path — `GetRunResultProto` plus
+`RunResult::CreateRunResult(const Location*, const PBRun&)` — which `main.cpp`
+still reaches via `--plan_type Evaluator`. Nothing was lost in practice, since it
+never ran, but that mode now has no test at all and the pipeline never uses it:
+`run_evaluator.py` always passes `--plan_type Solver`. Decide whether the mode is
+still supported. If it is, it wants a fixture like the HIP one; if it is not,
+retiring it removes a second plan format from the evaluator.
 
 ### What each repo should run
 
