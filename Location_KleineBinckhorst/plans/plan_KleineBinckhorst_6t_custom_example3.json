@@ -9,9 +9,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "0",
+				"id": 0,
 				"memberIDs": [
-					"2401"
+					2401
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -34,9 +34,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "0",
+				"id": 0,
 				"memberIDs": [
-					"2401"
+					2401
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -87,9 +87,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "0",
+				"id": 0,
 				"memberIDs": [
-					"2401"
+					2401
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -107,10 +107,10 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": 1,
 				"memberIDs": [
-					"2402",
-					"2403"
+					2402,
+					2403
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -133,10 +133,10 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": 1,
 				"memberIDs": [
-					"2402",
-					"2403"
+					2402,
+					2403
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -227,9 +227,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "2",
+				"id": 2,
 				"memberIDs": [
-					"2404"
+					2404
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -252,9 +252,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "2",
+				"id": 2,
 				"memberIDs": [
-					"2404"
+					2404
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -272,9 +272,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "2",
+				"id": 2,
 				"memberIDs": [
-					"2404"
+					2404
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -309,10 +309,10 @@
 				"other": "Reinigingsperron"
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": 1,
 				"memberIDs": [
-					"2402",
-					"2403"
+					2402,
+					2403
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -335,9 +335,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "0",
+				"id": 0,
 				"memberIDs": [
-					"2401"
+					2401
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -460,9 +460,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "2",
+				"id": 2,
 				"memberIDs": [
-					"2404"
+					2404
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -480,10 +480,10 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": 1,
 				"memberIDs": [
-					"2402",
-					"2403"
+					2402,
+					2403
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -501,10 +501,10 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": 1,
 				"memberIDs": [
-					"2402",
-					"2403"
+					2402,
+					2403
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -555,9 +555,9 @@
 				"other": "Reinigingsperron"
 			},
 			"shuntingUnit": {
-				"id": "0",
+				"id": 0,
 				"memberIDs": [
-					"2401"
+					2401
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -580,10 +580,10 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": 1,
 				"memberIDs": [
-					"2402",
-					"2403"
+					2402,
+					2403
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -601,9 +601,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "0",
+				"id": 0,
 				"memberIDs": [
-					"2401"
+					2401
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -621,9 +621,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "0",
+				"id": 0,
 				"memberIDs": [
-					"2401"
+					2401
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -730,9 +730,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "0",
+				"id": 0,
 				"memberIDs": [
-					"2401"
+					2401
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -755,9 +755,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "2",
+				"id": 2,
 				"memberIDs": [
-					"2404"
+					2404
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -792,9 +792,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "2",
+				"id": 2,
 				"memberIDs": [
-					"2404"
+					2404
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -817,10 +817,10 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": 1,
 				"memberIDs": [
-					"2402",
-					"2403"
+					2402,
+					2403
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -887,10 +887,10 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": 1,
 				"memberIDs": [
-					"2402",
-					"2403"
+					2402,
+					2403
 				],
 				"parentIDs": [],
 				"childIDs": [],

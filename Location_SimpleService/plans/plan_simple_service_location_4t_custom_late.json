@@ -9,9 +9,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "0",
+				"id": 0,
 				"memberIDs": [
-					"2422"
+					2422
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -34,9 +34,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "0",
+				"id": 0,
 				"memberIDs": [
-					"2422"
+					2422
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -63,9 +63,9 @@
 				"other": "Reinigingsperron"
 			},
 			"shuntingUnit": {
-				"id": "0",
+				"id": 0,
 				"memberIDs": [
-					"2422"
+					2422
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -88,9 +88,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": 1,
 				"memberIDs": [
-					"2301"
+					2301
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -113,9 +113,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": 1,
 				"memberIDs": [
-					"2301"
+					2301
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -150,9 +150,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": 1,
 				"memberIDs": [
-					"2301"
+					2301
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -170,9 +170,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": 1,
 				"memberIDs": [
-					"2301"
+					2301
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -190,9 +190,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "1",
+				"id": 1,
 				"memberIDs": [
-					"2301"
+					2301
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -215,9 +215,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "0",
+				"id": 0,
 				"memberIDs": [
-					"2422"
+					2422
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -235,9 +235,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "0",
+				"id": 0,
 				"memberIDs": [
-					"2422"
+					2422
 				],
 				"parentIDs": [],
 				"childIDs": [],
@@ -264,9 +264,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": "0",
+				"id": 0,
 				"memberIDs": [
-					"2422"
+					2422
 				],
 				"parentIDs": [],
 				"childIDs": [],
