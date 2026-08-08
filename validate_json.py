@@ -100,8 +100,11 @@ def _describe(error) -> str:
             candidates = on_branch or candidates
         specific = best_match(candidates)
         if specific is not None:
-            path = list(error.absolute_path) + list(specific.absolute_path)
-            return f"{'/'.join(str(p) for p in path) or '<root>'}: {specific.message}"
+            # absolute_path is relative to the instance root, not to the error it
+            # came from: a context error's parent is the union error, and
+            # absolute_path walks up through it. Prefixing error.absolute_path
+            # here would repeat the path rather than complete it.
+            return f"{'/'.join(str(p) for p in specific.absolute_path) or '<root>'}: {specific.message}"
     return f"{'/'.join(str(p) for p in error.absolute_path) or '<root>'}: {error.message}"
 
 
