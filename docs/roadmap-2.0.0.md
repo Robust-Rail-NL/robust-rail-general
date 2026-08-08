@@ -723,12 +723,30 @@ Two caveats, both encoded in the workflow:
   simply broken. Worth deciding once the release settles and schema changes
   become rare and individually versioned.
 
-**`scenario_config_*.json` stays out of scope.** It has no schema. It is
-validated by `check_config.py`, which is a list of presence checks and rejects
-nothing it does not recognise. That is load-bearing: the `intent` blocks added
-to the new configurations rely on unknown keys passing through untouched. If a
-config schema is ever written, it has to permit `intent`, or those
-configurations become invalid.
+**`scenario_config_*.json` is covered too, as of 2026-08-08.** An earlier note
+here said it should stay out of scope, on the grounds that `check_config.py`'s
+tolerance of unknown keys was load-bearing — the `intent` blocks relied on it.
+That had it backwards. `intent` is structured (`designed_for`, `expectation`,
+`exercises`, `notes[]`) and is now a declared field; admitting it by permitting
+unknown keys would have meant the mechanism documenting a configuration's
+purpose was also the one hiding typos in it.
+
+Tolerating unknown keys was never neutral. These are the only pipeline inputs
+written by hand, `check_config.py` checks required keys only, and every
+interesting knob is optional — `seed`, `min_gap_on_gateway`, `min_time_in_yard`,
+`mixed_traffic`, `matching`, `gateway`. A mistyped one simply never took effect.
+The schema found such a case immediately: `scenario_config_test.json` set
+`inStanding_ratio`/`outStanding_ratio` where `random_generator.py` reads
+`instanding_ratio`/`outstanding_ratio`. Both were `0.0` and the absent-key
+fallback is also "none", so nothing observable was wrong — which is why it had
+gone unnoticed.
+
+The model is a discriminated union on `trains_given`, matching the split
+`check_config.py` already encoded as `if` chains. `check_config.py` keeps what a
+schema cannot do: checking values against the location and material catalogue,
+and normalising the config in place. The `custom_*` payloads are typed only as
+objects for now — the value is at the top level, and the nested shapes deserve
+their own pass.
 
 ---
 

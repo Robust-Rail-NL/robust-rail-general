@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
 """Validate the fixtures in this repo against the generator's exported schemas.
 
-SKETCH — not yet wired into the pipeline. Two things are unresolved, both noted
-in docs/roadmap-2.0.0.md under Phase 3c:
+Run by .github/workflows/validate-fixtures.yml, which gates on it. The schemas
+come from a generator checkout via --schema-dir; where they should ultimately be
+published is recorded in docs/roadmap-2.0.0.md under Phase 3c, along with why
+that workflow also re-exports them and fails if they have gone stale.
 
-  * Where the schemas come from. This reads them from a generator checkout via
-    --schema-dir, which couples the repos. Publishing them as a release artifact
-    alongside the images is probably the better answer.
-  * Nothing here checks that the generator's committed schemas still match its
-    Pydantic models. Validating against a stale schema is worse than not
-    validating, because it looks like it passed.
-
-scenario_config_*.json is deliberately not covered: there is no schema for it.
-It is checked by the generator's check_config.py, which is a list of presence
-checks and rejects nothing it does not recognise — which is what lets the
-configurations carry their "intent" blocks. A schema written for them would have
-to permit those.
+Covers location.json, scenarios/, plans/ and configurations/. The last of those
+is generator input rather than interchange, and the only input written by hand
+rather than generated — which is why it is worth validating: check_config.py
+checks that required keys are present but accepts anything it does not
+recognise, so a mistyped optional key simply never takes effect.
 
 Usage:
     ./validate_json.py --schema-dir ../robust-rail-generator/schema
@@ -25,6 +20,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Optional
 
 ROOT = Path(__file__).parent
 
@@ -33,6 +29,7 @@ FIXTURE_SCHEMAS = {
     "location.json": "schema_location.json",
     "scenarios/scenario_*.json": "schema_scenario.json",
     "plans/plan_*.json": "schema_plan.json",
+    "configurations/scenario_config_*.json": "schema_scenario_config.json",
 }
 
 
@@ -48,6 +45,57 @@ def _load_validator(schema_path: Path):
     return Draft202012Validator(schema)
 
 
+def _branch_for(error) -> Optional[int]:
+    """Index of the oneOf branch a discriminated union meant to take.
+
+    jsonschema has no notion of `discriminator` — it is an OpenAPI keyword, not
+    a JSON Schema one — so a union failure is reported against every branch at
+    once. For scenario_config that means a single mistyped key in the
+    trains_given=false form is reported as eight unexpected keys against the
+    trains_given=true form, which is worse than useless. The schema does publish
+    the discriminator, so use it to say which branch was actually intended.
+    """
+    schema = error.schema
+    if not isinstance(schema, dict):
+        return None
+    discriminator = schema.get("discriminator")
+    if not discriminator or "oneOf" not in schema:
+        return None
+    if not isinstance(error.instance, dict):
+        return None
+    value = error.instance.get(discriminator.get("propertyName"))
+    if value is None:
+        return None
+    target = discriminator.get("mapping", {}).get(str(value))
+    for index, branch in enumerate(schema["oneOf"]):
+        if isinstance(branch, dict) and branch.get("$ref") == target:
+            return index
+    return None
+
+
+def _describe(error) -> str:
+    """One line for an error, descending into anyOf/oneOf where it helps.
+
+    A failure against a union reports only "is not valid under any of the given
+    schemas", which names the branch point rather than the mistake. The real
+    errors are in error.context: prefer the branch the discriminator selects,
+    and otherwise let best_match guess.
+    """
+    from jsonschema.exceptions import best_match
+
+    if error.context:
+        candidates = list(error.context)
+        branch = _branch_for(error)
+        if branch is not None:
+            on_branch = [e for e in candidates if list(e.schema_path)[:1] == [branch]]
+            candidates = on_branch or candidates
+        specific = best_match(candidates)
+        if specific is not None:
+            path = list(error.absolute_path) + list(specific.absolute_path)
+            return f"{'/'.join(str(p) for p in path) or '<root>'}: {specific.message}"
+    return f"{'/'.join(str(p) for p in error.absolute_path) or '<root>'}: {error.message}"
+
+
 def _validate(path: Path, validator) -> list[str]:
     try:
         instance = json.loads(path.read_text())
@@ -55,7 +103,7 @@ def _validate(path: Path, validator) -> list[str]:
         return [f"not valid JSON: {exc}"]
     # Sorted by path so the output is stable enough to diff between runs.
     return [
-        f"{'/'.join(str(p) for p in error.absolute_path) or '<root>'}: {error.message}"
+        _describe(error)
         for error in sorted(validator.iter_errors(instance), key=lambda e: list(e.absolute_path))
     ]
 

@@ -46,8 +46,8 @@
             1
         ],
         "super_type_ratio": 1.0,
-        "inStanding_ratio": 0.0,
-        "outStanding_ratio": 0.0
+        "instanding_ratio": 0.0,
+        "outstanding_ratio": 0.0
     },
     "custom_train_unit_types": [
         {
