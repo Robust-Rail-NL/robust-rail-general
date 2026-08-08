@@ -404,6 +404,58 @@ Evaluator / TORS:
 
 ---
 
+## Phase 3e — One naming convention, and three fields that were never used ✓ DONE
+
+Done 2026-08-08. Fixture validation reaches 18/18 and now gates CI.
+
+**Arrays of IDs all end in `IDs`.** The schema had been using three conventions
+at once — `members` and `relatedTrackParts` with no suffix, `parentIDs` and
+`childIDs` with `IDs`, `trainUnitIds` with `Ids` — so a field holding references
+could not be told from one holding objects by name. That ambiguity is what let
+`ShuntingUnit.members` keep its name when its type changed from embedded
+TrainUnits to IDs, leaving a half-finished rename that the evaluator still
+complains about by name (`Plan.cpp` errors calling `members` the legacy field).
+Now: `memberIDs` on ShuntingUnit and NonServiceTraffic,
+`Facility.relatedTrackPartIDs`. `IncomingTrain.members` and `Train.members` keep
+their names, because they really do embed their units.
+
+**Three fields deleted, all the same shape** — declared in the schema, written
+by nobody, read by nobody:
+
+| field | evidence |
+|---|---|
+| `Action.trainUnitIds` | never assigned in HIP; the evaluator derives the same list from `memberIDs`; `null` in all 606 actions |
+| `ShuntingUnit.standingType` | never assigned; the read was guarded on non-empty so could not fire; its destination `PBAction.standingType` is read nowhere; superseded by the StandIn/StandOut task types |
+| `Plan.trackParts` | never assigned; never read; **and already resolved for removal in Phase 0f**, which was simply never carried out |
+
+Retired proto fields are `reserved`, not freed, so a later field cannot inherit
+a number and meet an old message carrying the old meaning.
+
+### Things this turned up
+
+- **`location.json` is parsed by the non-HIP `Location.proto`.** `HIP_Location`'s
+  `Facility` is typedef'd in `Proto.h` and never used. So "HIP is the live path,
+  the rest is legacy" is wrong as a general rule: scenarios and plans go through
+  HIP, locations do not. Worth checking which proto is actually in play before
+  assuming.
+- **The `relatedTrackParts` rename touched 34 files**, nearly all bundled demo
+  and bug-report locations in the solver and evaluator, not the four fixtures
+  here. Mechanical, but the blast radius of a rename in this schema is mostly
+  test data.
+- **A missed fixture fails loudly.** An uninitialised `ImmutableArray` in C#
+  throws `NullReferenceException` rather than reading as empty, so
+  `TestJsonSorted` caught the one location file left behind.
+
+### On protobuf and empty lists
+
+`trainUnitIds` was documented as "if not specified, all train units are
+involved". That contract was never expressible: protobuf `repeated` fields carry
+no presence information, so absent, `null` and `[]` all arrive at the evaluator
+as the same empty field. Anything reintroducing an optional list needs a
+deliberate design for presence, not just the field back.
+
+---
+
 ## Phase 3d — Every id is an int ✓ DONE
 
 Completes the 2026-08-02 migration, which stopped at the unit-level ids. The
