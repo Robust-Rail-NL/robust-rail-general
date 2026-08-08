@@ -475,13 +475,26 @@ with a bad error message.
 
 Two caveats, both encoded in the workflow:
 
-- **The check does not gate yet.** It reports 2 of 18 fixtures valid. That is
-  real drift, not a broken script: train unit ids are strings in
-  `Location_SimpleService` (the string-to-int migration never reached it), and
-  every plan carries `null` in `actions/*/trainUnitIds` where the schema says
-  array. Failing the branch on known drift only teaches everyone to ignore the
-  check, so it runs under `continue-on-error` until those two are fixed. **Next
-  step for this repo: triage them, then drop `continue-on-error`.**
+- **The check does not gate yet.** It reports 2 of 18 fixtures valid — the only
+  two that pass are the `location.json` files. That is real drift, not a broken
+  script, and it is wider than the earlier note in this document claimed: it is
+  not confined to `Location_SimpleService`. Every scenario and every plan fails,
+  for three independent reasons:
+  1. **Train-unit ids are strings everywhere.** All 127 of them, in all eight
+     scenarios. The 2026-08-02 `string` → `int` decision below reached the code
+     in all three repos and essentially none of the data.
+  2. **Plans use `memberIDs`, the model says `members`** — and also carry
+     `standingType`, which the unified model dropped. `RailModel` sets
+     `extra="forbid"`, so both are hard rejections. Note the evaluator disagrees
+     in the opposite direction: `Plan.cpp` raises an error calling `members` the
+     *legacy* field and demanding `memberIDs`.
+  3. **`actions/*/trainUnitIds` is `null`** in all 606 actions, where the schema
+     says array. It is never populated by anything.
+
+  Failing the branch on known drift only teaches everyone to ignore the check,
+  so it runs under `continue-on-error` until these are fixed. **Next step for
+  this repo: settle the id-type question below, then (2) and (3), then drop
+  `continue-on-error`.**
 - **Where the schemas come from is still open.** The workflow checks out
   `robust-rail-generator` at `pydantic` and reads `schema/` from there, which
   couples the repos and pins a branch name. A copy vendored here would instead

@@ -60,10 +60,13 @@ So both the generator's workflow and this repo's re-export and diff them.
 
 ## Still open
 
-- **The fixture validation here does not gate.** It reports 2 of 18 valid: train
-  unit ids are strings in `Location_SimpleService`, and every plan has `null` in
-  `actions/*/trainUnitIds` where the schema says array. Both predate the
-  workflow. Triage them, then drop `continue-on-error` from
+- **The fixture validation here does not gate.** It reports 2 of 18 valid — the
+  two `location.json` files. The drift is wider than this brief originally said:
+  not just `Location_SimpleService`, but every scenario and every plan, for
+  three separate reasons (train-unit ids are strings throughout; plans use
+  `memberIDs` and `standingType` against a model that says `members` and forbids
+  extras; `trainUnitIds` is always `null`). See Phase 3c in the roadmap. Settle
+  those, then drop `continue-on-error` from
   `.github/workflows/validate-fixtures.yml`.
 - **Where the schemas should be published.** This repo reads them from a
   generator checkout pinned to `pydantic`, which couples the repos. A release
