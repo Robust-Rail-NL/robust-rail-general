@@ -472,6 +472,38 @@ Whoever knows why the Python bindings exist should decide.
 
 ---
 
+## Phase 3g — planning-approach ◐ PARTLY DONE
+
+There is a fifth repo, `planning-approach` (branch `new_schemas`): a PDDL-based
+planner that reads location and scenario JSON and writes plans for the
+evaluator. It is a producer of the interchange format like the solver, and was
+not covered by Phases 1–3.
+
+Done 2026-08-08: its converter now writes plans the schema accepts — 269
+validation errors to 0. Most of the gap predated Phase 3d/3e (`{name,
+trackPartId}` resources, quoted numbers, `members` with embedded units, no
+`schemaVersion`), which meant fixing only the recent renames would have left the
+output invalid anyway. Note `standingType` needed translating rather than
+deleting: it becomes the `StandIn`/`StandOut` task types.
+
+**Left open, recorded in `planning-approach/SCHEMA_STATUS.md`:**
+
+- `pipeline.py` still assumes the two-file scenario world Phase 1 removed. It
+  reads `location_solver.json`, which no longer exists, and pairs
+  `scenario_solver_*.json` with `scenario_*.json` by string replacement. Its
+  `GENERATE_DIR` points into this repo, so it breaks against current contents.
+  Deciding what its inputs are now is a design question, not a rename.
+- The visualizer's `member_lengths_from_scenario` reads the pre-unification
+  scenario shape.
+- `test_data/` cannot be re-converted: its `.plan` files were produced against
+  pre-unification scenarios whose train IDs no longer exist. Regenerating means
+  re-running the planner.
+
+**It has no CI.** Phase 3c covered four repos; this is a fifth, and the same
+argument applies — more so, since nothing validated its output until now.
+
+---
+
 ## Phase 3f — The proto layout ◐ PARTLY DONE
 
 The `HIP_*` / non-HIP split in `robust-rail-evaluator/protos/` does not mean what
