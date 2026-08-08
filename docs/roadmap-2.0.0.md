@@ -404,6 +404,74 @@ Evaluator / TORS:
 
 ---
 
+## `--plan_type Evaluator` — the open question, measured
+
+Repeatedly listed as "decide whether this mode is still supported". Here is what
+it actually consists of, surveyed 2026-08-08, so the decision can be made on
+evidence rather than on the name.
+
+### What it is
+
+`main.cpp` takes `--plan_type Solver|Evaluator` in each of its three modes
+(`EVAL`, `INTER`, `EVAL_AND_STORE`). The two branches read two different plan
+formats:
+
+| | `Solver` | `Evaluator` |
+|---|---|---|
+| parses | `PB_HIP_Plan` (`HIP_Plan.proto`) | `PBRun` (`Run.proto`) |
+| entry point | `ParseHIP_PlanFromJson` | `GetRunResultProto` |
+| builds via | `CreateRunResult(const PB_HIP_Plan&, ...)` | `CreateRunResult(const Location*, const PBRun&)` |
+| scenario comes from | `--path_scenario`, parsed as `PB_HIP_Scenario` | **the plan file itself** — `Run.scenario`, parsed as the legacy `PBScenario` (`Plan.cpp:503`) |
+
+That last row is the substantive difference, not a format detail: a `Run` is
+self-contained, carrying its own scenario, while the Solver path takes the
+scenario separately.
+
+### The case for retiring it
+
+- **`run_evaluator.py` always passes `Solver`.** No pipeline uses it.
+- **It has no test.** The only one that ever named this path was `EngineTest`'s
+  "Plan test", deleted 2026-08-07 as part of the dead-weight cleanup; it had
+  never passed. Phase 3c already records this gap.
+- **It is the sole remaining consumer of the legacy input shapes**, and so the
+  reason several things could not be finished during Phases 3d and 3e:
+  `Plan.proto` still declares `trainUnitIds` as `repeated string` (lines 29 and
+  85), `Train.cpp` still carries the `"****"` placeholder and `stoi()` guards,
+  and `TrainUnitType::types` is still keyed by the combined display-name string.
+  Each was left alone specifically because this path still reads it.
+
+### Why retiring it does **not** delete `Scenario.proto` and `Run.proto`
+
+Because the same formats are still *written*, from Python.
+`RunResult::SerializeToFile` produces a `PBRun` — and through it a legacy
+`PBScenario` and a `PartialOrderSchedule` — and it is bound in `pyTORS`
+(`module.cpp:429`, alongside `POSPlan::serialize_to_file` at 423). So
+`Run.proto`, `Scenario.proto` and `PartialOrderSchedule.proto` have a live
+producer regardless of whether anything still reads them here.
+
+`--plan_type Evaluator` and `pyTORS.serialize_to_file` are the two halves of one
+round trip: TORS writes a run, TORS reads it back. Retiring only the read half
+leaves a format that can be produced and never consumed.
+
+### So the decision is actually three
+
+1. **Is the self-contained `Run` format still wanted at all** — as an output for
+   Python users, as an archive format, as a way to replay an evaluation?
+2. If yes, does it need a *reader*, or is writing enough? Only the reader is
+   `--plan_type Evaluator`; only the reader blocks the cleanups listed above.
+3. If it is wanted in full, it needs a fixture and a test like the HIP one — it
+   currently has neither, which is how it came to be forgotten.
+
+Answering (1) "no" is what would let `Scenario.proto`, `Run.proto` and
+`PartialOrderSchedule.proto` go, `Plan.proto` become purely the engine's
+internal representation, and the last of the legacy string-id handling be
+deleted. Answering (2) "writing is enough" gets most of that for much less.
+
+Not a question CI can settle: nobody in this repo has ever run that mode.
+Whoever knows why the Python bindings exist should decide.
+
+---
+
 ## Phase 3f — The proto layout ◐ PARTLY DONE
 
 The `HIP_*` / non-HIP split in `robust-rail-evaluator/protos/` does not mean what
@@ -435,17 +503,11 @@ parse target and nothing named it. Removed, with the file renamed to
 does not mean an unused *message* — HIP `NonServiceTraffic` and
 `DisabledTrackPart` are reached through accessors and `auto`.)
 
-### Not done, and the decision it waits on
+### Not done — and it is not simply blocked on `--plan_type Evaluator`
 
-**Retiring `--plan_type Evaluator` would delete `Scenario.proto` and `Run.proto`
-outright** and reduce `Plan.proto` to purely internal, leaving one input family
-and one internal one. That mode already has no test (see Phase 3c), and
-`run_evaluator.py` always passes `Solver`. It is the same open question, and
-this is the payoff for answering it.
-
-What would remain afterwards is a genuine question rather than debt: whether the
-engine's internal plan representation should be protobuf at all, given nothing
-serialises it any more.
+An earlier draft of this section claimed that retiring `--plan_type Evaluator`
+would delete `Scenario.proto` and `Run.proto` outright. That is wrong; see
+"`--plan_type Evaluator`" below for what those protos are really holding up.
 
 ---
 
