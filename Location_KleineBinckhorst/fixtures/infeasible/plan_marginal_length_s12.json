@@ -1,0 +1,363 @@
+{
+	"schemaVersion": 1,
+	"actions": [
+		{
+			"startTime": 3600,
+			"endTime": 3600,
+			"taskType": {
+				"predefined": "Arrive",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 0,
+				"memberIDs": [
+					0,
+					3
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 42,
+			"resources": [
+				{
+					"kind": "trackPart",
+					"id": 15
+				}
+			]
+		},
+		{
+			"startTime": 3600,
+			"endTime": 3810,
+			"taskType": {
+				"predefined": "Move",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 0,
+				"memberIDs": [
+					0,
+					3
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 15,
+			"resources": [
+				{
+					"kind": "trackPart",
+					"id": 59
+				},
+				{
+					"kind": "trackPart",
+					"id": 24
+				},
+				{
+					"kind": "trackPart",
+					"id": 58
+				},
+				{
+					"kind": "trackPart",
+					"id": 23
+				},
+				{
+					"kind": "trackPart",
+					"id": 57
+				},
+				{
+					"kind": "trackPart",
+					"id": 2
+				}
+			]
+		},
+		{
+			"startTime": 3810,
+			"endTime": 6090,
+			"taskType": {
+				"predefined": "Wait",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 0,
+				"memberIDs": [
+					0,
+					3
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 2,
+			"resources": []
+		},
+		{
+			"startTime": 4500,
+			"endTime": 4500,
+			"taskType": {
+				"predefined": "Arrive",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 1,
+				"memberIDs": [
+					2,
+					1
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 42,
+			"resources": [
+				{
+					"kind": "trackPart",
+					"id": 15
+				}
+			]
+		},
+		{
+			"startTime": 4500,
+			"endTime": 4800,
+			"taskType": {
+				"predefined": "Move",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 1,
+				"memberIDs": [
+					2,
+					1
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 15,
+			"resources": [
+				{
+					"kind": "trackPart",
+					"id": 59
+				},
+				{
+					"kind": "trackPart",
+					"id": 24
+				},
+				{
+					"kind": "trackPart",
+					"id": 58
+				},
+				{
+					"kind": "trackPart",
+					"id": 23
+				},
+				{
+					"kind": "trackPart",
+					"id": 57
+				},
+				{
+					"kind": "trackPart",
+					"id": 22
+				},
+				{
+					"kind": "trackPart",
+					"id": 56
+				},
+				{
+					"kind": "trackPart",
+					"id": 20
+				},
+				{
+					"kind": "trackPart",
+					"id": 55
+				},
+				{
+					"kind": "trackPart",
+					"id": 21
+				},
+				{
+					"kind": "trackPart",
+					"id": 66
+				},
+				{
+					"kind": "trackPart",
+					"id": 8
+				}
+			]
+		},
+		{
+			"startTime": 4800,
+			"endTime": 7800,
+			"taskType": {
+				"predefined": "Wait",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 1,
+				"memberIDs": [
+					2,
+					1
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 8,
+			"resources": []
+		},
+		{
+			"startTime": 6090,
+			"endTime": 6300,
+			"taskType": {
+				"predefined": "Move",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 0,
+				"memberIDs": [
+					0,
+					3
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 2,
+			"resources": [
+				{
+					"kind": "trackPart",
+					"id": 57
+				},
+				{
+					"kind": "trackPart",
+					"id": 23
+				},
+				{
+					"kind": "trackPart",
+					"id": 58
+				},
+				{
+					"kind": "trackPart",
+					"id": 24
+				},
+				{
+					"kind": "trackPart",
+					"id": 59
+				},
+				{
+					"kind": "trackPart",
+					"id": 15
+				}
+			]
+		},
+		{
+			"startTime": 6300,
+			"endTime": 6300,
+			"taskType": {
+				"predefined": "Exit",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 0,
+				"memberIDs": [
+					0,
+					3
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 15,
+			"resources": [
+				{
+					"kind": "trackPart",
+					"id": 42
+				}
+			]
+		},
+		{
+			"startTime": 7800,
+			"endTime": 8100,
+			"taskType": {
+				"predefined": "Move",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 1,
+				"memberIDs": [
+					2,
+					1
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 8,
+			"resources": [
+				{
+					"kind": "trackPart",
+					"id": 66
+				},
+				{
+					"kind": "trackPart",
+					"id": 21
+				},
+				{
+					"kind": "trackPart",
+					"id": 55
+				},
+				{
+					"kind": "trackPart",
+					"id": 20
+				},
+				{
+					"kind": "trackPart",
+					"id": 56
+				},
+				{
+					"kind": "trackPart",
+					"id": 22
+				},
+				{
+					"kind": "trackPart",
+					"id": 57
+				},
+				{
+					"kind": "trackPart",
+					"id": 23
+				},
+				{
+					"kind": "trackPart",
+					"id": 58
+				},
+				{
+					"kind": "trackPart",
+					"id": 24
+				},
+				{
+					"kind": "trackPart",
+					"id": 59
+				},
+				{
+					"kind": "trackPart",
+					"id": 15
+				}
+			]
+		},
+		{
+			"startTime": 8100,
+			"endTime": 8100,
+			"taskType": {
+				"predefined": "Exit",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 1,
+				"memberIDs": [
+					2,
+					1
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 15,
+			"resources": [
+				{
+					"kind": "trackPart",
+					"id": 42
+				}
+			]
+		}
+	]
+}

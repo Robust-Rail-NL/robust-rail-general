@@ -1,0 +1,1137 @@
+{
+  "fixtures": {
+    "feasible_small_s01": {
+      "config": "feasible_small",
+      "seed": 1,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s01.json",
+        "plan": "plan_feasible_small_s01.json",
+        "evaluation": "eval_feasible_small_s01.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s02": {
+      "config": "feasible_small",
+      "seed": 2,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s02.json",
+        "plan": "plan_feasible_small_s02.json",
+        "evaluation": "eval_feasible_small_s02.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s03": {
+      "config": "feasible_small",
+      "seed": 3,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s03.json",
+        "plan": "plan_feasible_small_s03.json",
+        "evaluation": "eval_feasible_small_s03.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s04": {
+      "config": "feasible_small",
+      "seed": 4,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s04.json",
+        "plan": "plan_feasible_small_s04.json",
+        "evaluation": "eval_feasible_small_s04.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s05": {
+      "config": "feasible_small",
+      "seed": 5,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s05.json",
+        "plan": "plan_feasible_small_s05.json",
+        "evaluation": "eval_feasible_small_s05.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s06": {
+      "config": "feasible_small",
+      "seed": 6,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s06.json",
+        "plan": "plan_feasible_small_s06.json",
+        "evaluation": "eval_feasible_small_s06.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s07": {
+      "config": "feasible_small",
+      "seed": 7,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s07.json",
+        "plan": "plan_feasible_small_s07.json",
+        "evaluation": "eval_feasible_small_s07.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s08": {
+      "config": "feasible_small",
+      "seed": 8,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s08.json",
+        "plan": "plan_feasible_small_s08.json",
+        "evaluation": "eval_feasible_small_s08.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s09": {
+      "config": "feasible_small",
+      "seed": 9,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s09.json",
+        "plan": "plan_feasible_small_s09.json",
+        "evaluation": "eval_feasible_small_s09.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s10": {
+      "config": "feasible_small",
+      "seed": 10,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s10.json",
+        "plan": "plan_feasible_small_s10.json",
+        "evaluation": "eval_feasible_small_s10.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s11": {
+      "config": "feasible_small",
+      "seed": 11,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s11.json",
+        "plan": "plan_feasible_small_s11.json",
+        "evaluation": "eval_feasible_small_s11.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s12": {
+      "config": "feasible_small",
+      "seed": 12,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s12.json",
+        "plan": "plan_feasible_small_s12.json",
+        "evaluation": "eval_feasible_small_s12.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s13": {
+      "config": "feasible_small",
+      "seed": 13,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s13.json",
+        "plan": "plan_feasible_small_s13.json",
+        "evaluation": "eval_feasible_small_s13.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s14": {
+      "config": "feasible_small",
+      "seed": 14,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s14.json",
+        "plan": "plan_feasible_small_s14.json",
+        "evaluation": "eval_feasible_small_s14.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s15": {
+      "config": "feasible_small",
+      "seed": 15,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s15.json",
+        "plan": "plan_feasible_small_s15.json",
+        "evaluation": "eval_feasible_small_s15.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s16": {
+      "config": "feasible_small",
+      "seed": 16,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s16.json",
+        "plan": "plan_feasible_small_s16.json",
+        "evaluation": "eval_feasible_small_s16.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s17": {
+      "config": "feasible_small",
+      "seed": 17,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s17.json",
+        "plan": "plan_feasible_small_s17.json",
+        "evaluation": "eval_feasible_small_s17.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s18": {
+      "config": "feasible_small",
+      "seed": 18,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s18.json",
+        "plan": "plan_feasible_small_s18.json",
+        "evaluation": "eval_feasible_small_s18.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s19": {
+      "config": "feasible_small",
+      "seed": 19,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s19.json",
+        "plan": "plan_feasible_small_s19.json",
+        "evaluation": "eval_feasible_small_s19.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "feasible_small_s20": {
+      "config": "feasible_small",
+      "seed": 20,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_feasible_small_s20.json",
+        "plan": "plan_feasible_small_s20.json",
+        "evaluation": "eval_feasible_small_s20.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s01": {
+      "config": "marginal_congestion",
+      "seed": 1,
+      "outcome": "unknown",
+      "reason": "Adding ShuntingUnit-ShuntingUnit-12 to Track 906b exceeds the maximum length (369.520000 > 255.000000) (solver: {'tlv': 1})",
+      "directory": "unresolved",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s01.json",
+        "plan": "plan_marginal_congestion_s01.json",
+        "evaluation": "eval_marginal_congestion_s01.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s02": {
+      "config": "marginal_congestion",
+      "seed": 2,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s02.json",
+        "plan": "plan_marginal_congestion_s02.json",
+        "evaluation": "eval_marginal_congestion_s02.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s03": {
+      "config": "marginal_congestion",
+      "seed": 3,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s03.json",
+        "plan": "plan_marginal_congestion_s03.json",
+        "evaluation": "eval_marginal_congestion_s03.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s04": {
+      "config": "marginal_congestion",
+      "seed": 4,
+      "outcome": "unknown",
+      "reason": "ShuntingUnit-ShuntingUnit-11 cannot leave Track 906b. One side is blocked by another train, the other side is a Bumper",
+      "directory": "unresolved",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s04.json",
+        "plan": "plan_marginal_congestion_s04.json",
+        "evaluation": "eval_marginal_congestion_s04.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s05": {
+      "config": "marginal_congestion",
+      "seed": 5,
+      "outcome": "unknown",
+      "reason": "ShuntingUnit-ShuntingUnit-13 cannot leave Track 906b. One side is blocked by another train, the other side is a Bumper",
+      "directory": "unresolved",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s05.json",
+        "plan": "plan_marginal_congestion_s05.json",
+        "evaluation": "eval_marginal_congestion_s05.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s06": {
+      "config": "marginal_congestion",
+      "seed": 6,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s06.json",
+        "plan": "plan_marginal_congestion_s06.json",
+        "evaluation": "eval_marginal_congestion_s06.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s07": {
+      "config": "marginal_congestion",
+      "seed": 7,
+      "outcome": "unknown",
+      "reason": "ShuntingUnit-ShuntingUnit-13 cannot leave Track 906b. One side is blocked by another train, the other side is a Bumper",
+      "directory": "unresolved",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s07.json",
+        "plan": "plan_marginal_congestion_s07.json",
+        "evaluation": "eval_marginal_congestion_s07.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s08": {
+      "config": "marginal_congestion",
+      "seed": 8,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s08.json",
+        "plan": "plan_marginal_congestion_s08.json",
+        "evaluation": "eval_marginal_congestion_s08.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s09": {
+      "config": "marginal_congestion",
+      "seed": 9,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s09.json",
+        "plan": "plan_marginal_congestion_s09.json",
+        "evaluation": "eval_marginal_congestion_s09.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s10": {
+      "config": "marginal_congestion",
+      "seed": 10,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s10.json",
+        "plan": "plan_marginal_congestion_s10.json",
+        "evaluation": "eval_marginal_congestion_s10.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s11": {
+      "config": "marginal_congestion",
+      "seed": 11,
+      "outcome": "unknown",
+      "reason": "ShuntingUnit-ShuntingUnit-3 cannot leave Track 906b. One side is blocked by another train, the other side is a Bumper",
+      "directory": "unresolved",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s11.json",
+        "plan": "plan_marginal_congestion_s11.json",
+        "evaluation": "eval_marginal_congestion_s11.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s12": {
+      "config": "marginal_congestion",
+      "seed": 12,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s12.json",
+        "plan": "plan_marginal_congestion_s12.json",
+        "evaluation": "eval_marginal_congestion_s12.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s13": {
+      "config": "marginal_congestion",
+      "seed": 13,
+      "outcome": "unknown",
+      "reason": "ShuntingUnit-ShuntingUnit-6 cannot leave Track 906b. Both sides blocked",
+      "directory": "unresolved",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s13.json",
+        "plan": "plan_marginal_congestion_s13.json",
+        "evaluation": "eval_marginal_congestion_s13.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s14": {
+      "config": "marginal_congestion",
+      "seed": 14,
+      "outcome": "unknown",
+      "reason": "ShuntingUnit-ShuntingUnit-5 cannot leave Track 906b. Both sides blocked",
+      "directory": "unresolved",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s14.json",
+        "plan": "plan_marginal_congestion_s14.json",
+        "evaluation": "eval_marginal_congestion_s14.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s15": {
+      "config": "marginal_congestion",
+      "seed": 15,
+      "outcome": "unknown",
+      "reason": "Adding ShuntingUnit-ShuntingUnit-8 to Track 906b exceeds the maximum length (255.260000 > 255.000000)",
+      "directory": "unresolved",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s15.json",
+        "plan": "plan_marginal_congestion_s15.json",
+        "evaluation": "eval_marginal_congestion_s15.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s16": {
+      "config": "marginal_congestion",
+      "seed": 16,
+      "outcome": "unknown",
+      "reason": "ShuntingUnit-ShuntingUnit-1 cannot leave Track 906b. One side is blocked by another train, the other side is a Bumper",
+      "directory": "unresolved",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s16.json",
+        "plan": "plan_marginal_congestion_s16.json",
+        "evaluation": "eval_marginal_congestion_s16.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s17": {
+      "config": "marginal_congestion",
+      "seed": 17,
+      "outcome": "unknown",
+      "reason": "ShuntingUnit-ShuntingUnit-8 cannot leave Track 906b. Both sides blocked",
+      "directory": "unresolved",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s17.json",
+        "plan": "plan_marginal_congestion_s17.json",
+        "evaluation": "eval_marginal_congestion_s17.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s18": {
+      "config": "marginal_congestion",
+      "seed": 18,
+      "outcome": "unknown",
+      "reason": "plan rejected (solver: {'dd': 1})",
+      "directory": "unresolved",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s18.json",
+        "plan": "plan_marginal_congestion_s18.json",
+        "evaluation": "eval_marginal_congestion_s18.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s19": {
+      "config": "marginal_congestion",
+      "seed": 19,
+      "outcome": "unknown",
+      "reason": "plan rejected (solver: {'dd': 1})",
+      "directory": "unresolved",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s19.json",
+        "plan": "plan_marginal_congestion_s19.json",
+        "evaluation": "eval_marginal_congestion_s19.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_congestion_s20": {
+      "config": "marginal_congestion",
+      "seed": 20,
+      "outcome": "unknown",
+      "reason": "ShuntingUnit-ShuntingUnit-3 cannot leave Track 906b. One side is blocked by another train, the other side is a Bumper",
+      "directory": "unresolved",
+      "files": {
+        "scenario": "scenario_marginal_congestion_s20.json",
+        "plan": "plan_marginal_congestion_s20.json",
+        "evaluation": "eval_marginal_congestion_s20.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s01": {
+      "config": "marginal_length",
+      "seed": 1,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s01.json",
+        "plan": "plan_marginal_length_s01.json",
+        "evaluation": "eval_marginal_length_s01.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s02": {
+      "config": "marginal_length",
+      "seed": 2,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s02.json",
+        "plan": "plan_marginal_length_s02.json",
+        "evaluation": "eval_marginal_length_s02.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s03": {
+      "config": "marginal_length",
+      "seed": 3,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s03.json",
+        "plan": "plan_marginal_length_s03.json",
+        "evaluation": "eval_marginal_length_s03.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s04": {
+      "config": "marginal_length",
+      "seed": 4,
+      "outcome": "infeasible",
+      "reason": "The length of the arrival train [1]: 270.620000 is greater than the length of the track's [15] it arrives:255.000000",
+      "directory": "infeasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s04.json",
+        "plan": "plan_marginal_length_s04.json"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s05": {
+      "config": "marginal_length",
+      "seed": 5,
+      "outcome": "infeasible",
+      "reason": "The length of the arrival train [0]: 270.620000 is greater than the length of the track's [15] it arrives:255.000000",
+      "directory": "infeasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s05.json",
+        "plan": "plan_marginal_length_s05.json"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s06": {
+      "config": "marginal_length",
+      "seed": 6,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s06.json",
+        "plan": "plan_marginal_length_s06.json",
+        "evaluation": "eval_marginal_length_s06.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s07": {
+      "config": "marginal_length",
+      "seed": 7,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s07.json",
+        "plan": "plan_marginal_length_s07.json",
+        "evaluation": "eval_marginal_length_s07.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s08": {
+      "config": "marginal_length",
+      "seed": 8,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s08.json",
+        "plan": "plan_marginal_length_s08.json",
+        "evaluation": "eval_marginal_length_s08.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s09": {
+      "config": "marginal_length",
+      "seed": 9,
+      "outcome": "infeasible",
+      "reason": "The length of the arrival train [1]: 270.620000 is greater than the length of the track's [15] it arrives:255.000000",
+      "directory": "infeasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s09.json",
+        "plan": "plan_marginal_length_s09.json"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s10": {
+      "config": "marginal_length",
+      "seed": 10,
+      "outcome": "infeasible",
+      "reason": "The length of the arrival train [1]: 270.620000 is greater than the length of the track's [15] it arrives:255.000000",
+      "directory": "infeasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s10.json",
+        "plan": "plan_marginal_length_s10.json"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s11": {
+      "config": "marginal_length",
+      "seed": 11,
+      "outcome": "infeasible",
+      "reason": "The length of the arrival train [1]: 270.620000 is greater than the length of the track's [15] it arrives:255.000000",
+      "directory": "infeasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s11.json",
+        "plan": "plan_marginal_length_s11.json"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s12": {
+      "config": "marginal_length",
+      "seed": 12,
+      "outcome": "infeasible",
+      "reason": "The length of the arrival train [0]: 270.620000 is greater than the length of the track's [15] it arrives:255.000000",
+      "directory": "infeasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s12.json",
+        "plan": "plan_marginal_length_s12.json"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s13": {
+      "config": "marginal_length",
+      "seed": 13,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s13.json",
+        "plan": "plan_marginal_length_s13.json",
+        "evaluation": "eval_marginal_length_s13.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s14": {
+      "config": "marginal_length",
+      "seed": 14,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s14.json",
+        "plan": "plan_marginal_length_s14.json",
+        "evaluation": "eval_marginal_length_s14.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s15": {
+      "config": "marginal_length",
+      "seed": 15,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s15.json",
+        "plan": "plan_marginal_length_s15.json",
+        "evaluation": "eval_marginal_length_s15.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s16": {
+      "config": "marginal_length",
+      "seed": 16,
+      "outcome": "infeasible",
+      "reason": "The length of the arrival train [0]: 324.120000 is greater than the length of the track's [15] it arrives:255.000000",
+      "directory": "infeasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s16.json",
+        "plan": "plan_marginal_length_s16.json"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s17": {
+      "config": "marginal_length",
+      "seed": 17,
+      "outcome": "infeasible",
+      "reason": "The length of the arrival train [0]: 270.620000 is greater than the length of the track's [15] it arrives:255.000000",
+      "directory": "infeasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s17.json",
+        "plan": "plan_marginal_length_s17.json"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s18": {
+      "config": "marginal_length",
+      "seed": 18,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s18.json",
+        "plan": "plan_marginal_length_s18.json",
+        "evaluation": "eval_marginal_length_s18.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s19": {
+      "config": "marginal_length",
+      "seed": 19,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s19.json",
+        "plan": "plan_marginal_length_s19.json",
+        "evaluation": "eval_marginal_length_s19.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    },
+    "marginal_length_s20": {
+      "config": "marginal_length",
+      "seed": 20,
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
+      "files": {
+        "scenario": "scenario_marginal_length_s20.json",
+        "plan": "plan_marginal_length_s20.json",
+        "evaluation": "eval_marginal_length_s20.txt"
+      },
+      "measured": "2026-08-08",
+      "images": {
+        "generator": "generator:latest",
+        "solver": "hip:latest",
+        "evaluator": "tors:latest"
+      },
+      "solver_max_duration": 15
+    }
+  },
+  "note": "Classification is recorded per fixture, and the directory mirrors it. 'feasible' and 'infeasible' do not rot: the first is witnessed by the plan saved beside it, the second is a scenario-level rejection and so a proof. 'unresolved' means this pipeline could not confirm a plan, which is a statement about the tools rather than the scenario \u2014 re-run the sweep after a solver or evaluator fix and some may move."
+}

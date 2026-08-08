@@ -29,6 +29,7 @@ import shutil
 import subprocess
 import sys
 from collections import Counter
+from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).parent
@@ -126,6 +127,67 @@ def _classify(loc: Path, base: str) -> tuple[str, str]:
     return "unknown", reason
 
 
+# Directory a classified fixture is saved under. "unresolved" rather than
+# "unknown" because the verdict is a statement about this pipeline at a moment in
+# time, not about the scenario: fixing a solver bug can move a scenario out of it.
+# The other two do not rot — an infeasible verdict is a proof, and a feasible one
+# is witnessed by the plan saved beside it.
+SAVE_DIRS = {"feasible": "feasible", "infeasible": "infeasible", "unknown": "unresolved"}
+
+
+def _resolve_images(version: str) -> dict[str, str]:
+    """The image each step would use, for the manifest."""
+    import importlib.util
+
+    images = {}
+    for step in ("generator", "solver", "evaluator"):
+        spec = importlib.util.spec_from_file_location(step, ROOT / f"run_{step}.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        images[step] = module.DOCKER_IMAGE_VERSIONS.get(version, "?")
+    return images
+
+
+# Lines of the evaluation kept. The evaluator writes a full simulation trace,
+# which runs to hundreds of kilobytes per run and dwarfs the scenario and plan it
+# describes. It is also regenerable from those two. Only the tail carries the
+# verdict and, for a rejected plan, the action it failed on.
+EVAL_TAIL_LINES = 40
+
+
+def _save_fixture(work: Path, base: str, dest: Path, name: str) -> dict[str, str]:
+    """Copy one seed's scenario, plan and evaluation into dest. Returns what was saved.
+
+    A scenario rejected before any plan has no plan or evaluation, so the set of
+    files varies by outcome and the manifest records which are present.
+    """
+    dest.mkdir(parents=True, exist_ok=True)
+    saved = {}
+    for kind, source in (
+        ("scenario", work / "scenarios" / f"scenario_{base}.json"),
+        ("plan", work / "plans" / f"plan_{base}.json"),
+    ):
+        if source.exists() and source.stat().st_size > 0:
+            target = dest / f"{kind}_{name}{source.suffix}"
+            shutil.copy2(source, target)
+            saved[kind] = target.name
+
+    evaluation = work / "evaluations" / f"eval_{base}.txt"
+    if evaluation.exists() and evaluation.stat().st_size > 0:
+        lines = evaluation.read_text(errors="replace").splitlines()
+        tail = lines[-EVAL_TAIL_LINES:]
+        header = (
+            f"[last {len(tail)} of {len(lines)} lines; "
+            f"regenerate the full trace by evaluating the scenario and plan beside this file]\n"
+            if len(lines) > len(tail)
+            else ""
+        )
+        target = dest / f"eval_{name}.txt"
+        target.write_text(header + "\n".join(tail) + "\n")
+        saved["evaluation"] = target.name
+    return saved
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Sweep a scenario configuration over seeds and classify each outcome.",
@@ -141,6 +203,10 @@ def main() -> None:
     parser.add_argument("--max-duration", type=int, default=20,
                         help="Solver MaxDuration in seconds per seed (default: 20).")
     parser.add_argument("--json", metavar="FILE", help="Write the per-seed results as JSON.")
+    parser.add_argument("--save", action="store_true",
+                        help="Save each seed's scenario, plan and evaluation under "
+                             "<location>/fixtures/<classification>/, and record them in "
+                             "fixtures/manifest.json.")
     parser.add_argument("--keep", action="store_true",
                         help="Keep the scratch location directory for inspection.")
     args = parser.parse_args()
@@ -196,9 +262,12 @@ def main() -> None:
 
         results = []
         for seed in seeds:
+            # The generator derives this from the config filename's last underscored
+            # token, hence the "_s<seed>" suffix on the per-seed config written above.
+            # Note run_generator.py's .out/.err use a different, config-based name.
             base = f"{config['location']}_{config['number_of_trains']}t_random_{seed}s_s{seed}"
             bucket, reason = _classify(work, base)
-            results.append({"seed": seed, "outcome": bucket, "reason": reason})
+            results.append({"seed": seed, "outcome": bucket, "reason": reason, "base": base})
 
         counts = Counter(r["outcome"] for r in results)
         print(f"\n{'seed':>5}  {'outcome':<11} reason")
@@ -211,6 +280,58 @@ def main() -> None:
             if counts[bucket]:
                 print(f"{counts[bucket]:>5}  {bucket:<11} {100 * counts[bucket] / total:.0f}%")
         print(f"{total:>5}  total")
+
+        if args.save:
+            fixtures = source / "fixtures"
+            images = _resolve_images(args.version)
+            measured = datetime.now().strftime("%Y-%m-%d")
+
+            # Merge rather than replace: each sweep owns only its own config's
+            # entries, so sweeping one config does not discard another's.
+            manifest_path = fixtures / "manifest.json"
+            manifest = (
+                json.loads(manifest_path.read_text()) if manifest_path.exists() else {"fixtures": {}}
+            )
+            for key in [k for k, v in manifest["fixtures"].items() if v["config"] == args.config]:
+                stale = fixtures / SAVE_DIRS.get(manifest["fixtures"][key]["outcome"], "unresolved")
+                for filename in manifest["fixtures"][key].get("files", {}).values():
+                    (stale / filename).unlink(missing_ok=True)
+                del manifest["fixtures"][key]
+
+            saved_count = 0
+            for result in results:
+                if result["outcome"] == "generator":
+                    continue  # nothing was produced to save
+                name = f"{args.config}_s{result['seed']:02d}"
+                dest = fixtures / SAVE_DIRS[result["outcome"]]
+                files = _save_fixture(work, result["base"], dest, name)
+                if not files:
+                    continue
+                saved_count += 1
+                manifest["fixtures"][name] = {
+                    "config": args.config,
+                    "seed": result["seed"],
+                    "outcome": result["outcome"],
+                    "reason": result["reason"],
+                    "directory": SAVE_DIRS[result["outcome"]],
+                    "files": files,
+                    "measured": measured,
+                    "images": images,
+                    "solver_max_duration": args.max_duration,
+                }
+
+            manifest["note"] = (
+                "Classification is recorded per fixture, and the directory mirrors it. "
+                "'feasible' and 'infeasible' do not rot: the first is witnessed by the "
+                "plan saved beside it, the second is a scenario-level rejection and so a "
+                "proof. 'unresolved' means this pipeline could not confirm a plan, which "
+                "is a statement about the tools rather than the scenario — re-run the "
+                "sweep after a solver or evaluator fix and some may move."
+            )
+            manifest["fixtures"] = dict(sorted(manifest["fixtures"].items()))
+            manifest_path.parent.mkdir(parents=True, exist_ok=True)
+            manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
+            print(f"\nSaved {saved_count} fixtures under {fixtures.relative_to(ROOT)}/")
 
         if args.json:
             Path(args.json).write_text(json.dumps(

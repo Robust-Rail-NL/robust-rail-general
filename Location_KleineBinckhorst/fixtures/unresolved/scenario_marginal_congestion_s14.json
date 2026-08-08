@@ -1,0 +1,874 @@
+{
+    "schemaVersion": 1,
+    "trainUnitTypes": [
+        {
+            "typePrefix": "VIRM",
+            "carriages": 4,
+            "length": 108.56,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 280,
+            "backAdditionTime": 25,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "VIRM",
+            "carriages": 6,
+            "length": 162.06,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 280,
+            "backAdditionTime": 24,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "DDZ",
+            "carriages": 4,
+            "length": 101.08,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 261,
+            "backAdditionTime": 30,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "DDZ",
+            "carriages": 6,
+            "length": 154.0,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 261,
+            "backAdditionTime": 23,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "SLT",
+            "carriages": 4,
+            "length": 69.36,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 120,
+            "backAdditionTime": 16,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "SLT",
+            "carriages": 6,
+            "length": 100.54,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 120,
+            "backAdditionTime": 15,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "ICM",
+            "carriages": 3,
+            "length": 80.6,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "ICM",
+            "carriages": 4,
+            "length": 107.1,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "ICR",
+            "carriages": 7,
+            "length": 222.6,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": true,
+            "isLoco": true,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "ICR",
+            "carriages": 9,
+            "length": 275.4,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": true,
+            "isLoco": true,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "FFF",
+            "carriages": 3,
+            "length": 63.2,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "FFF",
+            "carriages": 4,
+            "length": 80.7,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "SNG",
+            "carriages": 3,
+            "length": 59.5,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "SNG",
+            "carriages": 4,
+            "length": 75.7,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "SGMM",
+            "carriages": 2,
+            "length": 52.2,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "SGMM",
+            "carriages": 3,
+            "length": 78.69,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "ICNG",
+            "carriages": 5,
+            "length": 109.4,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "ICNG",
+            "carriages": 8,
+            "length": 164.9,
+            "reversalDuration": null,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        }
+    ],
+    "in": [
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 3300,
+            "departure": 3300,
+            "id": 0,
+            "members": [
+                {
+                    "typePrefix": "SGMM",
+                    "carriages": 2,
+                    "id": 7,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 5100,
+            "departure": 5100,
+            "id": 1,
+            "members": [
+                {
+                    "typePrefix": "FFF",
+                    "carriages": 3,
+                    "id": 20,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 4500,
+            "departure": 4500,
+            "id": 2,
+            "members": [
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": 14,
+                    "tasks": []
+                },
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": 17,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 1200,
+            "departure": 1200,
+            "id": 3,
+            "members": [
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": 11,
+                    "tasks": []
+                },
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": 8,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 1500,
+            "departure": 1500,
+            "id": 4,
+            "members": [
+                {
+                    "typePrefix": "SGMM",
+                    "carriages": 2,
+                    "id": 0,
+                    "tasks": []
+                },
+                {
+                    "typePrefix": "SGMM",
+                    "carriages": 2,
+                    "id": 15,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 4200,
+            "departure": 4200,
+            "id": 5,
+            "members": [
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": 12,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 2400,
+            "departure": 2400,
+            "id": 6,
+            "members": [
+                {
+                    "typePrefix": "FFF",
+                    "carriages": 3,
+                    "id": 22,
+                    "tasks": []
+                },
+                {
+                    "typePrefix": "FFF",
+                    "carriages": 3,
+                    "id": 9,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 900,
+            "departure": 900,
+            "id": 7,
+            "members": [
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": 5,
+                    "tasks": []
+                },
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": 4,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 0,
+            "departure": 0,
+            "id": 8,
+            "members": [
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": 2,
+                    "tasks": []
+                },
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": 13,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 4800,
+            "departure": 4800,
+            "id": 9,
+            "members": [
+                {
+                    "typePrefix": "SGMM",
+                    "carriages": 2,
+                    "id": 16,
+                    "tasks": []
+                },
+                {
+                    "typePrefix": "SGMM",
+                    "carriages": 2,
+                    "id": 6,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 2100,
+            "departure": 2100,
+            "id": 10,
+            "members": [
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": 3,
+                    "tasks": []
+                },
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": 19,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 1800,
+            "departure": 1800,
+            "id": 11,
+            "members": [
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": 18,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 600,
+            "departure": 600,
+            "id": 12,
+            "members": [
+                {
+                    "typePrefix": "FFF",
+                    "carriages": 3,
+                    "id": 10,
+                    "tasks": []
+                },
+                {
+                    "typePrefix": "FFF",
+                    "carriages": 3,
+                    "id": 21,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 2700,
+            "departure": 2700,
+            "id": 13,
+            "members": [
+                {
+                    "typePrefix": "FFF",
+                    "carriages": 3,
+                    "id": 1,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        }
+    ],
+    "inStanding": [],
+    "out": [
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 9000,
+            "departure": 9000,
+            "id": 14,
+            "trainUnits": [
+                {
+                    "typePrefix": "SGMM",
+                    "carriages": 2,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null,
+            "canDepartFromAnyTrack": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 6300,
+            "departure": 6300,
+            "id": 15,
+            "trainUnits": [
+                {
+                    "typePrefix": "FFF",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null,
+            "canDepartFromAnyTrack": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 5700,
+            "departure": 5700,
+            "id": 16,
+            "trainUnits": [
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null,
+            "canDepartFromAnyTrack": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 10200,
+            "departure": 10200,
+            "id": 17,
+            "trainUnits": [
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null,
+            "canDepartFromAnyTrack": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 6600,
+            "departure": 6600,
+            "id": 18,
+            "trainUnits": [
+                {
+                    "typePrefix": "SGMM",
+                    "carriages": 2,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "SGMM",
+                    "carriages": 2,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null,
+            "canDepartFromAnyTrack": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 5400,
+            "departure": 5400,
+            "id": 19,
+            "trainUnits": [
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null,
+            "canDepartFromAnyTrack": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 10500,
+            "departure": 10500,
+            "id": 20,
+            "trainUnits": [
+                {
+                    "typePrefix": "FFF",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "FFF",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null,
+            "canDepartFromAnyTrack": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 8100,
+            "departure": 8100,
+            "id": 21,
+            "trainUnits": [
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null,
+            "canDepartFromAnyTrack": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 7800,
+            "departure": 7800,
+            "id": 22,
+            "trainUnits": [
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null,
+            "canDepartFromAnyTrack": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 9300,
+            "departure": 9300,
+            "id": 23,
+            "trainUnits": [
+                {
+                    "typePrefix": "SGMM",
+                    "carriages": 2,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "SGMM",
+                    "carriages": 2,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null,
+            "canDepartFromAnyTrack": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 6900,
+            "departure": 6900,
+            "id": 24,
+            "trainUnits": [
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null,
+            "canDepartFromAnyTrack": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 6000,
+            "departure": 6000,
+            "id": 25,
+            "trainUnits": [
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null,
+            "canDepartFromAnyTrack": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 8700,
+            "departure": 8700,
+            "id": 26,
+            "trainUnits": [
+                {
+                    "typePrefix": "FFF",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "FFF",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null,
+            "canDepartFromAnyTrack": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 7500,
+            "departure": 7500,
+            "id": 27,
+            "trainUnits": [
+                {
+                    "typePrefix": "FFF",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null,
+            "canDepartFromAnyTrack": null
+        }
+    ],
+    "outStanding": [],
+    "startTime": 0,
+    "endTime": 10800,
+    "nonServiceTraffic": [],
+    "disabledTrackPart": [],
+    "workers": []
+}
