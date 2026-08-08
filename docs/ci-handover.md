@@ -1,99 +1,76 @@
-# Handover: setting up CI (Phase 3c)
+# CI (Phase 3c) — what was built, 2026-08-08
 
-Brief for a fresh session picking up the CI work. The specification is Phase 3c
-in `roadmap-2.0.0.md`; this covers what a cold start would otherwise have to
-rediscover, and the ways it could reasonably go wrong.
+This started as a brief for a fresh session picking up the CI work. That work is
+done; what follows is the outcome, kept because the reasoning behind a few of
+the choices is not visible in the workflow files. The specification is Phase 3c
+in `roadmap-2.0.0.md`.
 
-## Read this first: the work is on a branch
+## Where it lives
 
-All of it lives on `claude/2026-08-07-replay-fixes` in each of the three code
-repos, **not** on `noproto` / `pydantic`, which are unchanged on the remote.
-Check the branch out before doing anything, or you will wire CI up against a
-tree where the suites still fail.
+On `claude/2026-08-07-replay-fixes` in each of the four repos, validated through
+draft PRs into the migration branches: solver #15, evaluator #5, generator #10,
+this repo #7. Nothing was pushed to `noproto` or `pydantic`.
 
-| repo | base branch | session branch |
+Note that in each local checkout the branch is *named* `noproto` / `pydantic`
+but sits well ahead of the corresponding remote — the session work never landed
+there. `git branch --show-current` is not enough to tell you what you are
+looking at; compare against `origin/claude/2026-08-07-replay-fixes` too.
+
+## What each repo got
+
+| repo | workflow | check |
 |---|---|---|
-| `robust-rail-generator` | `pydantic` | *(no changes this session)* |
-| `robust-rail-solver` | `noproto` | `claude/2026-08-07-replay-fixes` |
-| `robust-rail-evaluator` | `noproto` | `claude/2026-08-07-replay-fixes` |
-| `scenario-planning-inputs` | `pydantic` | `claude/2026-08-07-replay-fixes` |
+| `robust-rail-generator` | `python.yml` | `uv run pytest` (14); schema freshness |
+| `robust-rail-solver` | `dotnet.yml` (existing, retargeted) | csharpier; build; smoke run; tests (35) |
+| `robust-rail-evaluator` | `ctest.yml` (new) | cmake configure/build; `ctest` (7/7) |
+| `scenario-planning-inputs` | `validate-fixtures.yml` (new) | schema freshness (gating); fixture validation (report-only) |
 
-## Current CI, which is less than it looks
+Triggers are push and pull_request on the stable branches plus the relevant
+migration branch, and `workflow_dispatch`. There is deliberately no `claude/**`
+wildcard: a session branch is validated by opening a PR, and the `pull_request`
+event runs the workflow from the merge commit, so a workflow added in the PR
+runs on its first push.
 
-| repo | what exists | reality |
-|---|---|---|
-| `robust-rail-generator` | nothing | no `.github` directory |
-| `robust-rail-solver` | `.github/workflows/dotnet.yml` — csharpier, build, run, test | **triggers on `main` and `dev` only**, so it has never run on the migration branch |
-| `robust-rail-evaluator` | `.github/workflows/docker-image.yml~` (an editor backup) | the real workflow exists only on a local `main-leon` branch, is on no pushed branch, and builds an image without running tests |
-| `scenario-planning-inputs` | nothing | no `.github` directory |
+## Things that were not obvious
 
-So the solver's workflow is a good template that has simply never been pointed at
-the right branches, and the evaluator effectively has no CI at all.
+**The solver's workflow was already red, and the triggers were not the reason.**
+It had never run on `noproto`, but PR #12 into `main` fired it on 2026-08-03 and
+it failed in 29s. `Program.cs` had acquired an absolute
+`/home/leon/Projects/...` prefix for its no-config default run, so that path
+worked on one machine. Retargeting the triggers alone would have left it failing
+on a step that has nothing to do with the migration.
 
-## Current state of the suites
+**The evaluator's CI was more absent than it looked.** The only file under
+`.github/` was an editor backup (`docker-image.yml~`), and `.github/` was not
+tracked in git at all on `noproto`. The real workflow existed on a local
+`main-leon` branch, was on no pushed branch, and built an image without running
+a test.
 
-All green as of 2026-08-08 on the session branch. Anything red is something you
-changed.
+**`EngineTest` and `CompatibilityTest` must not be given environment
+variables.** They used to need `LOCATION_PATH`, `SCENARIO_PATH`, `PLAN_PATH` and
+`RESULT_PATH`, and failed even when they were set. Both were rebuilt on
+2026-08-07 to be self-contained; nothing reads those variables now, and setting
+them in CI would only mislead the next person.
 
-| repo | command | result |
-|---|---|---|
-| generator | `python -m pytest -q` (in `.venv`) | 14 passed |
-| solver | `dotnet test` | 35 passed |
-| evaluator | `cmake --build build && (cd build && ctest)` | 7/7 passed |
+**The generator's schema export is the check everything else rests on.** The
+schemas are generated from the Pydantic models, and the solver, the evaluator
+and this repo all validate against them. A model edited without a re-export does
+not produce a failure downstream — it produces a pass against the old contract.
+So both the generator's workflow and this repo's re-export and diff them.
 
-The evaluator suite reaching 7/7 is new — `EngineTest` and `CompatibilityTest`
-failed for years. Do not "fix" them again; see the traps below.
+## Still open
 
-## Traps
-
-**1. `EngineTest` and `CompatibilityTest` were just rebuilt.** They used to need
-`LOCATION_PATH`, `SCENARIO_PATH`, `PLAN_PATH` and `RESULT_PATH` exported, and
-failed even when they were set, because they pointed at a fixture using the
-pre-unification field names. `CompatibilityTest` is now self-contained against
-`data/Demo/hip_plan_evaluation_test`; `EngineTest` kept only its self-contained
-case and its two environment-driven cases were deleted. **CI must not export
-those variables** — nothing reads them any more.
-
-**2. Do not pin a copy of the JSON schemas into this repo.** `validate_json.py`
-here is a sketch that reads them from a generator checkout via `--schema-dir`,
-which couples the repos; a pinned copy instead goes stale silently. Whatever the
-source, CI must also check that the generator's committed `schema/*.json` still
-matches `model_json_schema()`. Validating against a stale schema is worse than
-not validating, because it reports success. The schemas were verified in sync on
-2026-08-08.
-
-**3. `validate_json.py` currently reports 2 of 19 files valid.** That is real
-drift, not a broken script: train unit ids are strings in
-`Location_SimpleService` where the schema says integer (the string-to-int
-migration never reached it), and plans carry `null` where the schema says array.
-Do not gate CI on it until that is triaged, or the first run is red for reasons
-unrelated to CI.
-
-**4. `scenario_config_*.json` has no schema and must keep accepting unknown
-keys.** The generator's `check_config.py` is a list of presence checks that
-rejects nothing it does not recognise, and the three configurations added this
-session rely on that to carry their `intent` blocks. A strict config schema
-would invalidate them.
-
-**5. The solver's formatting check is load-bearing.** `dotnet csharpier check`
-runs as a separate job, and a pre-commit hook reformats on commit. Keep both, and
-expect CSharpier to rewrite files if you commit C# without running it.
-
-## Suggested order
-
-1. Fix the solver workflow's triggers so it runs on the migration branches, and
-   confirm it passes there. Cheapest useful step, and it validates the template.
-2. Give the evaluator a workflow: configure, build, `ctest`. It has none, and its
-   suite is the one that had never run.
-3. Add a generator workflow: `pytest`, plus the schema-freshness check.
-4. Leave `scenario-planning-inputs` until trap 3 is triaged. Its check is JSON
-   validation, which is currently red for pre-existing reasons.
-
-## Things deliberately left open
-
-- Whether `--plan_type Evaluator` (the cTORS-native plan path in `main.cpp`) is
-  still supported. It now has no test, and the pipeline always passes `Solver`.
-- Where the exported schemas should be published so that neither staleness nor
-  repo coupling is required.
+- **The fixture validation here does not gate.** It reports 2 of 18 valid: train
+  unit ids are strings in `Location_SimpleService`, and every plan has `null` in
+  `actions/*/trainUnitIds` where the schema says array. Both predate the
+  workflow. Triage them, then drop `continue-on-error` from
+  `.github/workflows/validate-fixtures.yml`.
+- **Where the schemas should be published.** This repo reads them from a
+  generator checkout pinned to `pydantic`, which couples the repos. A release
+  artifact (Phase 2) removes both that and the staleness risk.
+- **Whether `--plan_type Evaluator` is still supported.** The cTORS-native plan
+  path in `main.cpp` now has no test, and the pipeline always passes `Solver`.
+- **`dotnet build` warnings-as-errors** for the solver, which currently builds
+  with two nullable warnings in `Initial/SimpleHeuristic.cs`.
 - Two open solver issues block two fixtures and are not CI's concern:
   Robust-Rail-NL/robust-rail-solver#13 and #14.

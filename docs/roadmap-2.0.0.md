@@ -404,13 +404,17 @@ Evaluator / TORS:
 
 ---
 
-## Phase 3c — Continuous integration
+## Phase 3c — Continuous integration ✓ DONE
 
 Set up CI across all four repos before tagging 2.0.0. The case for doing it now
 rather than after: every defect found on 2026-08-07 had been present in every
 released version, and each one was invisible to the suites that already existed.
 Two of those suites cannot pass at all (see below), which is the sort of thing
 that only stays broken when nothing runs them.
+
+Done 2026-08-08. All four repos now have a workflow, on
+`claude/2026-08-07-replay-fixes` in each, validated through draft PRs into the
+migration branches (solver #15, evaluator #5, generator #10, this repo #7).
 
 ### Prerequisite: the two dead-weight evaluator tests ✓ DONE
 
@@ -435,38 +439,63 @@ never ran, but that mode now has no test at all and the pipeline never uses it:
 still supported. If it is, it wants a fixture like the HIP one; if it is not,
 retiring it removes a second plan format from the evaluator.
 
-### What each repo should run
+### What each repo runs
 
-| repo | check |
-|---|---|
-| `robust-rail-generator` | `pytest` (14 tests); confirm `schema/*.json` still matches `model_json_schema()` |
-| `robust-rail-solver` | `dotnet test` (27 tests); `dotnet build` warnings-as-errors is a separate decision |
-| `robust-rail-evaluator` | `ctest` — currently 5 green, 2 dead (above) |
-| `scenario-planning-inputs` | JSON validation of every fixture against the exported schemas (below) |
+| repo | workflow | check |
+|---|---|---|
+| `robust-rail-generator` | `.github/workflows/python.yml` | `pytest` (14); `schema/*.json` still matches `model_json_schema()` |
+| `robust-rail-solver` | `.github/workflows/dotnet.yml` | `csharpier check`; build; no-config smoke run; tests (35) |
+| `robust-rail-evaluator` | `.github/workflows/ctest.yml` | configure, build, `ctest` (7/7) |
+| `scenario-planning-inputs` | `.github/workflows/validate-fixtures.yml` | generator schema freshness (gating); fixture validation (report-only) |
+
+All four trigger on push and pull request against the stable branches and the
+relevant migration branch (`noproto` or `pydantic`), plus `workflow_dispatch`.
+No `claude/**` wildcard, so work on a session branch is validated by opening a
+PR into the migration branch — which is enough, because the `pull_request` event
+runs the workflow from the merge commit, so a workflow added in the PR does run.
+
+`dotnet build` warnings-as-errors remains a separate decision; the solver builds
+with two nullable warnings in `Initial/SimpleHeuristic.cs`.
+
+**The solver's workflow was red before any of this, for a reason worth
+recording.** It had never run on `noproto` — the triggers named only `main` and
+`dev` — but PR #12 into `main` did fire it on 2026-08-03, and it failed in 29s.
+The no-config default run in `Program.cs` had been given an absolute
+`/home/leon/Projects/...` prefix, so it worked on exactly one machine. Fixing
+the triggers alone would have left it red. The paths are relative again, as they
+were on `dev`.
 
 ### Schema validation in this repo
 
-`location.json`, `scenarios/*.json` and `plans/*.json` should be validated
-against the generator's exported schemas, which are generated from the Pydantic
-models and were verified in sync on 2026-08-08. This closes a real gap: several
-fixtures have been edited by hand — the ID migration and the electrification fix
-were both bulk edits — and nothing checks the result until a tool falls over on
-it, usually with a bad error message.
+`location.json`, `scenarios/*.json` and `plans/*.json` are validated against the
+generator's exported schemas. This closes a real gap: several fixtures have been
+edited by hand — the ID migration and the electrification fix were both bulk
+edits — and nothing checked the result until a tool fell over on it, usually
+with a bad error message.
 
-Two things to decide first:
+Two caveats, both encoded in the workflow:
 
-- **Where the schemas come from.** Pinning a copy in this repo means it silently
-  goes stale; reading them from a generator checkout couples the repos. Publishing
-  them as a release artifact alongside the images is probably the right answer,
-  and is already listed under Phase 2. Whatever the source, CI should also check
-  that the generator's committed `schema/*.json` still matches its models, or
-  everything downstream is validated against a stale schema.
-- **`scenario_config_*.json` has no schema at all.** It is validated by
-  `check_config.py`, which is a list of presence checks and rejects nothing it
-  does not recognise. Note that this is load-bearing: the `intent` blocks added
-  to the new configurations rely on unknown keys passing through untouched. If a
-  config schema is written, it has to permit `intent`, or those configurations
-  become invalid.
+- **The check does not gate yet.** It reports 2 of 18 fixtures valid. That is
+  real drift, not a broken script: train unit ids are strings in
+  `Location_SimpleService` (the string-to-int migration never reached it), and
+  every plan carries `null` in `actions/*/trainUnitIds` where the schema says
+  array. Failing the branch on known drift only teaches everyone to ignore the
+  check, so it runs under `continue-on-error` until those two are fixed. **Next
+  step for this repo: triage them, then drop `continue-on-error`.**
+- **Where the schemas come from is still open.** The workflow checks out
+  `robust-rail-generator` at `pydantic` and reads `schema/` from there, which
+  couples the repos and pins a branch name. A copy vendored here would instead
+  go stale in silence, which is worse — a stale schema does not fail, it passes
+  having checked the wrong contract. Publishing the schemas as a release
+  artifact (Phase 2) is the end state. Until then the workflow re-exports them
+  in the generator checkout and fails if they differ, and *that* step is gating.
+
+**`scenario_config_*.json` stays out of scope.** It has no schema. It is
+validated by `check_config.py`, which is a list of presence checks and rejects
+nothing it does not recognise. That is load-bearing: the `intent` blocks added
+to the new configurations rely on unknown keys passing through untouched. If a
+config schema is ever written, it has to permit `intent`, or those
+configurations become invalid.
 
 ---
 
