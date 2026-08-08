@@ -206,7 +206,7 @@ See the generator Phase 1/2 summary above (commits `d65d1ec`–`b54080c`) for wh
     legacy `PBTrainUnit` path).
   - Composite/shunting-unit-level ids (`IncomingTrain.id`, `TrainRequest.displayName`,
     `ShuntingUnit.id`/`parentIDs`/`childIDs`) are a separate concept, unaffected,
-    still strings.
+    still strings. **Superseded 2026-08-08 — see below; they are ints now too.**
   - **Two bugs found and fixed along the way**, both on the evaluator: a stale
     test assertion from the earlier `displayName` fix (`6e0aefa`), and dead
     debug scaffolding in `RunResult::CreateRunResult` that re-parsed the
@@ -404,6 +404,57 @@ Evaluator / TORS:
 
 ---
 
+## Phase 3d — Every id is an int ✓ DONE
+
+Completes the 2026-08-02 migration, which stopped at the unit-level ids. The
+composite ones it deliberately left alone — `IncomingTrain.id`, `Train.id`,
+`ShuntingUnit.id`/`parentIDs`/`childIDs`, `NonServiceTraffic.id` — are ints as
+of 2026-08-08, across all three repos and every fixture.
+
+**`TrainRequest.displayName` became `id`.** It was never a display name. The
+generator assigned it the departing train's id (`src/scenario.py`), the
+evaluator derived *two* identities from it (`Outgoing`'s id in `TrainGoal.cpp`
+and the id of that request's `ShuntingUnit` in `ShuntingUnit.cpp`), and the
+solver's only read printed it as `"train (id)"`. The type information the name
+suggested is carried per unit in `trainUnits`, as `(typePrefix, carriages)`.
+
+Two things fell out that are worth keeping:
+
+- **cTORS got simpler, not more complex.** It has represented these ids as
+  `int` throughout since long before the JSON migration, and was calling
+  `stoi()` on every one of them at the boundary. Four such calls are gone. The
+  legacy non-HIP `PBTrainGoal` path keeps its strings, its `stoi()` guards and
+  the `"****"` placeholder; it belongs to `--plan_type Evaluator`.
+- **A latent sort bug in the solver.** `PlanGraph`'s Wait-merging pass orders by
+  `ShuntingUnit.Id`, which over strings sorted unit 10 before unit 2. It is
+  numeric now. `GetShuntUnit` also stopped parsing every existing id out of its
+  string to mint the next one.
+
+Fixture validation went from 2/19 to 10/19 — every scenario now passes. All
+1,921 string ids were numeric, so nothing needed renumbering.
+
+### Left open
+
+- **The nine plans still fail validation**, for two reasons unrelated to ids and
+  each needing a decision rather than a conversion:
+  - Plans carry `memberIDs` and `standingType`; the model says `members` and
+    sets `extra="forbid"`. This is a live disagreement, not a lag — the
+    evaluator's `Plan.cpp` raises an error calling `members` the *legacy* field
+    and demanding `memberIDs`. Someone has to pick a name.
+  - `trainUnitIds` is `null` in all 606 actions, against a schema saying array.
+    Either the model accepts `Optional[list[int]]` or the writer emits `[]`.
+- **`TrainUnitType.displayName` → `(typePrefix, carriages)`**, which is a
+  different field that happens to share a name, and the one this migration is
+  sometimes confused with. Already done in the generator (a derived property,
+  off the wire), the solver (`TypeDisplayName()` returns the tuple) and every
+  fixture. Outstanding only in the evaluator: `TrainUnitType::types` is still
+  `map<string, TrainUnitType*>` keyed by the combined string (`Train.h:15`),
+  even though `Scenario.cpp:361` already notes the key must be
+  `(displayName, carriages)` because the name alone is not unique.
+  `TrainUnitTypes.proto:8` retires with it.
+
+---
+
 ## Phase 3c — Continuous integration ✓ DONE
 
 Set up CI across all four repos before tagging 2.0.0. The case for doing it now
@@ -475,26 +526,16 @@ with a bad error message.
 
 Two caveats, both encoded in the workflow:
 
-- **The check does not gate yet.** It reports 2 of 18 fixtures valid — the only
-  two that pass are the `location.json` files. That is real drift, not a broken
-  script, and it is wider than the earlier note in this document claimed: it is
-  not confined to `Location_SimpleService`. Every scenario and every plan fails,
-  for three independent reasons:
-  1. **Train-unit ids are strings everywhere.** All 127 of them, in all eight
-     scenarios. The 2026-08-02 `string` → `int` decision below reached the code
-     in all three repos and essentially none of the data.
-  2. **Plans use `memberIDs`, the model says `members`** — and also carry
-     `standingType`, which the unified model dropped. `RailModel` sets
-     `extra="forbid"`, so both are hard rejections. Note the evaluator disagrees
-     in the opposite direction: `Plan.cpp` raises an error calling `members` the
-     *legacy* field and demanding `memberIDs`.
-  3. **`actions/*/trainUnitIds` is `null`** in all 606 actions, where the schema
-     says array. It is never populated by anything.
+- **The check does not gate yet.** It reported 2 of 18 fixtures valid when the
+  workflow was written — the two `location.json` files. Phase 3d took that to
+  10 of 18 by making every id an int; all eight scenarios now pass.
 
-  Failing the branch on known drift only teaches everyone to ignore the check,
-  so it runs under `continue-on-error` until these are fixed. **Next step for
-  this repo: settle the id-type question below, then (2) and (3), then drop
-  `continue-on-error`.**
+  The nine plans still fail, for the two reasons recorded under Phase 3d, both
+  of which need a decision and not a conversion: `memberIDs` vs `members` (plus
+  `standingType` against `extra="forbid"`), and `trainUnitIds` being `null` in
+  all 606 actions. Failing the branch on known drift only teaches everyone to
+  ignore the check, so it runs under `continue-on-error` until then. **Next step
+  for this repo: settle those two, then drop `continue-on-error`.**
 - **Where the schemas come from is still open.** The workflow checks out
   `robust-rail-generator` at `pydantic` and reads `schema/` from there, which
   couples the repos and pins a branch name. A copy vendored here would instead

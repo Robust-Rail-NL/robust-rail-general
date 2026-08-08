@@ -60,14 +60,12 @@ So both the generator's workflow and this repo's re-export and diff them.
 
 ## Still open
 
-- **The fixture validation here does not gate.** It reports 2 of 18 valid — the
-  two `location.json` files. The drift is wider than this brief originally said:
-  not just `Location_SimpleService`, but every scenario and every plan, for
-  three separate reasons (train-unit ids are strings throughout; plans use
-  `memberIDs` and `standingType` against a model that says `members` and forbids
-  extras; `trainUnitIds` is always `null`). See Phase 3c in the roadmap. Settle
-  those, then drop `continue-on-error` from
-  `.github/workflows/validate-fixtures.yml`.
+- **The fixture validation here does not gate.** It is at 10 of 18 after
+  Phase 3d made every id an int; all eight scenarios pass, the nine plans do
+  not. What remains is two decisions, not conversions: `memberIDs` vs `members`
+  (plus `standingType` against `extra="forbid"`), and `trainUnitIds` being
+  `null` in all 606 actions. See Phase 3d in the roadmap. Settle those, then
+  drop `continue-on-error` from `.github/workflows/validate-fixtures.yml`.
 - **Where the schemas should be published.** This repo reads them from a
   generator checkout pinned to `pydantic`, which couples the repos. A release
   artifact (Phase 2) removes both that and the staleness risk.
