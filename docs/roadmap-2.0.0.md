@@ -372,6 +372,8 @@ Solver / HIP:
 Evaluator / TORS:
 - Look through git diff with main / dev.
 - See if we can get pyTORS to work?  Probably not.
+- Fix or delete `EngineTest` and `CompatibilityTest` — see Phase 3c, which is
+  blocked on this.
 - **Do a focused session on TORS's own search mode.**  TORS does not only
   replay and evaluate a plan; it can also generate one itself, and that looks
   to be what it was originally built for, with plan replay added later.  Worth
@@ -399,6 +401,60 @@ Evaluator / TORS:
   So the two modes share primitives whose contracts only hold in one of them.
   A survey of where else that is true would probably predict the next round of
   bugs rather than waiting to trip over them.
+
+---
+
+## Phase 3c — Continuous integration
+
+Set up CI across all four repos before tagging 2.0.0. The case for doing it now
+rather than after: every defect found on 2026-08-07 had been present in every
+released version, and each one was invisible to the suites that already existed.
+Two of those suites cannot pass at all (see below), which is the sort of thing
+that only stays broken when nothing runs them.
+
+### Prerequisite: the two dead-weight evaluator tests
+
+`EngineTest` and `CompatibilityTest` require `LOCATION_PATH`, `SCENARIO_PATH` and
+`PLAN_PATH` to be exported, and then fail with `map::at` against the bundled demo
+data. They fail identically at `489a72c`, so this is long-standing rather than
+new. Either give them defaults and working fixtures — `add_test` sets no
+`WORKING_DIRECTORY`, so they also depend on the caller's cwd — or delete them. A
+suite that always fails trains people to ignore the suite, which is plausibly
+part of why these bugs survived so long. Do not wire CI up around them in their
+current state.
+
+### What each repo should run
+
+| repo | check |
+|---|---|
+| `robust-rail-generator` | `pytest` (14 tests); confirm `schema/*.json` still matches `model_json_schema()` |
+| `robust-rail-solver` | `dotnet test` (27 tests); `dotnet build` warnings-as-errors is a separate decision |
+| `robust-rail-evaluator` | `ctest` — currently 5 green, 2 dead (above) |
+| `scenario-planning-inputs` | JSON validation of every fixture against the exported schemas (below) |
+
+### Schema validation in this repo
+
+`location.json`, `scenarios/*.json` and `plans/*.json` should be validated
+against the generator's exported schemas, which are generated from the Pydantic
+models and were verified in sync on 2026-08-08. This closes a real gap: several
+fixtures have been edited by hand — the ID migration and the electrification fix
+were both bulk edits — and nothing checks the result until a tool falls over on
+it, usually with a bad error message.
+
+Two things to decide first:
+
+- **Where the schemas come from.** Pinning a copy in this repo means it silently
+  goes stale; reading them from a generator checkout couples the repos. Publishing
+  them as a release artifact alongside the images is probably the right answer,
+  and is already listed under Phase 2. Whatever the source, CI should also check
+  that the generator's committed `schema/*.json` still matches its models, or
+  everything downstream is validated against a stale schema.
+- **`scenario_config_*.json` has no schema at all.** It is validated by
+  `check_config.py`, which is a list of presence checks and rejects nothing it
+  does not recognise. Note that this is load-bearing: the `intent` blocks added
+  to the new configurations rely on unknown keys passing through untouched. If a
+  config schema is written, it has to permit `intent`, or those configurations
+  become invalid.
 
 ---
 
