@@ -18,16 +18,26 @@ jobs:
     - uses: actions/checkout@v5
 
     # The schemas live in the generator. Reading them from a checkout couples
-    # the two repos and pins a branch name here; a copy vendored into this repo
-    # would instead go stale in silence. Neither is the end state — publishing
-    # them as a release artifact is (roadmap Phase 2) — but of the two, a
-    # coupling that is visible beats staleness that is not.
+    # the two repos; a copy vendored into this repo would instead go stale in
+    # silence. Neither is the end state — publishing them as a release artifact
+    # is (roadmap Phase 2) — but of the two, a coupling that is visible beats
+    # staleness that is not.
+    #
+    # The branch is not pinned, because an id or field-name change lands in the
+    # generator and here on the same branch, and validating the new fixtures
+    # against the base branch's schema measures the wrong thing entirely — it
+    # reported 2/18 for a tree that was really at 10/18. So: prefer a generator
+    # branch of the same name, fall back to pydantic for ordinary changes.
     - name: Check out the generator
-      uses: actions/checkout@v5
-      with:
-        repository: Robust-Rail-NL/robust-rail-generator
-        ref: pydantic
-        path: generator
+      run: |
+        repo=https://github.com/Robust-Rail-NL/robust-rail-generator
+        ref="${{ github.head_ref || github.ref_name }}"
+        if ! git ls-remote --exit-code --heads "$repo" "$ref" >/dev/null 2>&1; then
+          echo "No generator branch '$ref'; falling back to pydantic."
+          ref=pydantic
+        fi
+        echo "Validating against generator@$ref"
+        git clone --quiet --depth 1 --branch "$ref" "$repo" generator
 
     - name: Set up uv
       uses: astral-sh/setup-uv@v6
