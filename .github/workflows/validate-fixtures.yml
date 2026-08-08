@@ -54,18 +54,15 @@ jobs:
         git diff --exit-code schema/ \
           || { echo "::error::the generator's schema/ is stale — re-export and commit it there before trusting this run"; exit 1; }
 
-    # Report-only. The fixtures are at 2/19 for reasons that predate this
-    # workflow: train unit ids are strings in Location_SimpleService where the
-    # schema says integer (the string-to-int migration never reached it), and
-    # plans carry null where the schema says array. Gating on that now would
-    # only produce a red branch that says nothing new.
-    #
-    # Drop continue-on-error once those two are fixed and the run is at 19/19.
+    # Gating since 2026-08-08, when the last of the drift was cleared and every
+    # fixture validated. It ran report-only before that, at 2 of 18, on the
+    # reasoning that a permanently red check teaches everyone to ignore it — and
+    # it promptly did exactly that, staying green through a run that measured
+    # the fixtures against the wrong schema and said so only in the log.
     #
     # scenario_config_*.json is deliberately not covered: it has no schema, and
     # check_config.py's tolerance of unknown keys is what lets the
     # configurations carry their "intent" blocks.
     - name: Validate the fixtures
-      continue-on-error: true
       run: |
         uv run --with jsonschema python validate_json.py --schema-dir generator/schema

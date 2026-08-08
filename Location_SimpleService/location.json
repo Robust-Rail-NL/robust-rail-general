@@ -165,15 +165,15 @@
         {
             "id": 22,
             "type": "Reinigingsperron",
-            "relatedTrackParts": [
-                1
-            ],
             "taskTypes": [
                 {
                     "other": "Reinigingsperron"
                 }
             ],
-            "simultaneousUsageCount": 1
+            "simultaneousUsageCount": 1,
+            "relatedTrackPartIDs": [
+                1
+            ]
         }
     ],
     "taskTypes": []

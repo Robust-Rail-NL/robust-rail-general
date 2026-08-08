@@ -1104,10 +1104,6 @@
         {
             "id": 72,
             "type": "Reinigingsperron",
-            "relatedTrackParts": [
-                10,
-                11
-            ],
             "taskTypes": [
                 {
                     "other": "Reinigingsperron"
@@ -1117,25 +1113,35 @@
             "timeWindow": {
                 "start": 0,
                 "end": 100000
-            }
+            },
+            "relatedTrackPartIDs": [
+                10,
+                11
+            ]
         },
         {
             "id": 73,
             "type": "Wasmachine",
-            "relatedTrackParts": [
-                12
-            ],
             "taskTypes": [
                 {
                     "other": "Wasmachine"
                 }
             ],
-            "simultaneousUsageCount": 1
+            "simultaneousUsageCount": 1,
+            "relatedTrackPartIDs": [
+                12
+            ]
         },
         {
             "id": 74,
             "type": "Monteur",
-            "relatedTrackParts": [
+            "taskTypes": [
+                {
+                    "other": "Monteur"
+                }
+            ],
+            "simultaneousUsageCount": 1,
+            "relatedTrackPartIDs": [
                 1,
                 2,
                 3,
@@ -1144,13 +1150,7 @@
                 6,
                 7,
                 8
-            ],
-            "taskTypes": [
-                {
-                    "other": "Monteur"
-                }
-            ],
-            "simultaneousUsageCount": 1
+            ]
         }
     ],
     "taskTypes": [],

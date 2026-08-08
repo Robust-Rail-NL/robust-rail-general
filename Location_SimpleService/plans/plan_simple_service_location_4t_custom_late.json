@@ -14,8 +14,7 @@
 					2422
 				],
 				"parentIDs": [],
-				"childIDs": [],
-				"standingType": null
+				"childIDs": []
 			},
 			"location": 13,
 			"resources": [
@@ -38,8 +37,7 @@
 					2422
 				],
 				"parentIDs": [],
-				"childIDs": [],
-				"standingType": null
+				"childIDs": []
 			},
 			"location": 4,
 			"resources": [
@@ -66,8 +64,7 @@
 					2422
 				],
 				"parentIDs": [],
-				"childIDs": [],
-				"standingType": null
+				"childIDs": []
 			},
 			"location": 1,
 			"resources": [
@@ -90,8 +87,7 @@
 					2301
 				],
 				"parentIDs": [],
-				"childIDs": [],
-				"standingType": null
+				"childIDs": []
 			},
 			"location": 10,
 			"resources": [
@@ -114,8 +110,7 @@
 					2301
 				],
 				"parentIDs": [],
-				"childIDs": [],
-				"standingType": null
+				"childIDs": []
 			},
 			"location": 5,
 			"resources": [
@@ -150,8 +145,7 @@
 					2301
 				],
 				"parentIDs": [],
-				"childIDs": [],
-				"standingType": null
+				"childIDs": []
 			},
 			"location": 3,
 			"resources": []
@@ -169,8 +163,7 @@
 					2301
 				],
 				"parentIDs": [],
-				"childIDs": [],
-				"standingType": null
+				"childIDs": []
 			},
 			"location": 3,
 			"resources": []
@@ -188,8 +181,7 @@
 					2301
 				],
 				"parentIDs": [],
-				"childIDs": [],
-				"standingType": null
+				"childIDs": []
 			},
 			"location": 3,
 			"resources": [
@@ -212,8 +204,7 @@
 					2422
 				],
 				"parentIDs": [],
-				"childIDs": [],
-				"standingType": null
+				"childIDs": []
 			},
 			"location": 1,
 			"resources": []
@@ -231,8 +222,7 @@
 					2422
 				],
 				"parentIDs": [],
-				"childIDs": [],
-				"standingType": null
+				"childIDs": []
 			},
 			"location": 1,
 			"resources": [
@@ -259,8 +249,7 @@
 					2422
 				],
 				"parentIDs": [],
-				"childIDs": [],
-				"standingType": null
+				"childIDs": []
 			},
 			"location": 2,
 			"resources": [
@@ -270,6 +259,5 @@
 				}
 			]
 		}
-	],
-	"trackParts": null
+	]
 }

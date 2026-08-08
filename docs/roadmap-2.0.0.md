@@ -526,16 +526,15 @@ with a bad error message.
 
 Two caveats, both encoded in the workflow:
 
-- **The check does not gate yet.** It reported 2 of 18 fixtures valid when the
-  workflow was written — the two `location.json` files. Phase 3d took that to
-  10 of 18 by making every id an int; all eight scenarios now pass.
+- **The check gates, as of 2026-08-08.** It reported 2 of 18 when the workflow
+  was written — only the two `location.json` files — and ran under
+  `continue-on-error` on the reasoning that a permanently red check teaches
+  everyone to ignore it. Phase 3d took it to 10 of 18 by making every id an int,
+  and Phase 3e to 18 of 18. It is now a hard gate.
 
-  The nine plans still fail, for the two reasons recorded under Phase 3d, both
-  of which need a decision and not a conversion: `memberIDs` vs `members` (plus
-  `standingType` against `extra="forbid"`), and `trainUnitIds` being `null` in
-  all 606 actions. Failing the branch on known drift only teaches everyone to
-  ignore the check, so it runs under `continue-on-error` until then. **Next step
-  for this repo: settle those two, then drop `continue-on-error`.**
+  The interim state made its own argument for not lingering there: the run that
+  validated the fixtures against the wrong generator branch stayed green, and
+  said 2/18 only in the log, where nobody was looking.
 - **Where the schemas come from is still open**, and is the least settled part
   of this setup.
 
