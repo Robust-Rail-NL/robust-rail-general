@@ -21,6 +21,25 @@ The integration test harness is this repo (`scenario-planning-inputs`).
 
 ---
 
+## Branch naming
+
+All five repos share one integration branch, **`release/2.0.0`**, merged into
+each repo's stable branch and deleted when 2.0.0 ships. Renamed 2026-08-08 from
+`pydantic` (generator, scenario-planning-inputs), `noproto` (solver, evaluator)
+and `new_schemas` (planning-approach) — each named for an implementation detail
+rather than the goal, and differing per repo.
+
+The shared name is not only tidiness. `validate-fixtures.yml` reads the
+generator's schemas from the branch of the same name, so that a coordinated
+schema change is validated against its own schema rather than the base branch's.
+That only works when the name matches everywhere; with five different names it
+needed either a pointer file or manual runs.
+
+References to the old names in earlier phases below are historical and correct
+as written: that is where the work happened at the time.
+
+---
+
 ## Phase 0 — Decisions required before code changes
 
 These are judgment calls that block schema work. Resolve them in the design doc first.
@@ -474,7 +493,7 @@ Whoever knows why the Python bindings exist should decide.
 
 ## Phase 3g — planning-approach ◐ PARTLY DONE
 
-There is a fifth repo, `planning-approach` (branch `new_schemas`): a PDDL-based
+There is a fifth repo, `planning-approach`: a PDDL-based
 planner that reads location and scenario JSON and writes plans for the
 evaluator. It is a producer of the interchange format like the solver, and was
 not covered by Phases 1–3.
@@ -690,10 +709,9 @@ retiring it removes a second plan format from the evaluator.
 | `robust-rail-evaluator` | `.github/workflows/ctest.yml` | configure, build, `ctest` (7/7) |
 | `scenario-planning-inputs` | `.github/workflows/validate-fixtures.yml` | generator schema freshness (gating); fixture validation (report-only) |
 
-All four trigger on push and pull request against the stable branches and the
-relevant migration branch (`noproto` or `pydantic`), plus `workflow_dispatch`.
-No `claude/**` wildcard, so work on a session branch is validated by opening a
-PR into the migration branch — which is enough, because the `pull_request` event
+All four trigger on push and pull request against the stable branches and
+`release/2.0.0`, plus `workflow_dispatch`. No `claude/**` wildcard, so work on a
+session branch is validated by opening a PR into the release branch — which is enough, because the `pull_request` event
 runs the workflow from the merge commit, so a workflow added in the PR does run.
 
 `dotnet build` warnings-as-errors remains a separate decision; the solver builds

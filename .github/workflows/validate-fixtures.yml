@@ -1,12 +1,12 @@
 name: Validate fixtures
 
-# pydantic is the 2.0.0 migration branch; main is kept stable for the planner
-# team.
+# release/2.0.0 is the shared integration branch for the 2.0.0 release; main is
+# kept stable for the planner team.
 on:
   push:
-    branches: [ "main", "dev", "pydantic" ]
+    branches: [ "main", "dev", "release/2.0.0" ]
   pull_request:
-    branches: [ "main", "dev", "pydantic" ]
+    branches: [ "main", "dev", "release/2.0.0" ]
   workflow_dispatch:
 
 jobs:
@@ -23,18 +23,19 @@ jobs:
     # is (roadmap Phase 2) — but of the two, a coupling that is visible beats
     # staleness that is not.
     #
-    # The branch is not pinned, because an id or field-name change lands in the
+    # The branch is not pinned, because a field-name change lands in the
     # generator and here on the same branch, and validating the new fixtures
     # against the base branch's schema measures the wrong thing entirely — it
-    # reported 2/18 for a tree that was really at 10/18. So: prefer a generator
-    # branch of the same name, fall back to pydantic for ordinary changes.
+    # once reported 2/18 for a tree that was really at 10/18. Taking the branch
+    # of the same name works because every repo in this release uses one shared
+    # branch name; it is why they were renamed to release/2.0.0.
     - name: Check out the generator
       run: |
         repo=https://github.com/Robust-Rail-NL/robust-rail-generator
         ref="${{ github.head_ref || github.ref_name }}"
         if ! git ls-remote --exit-code --heads "$repo" "$ref" >/dev/null 2>&1; then
-          echo "No generator branch '$ref'; falling back to pydantic."
-          ref=pydantic
+          echo "No generator branch '$ref'; falling back to release/2.0.0."
+          ref=release/2.0.0
         fi
         echo "Validating against generator@$ref"
         git clone --quiet --depth 1 --branch "$ref" "$repo" generator

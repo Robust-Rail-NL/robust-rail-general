@@ -23,10 +23,10 @@ looking at; compare against `origin/claude/2026-08-07-replay-fixes` too.
 | `robust-rail-generator` | `python.yml` | `uv run pytest` (14); schema freshness |
 | `robust-rail-solver` | `dotnet.yml` (existing, retargeted) | csharpier; build; smoke run; tests (35) |
 | `robust-rail-evaluator` | `ctest.yml` (new) | cmake configure/build; `ctest` (7/7) |
-| `scenario-planning-inputs` | `validate-fixtures.yml` (new) | schema freshness (gating); fixture validation (report-only) |
+| `scenario-planning-inputs` | `validate-fixtures.yml` (new) | schema freshness; fixture validation (report-only then; gating since Phase 3e) |
 
-Triggers are push and pull_request on the stable branches plus the relevant
-migration branch, and `workflow_dispatch`. There is deliberately no `claude/**`
+Triggers are push and pull_request on the stable branches plus `release/2.0.0`
+(named `noproto`/`pydantic` at the time), and `workflow_dispatch`. There is deliberately no `claude/**`
 wildcard: a session branch is validated by opening a PR, and the `pull_request`
 event runs the workflow from the merge commit, so a workflow added in the PR
 runs on its first push.
@@ -60,15 +60,10 @@ So both the generator's workflow and this repo's re-export and diff them.
 
 ## Still open
 
-- **The fixture validation here does not gate.** It is at 10 of 18 after
-  Phase 3d made every id an int; all eight scenarios pass, the nine plans do
-  not. What remains is two decisions, not conversions: `memberIDs` vs `members`
-  (plus `standingType` against `extra="forbid"`), and `trainUnitIds` being
-  `null` in all 606 actions. See Phase 3d in the roadmap. Settle those, then
-  drop `continue-on-error` from `.github/workflows/validate-fixtures.yml`.
 - **Where the schemas should be published.** This repo reads them from a
-  generator checkout pinned to `pydantic`, which couples the repos. A release
-  artifact (Phase 2) removes both that and the staleness risk.
+  generator checkout on the branch of the same name, which couples the repos and
+  relies on every repo sharing one branch name. A release artifact keyed by
+  `schemaVersion` (Phase 2) removes both that and the staleness risk.
 - **Whether `--plan_type Evaluator` is still supported.** The cTORS-native plan
   path in `main.cpp` now has no test, and the pipeline always passes `Solver`.
 - **`dotnet build` warnings-as-errors** for the solver, which currently builds
