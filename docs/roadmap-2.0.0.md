@@ -404,6 +404,51 @@ Evaluator / TORS:
 
 ---
 
+## Phase 3f — The proto layout ◐ PARTLY DONE
+
+The `HIP_*` / non-HIP split in `robust-rail-evaluator/protos/` does not mean what
+its naming implies. It is not "HIP is current, the rest is legacy". Measured
+2026-08-08:
+
+| proto | what it actually is |
+|---|---|
+| `Location.proto` | **live input** — `location.json` parses into `proto_tors::Location`, *not* into anything HIP |
+| `HIP_Scenario.proto` | **live input** — `scenario.json` |
+| `HIP_Plan.proto` | **live input** — `plan.json` under `--plan_type Solver` |
+| `HIP_Common.proto` | **live** — `Resource`, `TaskType`, `PredefinedTaskType`, shared by the two above |
+| `Plan.proto`, `PartialOrderSchedule.proto` | **the engine's internal representation** — `PBAction` alone appears 31 times — *and* an input under `--plan_type Evaluator` |
+| `Scenario.proto`, `Run.proto` | reachable **only** under `--plan_type Evaluator` (`Plan.cpp:503`, `main.cpp:126`) |
+
+So each of the three inputs uses a different one of the two families, and the
+family called legacy is simultaneously the internal representation. Anyone
+reasoning from the names will pick the wrong file — which happened during
+Phase 3e, when `relatedTrackParts` was first renamed in `HIP_Location.proto` and
+the compiler objected that the live path reads `proto_tors::Facility`.
+
+### Done
+
+`HIP_Location.proto` declared `Location`, `Facility`, `TrackPart` and
+`TrackPartType` that nothing could reach — only `Location` could have been a
+parse target and nothing named it. Removed, with the file renamed to
+`HIP_Common.proto` for what it still holds. Nine unused typedefs dropped from
+`Proto.h` at the same time. (Careful with that as a signal: an unused *typedef*
+does not mean an unused *message* — HIP `NonServiceTraffic` and
+`DisabledTrackPart` are reached through accessors and `auto`.)
+
+### Not done, and the decision it waits on
+
+**Retiring `--plan_type Evaluator` would delete `Scenario.proto` and `Run.proto`
+outright** and reduce `Plan.proto` to purely internal, leaving one input family
+and one internal one. That mode already has no test (see Phase 3c), and
+`run_evaluator.py` always passes `Solver`. It is the same open question, and
+this is the payoff for answering it.
+
+What would remain afterwards is a genuine question rather than debt: whether the
+engine's internal plan representation should be protobuf at all, given nothing
+serialises it any more.
+
+---
+
 ## Phase 3e — One naming convention, and three fields that were never used ✓ DONE
 
 Done 2026-08-08. Fixture validation reaches 18/18 and now gates CI.
