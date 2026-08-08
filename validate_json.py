@@ -25,11 +25,20 @@ from typing import Optional
 ROOT = Path(__file__).parent
 
 # Which schema validates which fixtures, relative to a Location_* directory.
+#
+# fixtures/ holds the classified corpus written by `sweep_seeds.py --save`, filed
+# under feasible/, infeasible/ and unresolved/. Those are checked in and outlive
+# the run that produced them, so they are worth validating for the same reason
+# the working scenarios and plans are — more so, since a feasible fixture's plan
+# is evidence that the scenario can be planned at all, and evidence in a format
+# nothing can read any more is not evidence.
 FIXTURE_SCHEMAS = {
     "location.json": "schema_location.json",
     "scenarios/scenario_*.json": "schema_scenario.json",
     "plans/plan_*.json": "schema_plan.json",
     "configurations/scenario_config_*.json": "schema_scenario_config.json",
+    "fixtures/*/scenario_*.json": "schema_scenario.json",
+    "fixtures/*/plan_*.json": "schema_plan.json",
 }
 
 
