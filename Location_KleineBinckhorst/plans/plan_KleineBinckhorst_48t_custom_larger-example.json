@@ -24,8 +24,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 0,
@@ -118,8 +117,7 @@
 					"kind": "trackPart",
 					"id": 11
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 510,
@@ -144,8 +142,7 @@
 					"kind": "facility",
 					"id": 72
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 600,
@@ -170,8 +167,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 600,
@@ -264,8 +260,7 @@
 					"kind": "trackPart",
 					"id": 10
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 1110,
@@ -290,8 +285,7 @@
 					"kind": "facility",
 					"id": 72
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 1200,
@@ -316,8 +310,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 1200,
@@ -434,8 +427,7 @@
 					"kind": "trackPart",
 					"id": 9
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 1710,
@@ -455,8 +447,7 @@
 				"standingType": null
 			},
 			"location": 11,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 1740,
@@ -476,8 +467,7 @@
 				"standingType": null
 			},
 			"location": 9,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 1800,
@@ -502,8 +492,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 1800,
@@ -572,8 +561,7 @@
 					"kind": "trackPart",
 					"id": 14
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 2160,
@@ -593,8 +581,7 @@
 				"standingType": null
 			},
 			"location": 14,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 2310,
@@ -614,8 +601,7 @@
 				"standingType": null
 			},
 			"location": 10,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 2400,
@@ -640,8 +626,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 2400,
@@ -734,8 +719,7 @@
 					"kind": "trackPart",
 					"id": 10
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 2910,
@@ -760,8 +744,7 @@
 					"kind": "facility",
 					"id": 72
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 2910,
@@ -781,8 +764,7 @@
 				"standingType": null
 			},
 			"location": 11,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 3000,
@@ -807,8 +789,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 3000,
@@ -901,8 +882,7 @@
 					"kind": "trackPart",
 					"id": 11
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 3510,
@@ -927,8 +907,7 @@
 					"kind": "facility",
 					"id": 72
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 3510,
@@ -948,8 +927,7 @@
 				"standingType": null
 			},
 			"location": 10,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 3600,
@@ -974,8 +952,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 3600,
@@ -1028,8 +1005,7 @@
 					"kind": "trackPart",
 					"id": 3
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 3840,
@@ -1049,8 +1025,7 @@
 				"standingType": null
 			},
 			"location": 3,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 4110,
@@ -1070,8 +1045,7 @@
 				"standingType": null
 			},
 			"location": 11,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 4200,
@@ -1096,8 +1070,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 4200,
@@ -1134,8 +1107,7 @@
 					"kind": "trackPart",
 					"id": 1
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 4380,
@@ -1155,8 +1127,7 @@
 				"standingType": null
 			},
 			"location": 10,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 4380,
@@ -1176,8 +1147,7 @@
 				"standingType": null
 			},
 			"location": 1,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 4800,
@@ -1202,8 +1172,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 4800,
@@ -1296,8 +1265,7 @@
 					"kind": "trackPart",
 					"id": 10
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 5310,
@@ -1322,8 +1290,7 @@
 					"kind": "facility",
 					"id": 72
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 5400,
@@ -1348,8 +1315,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 5400,
@@ -1410,8 +1376,7 @@
 					"kind": "trackPart",
 					"id": 4
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 5670,
@@ -1431,8 +1396,7 @@
 				"standingType": null
 			},
 			"location": 4,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 5910,
@@ -1452,8 +1416,7 @@
 				"standingType": null
 			},
 			"location": 10,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 6000,
@@ -1478,8 +1441,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 6000,
@@ -1572,8 +1534,7 @@
 					"kind": "trackPart",
 					"id": 10
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 6510,
@@ -1598,8 +1559,7 @@
 					"kind": "facility",
 					"id": 72
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 6600,
@@ -1624,8 +1584,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 6600,
@@ -1670,8 +1629,7 @@
 					"kind": "trackPart",
 					"id": 2
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 6810,
@@ -1691,8 +1649,7 @@
 				"standingType": null
 			},
 			"location": 2,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 6900,
@@ -1717,8 +1674,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 6900,
@@ -1803,8 +1759,7 @@
 					"kind": "trackPart",
 					"id": 6
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 7260,
@@ -1824,8 +1779,7 @@
 				"standingType": null
 			},
 			"location": 6,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 7260,
@@ -1845,8 +1799,7 @@
 				"standingType": null
 			},
 			"location": 11,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 7300,
@@ -1871,8 +1824,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 7300,
@@ -1965,8 +1917,7 @@
 					"kind": "trackPart",
 					"id": 11
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 7600,
@@ -1991,8 +1942,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 7600,
@@ -2012,8 +1962,7 @@
 				"standingType": null
 			},
 			"location": 15,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 7710,
@@ -2033,8 +1982,7 @@
 				"standingType": null
 			},
 			"location": 10,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 7810,
@@ -2071,8 +2019,7 @@
 					"kind": "trackPart",
 					"id": 1
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 7810,
@@ -2097,8 +2044,7 @@
 					"kind": "facility",
 					"id": 72
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 7990,
@@ -2118,8 +2064,7 @@
 				"standingType": null
 			},
 			"location": 1,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 8000,
@@ -2144,8 +2089,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 8000,
@@ -2198,8 +2142,7 @@
 					"kind": "trackPart",
 					"id": 3
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 8240,
@@ -2252,8 +2195,7 @@
 					"kind": "trackPart",
 					"id": 8
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 8240,
@@ -2273,8 +2215,7 @@
 				"standingType": null
 			},
 			"location": 3,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 8510,
@@ -2294,8 +2235,7 @@
 				"standingType": null
 			},
 			"location": 8,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 8600,
@@ -2320,8 +2260,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 8600,
@@ -2422,8 +2361,7 @@
 					"kind": "trackPart",
 					"id": 10
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 9010,
@@ -2443,8 +2381,7 @@
 				"standingType": null
 			},
 			"location": 11,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 9100,
@@ -2469,8 +2406,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 9100,
@@ -2490,8 +2426,7 @@
 				"standingType": null
 			},
 			"location": 15,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 9140,
@@ -2592,8 +2527,7 @@
 					"kind": "trackPart",
 					"id": 11
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 9140,
@@ -2613,8 +2547,7 @@
 				"standingType": null
 			},
 			"location": 10,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 9140,
@@ -2634,8 +2567,7 @@
 				"standingType": null
 			},
 			"location": 11,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 9600,
@@ -2660,8 +2592,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 9600,
@@ -2681,8 +2612,7 @@
 				"standingType": null
 			},
 			"location": 15,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 9680,
@@ -2727,8 +2657,7 @@
 					"kind": "trackPart",
 					"id": 2
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 9680,
@@ -2753,8 +2682,7 @@
 					"kind": "facility",
 					"id": 72
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 9890,
@@ -2774,8 +2702,7 @@
 				"standingType": null
 			},
 			"location": 2,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 10000,
@@ -2800,8 +2727,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 10000,
@@ -2878,8 +2804,7 @@
 					"kind": "trackPart",
 					"id": 5
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 10330,
@@ -2899,8 +2824,7 @@
 				"standingType": null
 			},
 			"location": 5,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 10400,
@@ -2925,8 +2849,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 10400,
@@ -3027,8 +2950,7 @@
 					"kind": "trackPart",
 					"id": 10
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 10880,
@@ -3048,8 +2970,7 @@
 				"standingType": null
 			},
 			"location": 11,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 10940,
@@ -3074,8 +2995,7 @@
 					"kind": "facility",
 					"id": 72
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 11000,
@@ -3100,8 +3020,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 11000,
@@ -3130,8 +3049,7 @@
 					"kind": "trackPart",
 					"id": 41
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 11150,
@@ -3151,8 +3069,7 @@
 				"standingType": null
 			},
 			"location": 41,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 11600,
@@ -3177,8 +3094,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 11600,
@@ -3279,8 +3195,7 @@
 					"kind": "trackPart",
 					"id": 11
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 12000,
@@ -3305,8 +3220,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 12000,
@@ -3326,8 +3240,7 @@
 				"standingType": null
 			},
 			"location": 15,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 12140,
@@ -3380,8 +3293,7 @@
 					"kind": "trackPart",
 					"id": 8
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 12140,
@@ -3401,8 +3313,7 @@
 				"standingType": null
 			},
 			"location": 11,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 12140,
@@ -3422,8 +3333,7 @@
 				"standingType": null
 			},
 			"location": 11,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 12410,
@@ -3452,8 +3362,7 @@
 					"kind": "trackPart",
 					"id": 41
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 12410,
@@ -3473,8 +3382,7 @@
 				"standingType": null
 			},
 			"location": 8,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 12560,
@@ -3639,8 +3547,7 @@
 					"kind": "trackPart",
 					"id": 10
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 12560,
@@ -3660,8 +3567,7 @@
 				"standingType": null
 			},
 			"location": 41,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 13708,
@@ -3686,8 +3592,7 @@
 					"kind": "facility",
 					"id": 72
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 13708,
@@ -3772,8 +3677,7 @@
 					"kind": "trackPart",
 					"id": 6
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 13708,
@@ -3798,8 +3702,7 @@
 					"kind": "facility",
 					"id": 72
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 14308,
@@ -3819,8 +3722,7 @@
 				"standingType": null
 			},
 			"location": 10,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 14496,
@@ -3840,8 +3742,7 @@
 				"standingType": null
 			},
 			"location": 6,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 14908,
@@ -3861,8 +3762,7 @@
 				"standingType": null
 			},
 			"location": 11,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 14960,
@@ -3971,8 +3871,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 15500,
@@ -3997,8 +3896,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 15660,
@@ -4107,8 +4005,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 16200,
@@ -4133,8 +4030,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 16450,
@@ -4163,8 +4059,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 16600,
@@ -4189,8 +4084,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 16760,
@@ -4243,8 +4137,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 17000,
@@ -4269,8 +4162,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 17060,
@@ -4379,8 +4271,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 17600,
@@ -4405,8 +4296,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 17600,
@@ -4431,8 +4321,7 @@
 					"kind": "facility",
 					"id": 72
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 17600,
@@ -4452,8 +4341,7 @@
 				"standingType": null
 			},
 			"location": 10,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 17660,
@@ -4562,8 +4450,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 18200,
@@ -4588,8 +4475,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 18590,
@@ -4634,8 +4520,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 18800,
@@ -4660,8 +4545,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 18800,
@@ -4681,8 +4565,7 @@
 				"standingType": null
 			},
 			"location": 10,
-			"resources": [],
-			"trainUnitIds": null
+			"resources": []
 		},
 		{
 			"startTime": 19250,
@@ -4711,8 +4594,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 19400,
@@ -4737,8 +4619,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 19440,
@@ -4823,8 +4704,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 19800,
@@ -4849,8 +4729,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 20130,
@@ -4911,8 +4790,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 20400,
@@ -4937,8 +4815,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 20500,
@@ -5007,8 +4884,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 20800,
@@ -5033,8 +4909,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 20990,
@@ -5079,8 +4954,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 21200,
@@ -5105,8 +4979,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 21300,
@@ -5175,8 +5048,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 21600,
@@ -5201,8 +5073,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 21690,
@@ -5303,8 +5174,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 22200,
@@ -5329,8 +5199,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 22230,
@@ -5455,8 +5324,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 22800,
@@ -5481,8 +5349,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 22950,
@@ -5575,8 +5442,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 23400,
@@ -5601,8 +5467,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 23490,
@@ -5703,8 +5568,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 24000,
@@ -5729,8 +5593,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 24090,
@@ -5831,8 +5694,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 24600,
@@ -5857,8 +5719,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 24960,
@@ -5911,8 +5772,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 25200,
@@ -5937,8 +5797,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 25470,
@@ -6015,8 +5874,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 25800,
@@ -6041,8 +5899,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 25890,
@@ -6143,8 +6000,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 26400,
@@ -6169,8 +6025,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 26820,
@@ -6207,8 +6062,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 27000,
@@ -6233,8 +6087,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 27090,
@@ -6335,8 +6188,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 27600,
@@ -6361,8 +6213,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 28020,
@@ -6399,8 +6250,7 @@
 					"kind": "trackPart",
 					"id": 15
 				}
-			],
-			"trainUnitIds": null
+			]
 		},
 		{
 			"startTime": 28200,
@@ -6425,8 +6275,7 @@
 					"kind": "trackPart",
 					"id": 42
 				}
-			],
-			"trainUnitIds": null
+			]
 		}
 	],
 	"trackParts": null

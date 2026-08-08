@@ -536,13 +536,34 @@ Two caveats, both encoded in the workflow:
   all 606 actions. Failing the branch on known drift only teaches everyone to
   ignore the check, so it runs under `continue-on-error` until then. **Next step
   for this repo: settle those two, then drop `continue-on-error`.**
-- **Where the schemas come from is still open.** The workflow checks out
-  `robust-rail-generator` at `pydantic` and reads `schema/` from there, which
-  couples the repos and pins a branch name. A copy vendored here would instead
-  go stale in silence, which is worse — a stale schema does not fail, it passes
-  having checked the wrong contract. Publishing the schemas as a release
-  artifact (Phase 2) is the end state. Until then the workflow re-exports them
-  in the generator checkout and fails if they differ, and *that* step is gating.
+- **Where the schemas come from is still open**, and is the least settled part
+  of this setup.
+
+  The workflow clones `robust-rail-generator` and reads `schema/` from it. A
+  copy vendored into this repo would instead go stale in silence, which is
+  worse: a stale schema does not fail, it passes, having checked the wrong
+  contract. So the workflow also re-exports the schemas in that checkout and
+  fails if they differ from what is committed there — and *that* step gates,
+  even while the fixture validation itself does not.
+
+  **Which branch it clones caused a real false reading on 2026-08-08.** It was
+  pinned to `pydantic`, so the first run after the id migration validated the
+  newly converted fixtures against the pre-migration schema and reported 2/18
+  for a tree that was really at 10/18. The freshness gate passed throughout,
+  because that schema was perfectly consistent — with the wrong models. The
+  branch is now chosen to match: same name in the generator if it exists,
+  `pydantic` otherwise. That is enough for coordinated changes, which land in
+  both repos on one branch, but it is a naming convention standing in for a
+  contract, and it will mislead anyone who does not follow it.
+
+  **Where this should end up.** `schemaVersion` already exists on every fixture,
+  the generator already has `EXPECTED_SCHEMA_VERSION`, and the evaluator already
+  has `SchemaVersionTest`. Publishing the exported schemas as a release artifact
+  keyed by `schemaVersion` (the Phase 2 item) and validating each fixture against
+  *the version it declares* removes the branch guess and the staleness together,
+  and makes mixed-version fixtures during a migration expressible rather than
+  simply broken. Worth deciding once the release settles and schema changes
+  become rare and individually versioned.
 
 **`scenario_config_*.json` stays out of scope.** It has no schema. It is
 validated by `check_config.py`, which is a list of presence checks and rejects
