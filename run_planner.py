@@ -15,13 +15,14 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 CONTAINER_DB = "/app/database"
 
-# "protobuf"/"pydantic" mirror the other steps' --version choices so the
-# pipeline can pass --version uniformly, but no planner image is published
-# under either tag yet — the planner image is built locally (see
-# planning-approach-refactor/Dockerfile) until it's ready to publish.
+# These mirror the other steps' --version choices so the pipeline can pass
+# --version uniformly, but no planner image is published under any tag yet —
+# the planner image is built locally (see planning-approach-refactor/Dockerfile)
+# until it's ready to publish, which is why every key maps to the same image.
 PLANNER_DOCKER_IMAGE_VERSIONS = {
-    "protobuf": "planner:latest",
-    "pydantic": "planner:latest",
+    "legacy": "planner:latest",
+    "2.0.0": "planner:latest",
+    "2.0.0-assert": "planner:latest",
     "local": "planner:latest",
 }
 

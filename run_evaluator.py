@@ -9,15 +9,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
-    "protobuf": "ghcr.io/robust-rail-nl/tors:1.3.1",
-    "pydantic": "ghcr.io/robust-rail-nl/tors:2.0.0-beta.1",
+    "legacy": "ghcr.io/robust-rail-nl/tors:1.3.1",
+    "2.0.0": "ghcr.io/robust-rail-nl/tors:2.0.0-beta.1",
     # The evaluator is the oracle the pipeline trusts, and its assertions build
     # produces byte-identical output to the plain one (verified across all
     # KleineBinckhorst scenarios) while turning an internal invariant violation
     # into an abort rather than a verdict computed from corrupt state. A run
     # that trips one exits 134/139 with the assertion text in the .err file,
     # which reads very differently from an ordinary "plan is not valid".
-    "pydantic-assert": "ghcr.io/robust-rail-nl/tors:2.0.0-beta.2-assert",
+    "2.0.0-assert": "ghcr.io/robust-rail-nl/tors:2.0.0-beta.2-assert",
     "local": "tors:latest",
 }
 CONTAINER_DB = "/app/database"
@@ -91,7 +91,7 @@ def main() -> None:
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
-    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='protobuf',
+    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='legacy',
                         help="Pick a docker image version ('local' is reserved for locally built images).")
     args = parser.parse_args()
 

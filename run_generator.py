@@ -9,11 +9,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
-    "protobuf": "ghcr.io/robust-rail-nl/generator:1.2.2",
-    "pydantic": "ghcr.io/robust-rail-nl/generator:2.0.0-beta.1",
-    # The generator has no assertions build; same image as "pydantic-assert" is
+    "legacy": "ghcr.io/robust-rail-nl/generator:1.2.2",
+    "2.0.0": "ghcr.io/robust-rail-nl/generator:2.0.0-beta.1",
+    # The generator has no assertions build; same image as "2.0.0-assert" is
     # a pipeline configuration, not a per-tool build flag. See run_evaluator.py.
-    "pydantic-assert": "ghcr.io/robust-rail-nl/generator:2.0.0-beta.2",
+    "2.0.0-assert": "ghcr.io/robust-rail-nl/generator:2.0.0-beta.2",
     "local": "generator:latest",
 }
 CONTAINER_DB = "/app/database"
@@ -77,7 +77,7 @@ def main() -> None:
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
-    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='protobuf',
+    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='legacy',
                         help="Pick a docker image version ('local' is reserved for locally built images).")
     args = parser.parse_args()
 

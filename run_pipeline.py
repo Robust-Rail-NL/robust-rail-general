@@ -43,10 +43,11 @@ def main() -> None:
                         help="Pass --dry-run to each step.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
-    parser.add_argument("--version", choices=['protobuf', 'pydantic', 'pydantic-assert', 'local'],
-                        default='protobuf',
-                        help="Pick a docker image version ('local' is reserved for locally built "
-                             "images; 'pydantic-assert' runs the evaluator with assertions enabled "
+    parser.add_argument("--version", choices=['legacy', '2.0.0', '2.0.0-assert', 'local'],
+                        default='legacy',
+                        help="Pick a docker image version ('legacy' is the retiring protobuf "
+                             "pipeline; 'local' is reserved for locally built images; "
+                             "'2.0.0-assert' runs the evaluator with assertions enabled "
                              "for integration testing, and is not for baseline comparison).")
     parser.add_argument("--steps", metavar="STEPS",
                         default=",".join(ALL_STEPS),
