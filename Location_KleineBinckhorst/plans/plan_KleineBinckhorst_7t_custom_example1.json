@@ -5,7 +5,7 @@
 			"startTime": 0,
 			"endTime": 0,
 			"taskType": {
-				"predefined": "Wait",
+				"predefined": "StandIn",
 				"other": null
 			},
 			"shuntingUnit": {
@@ -17,6 +17,24 @@
 				"childIDs": []
 			},
 			"location": 2,
+			"resources": []
+		},
+		{
+			"startTime": 0,
+			"endTime": 0,
+			"taskType": {
+				"predefined": "StandIn",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 2,
+				"memberIDs": [
+					2802
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 3,
 			"resources": []
 		},
 		{
@@ -629,24 +647,6 @@
 		},
 		{
 			"startTime": 3870,
-			"endTime": 3870,
-			"taskType": {
-				"predefined": "Wait",
-				"other": null
-			},
-			"shuntingUnit": {
-				"id": 3,
-				"memberIDs": [
-					2601
-				],
-				"parentIDs": [],
-				"childIDs": []
-			},
-			"location": 10,
-			"resources": []
-		},
-		{
-			"startTime": 3870,
 			"endTime": 4834,
 			"taskType": {
 				"predefined": "Move",
@@ -777,6 +777,42 @@
 			]
 		},
 		{
+			"startTime": 4800,
+			"endTime": 4800,
+			"taskType": {
+				"predefined": "StandOut",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 3,
+				"memberIDs": [
+					2601
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 10,
+			"resources": []
+		},
+		{
+			"startTime": 4800,
+			"endTime": 4800,
+			"taskType": {
+				"predefined": "StandOut",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 1,
+				"memberIDs": [
+					2401
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 11,
+			"resources": []
+		},
+		{
 			"startTime": 4834,
 			"endTime": 5734,
 			"taskType": {
@@ -804,24 +840,6 @@
 			"endTime": 5734,
 			"taskType": {
 				"predefined": "Move",
-				"other": null
-			},
-			"shuntingUnit": {
-				"id": 1,
-				"memberIDs": [
-					2401
-				],
-				"parentIDs": [],
-				"childIDs": []
-			},
-			"location": 11,
-			"resources": []
-		},
-		{
-			"startTime": 5734,
-			"endTime": 5734,
-			"taskType": {
-				"predefined": "Wait",
 				"other": null
 			},
 			"shuntingUnit": {

@@ -3,6 +3,24 @@
 	"actions": [
 		{
 			"startTime": 0,
+			"endTime": 0,
+			"taskType": {
+				"predefined": "StandIn",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 3,
+				"memberIDs": [
+					2901
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 1,
+			"resources": []
+		},
+		{
+			"startTime": 0,
 			"endTime": 3154,
 			"taskType": {
 				"predefined": "Wait",
@@ -931,10 +949,10 @@
 			]
 		},
 		{
-			"startTime": 5074,
-			"endTime": 5074,
+			"startTime": 7200,
+			"endTime": 7200,
 			"taskType": {
-				"predefined": "Wait",
+				"predefined": "StandOut",
 				"other": null
 			},
 			"shuntingUnit": {

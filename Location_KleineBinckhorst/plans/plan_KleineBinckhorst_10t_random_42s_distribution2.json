@@ -5,7 +5,7 @@
 			"startTime": 0,
 			"endTime": 0,
 			"taskType": {
-				"predefined": "Wait",
+				"predefined": "StandIn",
 				"other": null
 			},
 			"shuntingUnit": {
@@ -18,6 +18,43 @@
 				"childIDs": []
 			},
 			"location": 6,
+			"resources": []
+		},
+		{
+			"startTime": 0,
+			"endTime": 0,
+			"taskType": {
+				"predefined": "StandIn",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 4,
+				"memberIDs": [
+					1
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 1,
+			"resources": []
+		},
+		{
+			"startTime": 0,
+			"endTime": 0,
+			"taskType": {
+				"predefined": "StandIn",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 5,
+				"memberIDs": [
+					4,
+					5
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 7,
 			"resources": []
 		},
 		{
