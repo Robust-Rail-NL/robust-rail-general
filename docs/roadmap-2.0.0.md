@@ -443,6 +443,24 @@ seven that differ do so only in key order — `id` moved to the front of the
 object — with equal parsed content. The committed fixtures were serialised by an
 older generator; nothing about their meaning has drifted.
 
+### Re-verified on `hip:2.0.0-beta.4`
+
+The solver moved to beta.4 for `641e380`, the fail-fast check in `Deque.Remove`
+(solver#11). Re-ran the whole pipeline against it: **all eleven plans
+byte-identical to the beta.3 ones, all eleven verdicts unchanged.** So that
+commit is inert on healthy paths, and everything recorded above still holds.
+
+The generator and evaluator stay at beta.3, which is correct rather than an
+oversight — neither repo's compiled source changed after its beta.3 tag, so
+`generator:2.0.0-beta.3` + `hip:2.0.0-beta.4` + `tors:2.0.0-beta.3` is the
+accurate description of what runs. Versions here are per-repo, not a release
+train, and the `--version` key names a pipeline configuration rather than a
+shared version number.
+
+`beta.3` was deliberately **not** re-tagged onto the newer commit. The images
+under that tag are what produced the evidence in this section, and moving a
+published tag would make that record unreproducible.
+
 ### What this run does not cover
 
 - x86-64 only. arm64 is now covered at the unit-test level (both repos' CI

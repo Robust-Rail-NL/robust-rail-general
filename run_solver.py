@@ -10,14 +10,18 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
     "legacy": "ghcr.io/robust-rail-nl/hip:1.4.2",
-    "2.0.0": "ghcr.io/robust-rail-nl/hip:2.0.0-beta.3",
+    # Ahead of the generator's and evaluator's beta.3 because only this repo's
+    # source changed after that tag (641e380, the Deque fail-fast). Versions are
+    # per-repo, not a release train: each tag describes its own source, and the
+    # --version key names a pipeline configuration rather than a shared number.
+    "2.0.0": "ghcr.io/robust-rail-nl/hip:2.0.0-beta.4",
     # Deliberately the plain image, not an -assert one. The solver is a
     # wall-clock-bounded local search, so an assertions-enabled build explores
     # less of the neighbourhood in the same budget and returns different plans
     # on any scenario that does not converge first — which would break the
     # comparison against the legacy baseline. Run the -assert solver image
     # separately as a soak test (seed sweeps looking for a violation) instead.
-    "2.0.0-assert": "ghcr.io/robust-rail-nl/hip:2.0.0-beta.3",
+    "2.0.0-assert": "ghcr.io/robust-rail-nl/hip:2.0.0-beta.4",
     "local": "hip:latest",
 }
 CONTAINER_DB = "/app/database"
