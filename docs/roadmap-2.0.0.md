@@ -356,10 +356,102 @@ solver-side debugging session at some point, but out of scope for the schema mig
 - No `scenario_solver_*.json` files produced or consumed ✓
 - `location.json` used throughout; `location_unified.json` and `location_solver.json` retired ✓ (already done on `pydantic` branch)
 
-Results above are from local builds. Once the `hip` solver's pre-existing intermittent
-crash (flagged just above) is fixed and `2.0.0-beta.2` images are built and pushed for
-all three repos, re-run the pipeline against the real ghcr.io images and update this
-section with the confirmed results.
+Results above are from local builds. The re-run against published images asked for
+here happened on 2026-08-09 and is recorded in the next section.
+
+---
+
+## Phase 3h — The `2.0.0-beta.3` run (2026-08-09)
+
+The first end-to-end run against **published** images since 2026-08-02, and the
+first at all since Phases 3d and 3e changed every id to an int, renamed
+`displayName`/`members`/`relatedTrackParts` and deleted four fields. Everything
+between those dates was verified by schema validation and unit tests, which
+establish that the files are well formed and that each tool parses them alone —
+not that the three agree at runtime. This closes that gap.
+
+Images: `generator`/`hip`/`tors:2.0.0-beta.3` from ghcr.io, x86-64.
+11 scenarios: the 8 canonical ones plus the three configurations added on
+2026-08-07 (`feasible_small`, `marginal_length`, `marginal_congestion`).
+Generator 11/11, solver 11/11, evaluator 8/11 exit-0. Whole pipeline: 2m20s.
+
+| Scenario | Verdict |
+|---|---|
+| `4t_random_1s_small` | **valid** |
+| `2t_random_1s_length` | **valid** |
+| `8t_custom_example2` | **valid** — was rejected on 2026-08-02 |
+| `10t_random_42s_distribution1` | infeasible: arrival train 270.62 m > track 15's 255 m |
+| `10t_random_42s_distribution2` | infeasible: departure train 270.62 m > track 15's 255 m |
+| `48t_custom_larger-example` | infeasible: arrival train 1006 324.12 m > 255 m |
+| `14t_random_1s_congestion` | not valid: adding SU-12 to 906b exceeds 255 m |
+| `6t_custom_example3` | not valid: parking not allowed on 906a |
+| `7t_custom_example1` | not valid: no-progress guard, stuck at T4800 |
+| `30t_random_98s_test` | not valid |
+| `simple_service_4t_custom_late` | not valid |
+
+**`example2` moved from rejected to valid.** On 2026-08-02 it failed with
+"Scenario failed: Invalid action" on both sides of the comparison; it now
+produces a plan the evaluator accepts. That is the 2026-08-07 replay fixes
+landing on a canonical fixture, and it is the single clearest piece of evidence
+that they were worth making.
+
+**`example3`'s rejection is consistent with the parking fix rather than a
+regression of it.** `legal_on_parking_track_rule` no longer rejects a *movement*
+ending on a non-parking track; what fails now is a `Wait` on the gateway, which
+is solver#13 exactly as filed — the solver parks a train on 906a because it
+cannot move into the yard yet.
+
+**`example1` hits an infinite-loop guard**, not a verdict: "EvaluatePlan made no
+progress (state time stuck at T4800, plan action iterator not advancing) for 100
+consecutive iterations; aborting instead of spinning forever." Related to
+solver#14. This is the one result here that is not yet understood, and it is
+listed under Phase 4 as an rc blocker.
+
+### The assert pass agrees
+
+Re-evaluated the same plans with `--version 2.0.0-assert`, which differs from
+`2.0.0` in exactly one image — the evaluator's — because
+`run_generator.py`/`run_solver.py` deliberately map it to the plain build. The
+second pass must be `--steps evaluator`: re-solving would produce its own plans
+and the diff would compare two unrelated things.
+
+Identical verdicts on all 11. 26 of 27 output files byte-identical; the
+twenty-seventh differs only in `docker pull` progress chatter captured into an
+`.err`, with matching substantive content. **No assertion fired anywhere.**
+
+`tors:2.0.0-beta.3-assert` is the first assert image ever published — until
+`robust-rail-evaluator` `b08a14c`/`49fa588` the push script never passed the
+build-arg the Dockerfile had always accepted, so the `2.0.0-assert` selector had
+referred to a nonexistent image for a whole release.
+
+### Reproducibility
+
+**The solver is deterministic run-to-run.** Four consecutive `run_solver.py
+--version 2.0.0` runs produced byte-identical plans for all 11 scenarios. This
+was initially assumed otherwise, on the grounds that a wall-clock-bounded local
+search cannot be reproducible — wrong here, because `StopWhenFeasible: true`
+means these searches terminate on a condition and none comes near the 3600 s
+budget (the whole step runs in well under two minutes). The budget would only
+arbitrate on a scenario hard enough to exhaust it, and none of these are.
+
+That matters for reading the fixture diff: the three plans that differ from the
+committed ones are a deterministic consequence of the beta.1 → beta.3 code
+changes, not timing noise.
+
+**Regenerated scenarios are semantically identical to the committed ones.** All
+seven that differ do so only in key order — `id` moved to the front of the
+object — with equal parsed content. The committed fixtures were serialised by an
+older generator; nothing about their meaning has drifted.
+
+### What this run does not cover
+
+- x86-64 only. arm64 is now covered at the unit-test level (both repos' CI
+  matrices as of 2026-08-09) but the pipeline has never run there. A cross-arch
+  comparison would not be meaningful anyway for the reason above — it would be
+  a different machine, and the guarantee is conditional on not exhausting the
+  time budget.
+- solver#11's intermittent crash did not fire. At a rate of roughly 1 in 3 that
+  is unsurprising and is not evidence of absence.
 
 ---
 
