@@ -1,23 +1,25 @@
 # Roadmap: 2.0.0 release of generator, HIP, and TORS
 
-## Context
+## Status
 
-The pydantic pipeline (generator, hip, tors) runs end-to-end on a single `location.json`.
-Protobuf-vs-pydantic comparison results are recorded directly in Phase 3 below (the
-standalone `docs/protobuf-pydantic-comparison.md` was retired once that became the
-single source of truth for parity results — see git history if the old alpha-era
-category-by-category diff catalog is ever needed). The remaining work before stable
-2.0.0 releases falls into four areas:
+The unified interchange schema is frozen and implemented across all five repos.
+The pipeline runs end-to-end on published images, all five repos have gating CI,
+and the release evidence is recorded under [Release evidence](#release-evidence)
+below.
 
-1. **Scenario unification** — the generator currently emits two files per scenario:
-   `scenario_*.json` (non-HIP field names, for the evaluator) and `scenario_solver_*.json`
-   (HIP field names, for the solver). The goal is one file, one schema, consumed by both.
-2. **Resolve open design questions** before freezing the schema.
-3. **Coordinated breaking changes** in HIP (C#) and TORS (C++) to match the unified schema.
-4. **Generator cleanup** — drop the protobuf dependency; finalise `displayName` and `priority`.
+**One thing gates rc.1:** Robust-Rail-NL/robust-rail-solver#11, the intermittent
+crash in `Deque`/`TrackOccupation`. It has a deterministic reproduction as of
+2026-08-09 and is being fixed rather than documented, by decision.
 
-The design source of truth is `robust-rail-generator/unified-schema-design.md`.
-The integration test harness is this repo (`scenario-planning-inputs`).
+Everything else outstanding is either a decision with no defect behind it, or a
+known issue to name in the release notes.
+
+> Condensed 2026-08-09, when the remaining work became small enough that the
+> record of how we got here was crowding it out. Completed phases are summarised
+> here as decisions-in-force plus a pointer; the full narrative — every commit,
+> every measurement, every wrong turn — is in this file's git history. If you
+> need to know *why* something is the way it is and the answer is not below,
+> `git log -p docs/roadmap-2.0.0.md` has it.
 
 ---
 
@@ -32,347 +34,189 @@ rather than the goal, and differing per repo.
 The shared name is not only tidiness. `validate-fixtures.yml` reads the
 generator's schemas from the branch of the same name, so that a coordinated
 schema change is validated against its own schema rather than the base branch's.
-That only works when the name matches everywhere; with five different names it
-needed either a pointer file or manual runs.
+That only works when the name matches everywhere.
 
-References to the old names in earlier phases below are historical and correct
-as written: that is where the work happened at the time.
-
----
-
-## Phase 0 — Decisions required before code changes
-
-These are judgment calls that block schema work. Resolve them in the design doc first.
-
-| # | Question | Where it matters |
-|---|---|---|
-| 0a | ~~Is `TrainUnitType.reversalDuration` computed from `backNormTime`/`backAdditionTime`, or a separate concept?~~ | **Confirmed computed** — drop from wire format; HIP C# derives it locally |
-| 0b | ~~Confirm `displayName` cleanup: `"SLT"` + `carriages: 4` instead of `"SLT4"`~~ | **Confirmed** — `displayName` is type family only; `carriages` is separate; consumers key on `(displayName, carriages)` pair |
-| 0c | ~~`TaskSpec.priority`: confirm it can be dropped everywhere~~ | **Resolved: rename to `optional: bool`** — TORS uses it as a binary 0/non-zero flag only; HIP drops it entirely |
-| 0d | ~~`Resource` discriminator: keep "exactly one of three nullables" or introduce an explicit `kind` field?~~ | **Resolved: `{ "kind": "trackPart"\|"facility"\|"staff", "id": <int> }`** — part of schemaVersion 1; `name` field dropped; evaluator hard-errors on unrecognised `kind` |
-| 0e | ~~Does `trainUnitTypes` stay on `Scenario`, referenced by name from `TrainUnit`?~~ | **Confirmed** — already the case in pydantic output |
-| 0f | ~~`Plan`: same schema file as Scenario/Location, or separate? And remove `Plan.trackParts`?~~ | **Resolved** — `plan.py` is already separate; TORS never reads `trackParts` (uses `--path_location`); drop field from schema and stop emitting it in HIP |
-| 0g | ~~Schema versioning: add `schemaVersion` to `Location`, `Scenario`, and `Plan` top level?~~ | **Decided** — see Phase 1a below |
-| 0h | ~~Forward-compatibility policy: `extra="forbid"` or `extra="ignore"` for new optional fields?~~ | **Decided: warn-and-continue** — see Phase 1a below |
+References to the old names in git history are correct as written: that is where
+the work happened at the time.
 
 ---
 
-## Phase 1a — `schemaVersion` field ✓ COMPLETE
+## Open — the rc.1 gate
 
-### Decisions
+**solver#11 — `Deque.Remove` on a node that is not in the deque.**
 
-- **Format:** independent monotonic integer, starting at `1` for the 2.0.0 release.
-  Increments only on breaking schema changes, decoupled from tool release versions.
-- **Scope:** one shared interchange version across `Location`, `Scenario`, and `Plan`.
-  All three carry the same value; all three bump together on a breaking change.
-- **Mismatch behaviour:** warn-and-continue. A missing or unexpected `schemaVersion`
-  produces a logged warning; parsing proceeds regardless. No hard reject.
-- **Constant:** each tool defines `EXPECTED_SCHEMA_VERSION = 1` locally. All three are
-  updated together as part of a coordinated release when the version increments.
-- **Changelog:** `SCHEMA_CHANGELOG.md` in `robust-rail-generator` records what changed
-  at each version.
+Reproduces deterministically once the *solver* seed varies:
+`run_solver.py` pins `Seed: 1`, which is why four consecutive pipeline runs give
+byte-identical plans and never crash. Sweeping the seed over
+`KleineBinckhorst_10t_random_42s_distribution2`, seeds 2/4/6/8/10/12 crash and
+the odd ones pass.
 
-### Implementation per repo
+Established: the same `TrackTask` is departed **twice**, on the correct
+occupation, within a single `ComputeModel` pass. Nothing detects it because
+`State.HasDeparted` is cleared only by `State.Reset()`, `Arrive` never clears it,
+and `Depart` never consults it.
 
-**`robust-rail-generator` (Python/Pydantic)**
-- Add `schema_version: int = 1` to `Location`, `Scenario`, and `Plan` Pydantic models
-  (wire name `schemaVersion` via `alias` or `model_config`)
-- Generator emits `schemaVersion: 1` in output `scenario_*.json`
-- Generator warns on read if `location_unified.json` has a missing or unexpected value
-- Create `SCHEMA_CHANGELOG.md`
+`641e380` added a fail-fast membership check to `Deque.Remove` (O(1) always, plus
+an exhaustive walk under `DEBUG`). It does not change which seeds fail — it makes
+the failure land closer to the cause. Its exhaustive check never fired on a
+passing seed, so **plans produced under `Seed: 1` are not built on a corrupted
+deque**, which had been an open worry about the committed fixtures.
 
-**`robust-rail-solver` (HIP, C#)**
-- Add `SchemaVersion` property (JSON: `schemaVersion`) to `Location`, `Scenario`, `Plan` records
-- On read (`Location`, `Scenario`): warn if missing or `!= EXPECTED_SCHEMA_VERSION`
-- On write (`Plan`): emit `schemaVersion: EXPECTED_SCHEMA_VERSION`
-
-**`robust-rail-evaluator` (TORS, C++)**
-- Parse `schemaVersion` from `Location`, `Scenario`, and `Plan` JSON
-- On read: warn if missing or `!= EXPECTED_SCHEMA_VERSION`
-- No write path needed (TORS is a pure consumer)
-
-**`scenario-planning-inputs` (this repo)**
-- Add `"schemaVersion": 1` to `location_unified.json` in each `Location_*` directory
-- No script changes needed
+Still open: which two call sites make the pair —
+`PlanGraph.ComputeLocation:197` and/or `PlanGraph.computeDepartureRoutes:769`.
+That decides whether the fix removes a redundant call or repairs a loop that
+revisits a task. The full brief, including a retracted intermediate conclusion
+and the instrument that caused it, is in solver#11's comments.
 
 ---
 
-## Phase 1 — Scenario unification
+## Open — known issues to name in the release notes
 
-**Goal:** one `scenario_<X>.json` per case, consumed by both the solver and the evaluator.
-
-### Current situation
-
-The two files differ in the field names used for `IncomingTrain` and `TrainRequest`:
-
-| Concept | `scenario_*.json` (evaluator, non-HIP) | `scenario_solver_*.json` (HIP) |
-|---|---|---|
-| Entry track | `sideTrackPart` | `entryTrackPart` |
-| First parking track | `parkingTrackPart` | `firstParkingTrackPart` |
-| Arrival time | `time` (overloaded) | `arrival` |
-| Departure time | (absent) | `departure` |
-| Can depart from any track | `canDepartFromAnyTrack` | (absent) |
-| Minimum duration | `minimumDuration` | (absent) |
-| `outStanding` member list | `members` (IncomingTrain shape) | `trainUnits` (TrainRequest shape) |
-| `outStanding` parking track | `parkingTrackPart` | `lastParkingTrackPart` |
-| `outStanding` exit track | `sideTrackPart` | `leaveTrackPart` |
-
-Per `unified-schema-design.md`, the unified model adopts the HIP field names.
-`canDepartFromAnyTrack` and `minimumDuration` need explicit decisions (keep on
-`TrainRequest`, or drop).
-
-### Changes by repo
-
-**`robust-rail-generator`** — Phase 1 ✓ COMPLETE, Phase 2 ✓ COMPLETE
-
-Completed (branch `pydantic`):
-- ✓ Emits one unified `scenario_*.json` (HIP field names); `scenario_solver_*.json` retired
-- ✓ `scenario-planning-inputs/run_solver.py` updated to read `scenario_*.json`
-- ✓ `location_unified.json` renamed to `location.json`
-- ✓ Phase 2 cleanup (commits `d65d1ec`–`b54080c`): protobuf dependency dropped
-  (`bf99964`), `typePrefix`/`carriages` identity + `TaskSpec.optional` (`0fda86f`),
-  JSON Schema exported (`fd553e8`), pytest suite added (`c9e2a84`)
-- ✓ Bumped to `generator:2.0.0-beta.1` (`b54080c`)
-
-**`robust-rail-solver` (HIP, C#)** — Phase 1 ✓ COMPLETE
-
-Completed (commits `96ad4ce`–`6ca108b` on `noproto`):
-- ✓ Retired legacy `DeepLook` mode, `Converter.cs`, and all protobuf-shaped classes
-- ✓ `ShuntingUnit.Members` (embedded) → `MemberIDs` (string list); `Members` dropped
-- ✓ `PredefinedTaskType` extended: `Walking`, `Break`, `NonService`, `StandIn`, `StandOut` added
-- ✓ `TaskSpec.Priority` dropped
-- ✓ `Resource` switched to `{ kind, id }` discriminator
-- ✓ `schemaVersion` added to `Location`, `Scenario`, `Plan`
-- ✓ JSON numbers unquoted (dropped `WriteAsString` protobuf holdover)
-- ✓ `IncomingTrain.StandingIndex` already present
-- ✓ Enum serialization fixed to PascalCase (`c05bbf4`) — `JsonStringEnumConverter()`
-  with no naming policy, replacing `JsonNamingPolicy.CamelCase` in both
-  `ProblemInstance.cs` and `Extensions.cs`
-- ✓ `TrainUnitType`/`TrainUnit`/`IncomingTrainUnit`: `TypePrefix`+`Carriages` identity
-  (`0c03b79`) — `DisplayName`/`TypeDisplayName` dropped; `Equals`/`GetHashCode` and
-  `traintypemap` all key on `(TypePrefix, Carriages)`
-- ✓ Fixed action-sort collision (Move sorting after Exit) and a `NullReferenceException`
-  logging optional InStanding/OutStanding (`dc607cd`, `0015e73`)
-- ✓ Bumped to `hip:2.0.0-beta.1` (`1d695b7`) — **tag already cut**
-- ✓ `TestData/setting_A` fixtures refreshed with real unified-format data (`6ca108b`)
-
-**`robust-rail-evaluator` (TORS, C++)** — Phase 1 ✓ COMPLETE (tag pending)
-
-Completed (commits `989806c`–`dbebb71` on `noproto`):
-- ✓ `HIP_Scenario`/`HIP_Location` protos extended to the unified schema shape
-- ✓ Scenario read path migrated to the unified (HIP) schema; `Task::priority` (int)
-  → `Task::optional` (bool); `mandatory_service_task_rule`/`optional_service_task_rule`
-  simplified accordingly (`033076e`)
-- ✓ `PredefinedTaskType`: dropped `allow_alias`/lowercase names, PascalCase only (`4494db2`)
-- ✓ Fixed `Scenario.in`/`out`/`inStanding`/`outStanding` wire shape mismatch (`5ce2ba0`,
-  documented in `910b82d`)
-- ✓ `TrainUnitType`/`TrainUnit` identity: HIP read path keyed on `(typePrefix, carriages)`
-  (`fb6d3b3`); fixed carriage-blind type matching in `CheckScenarioCorrectness`/`ShuntingUnit`
-  (`220215d`)
-- ✓ `schemaVersion` parsed from `Location`, `Scenario`, `Plan` (warn-and-continue)
-- No `Plan.trackParts` work needed — TORS already ignores this field entirely; all
-  infrastructure is loaded from `--path_location` via `LocationEngine`
-- Env-var-gated EngineTest/CompatibilityTest cases documented as deferred (`dbebb71`)
-
-All three repos have finished Phase 1 and Phase 2, and all three are tagged and
-released as Docker images to ghcr.io:
-- ✓ `generator:2.0.0-beta.1`
-- ✓ `hip:2.0.0-beta.1`
-- ✓ `tors:2.0.0-beta.1`
-
-Phase 3 (integration testing, below) is now unblocked.
-
----
-
-## Phase 2 — Generator schema cleanup ✓ COMPLETE
-
-These were generator-internal changes, unblocked once Phase 0 decisions were resolved.
-See the generator Phase 1/2 summary above (commits `d65d1ec`–`b54080c`) for what landed:
-
-- ✓ Drop protobuf dependency (`py_protobuf/`, `google-protobuf` package)
-- ✓ Implement `typePrefix`/`carriages` identity in Pydantic models (rename
-  `display_name` → `type_prefix` on `TrainUnitType`; add `type_prefix`/`carriages`
-  to `TrainUnit`; `typeDisplayName()` derived; both known key bugs in
-  `add_custom_train_unit_types`/`create_train_unit_type` fixed)
-- ✓ Drop `TaskSpec.priority` from Pydantic models; use `optional: bool = False`
-- ✓ Enforce PascalCase enum values in Pydantic
-- ✓ Export JSON Schema from the Pydantic models → published as a build artefact
-- ✓ **Follow-up (2026-08-02, `16dc053`):** `Resource` had not actually been
-  migrated to the `kind`/`id` discriminator decided in Phase 0 (0d) — it still
-  had the old three-nullable-`int`-fields shape (`trackPartId`/`facilityId`/
-  `staffId`), missed because it wasn't called out in this checklist even
-  though the design doc's per-consumer list always included it. Found while
-  investigating the Plan.cpp `Resource` wire-shape bug on the evaluator side
-  (see Phase 3 below); fixed to match what solver/evaluator already emit/expect,
-  and the exported JSON Schema regenerated.
-- ✓ **Follow-up (2026-08-02): `TrainUnit.id`/`IncomingTrainUnit.id`: `string` → `int`.**
-  Investigation (prompted by the non-numeric-ID fixture fix above) established
-  that every real train unit id on the wire is numeric, and the `"****"`
-  placeholder used for "unmatched" departing units was dead code in the
-  generator — real unmatched units are built directly with `id=None`, which
-  already carries the intended semantics and never went through the code path
-  that invented `"****"`. Implemented across all three repos:
-  - **Generator** (`4115c7f`): `TrainUnit.id: Optional[int]`,
-    `IncomingTrainUnit.id: int` (required), `ShuntingUnit.members`/
-    `Action.train_unit_ids: list[int]`; `from_train_unit()`'s `"****"` fallback
-    deleted rather than ported.
-  - **Solver** (`718a531`): `TrainUnit.Id: uint?`, `IncomingTrainUnit.Id: required uint`,
-    `ShuntingUnit.MemberIDs`/`Action.TrainUnitIds: IList<uint>` — same
-    nullable/`required` pattern already used for `Carriages`.
-  - **Evaluator** (`bf2fcf8`): `HIP_Scenario.proto`/`HIP_Plan.proto` fields
-    `string` → `uint64`/`optional uint64`; `stoi()`/`"****"`/`.empty()` guards
-    dropped from the two HIP `Train` constructors (kept as-is on the untouched
-    legacy `PBTrainUnit` path).
-  - Composite/shunting-unit-level ids (`IncomingTrain.id`, `TrainRequest.displayName`,
-    `ShuntingUnit.id`/`parentIDs`/`childIDs`) are a separate concept, unaffected,
-    still strings. **Superseded 2026-08-08 — see below; they are ints now too.**
-  - **Two bugs found and fixed along the way**, both on the evaluator: a stale
-    test assertion from the earlier `displayName` fix (`6e0aefa`), and dead
-    debug scaffolding in `RunResult::CreateRunResult` that re-parsed the
-    scenario file into the legacy (still-string) proto shape purely to write
-    a JSON dump to a hardcoded, nonexistent developer path — harmless before
-    this change (silently mismatched types were tolerated in unrelated ways),
-    hard-failing after it, so removed rather than fixed (`eaa7dad`).
-  - Verified end-to-end against all 8 real scenario/plan files (locally built
-    images) with no crashes and no new evaluator-side diffs against the
-    protobuf baseline beyond the already-known solver-plan-dependent ones.
-  - **Not yet done:** none of the three `2.0.0-beta.1` images have been
-    re-tagged/re-pushed with these commits yet — same outstanding step as the
-    `Resource` fix above.
-
----
-
-## Phase 3 — Integration testing
-
-Run the full pipeline in this repo against all scenarios and compare to the protobuf baseline.
-
-**Script updates:** ✓ done
-- `run_generator.py`/`run_solver.py`/`run_evaluator.py` `DOCKER_IMAGE_VERSIONS["pydantic"]`
-  bumped to the `2.0.0-beta.1` ghcr.io tags
-- `run_solver.py` and `run_evaluator.py` already glob/read `scenario_*.json` (unified);
-  no `scenario_solver_*.json` references remain in any script
-- `location.json` already in use throughout
-
-**Run status against `2.0.0-beta.1` images (2026-08-02):**
-
-- ✓ Also cleaned up 9 obsolete `scenario_solver_*.json` fixtures + 1 lowercase-`k`
-  duplicate (tracked since `cbc4231`, obsolete since Phase 1 retired the two-file
-  scheme) — they were colliding with `run_solver.py`'s `scenario_*.json` glob
-  (18 matches instead of 8)
-- ✓ `run_generator.py --version pydantic`: 8/8 succeeded, clean unified `scenario_*.json`
-  output, no `scenario_solver_*.json` produced
-- ✓ `run_solver.py --version pydantic`: 8/8 succeeded
-- ✗ **`run_evaluator.py --version pydantic`: 1/9 (only the harmless stale-fixture SKIP);
-  all 8 real runs crash — BLOCKING**
-
-**Evaluator crashes found and fixed on `robust-rail-evaluator` (`noproto`) — 3 bugs, 3 fixes:**
-
-1. **`d3d32a3`** — Scenario parsing crashed 8/8 (reported as SIGSEGV, actually an
-   uncaught `std::out_of_range` sliced to a bare `std::exception` by `throw e;`
-   instead of `throw;`, then `std::terminate`). Root cause: `HIP_Scenario.proto`'s
-   `IncomingTrainUnit` wrapped member identity fields in a nested `trainUnit`
-   submessage; the real generator output is flat (`{id, typePrefix, carriages,
-   tasks}`, same shape `TrainRequest.trainUnits` already used correctly). With
-   `ignore_unknown_fields=true` the parser silently dropped the real fields and
-   defaulted `typePrefix`/`carriages`, which then failed the
-   `(typePrefix, carriages)` lookup. Fixed by flattening the proto to match.
-2. **`dc16f21` + `492ddbc`** — After (1), 5/8 files still crashed (2 SIGABRT, 3
-   SIGSEGV) further downstream in `Plan.cpp`'s `RunResult::CreateRunResult`.
-   Root cause: `HIP_Location.proto`'s `Resource` modeled track/facility refs as
-   a proto3 `oneof`, but the solver's real Plan JSON emits `{"kind":
-   "trackPart"|"facility", "id": N}` — neither key matched, both silently
-   dropped to `0`, which then hit `GetTrackByID("0")` (throws → SIGABRT) or
-   `GetFacilityByID(0)` (null deref → SIGSEGV). One root cause, two symptoms;
-   fixed by giving `Resource` explicit `kind`/`id` fields matching the real
-   wire shape. Also fixed the same exception-slicing bug as (1) in
-   `Scenario::Init`, and wrapped `main.cpp`'s scenario load in try/catch so
-   load failures fail cleanly instead of crashing.
-3. **`38da47d`** — Byte-diff against the protobuf baseline (see run below)
-   showed 3 files differing only in truncated type names in human-readable
-   output (`"SLT"` instead of `"SLT-4"`). Root cause: the `PB_HIP_TrainUnitType`
-   constructor in `Train.h:47` forwarded `typeprefix()` as both the
-   `displayName` and `typePrefix` constructor arguments, so `displayName` never
-   got the derived `prefix-carriages` form. Fixed by composing it explicitly.
-
-**Resolved, not a code fix — fixture had non-numeric IDs.** 1 of 8 files
-(`KleineBinckhorst_48t_custom_larger-example`) used a `"uNN"` prefix for train unit
-IDs and `"arr-NN"`/`"dep-NN"` prefixes for shunting-unit-level IDs; both paths hit an
-unguarded `stoi()` in the evaluator (`Train.cpp`, `TrainGoal.cpp`) with no non-numeric
-fallback, causing a crash. **Confirmed this is not a migration regression** — the
-protobuf-era baseline (`evaluations-protobuf/`) crashed identically on this same
-scenario. Rather than adding string-ID support to the C++ engine (a real, broader
-change — train/shunting-unit IDs are used as `int`/map keys throughout), fixed the
-fixture itself: `scenario_config_larger-example.json` (`7dfd203`) now uses plain
-numeric-looking ID strings — `"1"`-`"48"` for train units, `"1001"`-`"1024"` /
-`"2001"`-`"2024"` for shunting units — matching the convention every other scenario
-config in this repo already follows. The scenario now loads and evaluates cleanly,
-rejecting only on a legitimate, unrelated data issue (train `1006` longer than its
-arrival track) — the same class of clean rejection as the two `random_distribution`
-files. No remaining open question here.
-
-**Comparison run (2026-08-02) against `evaluations-protobuf/` baseline**, using a
-locally rebuilt `tors:latest` image (includes all 3 fixes above; `2.0.0-beta.1` on
-ghcr.io does **not** yet include them — re-tag/re-push still needed):
-
-| File | Result |
+| issue | effect |
 |---|---|
-| `KleineBinckhorst_10t_random_42s_distribution1` | ✓ byte-identical (correctly rejected, both empty) |
-| `KleineBinckhorst_10t_random_42s_distribution2` | ✓ byte-identical (correctly rejected, both empty) |
-| `KleineBinckhorst_48t_custom_larger-example` | ✓ byte-identical (both empty — see fixture-fix note above; now a clean scenario-correctness rejection instead of a crash) |
-| `KleineBinckhorst_6t_custom_example3` | ✓ byte-identical |
-| `KleineBinckhorst_7t_custom_example1` | ✓ byte-identical |
-| `simple_service_location_4t_custom_late` | ✓ byte-identical |
-| `KleineBinckhorst_30t_random_98s_test` | ~ differs (same verdict, "plan not valid", both sides — differing internal action timings/train-matching, consistent with legitimate solver-side scheduling changes, e.g. the action-sort-collision fix `dc607cd`) |
-| `KleineBinckhorst_8t_custom_example2` | ~ differs (same verdict, "Scenario failed: Invalid action" on both sides — one `Wait` action's end timestamp differs, 3420 vs 3154, same solver-side cause as above) |
+| solver#13 | Solver parks on non-parking arrival tracks when it cannot move into the yard immediately. Blocks `6t_custom_example3`. |
+| solver#14 | outStanding trains have no deadline in the cost function, so plans over-run the scenario horizon for free. Produces the plan that trips evaluator#6. |
+| evaluator#6 | `EvaluatePlan` spins when the plan still has actions but the state is terminal, reporting the symptom rather than "plan extends past the horizon". Terminates via a safety valve; blocks nothing, but the diagnostic misleads. Blocks `7t_custom_example1`. |
+| solver#16 | `Deque.RemoveHead(Side)` throws unconditionally, including after removing successfully. Latent — no callers. |
+| evaluator#1 | Invalid JSON for PB parsing fails quietly. On the legacy `--plan_type Evaluator` path only. |
 
-6/8 byte-identical, 2/8 differ only in solver-plan-dependent details while agreeing on
-the top-level pass/fail verdict — not evaluator bugs.
-
-**Still to do before Phase 3 is complete:**
-- Rebuild and re-push all three `2.0.0-beta.1` images to ghcr.io: `tors` with
-  `d3d32a3`, `dc16f21`, `492ddbc`, `38da47d`, `bf2fcf8`, `6e0aefa`, `eaa7dad`;
-  `hip` with `718a531`; `generator` with `16dc053`, `4115c7f`
-- Re-run the full pipeline against the re-pushed images (not just local builds)
-  to confirm parity
-- Decide whether the `KleineBinckhorst_30t`/`6t`/`8t` solver-plan differences
-  (route/timing choices that vary by random seed) need deeper solver-side
-  diffing to confirm they're benign, or can be accepted as-is
-
-**Pre-existing solver robustness issue found (2026-08-02), not caused by anything
-in this session, not fixed — flagging for later:** `KleineBinckhorst_10t_random_42s_distribution2`
-intermittently crashes the solver (roughly 1-in-3 runs) with a seed-dependent internal
-error — observed as both a `PlanGraph.CheckGraphStructure` `Debug.Assert` failure and,
-separately, an unhandled `System.ArgumentException` in `Parking.Deque.Remove`. Confirmed
-this is **not** a regression from today's `TrainUnit.id` change: reproduced the *same*
-intermittent failure (different stack trace, same file) against the unpatched
-`ghcr.io/robust-rail-nl/hip:2.0.0-beta.1` image using the pre-existing string-ID scenario
-JSON. This is a real heuristic/local-search robustness gap in
-`ServiceSiteScheduling.Solutions.PlanGraph`/`Parking.TrackOccupation`, worth a dedicated
-solver-side debugging session at some point, but out of scope for the schema migration work.
-
-**Acceptance criteria:**
-- All 8 evaluation files identical (or equivalent) to the protobuf baseline — ✓ 6/8
-  identical, 2/8 equivalent (same verdict, differing solver-plan details)
-- No `scenario_solver_*.json` files produced or consumed ✓
-- `location.json` used throughout; `location_unified.json` and `location_solver.json` retired ✓ (already done on `pydantic` branch)
-
-Results above are from local builds. The re-run against published images asked for
-here happened on 2026-08-09 and is recorded in the next section.
+`6t_custom_example3` and `7t_custom_example1` therefore cannot produce a valid
+plan. Both were deferred deliberately. Phase 4's "once integration tests pass"
+should be read with that in mind — it is not literally true, and the release
+notes should say which two fixtures are expected to fail and why.
 
 ---
 
-## Phase 3h — The `2.0.0-beta.3` run (2026-08-09)
+## Open — decisions
+
+### `--plan_type Evaluator`
+
+Surveyed 2026-08-08 so this can be decided on evidence rather than on the name.
+
+`main.cpp` takes `--plan_type Solver|Evaluator`. The two branches read different
+plan formats, and the substantive difference is not the format: a `Run` is
+**self-contained**, carrying its own scenario (`Plan.cpp:503`), while the Solver
+path takes the scenario separately via `--path_scenario`.
+
+The case for retiring it: `run_evaluator.py` always passes `Solver`, nothing in
+the pipeline uses it, and it has no test — the only one that ever named it was
+`EngineTest`'s "Plan test", deleted 2026-08-07, which had never passed.
+
+It is also the sole remaining consumer of the legacy input shapes, and therefore
+the reason several cleanups stopped short: `Plan.proto` still declares
+`trainUnitIds` as `repeated string`, `Train.cpp` keeps its `"****"` placeholder
+and `stoi()` guards, and `TrainUnitType::types` is still the string-keyed map
+(`Train.h:15`) alongside the HIP path's `typesByPrefixAndCarriages`.
+
+**Retiring it does not delete `Scenario.proto` and `Run.proto`**, which an
+earlier draft claimed. The same formats are still *written*, from Python:
+`RunResult::SerializeToFile` produces a `PBRun` and is bound in `pyTORS`
+(`module.cpp:429`). The reader and that writer are two halves of one round trip.
+
+So the decision is three:
+
+1. Is the self-contained `Run` format wanted at all — as Python output, an
+   archive format, a way to replay an evaluation?
+2. If yes, does it need a *reader*, or is writing enough? Only the reader is
+   `--plan_type Evaluator`; only the reader blocks the cleanups above.
+3. If wanted in full, it needs a fixture and a test. It has neither, which is how
+   it came to be forgotten.
+
+Not a question CI can settle: nobody here has run that mode. Whoever knows why
+the Python bindings exist should decide.
+
+### Where the exported schemas should live
+
+`validate-fixtures.yml` clones `robust-rail-generator` and reads `schema/` from
+the branch of the same name. Vendoring a copy here would be worse — a stale
+schema does not fail, it passes, having checked the wrong contract — so the
+workflow also re-exports the schemas in that checkout and gates on them matching
+what is committed there.
+
+The branch guess has already produced one false reading: pinned to `pydantic`, a
+run validated newly migrated fixtures against the pre-migration schema and
+reported 2/18 for a tree really at 10/18, while the freshness gate stayed green
+because that schema was perfectly consistent with the wrong models.
+
+**Where this should end up:** publish the exported schemas as a release artifact
+keyed by `schemaVersion`, and validate each fixture against *the version it
+declares*. That removes the branch coupling and the staleness together, and makes
+mixed-version fixtures during a migration expressible rather than simply broken.
+Worth deciding once schema changes become rare and individually versioned.
+
+### `planning-approach/pipeline.py`
+
+Still assumes the two-file scenario world Phase 1 removed: it reads
+`location_solver.json`, which no longer exists, and pairs `scenario_solver_*.json`
+with `scenario_*.json` by string replacement. `GENERATE_DIR` points into this
+repo, so it breaks against current contents. Deciding what its inputs are now is
+a design question, not a rename. Its CI does not cover it — the reading tests
+exercise `converter.py`, not `pipeline.py`. Recorded in
+`planning-approach/SCHEMA_STATUS.md`, along with the visualizer's
+`member_lengths_from_scenario` and the un-reconvertible `test_data/`.
+
+---
+
+## Open — loose ends
+
+Things I (LP) noticed and want to write down so we won't forget:
+
+Generator:
+- Clean up the generator's README.md: it has a TODO that should be dealt with
+- Make sure the planner can also speak the new schema
+- Figure out what to do with the regression-baseline files in the generator repo
+  (just delete?). See also `src/generate-scenarios.sh`.
+- Clean up the generator repo: automated formatting with pre-commit, Ruff etc.
+- Decide what to do with `unified-schema-design.md`. At least remove in-progress
+  bits?
+
+Solver / HIP:
+- The "merge coinciding Wait actions" commit (`e545f33`) seems to have partially
+  lost its effectiveness: see differences between current and legacy (1.4.2) plan
+  versions.
+- Look through `git diff` with `main` / `dev`.
+- `dotnet build` warnings-as-errors is a separate decision; the solver builds with
+  two nullable warnings in `Initial/SimpleHeuristic.cs`.
+
+Evaluator / TORS:
+- Look through `git diff` with `main` / `dev`.
+- See if we can get pyTORS to work? Probably not.
+- **Do a focused session on TORS's own search mode.** TORS does not only replay
+  and evaluate a plan; it can also generate one itself, and that looks to be what
+  it was originally built for, with plan replay added later.
+
+  This matters beyond curiosity. Nearly every evaluator bug found on 2026-08-07
+  was a search-mode primitive behaving wrongly under replay, not a bug in its own
+  right:
+    - `legal_on_parking_track_rule` rejected a movement ending on a non-parking
+      track. Harmless for the search, which emits step-by-step moves the rule
+      exempts; fatal for replay, where every movement is a `MultiMove` and a
+      departure's last movement lands on the gateway.
+    - `Wait` runs until the next queued event. Correct for the search, which has
+      no plan and re-decides at every event; wrong for replay, where it discards
+      the duration the plan supplied.
+    - `ArriveActionGenerator` hardcodes a zero duration, so a plan cannot express
+      a train occupying the gateway while it waits for a route in (solver#13).
+    - `out_correct_time_rule` demanded an exact departure time that an outStanding
+      request (time 0) could never satisfy.
+
+  The two modes share primitives whose contracts hold in only one of them. A
+  survey of where else that is true would probably predict the next round of bugs
+  rather than waiting to trip over them.
+
+---
+
+## Release evidence
+
+### The `2.0.0-beta.3` run (2026-08-09)
 
 The first end-to-end run against **published** images since 2026-08-02, and the
-first at all since Phases 3d and 3e changed every id to an int, renamed
-`displayName`/`members`/`relatedTrackParts` and deleted four fields. Everything
-between those dates was verified by schema validation and unit tests, which
-establish that the files are well formed and that each tool parses them alone —
-not that the three agree at runtime. This closes that gap.
+first at all since every id became an int and three fields were renamed and four
+deleted. Everything in between was checked by schema validation and unit tests,
+which establish that the files are well formed and that each tool parses them
+alone — not that the three agree at runtime.
 
-Images: `generator`/`hip`/`tors:2.0.0-beta.3` from ghcr.io, x86-64.
-11 scenarios: the 8 canonical ones plus the three configurations added on
-2026-08-07 (`feasible_small`, `marginal_length`, `marginal_congestion`).
+11 scenarios: the 8 canonical plus the three configurations added 2026-08-07.
 Generator 11/11, solver 11/11, evaluator 8/11 exit-0. Whole pipeline: 2m20s.
 
 | Scenario | Verdict |
@@ -384,583 +228,140 @@ Generator 11/11, solver 11/11, evaluator 8/11 exit-0. Whole pipeline: 2m20s.
 | `10t_random_42s_distribution2` | infeasible: departure train 270.62 m > track 15's 255 m |
 | `48t_custom_larger-example` | infeasible: arrival train 1006 324.12 m > 255 m |
 | `14t_random_1s_congestion` | not valid: adding SU-12 to 906b exceeds 255 m |
-| `6t_custom_example3` | not valid: parking not allowed on 906a |
-| `7t_custom_example1` | not valid: no-progress guard, stuck at T4800 |
+| `6t_custom_example3` | not valid: parking not allowed on 906a (solver#13) |
+| `7t_custom_example1` | not valid: no-progress guard at T4800 (solver#14 + evaluator#6) |
 | `30t_random_98s_test` | not valid |
 | `simple_service_4t_custom_late` | not valid |
 
-**`example2` moved from rejected to valid.** On 2026-08-02 it failed with
-"Scenario failed: Invalid action" on both sides of the comparison; it now
-produces a plan the evaluator accepts. That is the 2026-08-07 replay fixes
-landing on a canonical fixture, and it is the single clearest piece of evidence
-that they were worth making.
+**`example2` moved from rejected to valid** — the clearest evidence the
+2026-08-07 replay fixes were worth making.
 
-**`example3`'s rejection is consistent with the parking fix rather than a
-regression of it.** `legal_on_parking_track_rule` no longer rejects a *movement*
-ending on a non-parking track; what fails now is a `Wait` on the gateway, which
-is solver#13 exactly as filed — the solver parks a train on 906a because it
-cannot move into the yard yet.
+**The assert pass agrees.** Re-evaluating the same plans with
+`--version 2.0.0-assert`, which differs from `2.0.0` in exactly one image,
+gave identical verdicts on all 11 and 26 of 27 byte-identical output files; the
+twenty-seventh differs only in `docker pull` chatter. No assertion fired.
 
-**`example1` hits an infinite-loop guard**, not a verdict: "EvaluatePlan made no
-progress (state time stuck at T4800, plan action iterator not advancing) for 100
-consecutive iterations; aborting instead of spinning forever." Related to
-solver#14. This is the one result here that is not yet understood, and it is
-listed under Phase 4 as an rc blocker.
+The second pass must be `--steps evaluator`: re-solving would produce its own
+plans and the diff would compare two unrelated things.
 
-### The assert pass agrees
-
-Re-evaluated the same plans with `--version 2.0.0-assert`, which differs from
-`2.0.0` in exactly one image — the evaluator's — because
-`run_generator.py`/`run_solver.py` deliberately map it to the plain build. The
-second pass must be `--steps evaluator`: re-solving would produce its own plans
-and the diff would compare two unrelated things.
-
-Identical verdicts on all 11. 26 of 27 output files byte-identical; the
-twenty-seventh differs only in `docker pull` progress chatter captured into an
-`.err`, with matching substantive content. **No assertion fired anywhere.**
-
-`tors:2.0.0-beta.3-assert` is the first assert image ever published — until
-`robust-rail-evaluator` `b08a14c`/`49fa588` the push script never passed the
-build-arg the Dockerfile had always accepted, so the `2.0.0-assert` selector had
-referred to a nonexistent image for a whole release.
-
-### Reproducibility
-
-**The solver is deterministic run-to-run.** Four consecutive `run_solver.py
---version 2.0.0` runs produced byte-identical plans for all 11 scenarios. This
-was initially assumed otherwise, on the grounds that a wall-clock-bounded local
-search cannot be reproducible — wrong here, because `StopWhenFeasible: true`
+**The solver is deterministic run-to-run.** Four consecutive runs produced
+byte-identical plans for all 11 scenarios. A wall-clock-bounded local search
+would not normally be reproducible; it is here because `StopWhenFeasible: true`
 means these searches terminate on a condition and none comes near the 3600 s
-budget (the whole step runs in well under two minutes). The budget would only
-arbitrate on a scenario hard enough to exhaust it, and none of these are.
+budget. That guarantee is conditional — it would not hold for a scenario hard
+enough to exhaust the budget.
 
-That matters for reading the fixture diff: the three plans that differ from the
-committed ones are a deterministic consequence of the beta.1 → beta.3 code
-changes, not timing noise.
-
-**Regenerated scenarios are semantically identical to the committed ones.** All
-seven that differ do so only in key order — `id` moved to the front of the
-object — with equal parsed content. The committed fixtures were serialised by an
-older generator; nothing about their meaning has drifted.
+**Regenerated scenarios are semantically identical to the committed ones**, all
+differences being key order (`id` moved to the front) with equal parsed content.
 
 ### Re-verified on `hip:2.0.0-beta.4`
 
-The solver moved to beta.4 for `641e380`, the fail-fast check in `Deque.Remove`
-(solver#11). Re-ran the whole pipeline against it: **all eleven plans
-byte-identical to the beta.3 ones, all eleven verdicts unchanged.** So that
-commit is inert on healthy paths, and everything recorded above still holds.
+The solver moved to beta.4 for `641e380`. Re-ran the whole pipeline: all eleven
+plans byte-identical, all eleven verdicts unchanged. That commit is inert on
+healthy paths.
 
 The generator and evaluator stay at beta.3, which is correct rather than an
-oversight — neither repo's compiled source changed after its beta.3 tag, so
-`generator:2.0.0-beta.3` + `hip:2.0.0-beta.4` + `tors:2.0.0-beta.3` is the
-accurate description of what runs. Versions here are per-repo, not a release
-train, and the `--version` key names a pipeline configuration rather than a
-shared version number.
+oversight — neither repo's compiled source changed after its beta.3 tag. Versions
+here are per-repo, not a release train, and the `--version` key names a pipeline
+configuration rather than a shared version number.
 
-`beta.3` was deliberately **not** re-tagged onto the newer commit. The images
-under that tag are what produced the evidence in this section, and moving a
-published tag would make that record unreproducible.
+`beta.3` was deliberately **not** re-tagged onto the newer commit. Those images
+produced the evidence above, and moving a published tag would make it
+unreproducible.
 
 **Do not assume the next solver bump is as cheap.** `641e380` only added throws
-on paths that were already corrupt, so it could not change a healthy run, and
-re-running was a formality that confirmed it. A fix for solver#11 will not have
-that property: removing a redundant `Depart` changes what the parking model
-computes, so plans can legitimately differ. If they do, the committed plan
-fixtures under `Location_*/plans/` and the verdict table above both have to be
-regenerated rather than re-confirmed — that is a change to the release evidence,
-not a formality, and it should be reviewed as one. Check the verdicts, not just
-whether the files differ: a plan changing is expected, a *verdict* changing is a
-finding.
+on paths that were already corrupt, so it could not change a healthy run. A fix
+for solver#11 will not have that property: removing a redundant `Depart` changes
+what the parking model computes, so plans can legitimately differ. If they do,
+the committed plan fixtures and the verdict table above have to be regenerated
+rather than re-confirmed — a change to the release evidence, not a formality.
+Check the verdicts, not just whether the files differ: a plan changing is
+expected, a *verdict* changing is a finding.
 
 ### What this run does not cover
 
-- x86-64 only. arm64 is now covered at the unit-test level (both repos' CI
-  matrices as of 2026-08-09) but the pipeline has never run there. A cross-arch
-  comparison would not be meaningful anyway for the reason above — it would be
-  a different machine, and the guarantee is conditional on not exhausting the
-  time budget.
-- solver#11's intermittent crash did not fire. At a rate of roughly 1 in 3 that
-  is unsurprising and is not evidence of absence.
-
----
-
-## Phase 3b — Loose ends
-
-Things I (LP) noticed and want to write down so we won't forget:
-
-Generator:
-- Cleaning up the generator's README.md: it has a TODO that should be dealt
-  with
-- Make sure the planner can also speak the new schema
-- Figure out what to do with the regression-baseline files in the generator
-  repo (just delete?).  See also src/generate-scenarios.sh.
-- Write a script to validate the various JSON files
-- Clean up the generator repo: do (automated) code formatting using
-  pre-commit, Ruff etc.
-- Decide what to do with unified-schema-design.md.  At least remove
-  in-progress bits?
-
-Solver / HIP:
-- Fixing the bug occuring in ~1/3 of the cases and noticed by Claude.  Is
-  this the same one I opened an issue for?
-- Ask Claude for a way to reproduce this bug
-- The "merge coinciding Wait actions" commit (e545f33) seems to have
-  partially lost its effectiveness: see differences between current (beta.2)
-  and legacy (1.4.2) plan versions.
-- Look through git diff with main / dev.
-
-Evaluator / TORS:
-- Look through git diff with main / dev.
-- See if we can get pyTORS to work?  Probably not.
-- Fix or delete `EngineTest` and `CompatibilityTest` — see Phase 3c, which is
-  blocked on this.
-- **Do a focused session on TORS's own search mode.**  TORS does not only
-  replay and evaluate a plan; it can also generate one itself, and that looks
-  to be what it was originally built for, with plan replay added later.  Worth
-  understanding properly: what the search can actually do, whether it is
-  usable or useful to us, and where else the two modes' assumptions diverge.
-
-  This matters beyond curiosity.  Nearly every evaluator bug found on
-  2026-08-07 was a search-mode primitive behaving wrongly under replay, not a
-  bug in its own right:
-    - `legal_on_parking_track_rule` rejected a movement ending on a
-      non-parking track.  Harmless for the search, which emits step-by-step
-      moves that the rule exempts; fatal for replay, where every movement is a
-      `MultiMove` and a departure's last movement lands on the gateway.
-    - `Wait` runs until the next queued event.  Correct for the search, which
-      has no plan and re-decides at every event; wrong for replay, where it
-      discards the duration the plan supplied and eats the time reserved for
-      whatever follows.
-    - `ArriveActionGenerator` hardcodes a zero duration, so a plan cannot
-      express a train occupying the gateway while it waits for a route in
-      (Robust-Rail-NL/robust-rail-solver#13).
-    - `out_correct_time_rule` demanded an exact departure time that an
-      outStanding request (time 0) could never satisfy, while the generator
-      only offers that exit at the end of the scenario.
-
-  So the two modes share primitives whose contracts only hold in one of them.
-  A survey of where else that is true would probably predict the next round of
-  bugs rather than waiting to trip over them.
-
----
-
-## `--plan_type Evaluator` — the open question, measured
-
-Repeatedly listed as "decide whether this mode is still supported". Here is what
-it actually consists of, surveyed 2026-08-08, so the decision can be made on
-evidence rather than on the name.
-
-### What it is
-
-`main.cpp` takes `--plan_type Solver|Evaluator` in each of its three modes
-(`EVAL`, `INTER`, `EVAL_AND_STORE`). The two branches read two different plan
-formats:
-
-| | `Solver` | `Evaluator` |
-|---|---|---|
-| parses | `PB_HIP_Plan` (`HIP_Plan.proto`) | `PBRun` (`Run.proto`) |
-| entry point | `ParseHIP_PlanFromJson` | `GetRunResultProto` |
-| builds via | `CreateRunResult(const PB_HIP_Plan&, ...)` | `CreateRunResult(const Location*, const PBRun&)` |
-| scenario comes from | `--path_scenario`, parsed as `PB_HIP_Scenario` | **the plan file itself** — `Run.scenario`, parsed as the legacy `PBScenario` (`Plan.cpp:503`) |
-
-That last row is the substantive difference, not a format detail: a `Run` is
-self-contained, carrying its own scenario, while the Solver path takes the
-scenario separately.
-
-### The case for retiring it
-
-- **`run_evaluator.py` always passes `Solver`.** No pipeline uses it.
-- **It has no test.** The only one that ever named this path was `EngineTest`'s
-  "Plan test", deleted 2026-08-07 as part of the dead-weight cleanup; it had
-  never passed. Phase 3c already records this gap.
-- **It is the sole remaining consumer of the legacy input shapes**, and so the
-  reason several things could not be finished during Phases 3d and 3e:
-  `Plan.proto` still declares `trainUnitIds` as `repeated string` (lines 29 and
-  85), `Train.cpp` still carries the `"****"` placeholder and `stoi()` guards,
-  and `TrainUnitType::types` is still keyed by the combined display-name string.
-  Each was left alone specifically because this path still reads it.
-
-### Why retiring it does **not** delete `Scenario.proto` and `Run.proto`
-
-Because the same formats are still *written*, from Python.
-`RunResult::SerializeToFile` produces a `PBRun` — and through it a legacy
-`PBScenario` and a `PartialOrderSchedule` — and it is bound in `pyTORS`
-(`module.cpp:429`, alongside `POSPlan::serialize_to_file` at 423). So
-`Run.proto`, `Scenario.proto` and `PartialOrderSchedule.proto` have a live
-producer regardless of whether anything still reads them here.
-
-`--plan_type Evaluator` and `pyTORS.serialize_to_file` are the two halves of one
-round trip: TORS writes a run, TORS reads it back. Retiring only the read half
-leaves a format that can be produced and never consumed.
-
-### So the decision is actually three
-
-1. **Is the self-contained `Run` format still wanted at all** — as an output for
-   Python users, as an archive format, as a way to replay an evaluation?
-2. If yes, does it need a *reader*, or is writing enough? Only the reader is
-   `--plan_type Evaluator`; only the reader blocks the cleanups listed above.
-3. If it is wanted in full, it needs a fixture and a test like the HIP one — it
-   currently has neither, which is how it came to be forgotten.
-
-Answering (1) "no" is what would let `Scenario.proto`, `Run.proto` and
-`PartialOrderSchedule.proto` go, `Plan.proto` become purely the engine's
-internal representation, and the last of the legacy string-id handling be
-deleted. Answering (2) "writing is enough" gets most of that for much less.
-
-Not a question CI can settle: nobody in this repo has ever run that mode.
-Whoever knows why the Python bindings exist should decide.
-
----
-
-## Phase 3g — planning-approach ◐ PARTLY DONE
-
-There is a fifth repo, `planning-approach`: a PDDL-based
-planner that reads location and scenario JSON and writes plans for the
-evaluator. It is a producer of the interchange format like the solver, and was
-not covered by Phases 1–3.
-
-Done 2026-08-08: its converter now writes plans the schema accepts — 269
-validation errors to 0. Most of the gap predated Phase 3d/3e (`{name,
-trackPartId}` resources, quoted numbers, `members` with embedded units, no
-`schemaVersion`), which meant fixing only the recent renames would have left the
-output invalid anyway. Note `standingType` needed translating rather than
-deleting: it becomes the `StandIn`/`StandOut` task types.
-
-**Left open, recorded in `planning-approach/SCHEMA_STATUS.md`:**
-
-- `pipeline.py` still assumes the two-file scenario world Phase 1 removed. It
-  reads `location_solver.json`, which no longer exists, and pairs
-  `scenario_solver_*.json` with `scenario_*.json` by string replacement. Its
-  `GENERATE_DIR` points into this repo, so it breaks against current contents.
-  Deciding what its inputs are now is a design question, not a rename.
-- The visualizer's `member_lengths_from_scenario` reads the pre-unification
-  scenario shape.
-- `test_data/` cannot be re-converted: its `.plan` files were produced against
-  pre-unification scenarios whose train IDs no longer exist. Regenerating means
-  re-running the planner.
-
-**CI added the same day** (`.github/workflows/schema.yml`, three tests in
-`tests/`). It covers both halves of the contract: that the reading helpers still
-resolve trains and tracks from today's unified inputs, and that one action of
-every kind validates against `schema_plan.json`. A third test pins
-`standingType`'s replacement, since deleting the field without translating it to
-`StandIn`/`StandOut` would still validate and only lose meaning.
-
-The job installs `pytest` and `jsonschema` and nothing else — `converter.py`
-imports only the standard library, so Julia, enhsp and the JDK stay out of CI.
-It takes the generator and this repo from the branch of the same name, which
-works because every repo shares `release/2.0.0`.
-
-Note what CI does *not* cover: the reading test exercises the converter's
-lookups, not `pipeline.py`, so the breakage listed above will not surface there.
-
----
-
-## Phase 3f — The proto layout ◐ PARTLY DONE
-
-The `HIP_*` / non-HIP split in `robust-rail-evaluator/protos/` does not mean what
-its naming implies. It is not "HIP is current, the rest is legacy". Measured
-2026-08-08:
-
-| proto | what it actually is |
-|---|---|
-| `Location.proto` | **live input** — `location.json` parses into `proto_tors::Location`, *not* into anything HIP |
-| `HIP_Scenario.proto` | **live input** — `scenario.json` |
-| `HIP_Plan.proto` | **live input** — `plan.json` under `--plan_type Solver` |
-| `HIP_Common.proto` | **live** — `Resource`, `TaskType`, `PredefinedTaskType`, shared by the two above |
-| `Plan.proto`, `PartialOrderSchedule.proto` | **the engine's internal representation** — `PBAction` alone appears 31 times — *and* an input under `--plan_type Evaluator` |
-| `Scenario.proto`, `Run.proto` | reachable **only** under `--plan_type Evaluator` (`Plan.cpp:503`, `main.cpp:126`) |
-
-So each of the three inputs uses a different one of the two families, and the
-family called legacy is simultaneously the internal representation. Anyone
-reasoning from the names will pick the wrong file — which happened during
-Phase 3e, when `relatedTrackParts` was first renamed in `HIP_Location.proto` and
-the compiler objected that the live path reads `proto_tors::Facility`.
-
-### Done
-
-`HIP_Location.proto` declared `Location`, `Facility`, `TrackPart` and
-`TrackPartType` that nothing could reach — only `Location` could have been a
-parse target and nothing named it. Removed, with the file renamed to
-`HIP_Common.proto` for what it still holds. Nine unused typedefs dropped from
-`Proto.h` at the same time. (Careful with that as a signal: an unused *typedef*
-does not mean an unused *message* — HIP `NonServiceTraffic` and
-`DisabledTrackPart` are reached through accessors and `auto`.)
-
-### Not done — and it is not simply blocked on `--plan_type Evaluator`
-
-An earlier draft of this section claimed that retiring `--plan_type Evaluator`
-would delete `Scenario.proto` and `Run.proto` outright. That is wrong; see
-"`--plan_type Evaluator`" below for what those protos are really holding up.
-
----
-
-## Phase 3e — One naming convention, and three fields that were never used ✓ DONE
-
-Done 2026-08-08. Fixture validation reaches 18/18 and now gates CI.
-
-**Arrays of IDs all end in `IDs`.** The schema had been using three conventions
-at once — `members` and `relatedTrackParts` with no suffix, `parentIDs` and
-`childIDs` with `IDs`, `trainUnitIds` with `Ids` — so a field holding references
-could not be told from one holding objects by name. That ambiguity is what let
-`ShuntingUnit.members` keep its name when its type changed from embedded
-TrainUnits to IDs, leaving a half-finished rename that the evaluator still
-complains about by name (`Plan.cpp` errors calling `members` the legacy field).
-Now: `memberIDs` on ShuntingUnit and NonServiceTraffic,
-`Facility.relatedTrackPartIDs`. `IncomingTrain.members` and `Train.members` keep
-their names, because they really do embed their units.
-
-**Three fields deleted, all the same shape** — declared in the schema, written
-by nobody, read by nobody:
-
-| field | evidence |
-|---|---|
-| `Action.trainUnitIds` | never assigned in HIP; the evaluator derives the same list from `memberIDs`; `null` in all 606 actions |
-| `ShuntingUnit.standingType` | never assigned; the read was guarded on non-empty so could not fire; its destination `PBAction.standingType` is read nowhere; superseded by the StandIn/StandOut task types |
-| `Plan.trackParts` | never assigned; never read; **and already resolved for removal in Phase 0f**, which was simply never carried out |
-
-Retired proto fields are `reserved`, not freed, so a later field cannot inherit
-a number and meet an old message carrying the old meaning.
-
-### Things this turned up
-
-- **`location.json` is parsed by the non-HIP `Location.proto`.** `HIP_Location`'s
-  `Facility` is typedef'd in `Proto.h` and never used. So "HIP is the live path,
-  the rest is legacy" is wrong as a general rule: scenarios and plans go through
-  HIP, locations do not. Worth checking which proto is actually in play before
-  assuming.
-- **The `relatedTrackParts` rename touched 34 files**, nearly all bundled demo
-  and bug-report locations in the solver and evaluator, not the four fixtures
-  here. Mechanical, but the blast radius of a rename in this schema is mostly
-  test data.
-- **A missed fixture fails loudly.** An uninitialised `ImmutableArray` in C#
-  throws `NullReferenceException` rather than reading as empty, so
-  `TestJsonSorted` caught the one location file left behind.
-
-### On protobuf and empty lists
-
-`trainUnitIds` was documented as "if not specified, all train units are
-involved". That contract was never expressible: protobuf `repeated` fields carry
-no presence information, so absent, `null` and `[]` all arrive at the evaluator
-as the same empty field. Anything reintroducing an optional list needs a
-deliberate design for presence, not just the field back.
-
----
-
-## Phase 3d — Every id is an int ✓ DONE
-
-Completes the 2026-08-02 migration, which stopped at the unit-level ids. The
-composite ones it deliberately left alone — `IncomingTrain.id`, `Train.id`,
-`ShuntingUnit.id`/`parentIDs`/`childIDs`, `NonServiceTraffic.id` — are ints as
-of 2026-08-08, across all three repos and every fixture.
-
-**`TrainRequest.displayName` became `id`.** It was never a display name. The
-generator assigned it the departing train's id (`src/scenario.py`), the
-evaluator derived *two* identities from it (`Outgoing`'s id in `TrainGoal.cpp`
-and the id of that request's `ShuntingUnit` in `ShuntingUnit.cpp`), and the
-solver's only read printed it as `"train (id)"`. The type information the name
-suggested is carried per unit in `trainUnits`, as `(typePrefix, carriages)`.
-
-Two things fell out that are worth keeping:
-
-- **cTORS got simpler, not more complex.** It has represented these ids as
-  `int` throughout since long before the JSON migration, and was calling
-  `stoi()` on every one of them at the boundary. Four such calls are gone. The
-  legacy non-HIP `PBTrainGoal` path keeps its strings, its `stoi()` guards and
-  the `"****"` placeholder; it belongs to `--plan_type Evaluator`.
-- **A latent sort bug in the solver.** `PlanGraph`'s Wait-merging pass orders by
-  `ShuntingUnit.Id`, which over strings sorted unit 10 before unit 2. It is
-  numeric now. `GetShuntUnit` also stopped parsing every existing id out of its
-  string to mint the next one.
-
-Fixture validation went from 2/19 to 10/19 — every scenario now passes. All
-1,921 string ids were numeric, so nothing needed renumbering.
-
-### Left open
-
-- **The nine plans still fail validation**, for two reasons unrelated to ids and
-  each needing a decision rather than a conversion:
-  - Plans carry `memberIDs` and `standingType`; the model says `members` and
-    sets `extra="forbid"`. This is a live disagreement, not a lag — the
-    evaluator's `Plan.cpp` raises an error calling `members` the *legacy* field
-    and demanding `memberIDs`. Someone has to pick a name.
-  - `trainUnitIds` is `null` in all 606 actions, against a schema saying array.
-    Either the model accepts `Optional[list[int]]` or the writer emits `[]`.
-- **`TrainUnitType.displayName` → `(typePrefix, carriages)`**, which is a
-  different field that happens to share a name, and the one this migration is
-  sometimes confused with. Already done in the generator (a derived property,
-  off the wire), the solver (`TypeDisplayName()` returns the tuple) and every
-  fixture. Outstanding only in the evaluator: `TrainUnitType::types` is still
-  `map<string, TrainUnitType*>` keyed by the combined string (`Train.h:15`),
-  even though `Scenario.cpp:361` already notes the key must be
-  `(displayName, carriages)` because the name alone is not unique.
-  `TrainUnitTypes.proto:8` retires with it.
-
----
-
-## Phase 3c — Continuous integration ✓ DONE
-
-Set up CI across all four repos before tagging 2.0.0. The case for doing it now
-rather than after: every defect found on 2026-08-07 had been present in every
-released version, and each one was invisible to the suites that already existed.
-Two of those suites cannot pass at all (see below), which is the sort of thing
-that only stays broken when nothing runs them.
-
-Done 2026-08-08. All four repos now have a workflow, on
-`claude/2026-08-07-replay-fixes` in each, validated through draft PRs into the
-migration branches (solver #15, evaluator #5, generator #10, this repo #7).
-
-### Prerequisite: the two dead-weight evaluator tests ✓ DONE
-
-`EngineTest` and `CompatibilityTest` required `LOCATION_PATH`, `SCENARIO_PATH`
-and `PLAN_PATH` to be exported, and then failed with `map::at` against the
-bundled demo data — whose `scenario.json` still uses the pre-unification field
-names this migration replaced, so they could not have passed even with the
-variables set. Resolved 2026-08-08: `ctest` is now 7/7.
-
-`CompatibilityTest` was rebuilt around a committed fixture
-(`data/Demo/hip_plan_evaluation_test`) covering the HIP plan path the pipeline
-actually runs, and demonstrably catches the `4482fa2` defect. `EngineTest` kept
-only its self-contained scenario-unification case; its two environment-driven
-cases were deleted.
-
-**Coverage this leaves open.** The deleted `EngineTest` "Plan test" was the only
-test naming the cTORS-native plan path — `GetRunResultProto` plus
-`RunResult::CreateRunResult(const Location*, const PBRun&)` — which `main.cpp`
-still reaches via `--plan_type Evaluator`. Nothing was lost in practice, since it
-never ran, but that mode now has no test at all and the pipeline never uses it:
-`run_evaluator.py` always passes `--plan_type Solver`. Decide whether the mode is
-still supported. If it is, it wants a fixture like the HIP one; if it is not,
-retiring it removes a second plan format from the evaluator.
-
-### What each repo runs
-
-| repo | workflow | check |
-|---|---|---|
-| `robust-rail-generator` | `.github/workflows/python.yml` | `pytest` (14); `schema/*.json` still matches `model_json_schema()` |
-| `robust-rail-solver` | `.github/workflows/dotnet.yml` | `csharpier check`; build; no-config smoke run; tests (35) |
-| `robust-rail-evaluator` | `.github/workflows/ctest.yml` | configure, build, `ctest` (7/7) |
-| `scenario-planning-inputs` | `.github/workflows/validate-fixtures.yml` | generator schema freshness (gating); fixture validation (report-only) |
-
-All four trigger on push and pull request against the stable branches and
-`release/2.0.0`, plus `workflow_dispatch`. No `claude/**` wildcard, so work on a
-session branch is validated by opening a PR into the release branch — which is enough, because the `pull_request` event
-runs the workflow from the merge commit, so a workflow added in the PR does run.
-
-Two open solver issues block two fixtures and are not CI's concern:
-Robust-Rail-NL/robust-rail-solver#13 and #14.
-
-`dotnet build` warnings-as-errors remains a separate decision; the solver builds
-with two nullable warnings in `Initial/SimpleHeuristic.cs`.
-
-**The evaluator had less CI than it appeared to.** Its only file under
-`.github/` was an editor backup, `docker-image.yml~`, and `.github/` was not
-tracked in git at all — the real workflow lived on a local `main-leon` branch,
-was on no pushed branch, and built an image without running a test. So `ctest.yml`
-was written from scratch rather than adapted.
-
-**The solver's workflow was red before any of this, for a reason worth
-recording.** It had never run on `noproto` — the triggers named only `main` and
-`dev` — but PR #12 into `main` did fire it on 2026-08-03, and it failed in 29s.
-The no-config default run in `Program.cs` had been given an absolute
-`/home/leon/Projects/...` prefix, so it worked on exactly one machine. Fixing
-the triggers alone would have left it red. The paths are relative again, as they
-were on `dev`.
-
-### Schema validation in this repo
-
-`location.json`, `scenarios/*.json` and `plans/*.json` are validated against the
-generator's exported schemas. This closes a real gap: several fixtures have been
-edited by hand — the ID migration and the electrification fix were both bulk
-edits — and nothing checked the result until a tool fell over on it, usually
-with a bad error message.
-
-Two caveats, both encoded in the workflow:
-
-- **The check gates, as of 2026-08-08.** It reported 2 of 18 when the workflow
-  was written — only the two `location.json` files — and ran under
-  `continue-on-error` on the reasoning that a permanently red check teaches
-  everyone to ignore it. Phase 3d took it to 10 of 18 by making every id an int,
-  and Phase 3e to 18 of 18. It is now a hard gate.
-
-  The interim state made its own argument for not lingering there: the run that
-  validated the fixtures against the wrong generator branch stayed green, and
-  said 2/18 only in the log, where nobody was looking.
-- **Where the schemas come from is still open**, and is the least settled part
-  of this setup.
-
-  The workflow clones `robust-rail-generator` and reads `schema/` from it. A
-  copy vendored into this repo would instead go stale in silence, which is
-  worse: a stale schema does not fail, it passes, having checked the wrong
-  contract. So the workflow also re-exports the schemas in that checkout and
-  fails if they differ from what is committed there — and *that* step gates,
-  even while the fixture validation itself does not.
-
-  **Which branch it clones caused a real false reading on 2026-08-08.** It was
-  pinned to `pydantic`, so the first run after the id migration validated the
-  newly converted fixtures against the pre-migration schema and reported 2/18
-  for a tree that was really at 10/18. The freshness gate passed throughout,
-  because that schema was perfectly consistent — with the wrong models. The
-  branch is now chosen to match: same name in the generator if it exists,
-  `pydantic` otherwise. That is enough for coordinated changes, which land in
-  both repos on one branch, but it is a naming convention standing in for a
-  contract, and it will mislead anyone who does not follow it.
-
-  **Where this should end up.** `schemaVersion` already exists on every fixture,
-  the generator already has `EXPECTED_SCHEMA_VERSION`, and the evaluator already
-  has `SchemaVersionTest`. Publishing the exported schemas as a release artifact
-  keyed by `schemaVersion` (the Phase 2 item) and validating each fixture against
-  *the version it declares* removes the branch guess and the staleness together,
-  and makes mixed-version fixtures during a migration expressible rather than
-  simply broken. Worth deciding once the release settles and schema changes
-  become rare and individually versioned.
-
-**`scenario_config_*.json` is covered too, as of 2026-08-08.** An earlier note
-here said it should stay out of scope, on the grounds that `check_config.py`'s
-tolerance of unknown keys was load-bearing — the `intent` blocks relied on it.
-That had it backwards. `intent` is structured (`designed_for`, `expectation`,
-`exercises`, `notes[]`) and is now a declared field; admitting it by permitting
-unknown keys would have meant the mechanism documenting a configuration's
-purpose was also the one hiding typos in it.
-
-Tolerating unknown keys was never neutral. These are the only pipeline inputs
-written by hand, `check_config.py` checks required keys only, and every
-interesting knob is optional — `seed`, `min_gap_on_gateway`, `min_time_in_yard`,
-`mixed_traffic`, `matching`, `gateway`. A mistyped one simply never took effect.
-The schema found such a case immediately: `scenario_config_test.json` set
-`inStanding_ratio`/`outStanding_ratio` where `random_generator.py` reads
-`instanding_ratio`/`outstanding_ratio`. Both were `0.0` and the absent-key
-fallback is also "none", so nothing observable was wrong — which is why it had
-gone unnoticed.
-
-The model is a discriminated union on `trains_given`, matching the split
-`check_config.py` already encoded as `if` chains. `check_config.py` keeps what a
-schema cannot do: checking values against the location and material catalogue,
-and normalising the config in place. The `custom_*` payloads are typed only as
-objects for now — the value is at the top level, and the nested shapes deserve
-their own pass.
+- x86-64 only. arm64 is covered at the unit-test level (evaluator and solver CI
+  matrices, 2026-08-09) but the pipeline has never run there. A cross-arch
+  comparison would not be meaningful anyway — different machine, and the
+  determinism guarantee is conditional on not exhausting the time budget.
+- solver#11 did not fire. At roughly 1 in 3 under a varying seed that is
+  unsurprising, and is not evidence of absence.
 
 ---
 
 ## Phase 4 — Stable release
 
-- Tag `generator:2.0.0`, `hip:2.0.0`, `tors:2.0.0` once integration tests pass
+- Tag `generator:2.0.0`, `hip:2.0.0`, `tors:2.0.0`
+- Release notes naming solver#13, solver#14 and evaluator#6, and the two fixtures
+  expected to fail because of them
 - Archive the `*-protobuf` and `*-pydantic` versioned directories in this repo
-  (keep as historical reference; remove from the active pipeline)
-- Update `README.md` in this repo to reflect the stable pipeline
+  (historical reference; remove from the active pipeline), and retire the
+  `legacy` entries from the `--version` selectors with them
+- Update this repo's `README.md` to reflect the stable pipeline
+- Merge `release/2.0.0` into each repo's stable branch and delete it
 
 ---
 
-## Sequencing
+## Settled — decisions still in force
 
-```
-Phase 0 (decisions)
-  ├─► Phase 1a (schemaVersion — all three repos)
-  └─► Phase 1 (scenario unification — all three repos) ◄─► Phase 2 (generator cleanup)
-          └─► Phase 3 (integration tests)
-                  └─► Phase 4 (release tags)
-```
+These constrain anything built on the schema, so they outlive the phases that
+produced them.
 
-Phase 1a and Phase 1 can proceed in parallel once Phase 0 decisions are resolved.
-Work within each phase can be split across the three repos and done concurrently.
-Phase 3 requires all three repos to be updated and re-tagged before it can run.
+| Decision | Resolution |
+|---|---|
+| `TrainUnitType.reversalDuration` | Computed from `backNormTime`/`backAdditionTime`; off the wire, derived locally |
+| Type identity | `(typePrefix, carriages)`, not a combined `displayName` string. Consumers key on the pair |
+| `TaskSpec.priority` | Renamed to `optional: bool` — TORS only ever used it as a 0/non-zero flag |
+| `Resource` | `{ "kind": "trackPart"\|"facility"\|"staff", "id": <int> }`; `name` dropped; evaluator hard-errors on an unrecognised `kind` |
+| `trainUnitTypes` | Stays on `Scenario`, referenced from `TrainUnit` |
+| `Plan.trackParts` | Dropped — TORS loads infrastructure from `--path_location` |
+| `schemaVersion` | One shared monotonic integer across `Location`, `Scenario` and `Plan`, starting at 1; all bump together |
+| Version mismatch | **Warn and continue.** Never a hard reject. Each tool holds `EXPECTED_SCHEMA_VERSION` locally; `SCHEMA_CHANGELOG.md` in the generator records each bump |
+| Every id | An `int`, including the composite ones |
+| Arrays of IDs | Always end in `IDs` — `memberIDs`, `parentIDs`, `relatedTrackPartIDs`. `IncomingTrain.members` and `Train.members` keep their names because they really do embed their units |
+| Retired proto fields | `reserved`, never freed, so a later field cannot inherit a number and meet an old message carrying the old meaning |
+
+**Two traps worth keeping.**
+
+*The proto names lie about which file is live.* Each of the three inputs uses a
+different family, and the family called legacy is simultaneously the engine's
+internal representation:
+
+| proto | what it actually is |
+|---|---|
+| `Location.proto` | **live input** — `location.json` parses into `proto_tors::Location`, *not* anything HIP |
+| `HIP_Scenario.proto` | **live input** — `scenario.json` |
+| `HIP_Plan.proto` | **live input** — `plan.json` under `--plan_type Solver` |
+| `HIP_Common.proto` | **live** — shared by the two above |
+| `Plan.proto`, `PartialOrderSchedule.proto` | engine internal representation, *and* an input under `--plan_type Evaluator` |
+| `Scenario.proto`, `Run.proto` | reachable **only** under `--plan_type Evaluator` |
+
+Anyone reasoning from the names picks the wrong file — which happened during
+Phase 3e, when a rename went into `HIP_Location.proto` and the compiler pointed
+out the live path reads `proto_tors::Facility`.
+
+*Protobuf cannot express an absent list.* `trainUnitIds` was documented as "if
+not specified, all train units are involved". That contract was never
+expressible: `repeated` fields carry no presence information, so absent, `null`
+and `[]` all arrive as the same empty field. Anything reintroducing an optional
+list needs a deliberate design for presence, not just the field back.
+
+---
+
+## Settled — what was done
+
+Full detail in git history; commit ranges given where they help.
+
+| Phase | Outcome |
+|---|---|
+| 0 — Design decisions | All eight resolved; results in the table above |
+| 1a — `schemaVersion` | Implemented in all three tools plus fixtures |
+| 1 — Scenario unification | One `scenario_*.json` per case in HIP field names; `scenario_solver_*.json` retired; `location_unified.json` → `location.json`. Solver retired `DeepLook`, `Converter.cs` and every protobuf-shaped class; evaluator migrated its read path and simplified the service-task rules |
+| 2 — Generator cleanup | protobuf dependency dropped; `typePrefix`/`carriages` identity; `optional: bool`; PascalCase enums; JSON Schema exported |
+| 3 — Integration testing | Parity established against the protobuf baseline (6/8 byte-identical, 2/8 same verdict); three evaluator crash bugs found and fixed along the way |
+| 3c — CI | All five repos gate on push and PR. Generator `pytest` + schema freshness; solver `csharpier`, build, smoke run, 35 tests; evaluator `ctest` 7/7; this repo's fixture validation; planning-approach schema tests. arm64 matrices added 2026-08-09 for the two compiled repos |
+| 3d — Every id an int | Across all three repos and every fixture. Removed four `stoi()` calls from cTORS and fixed a latent sort bug where `ShuntingUnit.Id` sorted unit 10 before unit 2 |
+| 3e — Naming convention | `*IDs` everywhere; `Action.trainUnitIds`, `ShuntingUnit.standingType` and `Plan.trackParts` deleted as written-by-nobody and read-by-nobody; the `Park` task type turned out unreachable |
+| 3f — Proto layout | `HIP_Location.proto` held four unreachable messages; removed and renamed to `HIP_Common.proto`. The rest is blocked on the `--plan_type Evaluator` decision |
+| 3g — planning-approach | Converter now writes plans the schema accepts (269 validation errors to 0); `standingType` translated to the `StandIn`/`StandOut` task types rather than deleted; first tests and CI added. `pipeline.py` still open, above |
+| Fixture corpus | `sweep_seeds.py --save` writes a classified corpus under `Location_*/fixtures/{feasible,infeasible,unresolved}/`; all of it validated by `validate_json.py`, which CI gates on |
