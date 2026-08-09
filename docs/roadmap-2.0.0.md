@@ -461,6 +461,17 @@ shared version number.
 under that tag are what produced the evidence in this section, and moving a
 published tag would make that record unreproducible.
 
+**Do not assume the next solver bump is as cheap.** `641e380` only added throws
+on paths that were already corrupt, so it could not change a healthy run, and
+re-running was a formality that confirmed it. A fix for solver#11 will not have
+that property: removing a redundant `Depart` changes what the parking model
+computes, so plans can legitimately differ. If they do, the committed plan
+fixtures under `Location_*/plans/` and the verdict table above both have to be
+regenerated rather than re-confirmed — that is a change to the release evidence,
+not a formality, and it should be reviewed as one. Check the verdicts, not just
+whether the files differ: a plan changing is expected, a *verdict* changing is a
+finding.
+
 ### What this run does not cover
 
 - x86-64 only. arm64 is now covered at the unit-test level (both repos' CI
