@@ -10,14 +10,14 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
     "legacy": "ghcr.io/robust-rail-nl/tors:1.3.1",
-    "2.0.0": "ghcr.io/robust-rail-nl/tors:2.0.0-beta.1",
+    "2.0.0": "ghcr.io/robust-rail-nl/tors:2.0.0-beta.3",
     # The evaluator is the oracle the pipeline trusts, and its assertions build
     # produces byte-identical output to the plain one (verified across all
     # KleineBinckhorst scenarios) while turning an internal invariant violation
     # into an abort rather than a verdict computed from corrupt state. A run
     # that trips one exits 134/139 with the assertion text in the .err file,
     # which reads very differently from an ordinary "plan is not valid".
-    "2.0.0-assert": "ghcr.io/robust-rail-nl/tors:2.0.0-beta.2-assert",
+    "2.0.0-assert": "ghcr.io/robust-rail-nl/tors:2.0.0-beta.3-assert",
     "local": "tors:latest",
 }
 CONTAINER_DB = "/app/database"

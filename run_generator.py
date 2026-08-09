@@ -10,10 +10,11 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
     "legacy": "ghcr.io/robust-rail-nl/generator:1.2.2",
-    "2.0.0": "ghcr.io/robust-rail-nl/generator:2.0.0-beta.1",
-    # The generator has no assertions build; same image as "2.0.0-assert" is
-    # a pipeline configuration, not a per-tool build flag. See run_evaluator.py.
-    "2.0.0-assert": "ghcr.io/robust-rail-nl/generator:2.0.0-beta.2",
+    "2.0.0": "ghcr.io/robust-rail-nl/generator:2.0.0-beta.3",
+    # Same image: the generator has no assertions build. "2.0.0-assert" names a
+    # pipeline configuration — assert the evaluator, leave everything else
+    # alone — rather than a per-tool build flag. See run_evaluator.py.
+    "2.0.0-assert": "ghcr.io/robust-rail-nl/generator:2.0.0-beta.3",
     "local": "generator:latest",
 }
 CONTAINER_DB = "/app/database"
