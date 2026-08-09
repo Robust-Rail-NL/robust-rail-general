@@ -726,8 +726,17 @@ All four trigger on push and pull request against the stable branches and
 session branch is validated by opening a PR into the release branch — which is enough, because the `pull_request` event
 runs the workflow from the merge commit, so a workflow added in the PR does run.
 
+Two open solver issues block two fixtures and are not CI's concern:
+Robust-Rail-NL/robust-rail-solver#13 and #14.
+
 `dotnet build` warnings-as-errors remains a separate decision; the solver builds
 with two nullable warnings in `Initial/SimpleHeuristic.cs`.
+
+**The evaluator had less CI than it appeared to.** Its only file under
+`.github/` was an editor backup, `docker-image.yml~`, and `.github/` was not
+tracked in git at all — the real workflow lived on a local `main-leon` branch,
+was on no pushed branch, and built an image without running a test. So `ctest.yml`
+was written from scratch rather than adapted.
 
 **The solver's workflow was red before any of this, for a reason worth
 recording.** It had never run on `noproto` — the triggers named only `main` and
