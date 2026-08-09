@@ -518,8 +518,20 @@ deleting: it becomes the `StandIn`/`StandOut` task types.
   pre-unification scenarios whose train IDs no longer exist. Regenerating means
   re-running the planner.
 
-**It has no CI.** Phase 3c covered four repos; this is a fifth, and the same
-argument applies — more so, since nothing validated its output until now.
+**CI added the same day** (`.github/workflows/schema.yml`, three tests in
+`tests/`). It covers both halves of the contract: that the reading helpers still
+resolve trains and tracks from today's unified inputs, and that one action of
+every kind validates against `schema_plan.json`. A third test pins
+`standingType`'s replacement, since deleting the field without translating it to
+`StandIn`/`StandOut` would still validate and only lose meaning.
+
+The job installs `pytest` and `jsonschema` and nothing else — `converter.py`
+imports only the standard library, so Julia, enhsp and the JDK stay out of CI.
+It takes the generator and this repo from the branch of the same name, which
+works because every repo shares `release/2.0.0`.
+
+Note what CI does *not* cover: the reading test exercises the converter's
+lookups, not `pipeline.py`, so the breakage listed above will not surface there.
 
 ---
 
