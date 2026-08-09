@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""Run the planner docker image on all scenario_solver_*.json files.
+"""Run the planner docker image on all scenario_*.json files.
 
-Replaces the HIP solver step: converts each solver-format scenario to PDDL,
-plans, and converts the result back to TORS JSON at plans/plan_<suffix>.json —
-the same output convention run_evaluator.py already consumes.
+Replaces the HIP solver step: converts each scenario to PDDL, plans, and
+converts the result back to TORS JSON at plans/plan_<suffix>.json — the same
+output convention run_evaluator.py already consumes.
+
+Note that no planner image is published or built anywhere reachable from this
+repo, so this step cannot currently run; see PLANNER_DOCKER_IMAGE_VERSIONS.
 """
 
 import argparse
@@ -16,9 +19,11 @@ ROOT = Path(__file__).parent
 CONTAINER_DB = "/app/database"
 
 # These mirror the other steps' --version choices so the pipeline can pass
-# --version uniformly, but no planner image is published under any tag yet —
-# the planner image is built locally (see planning-approach-refactor/Dockerfile)
-# until it's ready to publish, which is why every key maps to the same image.
+# --version uniformly, but no planner image is published under any tag, which
+# is why every key maps to the same one. Nor is `planner:latest` built anywhere
+# reachable: the comment here used to point at planning-approach-refactor/
+# Dockerfile, and neither that repo nor any Dockerfile in planning-approach
+# exists any more. Whoever revives this step has to supply the image first.
 PLANNER_DOCKER_IMAGE_VERSIONS = {
     "legacy": "planner:latest",
     "2.0.0": "planner:latest",
@@ -28,7 +33,7 @@ PLANNER_DOCKER_IMAGE_VERSIONS = {
 
 
 def _scenario_name(scenario: Path) -> str:
-    return scenario.stem.removeprefix("scenario_solver_")
+    return scenario.stem.removeprefix("scenario_")
 
 
 def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner: str, dry_run: bool) -> bool:
@@ -83,7 +88,7 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Run the planner on all scenario_solver_*.json files."
+        description="Run the planner on all scenario_*.json files."
     )
     parser.add_argument("--dry-run", action="store_true",
                         help="Print docker commands without executing them.")
@@ -102,7 +107,7 @@ def main() -> None:
         if not loc.is_dir():
             print(f"WARNING: {loc} not found, skipping.", file=sys.stderr)
             continue
-        scenarios = sorted(loc.glob("scenarios/scenario_solver_*.json"))
+        scenarios = sorted(loc.glob("scenarios/scenario_*.json"))
         if not scenarios:
             continue
         print(f"\n{loc.name} ({len(scenarios)} scenario(s))")
@@ -110,6 +115,15 @@ def main() -> None:
             total += 1
             if not _run_scenario(PLANNER_DOCKER_IMAGE_VERSIONS[args.version], loc, scenario, args.planner, args.dry_run):
                 errors += 1
+
+    if total == 0:
+        # This script spent the whole scenario-unification period globbing
+        # scenario_solver_*.json, a filename that stopped existing, and reported
+        # "Done: 0/0 succeeded" with exit 0 every time — indistinguishable from
+        # a clean run. Finding no work is nearly always a broken glob or a wrong
+        # --location rather than a real empty repo, so say so out loud.
+        print("WARNING: no scenarios/scenario_*.json found — nothing was planned.",
+              file=sys.stderr)
 
     print(f"\nDone: {total - errors}/{total} succeeded.")
     if errors:
