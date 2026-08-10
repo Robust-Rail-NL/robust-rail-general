@@ -7,10 +7,10 @@ The pipeline runs end-to-end on published images, all five repos have gating CI,
 and the release evidence is recorded under [Release evidence](#release-evidence)
 below.
 
-**solver#11 is fixed** as of 2026-08-10, root cause and all, on
-`release/2.0.0`. What gates rc.1 is now only the consequence: the solver needs a
-new image and the pipeline needs re-running against it, because the evidence
-below was produced by `hip:2.0.0-beta.4`, which predates the fix.
+**solver#11 is fixed** as of 2026-08-10, root cause and all, on `release/2.0.0`,
+and the pipeline has been re-run against an image carrying the fix
+(`hip:2.0.0-beta.5`) with every plan and every evaluation byte-identical. That
+was the rc.1 gate, and it is met.
 
 Everything else outstanding is either a decision with no defect behind it, or a
 known issue to name in the release notes. Three issues came out of the #11
@@ -44,19 +44,29 @@ the work happened at the time.
 
 ---
 
-## Open — the rc.1 gate
+## Open — cutting rc.1
 
-**Re-run the pipeline against a solver image containing the solver#11 fix.**
+The gate — re-run the pipeline against a solver image containing the solver#11
+fix — is **met**: see [Re-verified on
+`hip:2.0.0-beta.5`](#re-verified-on-hip200-beta5). What is left is the tagging
+itself, plus one confirmation pass:
 
-The fix is on `release/2.0.0` (`6317d8e`, `82c825f`, `87a48c9`, `5a4a7f8`,
-`2bd3bf2`), but no image has been tagged for it, so `--version 2.0.0` still
-resolves to `hip:2.0.0-beta.4` and the [Release evidence](#release-evidence)
-below still describes a solver without it. Tag `beta.5`, re-run, and update the
-plan fixtures and the verdict table if anything moves.
+- **Run the assert pass once `tors:…-assert` and `hip:…-assert` are published for
+  the tagged versions.** `--version 2.0.0-assert --steps evaluator` reproduces the
+  beta.3 check: same plans, evaluator with assertions on, expect identical
+  verdicts and no assertion. The solver's own `-assert` image is deliberately
+  *not* what `--version 2.0.0-assert` runs — assertions change how far a
+  wall-clock-bounded search gets, so it belongs in a seed soak, not the baseline.
+- **Decide whether rc.1 is a release-train tag or a per-repo one.** Everything so
+  far has been per-repo: a tag describes its own source, which is why the solver
+  sits at beta.5 while the generator and evaluator sit at beta.3. "Release
+  candidate" argues the other way — a candidate is one nameable set of images
+  that were verified together. Recommend tagging all five repos `2.0.0-rc.1`
+  even where the source is unchanged, and saying so in the release notes, so
+  that the candidate has a single name.
 
-This is expected to be cheap — see [Re-verified on
-`hip:2.0.0-beta.4`](#re-verified-on-hip200-beta4) for why, and for what would
-make it not cheap.
+Nothing else below blocks rc.1. The remaining opens are decisions with no defect
+behind them, and known issues to name in the release notes.
 
 ### What solver#11 turned out to be
 
@@ -312,27 +322,46 @@ produce a plan. The fix does change the parking model, but only on a
 configuration — a split that stays on its own track — that healthy runs never
 reach, which is the same reason the crash only ever appeared on even seeds.
 
-So re-verification is expected to be a formality. Two caveats before treating it
-as one:
+So re-verification was expected to be a formality, with two caveats: the sweep
+used a local assertions build at `MaxDuration: 15` rather than the published
+image at the pipeline's `3600`, and it covered KleineBinckhorst only. Both are
+now closed by the beta.5 run below, which used the published image at the full
+budget and included SimpleService.
 
-- That sweep used a local assertions build at `MaxDuration: 15`, not the
-  published image at the pipeline's `3600`. A longer budget explores more of the
-  neighbourhood, so it can reach configurations the sweep did not.
-- It covered KleineBinckhorst only, not SimpleService.
+### Re-verified on `hip:2.0.0-beta.5`
 
-Check the verdicts, not just whether the files differ: a plan changing is
-expected, a *verdict* changing is a finding.
+The solver moved to beta.5 for the solver#11 fix (`6317d8e`, `82c825f`,
+`87a48c9`, `5a4a7f8`, `2bd3bf2`) and `f99438c` (solver#16). Re-ran the whole
+pipeline on 2026-08-10, generator through evaluator, 2m05s:
 
-### What this run does not cover
+- Generator 11/11, solver 11/11, evaluator 8/11 exit-0 — the same counts as
+  beta.3 and beta.4.
+- **All 11 plans byte-identical** to the beta.4 run, and **all 11 evaluation
+  outputs byte-identical** too. Not just the same verdicts: the same bytes.
+- Regenerated scenarios again differ from the committed ones only in key order,
+  parsing equal on all 8 that the generator rewrites.
+
+This is the outcome the seed sweep predicted, now at the pipeline's own budget
+and covering both locations. The fix changes the parking model only on a
+configuration healthy runs never reach.
+
+The generator and evaluator stay at beta.3 for the same per-repo reason as
+before; neither repo's source has changed since.
+
+Not yet covered: the assert pass. `hip:2.0.0-beta.5-assert` was still building
+when this ran, so the run above is the plain image only. No assertion has been
+exercised against the fix outside the solver's own tests.
+
+### What these runs do not cover
 
 - x86-64 only. arm64 is covered at the unit-test level (evaluator and solver CI
   matrices, 2026-08-09) but the pipeline has never run there. A cross-arch
   comparison would not be meaningful anyway — different machine, and the
   determinism guarantee is conditional on not exhausting the time budget.
-- solver#11 did not fire. At roughly 1 in 3 under a varying seed that is
-  unsurprising, and is not evidence of absence. Now understood rather than
-  merely unobserved: this run pinned `Seed: 1`, on which the triggering
-  configuration never arises at all.
+- Only `Seed: 1`. That is why solver#11 never fired here even before the fix:
+  the triggering configuration does not arise on that seed at all. The pipeline
+  exercises one path through the search per scenario, not the search's range —
+  the seed sweep in the solver repo is what covers that.
 
 ---
 
