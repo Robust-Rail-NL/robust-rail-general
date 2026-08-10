@@ -7,12 +7,15 @@ The pipeline runs end-to-end on published images, all five repos have gating CI,
 and the release evidence is recorded under [Release evidence](#release-evidence)
 below.
 
-**One thing gates rc.1:** Robust-Rail-NL/robust-rail-solver#11, the intermittent
-crash in `Deque`/`TrackOccupation`. It has a deterministic reproduction as of
-2026-08-09 and is being fixed rather than documented, by decision.
+**solver#11 is fixed** as of 2026-08-10, root cause and all, on
+`release/2.0.0`. What gates rc.1 is now only the consequence: the solver needs a
+new image and the pipeline needs re-running against it, because the evidence
+below was produced by `hip:2.0.0-beta.4`, which predates the fix.
 
 Everything else outstanding is either a decision with no defect behind it, or a
-known issue to name in the release notes.
+known issue to name in the release notes. Three issues came out of the #11
+investigation — solver#17, #18 and #19 — none of which blocks the pipeline; see
+the table below.
 
 > Condensed 2026-08-09, when the remaining work became small enough that the
 > record of how we got here was crowding it out. Completed phases are summarised
@@ -43,30 +46,48 @@ the work happened at the time.
 
 ## Open — the rc.1 gate
 
-**solver#11 — `Deque.Remove` on a node that is not in the deque.**
+**Re-run the pipeline against a solver image containing the solver#11 fix.**
 
-Reproduces deterministically once the *solver* seed varies:
-`run_solver.py` pins `Seed: 1`, which is why four consecutive pipeline runs give
-byte-identical plans and never crash. Sweeping the seed over
-`KleineBinckhorst_10t_random_42s_distribution2`, seeds 2/4/6/8/10/12 crash and
-the odd ones pass.
+The fix is on `release/2.0.0` (`6317d8e`, `82c825f`, `87a48c9`, `5a4a7f8`,
+`2bd3bf2`), but no image has been tagged for it, so `--version 2.0.0` still
+resolves to `hip:2.0.0-beta.4` and the [Release evidence](#release-evidence)
+below still describes a solver without it. Tag `beta.5`, re-run, and update the
+plan fixtures and the verdict table if anything moves.
 
-Established: the same `TrackTask` is departed **twice**, on the correct
-occupation, within a single `ComputeModel` pass. Nothing detects it because
-`State.HasDeparted` is cleared only by `State.Reset()`, `Arrive` never clears it,
-and `Depart` never consults it.
+This is expected to be cheap — see [Re-verified on
+`hip:2.0.0-beta.4`](#re-verified-on-hip200-beta4) for why, and for what would
+make it not cheap.
 
-`641e380` added a fail-fast membership check to `Deque.Remove` (O(1) always, plus
-an exhaustive walk under `DEBUG`). It does not change which seeds fail — it makes
-the failure land closer to the cause. Its exhaustive check never fired on a
-passing seed, so **plans produced under `Seed: 1` are not built on a corrupted
-deque**, which had been an open worry about the committed fixtures.
+### What solver#11 turned out to be
 
-Still open: which two call sites make the pair —
-`PlanGraph.ComputeLocation:197` and/or `PlanGraph.computeDepartureRoutes:769`.
-That decides whether the fix removes a redundant call or repairs a loop that
-revisits a task. The full brief, including a retracted intermediate conclusion
-and the instrument that caused it, is in solver#11's comments.
+The same `State` was departed twice, but not by the same task. `ComputeLocation`
+treats a routing that ends on the track it started from as "nothing moved": the
+next task takes over the previous task's `State` rather than departing and
+re-arriving, which keeps the train's place in the occupation and is what makes
+switching a task onto the from-track worth proposing at all.
+
+That shortcut only works one-to-one. When such a routing is a **split**, every
+one of its parts was given the same `State`, so each later removed the same deque
+node and the second found it gone. `ParkingSwitchMove`/`ParkingSwapMove` create
+the configuration by relocating a split's halves onto the routing's own
+from-track.
+
+The seed parity — 2/4/6/8/10/12 crash, odd ones pass — was the thread we expected
+to pull hardest and turned out to be shallow: splits-in-place occur on exactly the
+even seeds. Seed 1 runs 86,370 `ComputeModel` passes without one.
+
+Two defects, fixed separately: the aliased `State`, and a serialisation crash it
+uncovered (a routing's duration covers a split's decoupling as well as its
+travel, so an in-place split emitted a Move action with an empty path). Then
+modelled properly: the parts now take over the stretch the whole train held
+rather than being departed and re-arrived at the end of the track, which had
+understated the crossings they would later owe to get out.
+
+`Tests/TestData/scenario_inplace_split.json` in the solver reproduces it
+deterministically at seed 1 in under a second, replacing the thirty-second seed
+sweep, and fails against both pre-fix states for the right reasons.
+
+Full brief in solver#11's comments.
 
 ---
 
@@ -77,8 +98,18 @@ and the instrument that caused it, is in solver#11's comments.
 | solver#13 | Solver parks on non-parking arrival tracks when it cannot move into the yard immediately. Blocks `6t_custom_example3`. |
 | solver#14 | outStanding trains have no deadline in the cost function, so plans over-run the scenario horizon for free. Produces the plan that trips evaluator#6. |
 | evaluator#6 | `EvaluatePlan` spins when the plan still has actions but the state is terminal, reporting the symptom rather than "plan extends past the horizon". Terminates via a safety valve; blocks nothing, but the diagnostic misleads. Blocks `7t_custom_example1`. |
-| solver#16 | `Deque.RemoveHead(Side)` throws unconditionally, including after removing successfully. Latent — no callers. |
 | evaluator#1 | Invalid JSON for PB parsing fails quietly. On the legacy `--plan_type Evaluator` path only. |
+| solver#17 | Solver and evaluator place a combined inStanding train's members at opposite ends of the track, so the solver routes a departing half out of the blocked end and calls the result feasible. Needs a decision on which convention is right, and probably a companion evaluator issue. |
+| solver#18 | Solver ignores `standingIndex`, so the order of several standing units on one track is not the one the scenario asked for. Latent in this corpus — every scenario leaves the field null. The evaluator does honour it. |
+| solver#19 | Question, not a defect: splitting a train in place costs no shunt move, and nothing prices the personnel it would need. |
+
+solver#16 (`Deque.RemoveHead` throwing after a successful removal) was fixed in
+`f99438c` and drops off this list.
+
+None of #17, #18 or #19 blocks the pipeline. #17 needs a combined inStanding
+train that gets split, which no fixture has; #18 needs a non-null
+`standingIndex`, which no fixture has; #19 is a modelling question. They are here
+because they were found under #11 and are easy to lose otherwise.
 
 `6t_custom_example3` and `7t_custom_example1` therefore cannot produce a valid
 plan. Both were deferred deliberately. Phase 4's "once integration tests pass"
@@ -269,12 +300,26 @@ configuration rather than a shared version number.
 produced the evidence above, and moving a published tag would make it
 unreproducible.
 
-**Do not assume the next solver bump is as cheap.** `641e380` only added throws
-on paths that were already corrupt, so it could not change a healthy run. A fix
-for solver#11 will not have that property: removing a redundant `Depart` changes
-what the parking model computes, so plans can legitimately differ. If they do,
-the committed plan fixtures and the verdict table above have to be regenerated
-rather than re-confirmed — a change to the release evidence, not a formality.
+**The warning that used to be here has been settled by measurement, in the
+cheap direction.** It said a solver#11 fix would change what the parking model
+computes, so plans could legitimately differ and the fixtures might need
+regenerating rather than re-confirming.
+
+Measured over all 10 KleineBinckhorst scenarios at seeds 1-6, solver and
+evaluator, before and after the fix: **57 of 57 plans byte-identical, no verdict
+changed.** The only difference is that the three runs that previously crashed now
+produce a plan. The fix does change the parking model, but only on a
+configuration — a split that stays on its own track — that healthy runs never
+reach, which is the same reason the crash only ever appeared on even seeds.
+
+So re-verification is expected to be a formality. Two caveats before treating it
+as one:
+
+- That sweep used a local assertions build at `MaxDuration: 15`, not the
+  published image at the pipeline's `3600`. A longer budget explores more of the
+  neighbourhood, so it can reach configurations the sweep did not.
+- It covered KleineBinckhorst only, not SimpleService.
+
 Check the verdicts, not just whether the files differ: a plan changing is
 expected, a *verdict* changing is a finding.
 
@@ -285,7 +330,9 @@ expected, a *verdict* changing is a finding.
   comparison would not be meaningful anyway — different machine, and the
   determinism guarantee is conditional on not exhausting the time budget.
 - solver#11 did not fire. At roughly 1 in 3 under a varying seed that is
-  unsurprising, and is not evidence of absence.
+  unsurprising, and is not evidence of absence. Now understood rather than
+  merely unobserved: this run pinned `Seed: 1`, on which the triggering
+  configuration never arises at all.
 
 ---
 
