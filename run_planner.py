@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Run the planner docker image on all scenario_*.json files.
 
-Replaces the HIP solver step: converts each scenario to PDDL, plans, and
-converts the result back to TORS JSON at plans/plan_<suffix>.json — the same
-output convention run_evaluator.py already consumes.
+An alternative to the HIP solver step, not an addition: it converts each
+scenario to PDDL, plans, and converts the result back to TORS JSON at
+plans/plan_<suffix>.json — the same output convention run_evaluator.py
+consumes, and the same filename run_solver.py writes. Running both against one
+location would have them overwrite each other, so run_pipeline.py refuses the
+combination.
 
-Note that no planner image is published or built anywhere reachable from this
-repo, so this step cannot currently run; see PLANNER_DOCKER_IMAGE_VERSIONS.
+The image is built and published from ../planning-approach by its
+docker-push.sh.
 """
 
 import argparse
@@ -18,16 +21,26 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 CONTAINER_DB = "/app/database"
 
-# These mirror the other steps' --version choices so the pipeline can pass
-# --version uniformly, but no planner image is published under any tag, which
-# is why every key maps to the same one. Nor is `planner:latest` built anywhere
-# reachable: the comment here used to point at planning-approach-refactor/
-# Dockerfile, and neither that repo nor any Dockerfile in planning-approach
-# exists any more. Whoever revives this step has to supply the image first.
-PLANNER_DOCKER_IMAGE_VERSIONS = {
-    "legacy": "planner:latest",
-    "2.0.0": "planner:latest",
-    "2.0.0-assert": "planner:latest",
+# Named DOCKER_IMAGE_VERSIONS like every other step's, because run_pipeline.py
+# reads that attribute by name to report which images a run will use. It was
+# PLANNER_DOCKER_IMAGE_VERSIONS, which made `--steps planner` an AttributeError.
+#
+# The keys mirror the other steps' --version choices so the pipeline can pass
+# --version uniformly, but they do not all mean something here:
+#
+# - "legacy" has no honest value. The planner step did not exist in 1.x, so
+#   there is no 1.x planner image to compare against. It maps to the current
+#   one rather than to a tag that was never built.
+# - "2.0.0-assert" likewise: the assertions builds are the evaluator's and the
+#   solver's. This image has no such variant, so the selector resolves to the
+#   plain image and the run stays comparable.
+#
+# The version is planning-approach's own (see its VERSION file), deliberately
+# not 2.0.0 — that number belongs to the repos sharing an interchange format.
+DOCKER_IMAGE_VERSIONS = {
+    "legacy": "ghcr.io/robust-rail-nl/planner:0.1.0",
+    "2.0.0": "ghcr.io/robust-rail-nl/planner:0.1.0",
+    "2.0.0-assert": "ghcr.io/robust-rail-nl/planner:0.1.0",
     "local": "planner:latest",
 }
 
@@ -94,7 +107,7 @@ def main() -> None:
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
-    parser.add_argument("--version", choices=PLANNER_DOCKER_IMAGE_VERSIONS.keys(), default="local",
+    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default="local",
                         help="Pick a docker image version.")
     parser.add_argument("--planner", choices=["symbolic", "enhsp"], default="symbolic",
                         help="Planner implementation to use inside the container.")
@@ -113,7 +126,7 @@ def main() -> None:
         print(f"\n{loc.name} ({len(scenarios)} scenario(s))")
         for scenario in scenarios:
             total += 1
-            if not _run_scenario(PLANNER_DOCKER_IMAGE_VERSIONS[args.version], loc, scenario, args.planner, args.dry_run):
+            if not _run_scenario(DOCKER_IMAGE_VERSIONS[args.version], loc, scenario, args.planner, args.dry_run):
                 errors += 1
 
     if total == 0:

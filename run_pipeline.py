@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Run the full generator → solver → evaluator pipeline."""
+"""Run the full generator → solver → evaluator pipeline.
+
+`planner` is available as an alternative to `solver`: both produce plans for the
+evaluator to judge, by different means. See EXCLUSIVE_STEPS.
+"""
 
 import argparse
 import importlib.util
@@ -8,13 +12,21 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-ALL_STEPS = ["generator", "solver", "evaluator"]
+ALL_STEPS = ["generator", "solver", "planner", "evaluator"]
+DEFAULT_STEPS = ["generator", "solver", "evaluator"]
 SCRIPTS = {
     "generator": ROOT / "run_generator.py",
     "solver": ROOT / "run_solver.py",
     "planner": ROOT / "run_planner.py",
     "evaluator": ROOT / "run_evaluator.py",
 }
+
+# run_solver.py and run_planner.py both write plans/plan_<suffix>.json. Running
+# both over one location does not produce two sets of plans to compare, it
+# produces one set from whichever ran last — and run_evaluator.py globs
+# plans/plan_*.json, so nothing downstream can tell which tool made what.
+# Rejected outright rather than documented: the failure is silent otherwise.
+EXCLUSIVE_STEPS = {"solver", "planner"}
 
 
 def _load_versions(step: str, version_key: str) -> str:
@@ -50,14 +62,25 @@ def main() -> None:
                              "'2.0.0-assert' runs the evaluator with assertions enabled "
                              "for integration testing, and is not for baseline comparison).")
     parser.add_argument("--steps", metavar="STEPS",
-                        default=",".join(ALL_STEPS),
-                        help=f"Comma-separated list of steps to run (default: {','.join(ALL_STEPS)}).")
+                        default=",".join(DEFAULT_STEPS),
+                        help=f"Comma-separated list of steps to run (default: "
+                             f"{','.join(DEFAULT_STEPS)}). Valid: {', '.join(ALL_STEPS)}. "
+                             f"'planner' is an alternative to 'solver' and cannot be "
+                             f"combined with it.")
     args = parser.parse_args()
 
     steps = [s.strip() for s in args.steps.split(",")]
     unknown = [s for s in steps if s not in ALL_STEPS]
     if unknown:
         print(f"ERROR: unknown step(s): {', '.join(unknown)}. Valid: {', '.join(ALL_STEPS)}", file=sys.stderr)
+        sys.exit(1)
+
+    both = EXCLUSIVE_STEPS.intersection(steps)
+    if len(both) > 1:
+        print(f"ERROR: {' and '.join(sorted(both))} cannot run in one pipeline — they "
+              f"both write plans/plan_<suffix>.json, so the second would overwrite the "
+              f"first and the evaluator could not tell them apart. Run them separately, "
+              f"keeping the plans/ output of each.", file=sys.stderr)
         sys.exit(1)
 
     extra: list[str] = []

@@ -185,16 +185,49 @@ declares*. That removes the branch coupling and the staleness together, and make
 mixed-version fixtures during a migration expressible rather than simply broken.
 Worth deciding once schema changes become rare and individually versioned.
 
-### `planning-approach/pipeline.py`
+### ~~`planning-approach/pipeline.py`~~ — resolved 2026-08-10
 
-Still assumes the two-file scenario world Phase 1 removed: it reads
-`location_solver.json`, which no longer exists, and pairs `scenario_solver_*.json`
-with `scenario_*.json` by string replacement. `GENERATE_DIR` points into this
-repo, so it breaks against current contents. Deciding what its inputs are now is
-a design question, not a rename. Its CI does not cover it — the reading tests
-exercise `converter.py`, not `pipeline.py`. Recorded in
-`planning-approach/SCHEMA_STATUS.md`, along with the visualizer's
-`member_lengths_from_scenario` and the un-reconvertible `test_data/`.
+Deleted, along with `run.py`, `cli.py`, `evaluate.py` and `generate.py`, by
+`new_pipeline_version`'s Docker-first restructure, which was merged into
+`release/2.0.0` on 2026-08-10. The batch-driver role it played belongs to this
+repo's `run_planner.py` / `run_evaluator.py` now, so the design question it
+posed no longer needs answering.
+
+Note what went with it and has **no** replacement: `src/local_search/solve.py`
+and `src/plan/audit_discrete_plan.py`. Recoverable from
+`git show 7c0346e:<path>`; recorded in `planning-approach/SCHEMA_STATUS.md`.
+
+### The planner step is live, and its plans are not yet valid
+
+`run_planner.py` can run: `ghcr.io/robust-rail-nl/planner` is built and pushed
+by `planning-approach/docker-push.sh`, versioned from a `VERSION` file on that
+repo's own line (0.1.0), deliberately not 2.0.0 — that number belongs to the
+three repos sharing an interchange format.
+
+**The format contract holds end to end.** The image plans
+`Location_SimpleService` into a plan that validates against `schema_plan.json`
+with zero errors, and the evaluator parses and executes it.
+
+**The plans themselves are not valid solutions yet**, for two reasons that are
+the planning-approach team's, not the schema's:
+
+- The evaluator rejects the SimpleService plan with *"Facility 22 is not
+  available from 1500 to 2000"*. No converter reads `timeWindow`, so the PDDL
+  model cannot respect facility availability. Note the location declares no
+  `timeWindow` on that facility at all, so the evaluator is applying a default
+  from somewhere — worth establishing where before modelling it.
+- `convert_to_tors` stops emitting actions partway through a plan: the trailing
+  move/depart steps produce no `Exit`. Pre-existing and confirmed against
+  `new_pipeline_version`'s own converter on its own fixture, so not schema
+  drift. Held as a strict `xfail` in `test_main_plan_ends_with_an_exit`.
+
+**Planner and solver are mutually exclusive.** Both write
+`plans/plan_<suffix>.json`, and `run_evaluator.py` globs `plans/plan_*.json`, so
+running both over one location yields one set of plans from whichever ran last
+with nothing able to tell them apart. `run_pipeline.py` rejects the combination
+rather than documenting it. Comparing planner and solver output on the same
+scenario therefore needs a design — separate output directories, or a variant in
+the filename that `run_evaluator.py` and the evaluation naming both understand.
 
 ---
 
