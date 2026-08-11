@@ -37,10 +37,15 @@ CONTAINER_DB = "/app/database"
 #
 # The version is planning-approach's own (see its VERSION file), deliberately
 # not 2.0.0 — that number belongs to the repos sharing an interchange format.
+# 0.2.0 is the first image that emits whole plans. 0.1.0's converter matched no
+# pattern for the corridor model's compiled departure, so it dropped every plan's
+# Exit and the moves leading to it, and reported success — any plan produced by
+# that image stops at its last service task and is not a solution. Do not pin
+# back to it for a comparison run.
 DOCKER_IMAGE_VERSIONS = {
-    "legacy": "ghcr.io/robust-rail-nl/planner:0.1.0",
-    "2.0.0": "ghcr.io/robust-rail-nl/planner:0.1.0",
-    "2.0.0-assert": "ghcr.io/robust-rail-nl/planner:0.1.0",
+    "legacy": "ghcr.io/robust-rail-nl/planner:0.2.0",
+    "2.0.0": "ghcr.io/robust-rail-nl/planner:0.2.0",
+    "2.0.0-assert": "ghcr.io/robust-rail-nl/planner:0.2.0",
     "local": "planner:latest",
 }
 
