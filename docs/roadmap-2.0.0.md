@@ -7,10 +7,11 @@ The pipeline runs end-to-end on published images, all five repos have gating CI,
 and the release evidence is recorded under [Release evidence](#release-evidence)
 below.
 
-**solver#11 is fixed** as of 2026-08-10, root cause and all, on `release/2.0.0`,
-and the pipeline has been re-run against an image carrying the fix
-(`hip:2.0.0-beta.5`) with every plan and every evaluation byte-identical. That
-was the rc.1 gate, and it is met.
+**`2.0.0-rc.1` is cut and fully verified** as of 2026-08-11: tagged across all
+five repos, plain and assert pipelines both re-run against published images,
+every fixture plan byte-identical to the beta.5 run and every evaluation
+byte-identical between the plain and assert passes. See [rc.1 — cut and
+verified](#rc1--cut-and-verified).
 
 Everything else outstanding is either a decision with no defect behind it, or a
 known issue to name in the release notes. Three issues came out of the #11
@@ -44,29 +45,17 @@ the work happened at the time.
 
 ---
 
-## Open — cutting rc.1
+## rc.1 — cut and verified
 
-The gate — re-run the pipeline against a solver image containing the solver#11
-fix — is **met**: see [Re-verified on
-`hip:2.0.0-beta.5`](#re-verified-on-hip200-beta5). What is left is the tagging
-itself, plus one confirmation pass:
+All five repos tagged `2.0.0-rc.1`, one nameable candidate rather than
+per-repo tags. Both the plain and assert pipelines have run against published
+images with identical verdicts and byte-identical output — see [Re-verified on
+`hip:2.0.0-beta.5`](#re-verified-on-hip200-beta5) and [Re-verified on
+`2.0.0-rc.1`](#re-verified-on-200-rc1) for the evidence. Nothing left gating
+rc.1.
 
-- **Run the assert pass once `tors:…-assert` and `hip:…-assert` are published for
-  the tagged versions.** `--version 2.0.0-assert --steps evaluator` reproduces the
-  beta.3 check: same plans, evaluator with assertions on, expect identical
-  verdicts and no assertion. The solver's own `-assert` image is deliberately
-  *not* what `--version 2.0.0-assert` runs — assertions change how far a
-  wall-clock-bounded search gets, so it belongs in a seed soak, not the baseline.
-- **Decide whether rc.1 is a release-train tag or a per-repo one.** Everything so
-  far has been per-repo: a tag describes its own source, which is why the solver
-  sits at beta.5 while the generator and evaluator sit at beta.3. "Release
-  candidate" argues the other way — a candidate is one nameable set of images
-  that were verified together. Recommend tagging all five repos `2.0.0-rc.1`
-  even where the source is unchanged, and saying so in the release notes, so
-  that the candidate has a single name.
-
-Nothing else below blocks rc.1. The remaining opens are decisions with no defect
-behind them, and known issues to name in the release notes.
+The remaining opens below are decisions with no defect behind them, and known
+issues to name in the release notes — none block cutting `2.0.0` itself.
 
 ### What solver#11 turned out to be
 
@@ -243,6 +232,31 @@ Generator:
 - Clean up the generator repo: automated formatting with pre-commit, Ruff etc.
 - Decide what to do with `unified-schema-design.md`. At least remove in-progress
   bits?
+- **Default scenario filename truncates the config name to its last
+  underscore-token.** `main.py`'s auto-naming
+  (`create_scenario_from_config`, used whenever `--scenario-file` is not
+  passed) builds the filename as `scenario_{location}_{n}t_{custom}_{suffix}`,
+  where `suffix` is `config_file.split('_')[-1]` with the extension stripped —
+  only the last token, not everything after `scenario_config_`. A config named
+  `scenario_config_feasible_small.json` yields `..._small`, silently dropping
+  `feasible_`. `run_generator.py`'s own `_config_name()` in this repo already
+  does this correctly (`removeprefix("scenario_config_")`, keeping the whole
+  suffix) — that's the fix to mirror.
+
+  Not a one-line change: **`sweep_seeds.py` depends on the truncation**, twice
+  documented (lines ~250, ~265) — it names each per-seed config
+  `scenario_config_{config}_s{seed}.json` specifically so the truncated
+  suffix comes out as `_s{seed}`, and its `_classify()` lookup (`base =
+  f"{location}_{n}t_random_{seed}s_s{seed}"`) assumes that. Fixing the
+  generator without updating `sweep_seeds.py`'s `base` formula and comments in
+  lockstep would break the seed-sweep tool that produced the fixture corpus
+  and the solver#11 investigation.
+
+  Deliberately **not blocking rc.1 or 2.0.0** — no currently-committed
+  top-level fixture goes through the truncating path unqualified, only
+  `sweep_seeds.py`'s scratch runs and fixture generation do. Batch with
+  whatever else turns up in the generator before the next real reason to touch
+  it; it isn't worth an image bump by itself.
 
 Solver / HIP:
 - The "merge coinciding Wait actions" commit (`e545f33`) seems to have partially
@@ -385,6 +399,37 @@ Not yet covered: the assert pass. `hip:2.0.0-beta.5-assert` was still building
 when this ran, so the run above is the plain image only. No assertion has been
 exercised against the fix outside the solver's own tests.
 
+### Re-verified on `2.0.0-rc.1`
+
+All five repos tagged `2.0.0-rc.1`, this repo's `--version` selectors repointed
+(`7989c59`), and the pipeline re-run on 2026-08-11 against the published
+non-assert images (`generator:2.0.0-rc.1`, `hip:2.0.0-rc.1`,
+`tors:2.0.0-rc.1`), 2m06s:
+
+- Same counts as every prior run: generator 11/11, solver 11/11, evaluator
+  8/11 exit-0.
+- **Every plan in the committed fixture set is byte-identical** to the
+  beta.5 run. The three non-fixture scenarios added 2026-08-07
+  (`14t_random_1s_congestion`, `2t_random_1s_length`, `4t_random_1s_small`)
+  aren't in git to diff against, but their solver/evaluator exit codes match.
+- The one stderr size change (`distribution1`, 2 lines → 32) is `docker pull`
+  chatter from the first pull of the new tag, not a content difference — the
+  same kind of noise the beta.3 evidence already called out.
+
+`hip:2.0.0-rc.1-assert` is published; `tors:2.0.0-rc.1-assert` is still
+building, so the assert pass is the one thing this run does not cover.
+
+**Assert pass, 2026-08-11.** `tors:2.0.0-rc.1-assert` published; re-ran
+`--version 2.0.0-assert --steps evaluator` against the plans already on disk
+(re-solving would produce different plans and the diff would compare two
+unrelated things). All 11 evaluation outputs byte-identical to the plain
+`tors:2.0.0-rc.1` pass — same 8/11 exit-0 pattern, no assertion fired.
+
+**The rc.1 gate is now fully closed**: every image is published, the pipeline
+has run against all of them, plain and assert agree, and every fixture plan
+matches beta.5. Nothing left under [Open — cutting
+rc.1](#open--cutting-rc1).
+
 ### What these runs do not cover
 
 - x86-64 only. arm64 is covered at the unit-test level (evaluator and solver CI
@@ -403,9 +448,10 @@ exercised against the fix outside the solver's own tests.
 - Tag `generator:2.0.0`, `hip:2.0.0`, `tors:2.0.0`
 - Release notes naming solver#13, solver#14 and evaluator#6, and the two fixtures
   expected to fail because of them
-- Archive the `*-protobuf` and `*-pydantic` versioned directories in this repo
-  (historical reference; remove from the active pipeline), and retire the
-  `legacy` entries from the `--version` selectors with them
+- Retire the `legacy` entries from the `--version` selectors. (The
+  `*-protobuf`/`*-pydantic` comparison directories were never committed —
+  local scratch output only, deleted 2026-08-10. The comparison they produced
+  is recorded in this file's git history, not in the files themselves.)
 - Update this repo's `README.md` to reflect the stable pipeline
 - Merge `release/2.0.0` into each repo's stable branch and delete it
 
