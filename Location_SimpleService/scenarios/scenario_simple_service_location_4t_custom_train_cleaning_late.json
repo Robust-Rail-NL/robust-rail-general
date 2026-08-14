@@ -343,6 +343,7 @@
             "lastParkingTrackPart": 3,
             "arrival": 2000,
             "departure": 2000,
+            "id": 33334,
             "trainUnits": [
                 {
                     "typePrefix": "SNG",
@@ -352,14 +353,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 33334
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 11,
             "lastParkingTrackPart": 2,
             "arrival": 2300,
             "departure": 2300,
+            "id": 11112,
             "trainUnits": [
                 {
                     "typePrefix": "SLT",
@@ -369,8 +370,7 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 11112
+            "canDepartFromAnyTrack": null
         }
     ],
     "outStanding": [],
