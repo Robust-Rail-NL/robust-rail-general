@@ -232,31 +232,12 @@ Generator:
 - Clean up the generator repo: automated formatting with pre-commit, Ruff etc.
 - Decide what to do with `unified-schema-design.md`. At least remove in-progress
   bits?
-- **Default scenario filename truncates the config name to its last
-  underscore-token.** `main.py`'s auto-naming
-  (`create_scenario_from_config`, used whenever `--scenario-file` is not
-  passed) builds the filename as `scenario_{location}_{n}t_{custom}_{suffix}`,
-  where `suffix` is `config_file.split('_')[-1]` with the extension stripped —
-  only the last token, not everything after `scenario_config_`. A config named
-  `scenario_config_feasible_small.json` yields `..._small`, silently dropping
-  `feasible_`. `run_generator.py`'s own `_config_name()` in this repo already
-  does this correctly (`removeprefix("scenario_config_")`, keeping the whole
-  suffix) — that's the fix to mirror.
-
-  Not a one-line change: **`sweep_seeds.py` depends on the truncation**, twice
-  documented (lines ~250, ~265) — it names each per-seed config
-  `scenario_config_{config}_s{seed}.json` specifically so the truncated
-  suffix comes out as `_s{seed}`, and its `_classify()` lookup (`base =
-  f"{location}_{n}t_random_{seed}s_s{seed}"`) assumes that. Fixing the
-  generator without updating `sweep_seeds.py`'s `base` formula and comments in
-  lockstep would break the seed-sweep tool that produced the fixture corpus
-  and the solver#11 investigation.
-
-  Deliberately **not blocking rc.1 or 2.0.0** — no currently-committed
-  top-level fixture goes through the truncating path unqualified, only
-  `sweep_seeds.py`'s scratch runs and fixture generation do. Batch with
-  whatever else turns up in the generator before the next real reason to touch
-  it; it isn't worth an image bump by itself.
+- ~~Default scenario filename truncated the config name to its last
+  underscore-token~~ — fixed on `generator@2d086f0`, shipped in `rc.1`
+  (moved tag). `sweep_seeds.py`'s matching `base` formula updated alongside
+  (`5911f1b`). `feasible_small`/`marginal_congestion`/`marginal_length` and
+  the two `random_distribution*` fixtures were renamed to their un-truncated
+  names as a result (`3fac5cb`).
 
 Solver / HIP:
 - The "merge coinciding Wait actions" commit (`e545f33`) seems to have partially
