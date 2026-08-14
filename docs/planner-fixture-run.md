@@ -1,160 +1,140 @@
 # Planner runs against the fixtures
 
-We ran `run_planner.py` over the KleineBinckhorst fixtures.  Here are the
-outcomes:
+We ran `run_planner.py` over the KleineBinckhorst fixtures, against the
+`planning-approach` image built from `fix-fixture-converter-bugs` (run of
+2026-08-14). All 39 `feasible` and 8 `infeasible` fixtures were symlinked into
+`scenarios/` and run. Here are the outcomes:
 
-| outcome | feasible (39) | infeasible (8) | where it fails |
-|---|---|---|---|
-| plan JSON written | 8 | 0 | — |
-| ENHSP reports `Unsolvable Problem` | 22 | 1 | AIBR preprocessing, before search |
-| converter rejects an action | 9 | 7 | `convert_to_tors.py:1032`, after ENHSP solved |
-
-Taking ENHSP's own verdict rather than the end-to-end result — conversion is a
-separate downstream stage — the headline is:
-
-| fixture set | n | ENHSP solved | ENHSP unsolvable |
-|---|---|---|---|
-| known feasible | 39 | 17 (44%) | 22 (56%) |
-| known infeasible | 8 | 7 (88%) | 1 (12%) |
-
-**An `Unsolvable` verdict carries no signal.** ENHSP is in fact more likely to
-return a plan for a provably infeasible instance than for a feasible one, so the
-verdict is mildly anti-correlated with the truth.
-
-By configuration, on the feasible pass:
-
-| configuration | runs | success | unsolvable | converter |
+| | n | ENHSP solved | ENHSP unsolvable | other |
 |---|---|---|---|---|
-| `feasible_small` | 20 | 1 | 16 | 3 |
-| `marginal_length` | 12 | 7 | 0 | 5 |
-| `marginal_congestion` | 7 | 0 | 6 | 1 |
+| known feasible | 39 | 38 | 0 | 1 (out of memory) |
+| known infeasible | 8 | 0 | 8 | 0 |
 
-## Failure type 1 — 22 false unsolvable verdicts
+**Zero misclassifications in either direction.** `PLAN IS VALID` appears on
+exactly the 38 solved feasible runs and on none of the infeasible ones. Of the 8
+rejections, 5 come from AIBR preprocessing and 3 after search.
 
-All 22 fail identically, with `Problem Detected as Unsolvable by AIBR during
-preprocessing`. There are no timeouts, no crashes and no exhausted searches: the
-numeric relaxation declares the problem unsolvable before search begins.
+Against the previous image this is a large move on both axes:
 
-Every one of these 22 instances has a valid plan from the existing solver,
-confirmed by the evaluator. A relaxation that proves a feasible instance
-unsolvable is unsound, so these are **modelling bugs in the PDDL or its
-grounding, not planner capacity limits**.
+| | before (2026-08-12) | now |
+|---|---|---|
+| feasible instances solved | 17/39 (44%) | 38/39 (97%) |
+| infeasible instances solved | 7/8 (88%) | 0/8 (0%) |
 
-## Failure type 2 — 16 converter rejections
+## The length constraint is now modelled
 
-All 16, across both passes, name the same unmodelled action:
+The previous image had no notion of whether an arriving train fits the track it
+arrives on, so it planned straight through provably infeasible scenarios. It now
+discriminates exactly on the 255 m gateway (`906a`, track 15):
+
+| max arrival length | fits? | instances | verdict |
+|---|---|---|---|
+| 108.56–217.12 m | yes | 12 feasible | all solved |
+| 270.62–324.12 m | no | 8 infeasible | all unsolvable |
+
+`marginal_length` is a clean natural experiment for this, because length is the
+only thing it varies. `marginal_length_s13` (two coupled VIRM pairs, 217.12 m)
+solves, while `s09` — same structure, 270.62 m — is rejected.
+
+## Coupled compositions are now modelled
+
+The previous image failed on every instance containing a multi-unit arrival.
+Plans now carry a proper split-and-recombine sequence; from
+`plan_feasible_small_s03.out`:
 
 ```
-(compiled_adopt_composition su_train2 su_request6 sein70)
+compiled_uncouple_front → move_bside_empty_su → compiled_start_request
+  → move_bside_occupied_su → compiled_couple_back
+  → complete_request_composition
 ```
 
-The number of unrecognised actions in each run equals the number of coupled
-two-unit arrivals in that scenario exactly — 1 for `feasible_small_s01`, 2 for
-`marginal_length_s13`, 5 for `marginal_congestion_s08`. This is a single missing
-pattern rather than sixteen separate gaps. The guard behaved correctly; without
-it these plans would have been silently truncated.
+All 39 feasible instances contain coupled arrivals or are trivially single-unit,
+and 38 of them now solve, so this barrier is gone.
 
-## Instance size is not the driver — composition arity is
+## The converter blocks the whole pipeline
 
-Sizes span 2–14 arrivals, 2–23 units and grounded `|F|` from 24 to 13442, and
-that axis does not predict the outcome:
+**No plan JSON was written for any of the 47 runs.** All 38 solved runs fail in
+`convert_to_tors.py`, which now rejects 8 distinct action types rather than the
+single `compiled_adopt_composition` of the previous image:
 
-- The largest instance ENHSP solved is `marginal_congestion_s08` — 14 arrivals,
-  19 units, `|F|`=5133. It failed only in conversion.
-- The smallest instance declared unsolvable is `feasible_small_s03` — 4
-  arrivals, 6 units, `|F|`=525.
-
-What does predict the outcome, on the feasible pass, is whether any train
-arrives or departs as a coupled pair:
-
-| coupled arrivals | outcome |
+| unhandled action | occurrences |
 |---|---|
-| 0 | success — 8 of 8, no exceptions |
-| 1 or more | failure — 31 of 31 |
+| `enter_yard_su` | 188 |
+| `compiled_advance_request_N` | 113 |
+| `compiled_adopt_composition` | 55 |
+| `complete_request_composition` | 36 |
+| `compiled_start_request` | 36 |
+| `compiled_couple_back` | 36 |
+| `compiled_uncouple_front` | 20 |
+| `compiled_uncouple_back` | 16 |
 
-All 8 successes are exactly the instances in which every arrival and departure
-is a single unit. The smallest failing instance, `marginal_length_s06` at 2
-arrivals and 3 units, is smaller than several successes. The planner handles no
-composition at all: the moment two units are coupled it breaks, either as a
-converter gap when ENHSP solves or as a false unsolvable when it does not.
+The domain rework introduced a new action vocabulary and the converter was not
+extended to match. On the planner axis this run is a large win; end to end the
+pipeline still emits zero plans.
 
-This also explains the per-configuration spread above — it tracks how often each
-configuration draws coupled trains, not how large its scenarios are. Note that
-all 8 infeasible fixtures contain coupled arrivals, so that pass cannot test
-this axis independently.
+## What `PLAN IS VALID` does and does not establish
 
-## The negative control: infeasible scenarios are planned anyway
+`PLAN IS VALID` comes from the planner image's own `=== VALIDATING PLAN ===`
+step, which checks the plan against the same PDDL domain that was just
+rewritten. It shows ENHSP's search is consistent with its model. It is **not**
+the TORS evaluator and does not show the plan is executable in TORS.
 
-All 8 `infeasible` fixtures are infeasible for the same plain, plan-independent
-reason — an arriving train is longer than the track it arrives on:
+Keep the strength of evidence straight: the `feasible` label on these fixtures
+comes from the solver and the evaluator agreeing (see `scenario-feasibility.md`),
+which is a much stronger check than a model validating its own output. The
+supportable claim from this run is that the model now agrees with ground truth
+on **solvability** — not that the plans are correct. Confirming that needs the
+evaluator, which needs plan JSON, which needs the converter.
 
-| instance | longest arrival | gateway `906a` (track 15) | fits |
-|---|---|---|---|
-| `marginal_length_s16` | 324.12 m | 255 m | no |
-| the other 7 | 270.62 m | 255 m | no |
+## The one failure: out of memory
 
-This is exactly the `marginal_length` design intent: a two-unit VIRM train fits
-only if both draws are the shorter 108.56 m variant. **The PDDL model has no
-such constraint**, so it plans straight through a train that physically cannot
-arrive. This is the same missing numeric reasoning implicated in the false
-negatives above, seen from the other side.
+`marginal_congestion_s12`, the largest instance at 23 units:
 
-## The one correct rejection is right by accident
+```
+java.lang.OutOfMemoryError: Java heap space
+  at ...heuristics.advanced.H1.<init>(H1.java:186)
+```
 
-`marginal_length_s05` was declared unsolvable, but not for being too long. It
-carries the `|X|`=21 anomaly signature described below — the same mechanism that
-rejects feasible instances. Its structural twins violate the identical length
-bound and were all solved:
+This fails while building the `hadd` heuristic, *after* grounding succeeded
+(16.5 s, `|F|`=11808). The java invocation in the image carries no `-Xmx`, so it
+runs on the JVM default heap. Worth setting an explicit heap size before
+concluding the largest instances are out of reach — the other six
+`marginal_congestion` instances now solve, where previously all seven were
+declared unsolvable, so s12 is at the edge rather than beyond it.
 
-| instance | coupled arrivals | first arrival | `\|X\|` | ENHSP |
-|---|---|---|---|---|
-| `marginal_length_s05` | 2 (VIRM6+4, VIRM4+4) | 217.12 m | **21** | unsolvable |
-| `marginal_length_s11` | 2 (VIRM4+4, VIRM6+4) | 270.62 m | 8 | solved |
-| s09, s12, s16, s17 | 2 | ≥ 270.62 m | 8 | solved |
+## What to fix next
 
-s05 and s11 hold the same two compositions and differ essentially in which
-arrival slot carries the mixed pair. One grounds 21 numeric fluents and is
-rejected; the other grounds 8 and is solved.
+1. Extend the converter to the new action vocabulary. It is now the only thing
+   between the planner and an end-to-end result, and it gates the evaluator
+   check that would confirm the plans are actually valid.
+2. Set an explicit JVM heap size and re-run `marginal_congestion_s12`.
+3. Once plans are being written, run them through the evaluator and compare
+   against the fixture plans, to upgrade the claim from "solvable" to "valid".
 
-That makes **s05 versus s11 a minimal reproducer** for the grounding bug: two
-near-identical instances, opposite verdicts, no structural difference to explain
-it. Two obvious candidate explanations were tested and ruled out — distinct pair
-types (both have exactly one) and "the first arrival fits" (`s04` and `s10` fit
-and are solved normally).
+The earlier advice not to fix the converter first no longer applies: it was
+written when infeasible scenarios were being planned anyway, so a converter fix
+would have produced TORS plans for impossible scenarios. That risk is gone now
+that all 8 infeasible fixtures are correctly rejected.
 
-## The `|X|` signature
+## Superseded findings
 
-Across all 47 runs, the grounded numeric fluent count `|X|` separates the two
-ENHSP verdicts perfectly:
+These held against the previous image (runs of 2026-08-12) and are recorded so
+they are not re-derived or applied to the current one.
 
-- `|X| = 4 + 2 × (coupled arrivals)` — ENHSP solves it. 24 of 24.
-- `|X|` above that — ENHSP declares it unsolvable. 23 of 23.
+| finding | status |
+|---|---|
+| 22 of 39 feasible instances wrongly declared unsolvable | fixed |
+| Infeasible scenarios planned anyway; no arrival-length constraint | fixed |
+| Any coupled arrival causes failure (31 of 31) | fixed |
+| `\|X\| = 4 + 2 × (coupled arrivals)` predicts solvability | **retired — do not apply** |
+| `marginal_length_s05` vs `s11` as a grounding-bug reproducer | obsolete; both now behave correctly |
+| Converter gap limited to `compiled_adopt_composition` | superseded; 8 action types now |
 
-No exceptions in either direction, on feasible and infeasible instances alike.
-The unsolvable instances therefore ground a *different* set of numeric fluents,
-not merely more of the same: `feasible_small_s03` grounds 21 where the formula
-predicts 8. Whatever causes those extra fluents to ground is the false-unsolvable
-bug, and the s05/s11 pair shows the trigger lies in the data values rather than
-in the coupling structure.
+The `|X|` rule is retired rather than fixed: `|X|` rose across the board in the
+new image (`feasible_small_s03` 21→26, `marginal_congestion_s12` 48→68) while
+`|F|` fell (525→445, 13442→11808), consistent with length and capacity moving
+into numeric fluents. The old arithmetic no longer describes anything.
 
-One related observation: `Numeric Error for Complex Condition Activated` appears
-in every run ENHSP solved, so its numeric condition handling is degrading even
-on the successes. The 8 plans that were written deserve evaluator validation
-before being trusted.
-
-## What to fix first
-
-**Do not fix the converter first.** All 7 solved-but-infeasible runs died at
-`convert_to_tors.py:1032`, and that gap is the only reason no invalid plan
-reached disk. Adding the `compiled_adopt_composition` pattern in isolation would
-move the pipeline from failing loudly to emitting TORS plans for physically
-impossible scenarios.
-
-Suggested order:
-
-1. Model the arrival-track length constraint, so infeasible scenarios are
-   rejected for the right reason.
-2. Fix the false-unsolvable grounding bug, using `marginal_length_s05` versus
-   `s11` as the reproducer.
-3. Only then add the converter pattern — or land it behind an evaluator
-   validation gate on every emitted plan.
+For the record, the previous image's end-to-end results were: 39 feasible runs
+producing 8 plans, 22 unsolvable verdicts and 9 converter rejections; 8
+infeasible runs producing 7 solved-then-rejected and 1 unsolvable.
