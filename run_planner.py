@@ -47,9 +47,9 @@ CONTAINER_DB = "/app/database"
 #          departing train never moved — fine on SimpleService, dead on
 #          KleineBinckhorst.
 DOCKER_IMAGE_VERSIONS = {
-    "legacy": "ghcr.io/robust-rail-nl/planner:0.2.1",
-    "2.0.0": "ghcr.io/robust-rail-nl/planner:0.2.1",
-    "2.0.0-assert": "ghcr.io/robust-rail-nl/planner:0.2.1",
+    "legacy": "ghcr.io/robust-rail-nl/planner:0.3.0",
+    "2.0.0": "ghcr.io/robust-rail-nl/planner:0.3.0",
+    "2.0.0-assert": "ghcr.io/robust-rail-nl/planner:0.3.0",
     "local": "planner:latest",
 }
 
@@ -118,7 +118,7 @@ def main() -> None:
                         help="Restrict to a single Location_* directory.")
     parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default="local",
                         help="Pick a docker image version.")
-    parser.add_argument("--planner", choices=["symbolic", "enhsp"], default="symbolic",
+    parser.add_argument("--planner", choices=["symbolic", "enhsp"], default="enhsp",
                         help="Planner implementation to use inside the container.")
     args = parser.parse_args()
 
