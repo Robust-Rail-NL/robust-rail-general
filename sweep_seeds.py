@@ -247,8 +247,9 @@ def main() -> None:
 
         for seed in seeds:
             seeded = dict(config, seed=seed)
-            # The generator derives the scenario name from the last underscored
-            # token of the config filename, so "_s<seed>" keeps outputs distinct.
+            # The generator derives the scenario name from everything after
+            # "scenario_config_" in the config filename, so "_s<seed>" keeps
+            # outputs distinct per seed.
             (work / "configurations" / f"scenario_config_{args.config}_s{seed}.json").write_text(
                 json.dumps(seeded, indent=4)
             )
@@ -262,10 +263,10 @@ def main() -> None:
 
         results = []
         for seed in seeds:
-            # The generator derives this from the config filename's last underscored
-            # token, hence the "_s<seed>" suffix on the per-seed config written above.
+            # Mirrors main.py's default naming: everything after "scenario_config_"
+            # in the per-seed config filename written above becomes the suffix.
             # Note run_generator.py's .out/.err use a different, config-based name.
-            base = f"{config['location']}_{config['number_of_trains']}t_random_{seed}s_s{seed}"
+            base = f"{config['location']}_{config['number_of_trains']}t_random_{seed}s_{args.config}_s{seed}"
             bucket, reason = _classify(work, base)
             results.append({"seed": seed, "outcome": bucket, "reason": reason, "base": base})
 
