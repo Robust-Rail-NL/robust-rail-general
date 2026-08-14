@@ -1067,6 +1067,7 @@
             "lastParkingTrackPart": 15,
             "arrival": 15500,
             "departure": 15500,
+            "id": 2001,
             "trainUnits": [
                 {
                     "typePrefix": "SLT",
@@ -1082,14 +1083,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2001
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 16200,
             "departure": 16200,
+            "id": 2002,
             "trainUnits": [
                 {
                     "typePrefix": "SLT",
@@ -1105,14 +1106,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2002
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 16600,
             "departure": 16600,
+            "id": 2003,
             "trainUnits": [
                 {
                     "typePrefix": "SNG",
@@ -1128,14 +1129,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2003
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 17000,
             "departure": 17000,
+            "id": 2004,
             "trainUnits": [
                 {
                     "typePrefix": "SNG",
@@ -1151,14 +1152,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2004
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 17600,
             "departure": 17600,
+            "id": 2005,
             "trainUnits": [
                 {
                     "typePrefix": "VIRM",
@@ -1174,14 +1175,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2005
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 18200,
             "departure": 18200,
+            "id": 2006,
             "trainUnits": [
                 {
                     "typePrefix": "VIRM",
@@ -1197,14 +1198,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2006
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 18800,
             "departure": 18800,
+            "id": 2007,
             "trainUnits": [
                 {
                     "typePrefix": "ICM",
@@ -1220,14 +1221,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2007
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 19400,
             "departure": 19400,
+            "id": 2008,
             "trainUnits": [
                 {
                     "typePrefix": "ICM",
@@ -1243,14 +1244,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2008
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 19800,
             "departure": 19800,
+            "id": 2009,
             "trainUnits": [
                 {
                     "typePrefix": "SLT",
@@ -1266,14 +1267,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2009
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 20400,
             "departure": 20400,
+            "id": 2010,
             "trainUnits": [
                 {
                     "typePrefix": "SNG",
@@ -1289,14 +1290,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2010
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 20800,
             "departure": 20800,
+            "id": 2011,
             "trainUnits": [
                 {
                     "typePrefix": "VIRM",
@@ -1312,14 +1313,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2011
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 21200,
             "departure": 21200,
+            "id": 2012,
             "trainUnits": [
                 {
                     "typePrefix": "ICM",
@@ -1335,14 +1336,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2012
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 21600,
             "departure": 21600,
+            "id": 2013,
             "trainUnits": [
                 {
                     "typePrefix": "SLT",
@@ -1358,14 +1359,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2013
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 22200,
             "departure": 22200,
+            "id": 2014,
             "trainUnits": [
                 {
                     "typePrefix": "SLT",
@@ -1381,14 +1382,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2014
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 22800,
             "departure": 22800,
+            "id": 2015,
             "trainUnits": [
                 {
                     "typePrefix": "SNG",
@@ -1404,14 +1405,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2015
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 23400,
             "departure": 23400,
+            "id": 2016,
             "trainUnits": [
                 {
                     "typePrefix": "SNG",
@@ -1427,14 +1428,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2016
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 24000,
             "departure": 24000,
+            "id": 2017,
             "trainUnits": [
                 {
                     "typePrefix": "VIRM",
@@ -1450,14 +1451,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2017
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 24600,
             "departure": 24600,
+            "id": 2018,
             "trainUnits": [
                 {
                     "typePrefix": "VIRM",
@@ -1473,14 +1474,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2018
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 25200,
             "departure": 25200,
+            "id": 2019,
             "trainUnits": [
                 {
                     "typePrefix": "ICM",
@@ -1496,14 +1497,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2019
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 25800,
             "departure": 25800,
+            "id": 2020,
             "trainUnits": [
                 {
                     "typePrefix": "ICM",
@@ -1519,14 +1520,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2020
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 26400,
             "departure": 26400,
+            "id": 2021,
             "trainUnits": [
                 {
                     "typePrefix": "SLT",
@@ -1542,14 +1543,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2021
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 27000,
             "departure": 27000,
+            "id": 2022,
             "trainUnits": [
                 {
                     "typePrefix": "SNG",
@@ -1565,14 +1566,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2022
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 27600,
             "departure": 27600,
+            "id": 2023,
             "trainUnits": [
                 {
                     "typePrefix": "VIRM",
@@ -1588,14 +1589,14 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2023
+            "canDepartFromAnyTrack": null
         },
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
             "arrival": 28200,
             "departure": 28200,
+            "id": 2024,
             "trainUnits": [
                 {
                     "typePrefix": "ICM",
@@ -1611,8 +1612,7 @@
                 }
             ],
             "standingIndex": null,
-            "canDepartFromAnyTrack": null,
-            "id": 2024
+            "canDepartFromAnyTrack": null
         }
     ],
     "outStanding": [],
