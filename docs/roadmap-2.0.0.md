@@ -246,6 +246,14 @@ Solver / HIP:
 - Look through `git diff` with `main` / `dev`.
 - `dotnet build` warnings-as-errors is a separate decision; the solver builds with
   two nullable warnings in `Initial/SimpleHeuristic.cs`.
+- Rename `ServiceSiteScheduling.NoProto` (`Location.cs`, `Scenario.cs`,
+  `Plan.cs`, `InterchangeSchema.cs`, `Utilities.cs` — the records that mirror
+  the JSON interchange schema for deserialization). Named for what it isn't,
+  a protobuf leftover from the migration. Suggest `Interchange`: matches the
+  vocabulary this whole release already uses ("unified interchange schema"),
+  and stays clearly distinct from the solver's own internal domain model
+  (`Track`, `Train`, `State`, ...) elsewhere in `ServiceSiteScheduling` — bare
+  `Model` would collide with that in meaning, not just in name.
 
 Evaluator / TORS:
 - Look through `git diff` with `main` / `dev`.
@@ -426,15 +434,34 @@ rc.1](#open--cutting-rc1).
 
 ## Phase 4 — Stable release
 
-- Tag `generator:2.0.0`, `hip:2.0.0`, `tors:2.0.0`
-- Release notes naming solver#13, solver#14 and evaluator#6, and the two fixtures
-  expected to fail because of them
+Draft PRs open in all four repos sharing the interchange format
+(`planning-approach` deliberately excluded — not ready), `release/2.0.0` into
+each stable branch: [generator#11](https://github.com/Robust-Rail-NL/robust-rail-generator/pull/11),
+[solver#20](https://github.com/Robust-Rail-NL/robust-rail-solver/pull/20),
+[evaluator#7](https://github.com/Robust-Rail-NL/robust-rail-evaluator/pull/7),
+[this repo#8](https://github.com/Robust-Rail-NL/scenario-planning-inputs/pull/8).
+Opened as drafts, not for line-by-line review of a months-long migration diff —
+a coordination point and a CI run against the real merge target. None of the
+below is done yet:
+
+- **Write the release notes.** Don't exist yet. Must name solver#13, solver#14
+  and evaluator#6, and the two fixtures they permanently block
+  (`6t_custom_example3`, `7t_custom_example1`) — otherwise "integration tests
+  pass" reads as more true than it is.
+- **Update this repo's `README.md`.** Currently describes the two-file world
+  Phase 1 removed — it still documents `location_solver.json` and
+  `scenario_solver_*.json` existing alongside `scenario_*.json`. Needs a
+  rewrite to the current single-file pipeline, not a touch-up.
 - Retire the `legacy` entries from the `--version` selectors. (The
   `*-protobuf`/`*-pydantic` comparison directories were never committed —
   local scratch output only, deleted 2026-08-10. The comparison they produced
   is recorded in this file's git history, not in the files themselves.)
-- Update this repo's `README.md` to reflect the stable pipeline
-- Merge `release/2.0.0` into each repo's stable branch and delete it
+- Mark the four PRs ready and merge them; delete `release/2.0.0` in each.
+- **Tag `generator:2.0.0`, `hip:2.0.0`, `tors:2.0.0` by re-tagging the
+  existing `rc.1` digests**, not rebuilding — same reasoning as moving the
+  `rc.1` tag itself onto the naming fix: the tag should point at the image
+  that was actually verified, and a fresh build from the same commit is not
+  guaranteed to be the same bytes.
 
 ---
 
