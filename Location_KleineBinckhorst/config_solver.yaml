@@ -1,7 +1,4 @@
 
-LocationPath: "/workspace/scenario-planning-inputs/Location_KleineBinckhorst/location_solver.json"
-ScenarioPath: "/workspace/scenario-planning-inputs/Location_KleineBinckhorst/scenarios/10trains/random/scenario_solver_10trains_1matching_3600TW__instance1.json"
-PlanPath: "/workspace/scenario-planning-inputs/Location_KleineBinckhorst/plans/10trains/random/plan__10trains_1matching_1800TW__instance1.json"
 Mode: "Standard"
 DebugLevel: 0
 
