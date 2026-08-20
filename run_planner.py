@@ -18,6 +18,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from docker_utils import ensure_docker_running
+
 ROOT = Path(__file__).parent
 CONTAINER_DB = "/app/database"
 
@@ -121,6 +123,9 @@ def main() -> None:
     parser.add_argument("--planner", choices=["symbolic", "enhsp"], default="enhsp",
                         help="Planner implementation to use inside the container.")
     args = parser.parse_args()
+
+    if not args.dry_run:
+        ensure_docker_running()
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 
