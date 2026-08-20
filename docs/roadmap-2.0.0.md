@@ -13,6 +13,12 @@ every fixture plan byte-identical to the `rc.1` baseline (itself byte-identical
 to beta.5) and every evaluation byte-identical between the plain and assert
 passes. See [rc.2 — cut and verified](#rc2--cut-and-verified).
 
+**`generator:2.0.0`, `hip:2.0.0` and `tors:2.0.0` are tagged** as of
+2026-08-21 — re-tagged from the verified `rc.2` digests, confirmed identical
+by digest, `:latest` moved alongside. All four PRs sharing the interchange
+format are open and marked ready for review (not yet merged). See [Phase 4 —
+Stable release](#phase-4--stable-release) for what's left.
+
 Everything else outstanding is either a decision with no defect behind it, or a
 known issue to name in the release notes. Three issues came out of the #11
 investigation — solver#17, #18 and #19 — none of which blocks the pipeline; see
@@ -553,20 +559,20 @@ plain `rc.2` pass — no assertion fired. `rc.2` is now verified as fully as
 
 ## Phase 4 — Stable release
 
-Draft PRs open in all four repos sharing the interchange format
-(`planning-approach` deliberately excluded — not ready), `release/2.0.0` into
-each stable branch: [generator#11](https://github.com/Robust-Rail-NL/robust-rail-generator/pull/11),
+PRs open in all four repos sharing the interchange format (`planning-approach`
+deliberately excluded — not ready), `release/2.0.0` into each stable branch:
+[generator#11](https://github.com/Robust-Rail-NL/robust-rail-generator/pull/11),
 [solver#20](https://github.com/Robust-Rail-NL/robust-rail-solver/pull/20),
 [evaluator#7](https://github.com/Robust-Rail-NL/robust-rail-evaluator/pull/7),
 [this repo#8](https://github.com/Robust-Rail-NL/scenario-planning-inputs/pull/8).
 Opened as drafts, not for line-by-line review of a months-long migration diff —
-a coordination point and a CI run against the real merge target. None of the
-below is done yet:
+a coordination point and a CI run against the real merge target.
 
-- **Write the release notes.** Don't exist yet. Must name solver#13, solver#14
-  and evaluator#6, and the two fixtures they permanently block
-  (`6t_custom_example3`, `7t_custom_example1`) — otherwise "integration tests
-  pass" reads as more true than it is.
+- ~~Write the release notes.~~ Done 2026-08-20: `RELEASE_NOTES.md` now exists
+  in all four repos. This one names solver#13, solver#14 and evaluator#6, and
+  the two fixtures they permanently block (`6t_custom_example3`,
+  `7t_custom_example1`) — otherwise "integration tests pass" reads as more
+  true than it is.
 - ~~Update this repo's `README.md`.~~ Done 2026-08-20: rewritten for the
   single-file pipeline, historical two-file framing dropped rather than
   footnoted.
@@ -577,12 +583,19 @@ below is done yet:
   `*-protobuf`/`*-pydantic` comparison directories were never committed —
   local scratch output only, deleted 2026-08-10. The comparison they produced
   is recorded in this file's git history, not in the files themselves.)
-- Mark the four PRs ready and merge them; delete `release/2.0.0` in each.
-- **Tag `generator:2.0.0`, `hip:2.0.0`, `tors:2.0.0` by re-tagging the
-  existing `rc.2` digests**, not rebuilding — same reasoning as moving the
-  `rc.1` tag itself onto the naming fix: the tag should point at the image
-  that was actually verified, and a fresh build from the same commit is not
-  guaranteed to be the same bytes.
+- ~~Mark the four PRs ready~~ Done 2026-08-21: all four are `draft=false`,
+  `state=OPEN`. **Not merged yet** — deliberately separate steps; merge order
+  still matters (generator's `main` before this repo's, see [Branch
+  naming](#branch-naming)), and this repo's PR has a known conflict with
+  `main` on `CLAUDE.md` to resolve first (see the PR body). Still open:
+  merge all four, then delete `release/2.0.0` in each — and for solver
+  specifically, the follow-up `dev` → `main` promotion (see `CLAUDE.md`).
+- ~~Tag `generator:2.0.0`, `hip:2.0.0`, `tors:2.0.0` by re-tagging the
+  existing `rc.2` digests~~ Done 2026-08-21, confirmed by digest: `2.0.0` and
+  `2.0.0-rc.2` are byte-identical images in all three repos, not rebuilds.
+  `:latest` moved to `2.0.0` in all three as well, also confirmed by digest —
+  first stable tag of the release, per the "hold `latest` for the stable tag,
+  not the rc/beta line" decision.
 
 ---
 
