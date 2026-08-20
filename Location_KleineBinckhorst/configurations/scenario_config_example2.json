@@ -13,86 +13,86 @@
         {
             "name": "clean_train",
             "type": "Reinigingsperron",
-            "priority": 1,
+            "optional": false,
             "duration": 600,
             "required_skills": ["inwendige_reiniging"]
         }
     ],
     "custom_train_units": [
         {
-            "id": "2401",
+            "id": 2401,
             "type": "SLT-4",
             "services": ["clean_train"]
         },
         {
-            "id": "2601",
+            "id": 2601,
             "type": "SLT-6",
             "services": ["clean_train"]
         },
         {
-            "id": "2801",
+            "id": 2801,
             "type": "SNG-3",
             "services": []
         },
         {
-            "id": "2802",
+            "id": 2802,
             "type": "SNG-4",
             "services": []
         },
         {
-            "id": "2901",
+            "id": 2901,
             "type": "SLT-4",
             "services": []
         }
     ],
     "custom_trains": [
         {
-            "id": "2000",
-            "members": ["2401"],
+            "id": 2000,
+            "members": [2401],
             "arrival_time": 300,
             "arrival_track": "906a"
         },
         {
-            "id": "3000",
-            "members": ["2601"],
+            "id": 3000,
+            "members": [2601],
             "arrival_time": 600,
             "arrival_track": "906a"
         },
         {
-            "id": "4000",
-            "members": ["2801", "2802"],
+            "id": 4000,
+            "members": [2801, 2802],
             "arrival_time": 900,
             "arrival_track": "906a"
         },
         {
-            "id": "2001",
+            "id": 2001,
             "member_types": ["SLT-4"],
             "departure_time": 3600,
             "departure_track": "906a"
         },
         {
-            "id": "3001",
+            "id": 3001,
             "member_types": ["SLT-6"],
             "departure_time": 3900,
             "departure_track": "906a"
         },
         {
-            "id": "4001",
+            "id": 4001,
             "member_types": ["SNG-3", "SNG-4"],
             "departure_time": 4200,
             "departure_track": "906a"
         },
         {
-            "id": "2002",
-            "members": ["2901"],
+            "id": 2002,
+            "members": [2901],
             "start_at_track": "52",
             "side_track_part": "Wissel961"
         },
         {
-            "id": "2032",
+            "id": 2032,
             "member_types": ["SLT-4"],
             "end_at_track": "52",
             "side_track_part": "Wissel961"
-        }        
+        }
     ]
 }

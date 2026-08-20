@@ -13,66 +13,66 @@
         {
             "name": "clean_train",
             "type": "Reinigingsperron",
-            "priority": 1,
+            "optional": false,
             "duration": 600,
             "required_skills": ["inwendige_reiniging"]
         }
     ],
     "custom_train_units": [
         {
-            "id": "2401",
+            "id": 2401,
             "type": "SLT-4",
             "services": ["clean_train"]
         },
         {
-            "id": "2402",
+            "id": 2402,
             "type": "SLT-4",
             "services": ["clean_train"]
         },
         {
-            "id": "2403",
+            "id": 2403,
             "type": "SLT-4",
             "services": []
         },
         {
-            "id": "2404",
+            "id": 2404,
             "type": "SLT-4",
             "services": []
         }
     ],
     "custom_trains": [
         {
-            "id": "2000",
-            "members": ["2401"],
+            "id": 2000,
+            "members": [2401],
             "arrival_time": 300,
             "arrival_track": "906a"
         },
         {
-            "id": "3000",
-            "members": ["2402", "2403"],
+            "id": 3000,
+            "members": [2402, 2403],
             "arrival_time": 600,
             "arrival_track": "906a"
         },
         {
-            "id": "4000",
-            "members": ["2404"],
+            "id": 4000,
+            "members": [2404],
             "arrival_time": 900,
             "arrival_track": "906a"
         },
         {
-            "id": "2001",
+            "id": 2001,
             "member_types": ["SLT-4"],
             "departure_time": 3600,
             "departure_track": "906a"
         },
         {
-            "id": "3001",
+            "id": 3001,
             "member_types": ["SLT-4"],
             "departure_time": 3900,
             "departure_track": "906a"
         },
         {
-            "id": "4001",
+            "id": 4001,
             "member_types": ["SLT-4", "SLT-4"],
             "departure_time": 4200,
             "departure_track": "906a"

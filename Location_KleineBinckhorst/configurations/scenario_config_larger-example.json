@@ -13,7 +13,7 @@
         {
             "name": "clean_train",
             "type": "Reinigingsperron",
-            "priority": 1,
+            "optional": false,
             "duration": 600,
             "required_skills": [
                 "inwendige_reiniging"
@@ -22,511 +22,511 @@
     ],
     "custom_train_units": [
         {
-            "id": "1",
+            "id": 1,
             "type": "SLT-4",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "2",
+            "id": 2,
             "type": "SLT-4",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "3",
+            "id": 3,
             "type": "SLT-6",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "4",
+            "id": 4,
             "type": "SLT-6",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "5",
+            "id": 5,
             "type": "SNG-3",
             "services": []
         },
         {
-            "id": "6",
+            "id": 6,
             "type": "SNG-3",
             "services": []
         },
         {
-            "id": "7",
+            "id": 7,
             "type": "SNG-4",
             "services": []
         },
         {
-            "id": "8",
+            "id": 8,
             "type": "SNG-4",
             "services": []
         },
         {
-            "id": "9",
+            "id": 9,
             "type": "VIRM-4",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "10",
+            "id": 10,
             "type": "VIRM-4",
             "services": [
             ]
         },
         {
-            "id": "11",
+            "id": 11,
             "type": "VIRM-6",
             "services": [
             ]
         },
         {
-            "id": "12",
+            "id": 12,
             "type": "VIRM-6",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "13",
+            "id": 13,
             "type": "ICM-3",
             "services": []
         },
         {
-            "id": "14",
+            "id": 14,
             "type": "ICM-3",
             "services": []
         },
         {
-            "id": "15",
+            "id": 15,
             "type": "ICM-4",
             "services": []
         },
         {
-            "id": "16",
+            "id": 16,
             "type": "ICM-4",
             "services": []
         },
         {
-            "id": "17",
+            "id": 17,
             "type": "SLT-4",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "18",
+            "id": 18,
             "type": "SLT-4",
             "services": [
             ]
         },
         {
-            "id": "19",
+            "id": 19,
             "type": "SNG-3",
             "services": []
         },
         {
-            "id": "20",
+            "id": 20,
             "type": "SNG-3",
             "services": []
         },
         {
-            "id": "21",
+            "id": 21,
             "type": "VIRM-4",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "22",
+            "id": 22,
             "type": "VIRM-4",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "23",
+            "id": 23,
             "type": "ICM-4",
             "services": []
         },
         {
-            "id": "24",
+            "id": 24,
             "type": "ICM-4",
             "services": []
         },
 
         {
-            "id": "25",
+            "id": 25,
             "type": "SLT-4",
             "services": [
             ]
         },
         {
-            "id": "26",
+            "id": 26,
             "type": "SLT-4",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "27",
+            "id": 27,
             "type": "SLT-6",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "28",
+            "id": 28,
             "type": "SLT-6",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "29",
+            "id": 29,
             "type": "SNG-3",
             "services": []
         },
         {
-            "id": "30",
+            "id": 30,
             "type": "SNG-3",
             "services": []
         },
         {
-            "id": "31",
+            "id": 31,
             "type": "SNG-4",
             "services": []
         },
         {
-            "id": "32",
+            "id": 32,
             "type": "SNG-4",
             "services": []
         },
         {
-            "id": "33",
+            "id": 33,
             "type": "VIRM-4",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "34",
+            "id": 34,
             "type": "VIRM-4",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "35",
+            "id": 35,
             "type": "VIRM-6",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "36",
+            "id": 36,
             "type": "VIRM-6",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "37",
+            "id": 37,
             "type": "ICM-3",
             "services": []
         },
         {
-            "id": "38",
+            "id": 38,
             "type": "ICM-3",
             "services": []
         },
         {
-            "id": "39",
+            "id": 39,
             "type": "ICM-4",
             "services": []
         },
         {
-            "id": "40",
+            "id": 40,
             "type": "ICM-4",
             "services": []
         },
         {
-            "id": "41",
+            "id": 41,
             "type": "SLT-4",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "42",
+            "id": 42,
             "type": "SLT-4",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "43",
+            "id": 43,
             "type": "SNG-3",
             "services": []
         },
         {
-            "id": "44",
+            "id": 44,
             "type": "SNG-3",
             "services": []
         },
         {
-            "id": "45",
+            "id": 45,
             "type": "VIRM-4",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "46",
+            "id": 46,
             "type": "VIRM-4",
             "services": [
                 "clean_train"
             ]
         },
         {
-            "id": "47",
+            "id": 47,
             "type": "ICM-4",
             "services": []
         },
         {
-            "id": "48",
+            "id": 48,
             "type": "ICM-4",
             "services": []
         }
     ],
     "custom_trains": [
         {
-            "id": "1001",
+            "id": 1001,
             "members": [
-                "1",
-                "2"
+                1,
+                2
             ],
             "arrival_time": 0,
             "arrival_track": "906a"
         },
         {
-            "id": "1002",
+            "id": 1002,
             "members": [
-                "3",
-                "4"
+                3,
+                4
             ],
             "arrival_time": 600,
             "arrival_track": "906a"
         },
         {
-            "id": "1003",
+            "id": 1003,
             "members": [
-                "5",
-                "6"
+                5,
+                6
             ],
             "arrival_time": 1200,
             "arrival_track": "906a"
         },
         {
-            "id": "1004",
+            "id": 1004,
             "members": [
-                "7",
-                "8"
+                7,
+                8
             ],
             "arrival_time": 1800,
             "arrival_track": "906a"
         },
         {
-            "id": "1005",
+            "id": 1005,
             "members": [
-                "9",
-                "10"
+                9,
+                10
             ],
             "arrival_time": 2400,
             "arrival_track": "906a"
         },
         {
-            "id": "1006",
+            "id": 1006,
             "members": [
-                "11",
-                "12"
+                11,
+                12
             ],
             "arrival_time": 3000,
             "arrival_track": "906a"
         },
         {
-            "id": "1007",
+            "id": 1007,
             "members": [
-                "13",
-                "14"
+                13,
+                14
             ],
             "arrival_time": 3600,
             "arrival_track": "906a"
         },
         {
-            "id": "1008",
+            "id": 1008,
             "members": [
-                "15",
-                "16"
+                15,
+                16
             ],
             "arrival_time": 4200,
             "arrival_track": "906a"
         },
         {
-            "id": "1009",
+            "id": 1009,
             "members": [
-                "17",
-                "18"
+                17,
+                18
             ],
             "arrival_time": 4800,
             "arrival_track": "906a"
         },
         {
-            "id": "1010",
+            "id": 1010,
             "members": [
-                "19",
-                "20"
+                19,
+                20
             ],
             "arrival_time": 5400,
             "arrival_track": "906a"
         },
         {
-            "id": "1011",
+            "id": 1011,
             "members": [
-                "21",
-                "22"
+                21,
+                22
             ],
             "arrival_time": 6000,
             "arrival_track": "906a"
         },
         {
-            "id": "1012",
+            "id": 1012,
             "members": [
-                "23",
-                "24"
+                23,
+                24
             ],
             "arrival_time": 6600,
             "arrival_track": "906a"
         },
 
         {
-            "id": "1013",
+            "id": 1013,
             "members": [
-                "25",
-                "26"
+                25,
+                26
             ],
             "arrival_time": 6900,
             "arrival_track": "906a"
         },
         {
-            "id": "1014",
+            "id": 1014,
             "members": [
-                "27",
-                "28"
+                27,
+                28
             ],
             "arrival_time": 7300,
             "arrival_track": "906a"
         },
         {
-            "id": "1015",
+            "id": 1015,
             "members": [
-                "29",
-                "30"
+                29,
+                30
             ],
             "arrival_time": 7600,
             "arrival_track": "906a"
         },
         {
-            "id": "1016",
+            "id": 1016,
             "members": [
-                "31",
-                "32"
+                31,
+                32
             ],
             "arrival_time": 8000,
             "arrival_track": "906a"
         },
         {
-            "id": "1017",
+            "id": 1017,
             "members": [
-                "33",
-                "34"
+                33,
+                34
             ],
             "arrival_time": 8600,
             "arrival_track": "906a"
         },
         {
-            "id": "1018",
+            "id": 1018,
             "members": [
-                "35",
-                "36"
+                35,
+                36
             ],
             "arrival_time": 9100,
             "arrival_track": "906a"
         },
         {
-            "id": "1019",
+            "id": 1019,
             "members": [
-                "37",
-                "38"
+                37,
+                38
             ],
             "arrival_time": 9600,
             "arrival_track": "906a"
         },
         {
-            "id": "1020",
+            "id": 1020,
             "members": [
-                "39",
-                "40"
+                39,
+                40
             ],
             "arrival_time": 10000,
             "arrival_track": "906a"
         },
         {
-            "id": "1021",
+            "id": 1021,
             "members": [
-                "41",
-                "42"
+                41,
+                42
             ],
             "arrival_time": 10400,
             "arrival_track": "906a"
         },
         {
-            "id": "1022",
+            "id": 1022,
             "members": [
-                "43",
-                "44"
+                43,
+                44
             ],
             "arrival_time": 11000,
             "arrival_track": "906a"
         },
         {
-            "id": "1023",
+            "id": 1023,
             "members": [
-                "45",
-                "46"
+                45,
+                46
             ],
             "arrival_time": 11600,
             "arrival_track": "906a"
         },
         {
-            "id": "1024",
+            "id": 1024,
             "members": [
-                "47",
-                "48"
+                47,
+                48
             ],
             "arrival_time": 12000,
             "arrival_track": "906a"
         },
         {
-            "id": "2001",
+            "id": 2001,
             "member_types": [
                 "SLT-4",
                 "SLT-4"
@@ -535,7 +535,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2002",
+            "id": 2002,
             "member_types": [
                 "SLT-6",
                 "SLT-6"
@@ -544,7 +544,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2003",
+            "id": 2003,
             "member_types": [
                 "SNG-3",
                 "SNG-3"
@@ -553,7 +553,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2004",
+            "id": 2004,
             "member_types": [
                 "SNG-4",
                 "SNG-4"
@@ -562,7 +562,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2005",
+            "id": 2005,
             "member_types": [
                 "VIRM-4",
                 "VIRM-4"
@@ -571,7 +571,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2006",
+            "id": 2006,
             "member_types": [
                 "VIRM-6",
                 "VIRM-6"
@@ -580,7 +580,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2007",
+            "id": 2007,
             "member_types": [
                 "ICM-3",
                 "ICM-3"
@@ -589,7 +589,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2008",
+            "id": 2008,
             "member_types": [
                 "ICM-4",
                 "ICM-4"
@@ -598,7 +598,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2009",
+            "id": 2009,
             "member_types": [
                 "SLT-4",
                 "SLT-4"
@@ -607,7 +607,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2010",
+            "id": 2010,
             "member_types": [
                 "SNG-3",
                 "SNG-3"
@@ -616,7 +616,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2011",
+            "id": 2011,
             "member_types": [
                 "VIRM-4",
                 "VIRM-4"
@@ -625,7 +625,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2012",
+            "id": 2012,
             "member_types": [
                 "ICM-4",
                 "ICM-4"
@@ -635,7 +635,7 @@
         },
 
         {
-            "id": "2013",
+            "id": 2013,
             "member_types": [
                 "SLT-4",
                 "SLT-4"
@@ -644,7 +644,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2014",
+            "id": 2014,
             "member_types": [
                 "SLT-6",
                 "SLT-6"
@@ -653,7 +653,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2015",
+            "id": 2015,
             "member_types": [
                 "SNG-3",
                 "SNG-3"
@@ -662,7 +662,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2016",
+            "id": 2016,
             "member_types": [
                 "SNG-4",
                 "SNG-4"
@@ -671,7 +671,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2017",
+            "id": 2017,
             "member_types": [
                 "VIRM-4",
                 "VIRM-4"
@@ -680,7 +680,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2018",
+            "id": 2018,
             "member_types": [
                 "VIRM-6",
                 "VIRM-6"
@@ -689,7 +689,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2019",
+            "id": 2019,
             "member_types": [
                 "ICM-3",
                 "ICM-3"
@@ -698,7 +698,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2020",
+            "id": 2020,
             "member_types": [
                 "ICM-4",
                 "ICM-4"
@@ -707,7 +707,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2021",
+            "id": 2021,
             "member_types": [
                 "SLT-4",
                 "SLT-4"
@@ -716,7 +716,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2022",
+            "id": 2022,
             "member_types": [
                 "SNG-3",
                 "SNG-3"
@@ -725,7 +725,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2023",
+            "id": 2023,
             "member_types": [
                 "VIRM-4",
                 "VIRM-4"
@@ -734,7 +734,7 @@
             "departure_track": "906a"
         },
         {
-            "id": "2024",
+            "id": 2024,
             "member_types": [
                 "ICM-4",
                 "ICM-4"

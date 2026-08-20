@@ -13,48 +13,48 @@
         {
             "name": "clean_train",
             "type": "Reinigingsperron",
-            "priority": 1,
+            "optional": false,
             "duration": 500,
             "required_skills": ["inwendige_reiniging"]
         }
     ],
     "custom_train_units": [
         {
-            "id": "2422",
+            "id": 2422,
             "type": "SLT-4",
             "services": ["clean_train"]
         },
         {
-            "id": "2301",
+            "id": 2301,
             "type": "SNG-3",
             "services": []
         }
     ],
     "custom_trains": [
         {
-            "id": "11111",
-            "members": ["2422"],
+            "id": 11111,
+            "members": [2422],
             "arrival_time": 1500,
             "arrival_track": "4",
             "side_track_part": "13"
 
         },
         {
-            "id": "33333",
-            "members": ["2301"],
+            "id": 33333,
+            "members": [2301],
             "arrival_time": 1900,
             "arrival_track": "5",
             "side_track_part": "10"
         },
         {
-            "id": "33334",
+            "id": 33334,
             "member_types": ["SNG-3"],
             "departure_time": 2000,
             "departure_track": "3",
             "side_track_part": "12"
         },
         {
-            "id": "11112",
+            "id": 11112,
             "member_types": ["SLT-4"],
             "departure_time": 2300,
             "departure_track": "2",
