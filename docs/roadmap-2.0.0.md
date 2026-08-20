@@ -499,6 +499,31 @@ has run against all of them, plain and assert agree, and every fixture plan
 matches beta.5. Nothing left under [Open — cutting
 rc.1](#open--cutting-rc1).
 
+### Re-verified on `2.0.0-rc.2`
+
+`rc.2` across generator, hip and tors carries the `standingIndex:
+Optional[float] -> Optional[NonNegativeInt]` change (see
+`SCHEMA_CHANGELOG.md`'s "Unversioned — 2026-08-19" entry) and the new
+standing-order consistency check. Re-verified in two steps as each image
+landed:
+
+- **Generator + solver**, once `hip:2.0.0-rc.2` was published: full
+  `--steps generator,solver` run, all 11 canonical scenario/plan pairs
+  byte-identical to the committed baseline. Expected — every fixture already
+  has `standingIndex: null`, so the type narrowing is a no-op on the wire, and
+  the solver's own change (`?? 0.0` → `?? 0` in `ProblemInstance.cs`) doesn't
+  observably affect output either.
+- **Evaluator**, once `tors:2.0.0-rc.2` was published: ran against the same
+  plans. `docker inspect` showed `rc.1` and `rc.2` are genuinely different
+  image digests (a real rebuild, not a re-tag), so this wasn't assumed safe —
+  re-ran the same plans against `tors:2.0.0-rc.1` for comparison and diffed
+  all 11 canonical `.txt` outputs: byte-identical. Confirms the changelog's
+  claim that the evaluator needed no code change, in the actual output, not
+  just the source diff.
+
+Assert pass not yet covered for `rc.2` — `tors:2.0.0-rc.2-assert` wasn't
+published as of this check.
+
 ### What these runs do not cover
 
 - x86-64 only. arm64 is covered at the unit-test level (evaluator and solver CI
