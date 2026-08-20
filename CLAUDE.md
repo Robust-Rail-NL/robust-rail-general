@@ -8,18 +8,21 @@ branch and deleted when 2.0.0 ships.
 | Repo | Stable branch | Release branch |
 |---|---|---|
 | `robust-rail-generator` | `main` | `release/2.0.0` |
-| `robust-rail-solver` | `dev`, then `main` | `release/2.0.0` |
+| `robust-rail-solver` | `main` | `release/2.0.0` |
 | `robust-rail-evaluator` | `main` | `release/2.0.0` |
 | `scenario-planning-inputs` (this repo) | `main` | `release/2.0.0` |
 | `planning-approach` | `main` | `release/2.0.0` |
 
-Solver is the one repo with two stable branches: `dev` is where `release/2.0.0`
-merges (as with every other repo), but `dev` itself sits ~25 commits ahead of
-`main` from before this release (version bump, dockerization, arm64 support,
-refactors — never promoted). For 2.0.0 to actually reach `main`, `dev` needs a
-follow-up promotion to `main` after the `release/2.0.0` merge, which brings
-that backlog along with it. Confirmed intentional 2026-08-20: bringing `main`
-fully up to date with `dev` is the point, not an accidental side effect.
+Solver is the one repo with two stable-ish branches, `dev` and `main`, and the
+one place that needed a deliberate call rather than following the table:
+`release/2.0.0`'s PR (solver#20) targets `main` directly, not `dev` — it was
+opened against `dev` first, retargeted 2026-08-21 before any review landed.
+`release/2.0.0` already contains `dev`'s full history as an ancestor (~25
+pre-release commits: version bump, dockerization, arm64 support, refactors —
+never promoted to `main`), so merging straight into `main` brings that backlog
+along for free; no separate `dev`→`main` promotion needed. `dev` itself is
+being updated separately, by hand, outside a PR — not part of this release's
+merge sequence.
 
 It was previously a different name per repo — `pydantic`, `noproto`,
 `new_schemas` — each named after an implementation detail rather than the goal.

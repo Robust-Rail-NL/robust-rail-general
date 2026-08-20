@@ -587,9 +587,12 @@ a coordination point and a CI run against the real merge target.
   `state=OPEN`. **Not merged yet** — deliberately separate steps; merge order
   still matters (generator's `main` before this repo's, see [Branch
   naming](#branch-naming)), and this repo's PR has a known conflict with
-  `main` on `CLAUDE.md` to resolve first (see the PR body). Still open:
-  merge all four, then delete `release/2.0.0` in each — and for solver
-  specifically, the follow-up `dev` → `main` promotion (see `CLAUDE.md`).
+  `main` on `CLAUDE.md` to resolve first (see the PR body). solver#20 now
+  targets `main` directly rather than `dev` (retargeted 2026-08-21, before
+  any review — see `CLAUDE.md`): `release/2.0.0` already contains `dev`'s
+  full history, so this one merge covers both without a separate promotion.
+  `dev` itself is being updated by hand, outside this release's merge
+  sequence. Still open: merge all four, then delete `release/2.0.0` in each.
 - ~~Tag `generator:2.0.0`, `hip:2.0.0`, `tors:2.0.0` by re-tagging the
   existing `rc.2` digests~~ Done 2026-08-21, confirmed by digest: `2.0.0` and
   `2.0.0-rc.2` are byte-identical images in all three repos, not rebuilds.
