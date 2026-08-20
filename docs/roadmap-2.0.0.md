@@ -155,7 +155,7 @@ So the decision is three:
 Not a question CI can settle: nobody here has run that mode. Whoever knows why
 the Python bindings exist should decide.
 
-### Where the exported schemas should live
+### Where the exported schemas should live — resolved, post-2.0.0
 
 `validate-fixtures.yml` clones `robust-rail-generator` and reads `schema/` from
 the branch of the same name. Vendoring a copy here would be worse — a stale
@@ -168,11 +168,56 @@ run validated newly migrated fixtures against the pre-migration schema and
 reported 2/18 for a tree really at 10/18, while the freshness gate stayed green
 because that schema was perfectly consistent with the wrong models.
 
-**Where this should end up:** publish the exported schemas as a release artifact
-keyed by `schemaVersion`, and validate each fixture against *the version it
-declares*. That removes the branch coupling and the staleness together, and makes
-mixed-version fixtures during a migration expressible rather than simply broken.
-Worth deciding once schema changes become rare and individually versioned.
+**Decided 2026-08-20, on a collaborator's suggestion: move `src/models/` out of
+the generator and into this repo.** Not a schema-hosting tweak — the models
+themselves relocate, and the generator becomes a consumer of a package published
+from here rather than the other way round. The rationale is ownership, not
+mechanics: the generator produces `location.json` and `scenario_*.json`, never
+a plan, yet its models package currently owns `Plan` too; the configs
+(`scenario_config_*.json`) already live under this repo's `Location_*/` and are
+the one input in the pipeline that's hand-written rather than generated.
+
+Checked before committing to it, since "the generator has nothing to do with
+Plan" needed verifying rather than assuming:
+
+- `Plan`/`Action` (`plan.py`) are imported by exactly one thing in the
+  generator: `scripts/export_schema.py`. Nothing in the generator's own
+  runtime — `scenario.py`, `random_generator.py`, `check_config.py`, `main.py`
+  — touches them. But `Plan` embeds `Resource`/`TaskType` (from `location.py`)
+  and `ShuntingUnit` (from `scenario.py`), so it cannot move alone without
+  either duplicating those types or moving `location.py`/`scenario.py` with it.
+  The interchange schema is one closed graph, not three independent files.
+- `ScenarioConfig` (`scenario_config.py`) is the same story at the usage level
+  — `export_schema.py` is its only importer; `check_config.py`'s actual
+  validation never calls it, doing its own dict-based checks instead — but
+  structurally simpler: it depends on nothing but the shared `RailModel` base
+  in `utilities.py`, no cross-references into `location.py`/`scenario.py`. Its
+  own docstring already says as much: "these are the `scenario_config_*.json`
+  files under a location's `configurations/` directory in
+  scenario-planning-inputs."
+
+So the move is the whole `src/models/` directory — `location.py`, `scenario.py`,
+`plan.py`, `scenario_config.py`, `utilities.py` — as one package. Inside the
+generator, only 3 files touch any of it (`check_config.py`, `random_generator.py`,
+`scenario.py`, a handful of import lines each), which become imports from the
+new external package instead. `scripts/export_schema.py` moves here wholesale —
+it has no generator-specific logic, it only calls `.model_json_schema()` on
+models it no longer owns.
+
+This **replaces** the branch-matching clone in `validate-fixtures.yml` rather
+than just fixing it: once the models live here, the exported schema is direct
+build output, not a copy of anything, so there is nothing left to go stale
+against. It also resolves the "publish as a release artifact keyed by
+`schemaVersion`" idea above — moot once there's no second copy to key.
+
+**Deliberately post-2.0.0, not part of this release.** It changes ownership,
+not schema content or runtime behaviour, so nothing about the 2.0.0 pipeline
+depends on it landing first. Generator's PR (#11) is already out for review;
+pulling `src/models/` out from under it now would reopen that diff. Needs its
+own pass: packaging `scenario-planning-inputs` as an installable dependency
+(doesn't exist today), a pin/lockfile discipline in the generator's build
+matching the Docker-tag pinning already in force, and a decision on
+distribution mechanism (git dependency vs. a published package).
 
 ### ~~`planning-approach/pipeline.py`~~ — resolved 2026-08-10
 
