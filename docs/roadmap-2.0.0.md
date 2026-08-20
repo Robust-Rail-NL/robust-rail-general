@@ -521,8 +521,10 @@ landed:
   claim that the evaluator needed no code change, in the actual output, not
   just the source diff.
 
-Assert pass not yet covered for `rc.2` — `tors:2.0.0-rc.2-assert` wasn't
-published as of this check.
+**Assert pass, 2026-08-20.** `tors:2.0.0-rc.2-assert` published; re-ran the
+same plans against it. All 11 canonical evaluations byte-identical to the
+plain `rc.2` pass — no assertion fired. `rc.2` is now verified as fully as
+`rc.1` was: generator, solver and evaluator all checked, plain and assert.
 
 ### What these runs do not cover
 
