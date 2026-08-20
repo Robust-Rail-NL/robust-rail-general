@@ -323,13 +323,19 @@ Generator:
   tracked as "Next steps" item 6 in `unified-schema-design.md`; purely
   internal to the generator, doesn't touch the interchange schema, doesn't
   gate 2.0.0.
-- Clean up the generator's README.md: it has a TODO that should be dealt with
+- ~~Clean up the generator's README.md: it has a TODO that should be dealt
+  with~~ Done — no TODOs left; setup instructions now match reality (`uv
+  sync`, `uv run`) instead of the conda-based world that predated
+  `pyproject.toml`.
 - Make sure the planner can also speak the new schema
-- Figure out what to do with the regression-baseline files in the generator repo
-  (just delete?). See also `src/generate-scenarios.sh`.
-- Clean up the generator repo: automated formatting with pre-commit, Ruff etc.
-- Decide what to do with `unified-schema-design.md`. At least remove in-progress
-  bits?
+- ~~Figure out what to do with the regression-baseline files in the generator
+  repo (just delete?). See also `src/generate-scenarios.sh`.~~ Done — both
+  gone; existed only to support the protobuf-to-Pydantic migration itself.
+- ~~Clean up the generator repo: automated formatting with pre-commit, Ruff
+  etc.~~ Done — `.pre-commit-config.yaml` and a CI job enforce it.
+- ~~Decide what to do with `unified-schema-design.md`. At least remove
+  in-progress bits?~~ Done — marked `**Status: historical.**`, the migration
+  it planned is this release.
 - ~~Default scenario filename truncated the config name to its last
   underscore-token~~ — fixed on `generator@2d086f0`, shipped in `rc.1`
   (moved tag). `sweep_seeds.py`'s matching `base` formula updated alongside
