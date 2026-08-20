@@ -219,6 +219,41 @@ own pass: packaging `scenario-planning-inputs` as an installable dependency
 matching the Docker-tag pinning already in force, and a decision on
 distribution mechanism (git dependency vs. a published package).
 
+### Renaming this repo to `robust-rail-general` — post-2.0.0
+
+Under discussion. Checked what would actually break, across all four sibling
+repos, before treating it as a git-settings change:
+
+- **Load-bearing, would break outright:** `robust-rail-generator/src/main.py`
+  and `src/example.py` default `--path` to a sibling directory literally named
+  `scenario-planning-inputs`. `planning-approach/.github/workflows/schema.yml`
+  clones this repo by that name, mounts it at `/siblings/scenario-planning-inputs`,
+  and sets `RRN_INPUTS_DIR` to match — all three spots have to move together, or
+  its CI breaks. `planning-approach/tests/test_plan_schema.py` makes the same
+  sibling-directory assumption locally (`_sibling("scenario-planning-inputs",
+  "RRN_INPUTS_DIR")`), overridable by the env var but not by default.
+- **Present but not load-bearing:** `robust-rail-solver`'s
+  `config_standard.yaml`/`config_simple_service.yaml` and
+  `robust-rail-evaluator/data/Bugs/*/config_solver.yaml` hardcode
+  `/workspace/scenario-planning-inputs/...` paths, but nothing in either
+  repo's CI references them by name — manual/local-dev config, and already
+  stale regardless (pre-unification `location_solver.json`/
+  `scenario_solver.json` layout, removed in Phase 1).
+- **Cosmetic only, safe to sweep separately:** READMEs, `SCHEMA_CHANGELOG.md`,
+  `RELEASE_NOTES.md`, `unified-schema-design.md` and similar docs/comments
+  across generator, evaluator and planning-approach. Not fully inventoried —
+  `planning-approach/plan_visualizer/*.py` and
+  `convert_to_pddl/**/convert.py` also matched a search for the name and
+  weren't individually checked.
+- **Not code:** GitHub redirects the old repo URL (web, clone, fetch/push)
+  as long as nobody claims `scenario-planning-inputs` afterward, so PR links
+  already shared keep working. Existing local clones should still get
+  `git remote set-url origin <new-url>` explicitly rather than rely on that.
+
+Sequence as a small coordinated PR in each affected repo (generator,
+planning-approach at minimum) alongside the rename itself, not as a rider on
+2.0.0.
+
 ### ~~`planning-approach/pipeline.py`~~ — resolved 2026-08-10
 
 Deleted, along with `run.py`, `cli.py`, `evaluate.py` and `generate.py`, by
