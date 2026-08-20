@@ -56,9 +56,10 @@ def main() -> None:
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
     parser.add_argument("--version", choices=['legacy', '2.0.0', '2.0.0-assert', 'local'],
-                        default='legacy',
-                        help="Pick a docker image version ('legacy' is the retiring protobuf "
-                             "pipeline; 'local' is reserved for locally built images; "
+                        default='2.0.0',
+                        help="Pick a docker image version ('legacy' no longer works against this "
+                             "repo's fixtures — Phase 1 moved run_*.py to the unified format "
+                             "unconditionally; 'local' is reserved for locally built images; "
                              "'2.0.0-assert' runs the evaluator with assertions enabled "
                              "for integration testing, and is not for baseline comparison).")
     parser.add_argument("--steps", metavar="STEPS",

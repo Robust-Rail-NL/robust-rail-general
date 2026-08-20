@@ -7,6 +7,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from docker_utils import ensure_docker_running
+
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
     "legacy": "ghcr.io/robust-rail-nl/tors:1.3.1",
@@ -91,9 +93,14 @@ def main() -> None:
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
-    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='legacy',
-                        help="Pick a docker image version ('local' is reserved for locally built images).")
+    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='2.0.0',
+                        help="Pick a docker image version ('legacy' no longer works against this "
+                             "repo's fixtures — Phase 1 moved run_*.py to the unified format "
+                             "unconditionally; 'local' is reserved for locally built images).")
     args = parser.parse_args()
+
+    if not args.dry_run:
+        ensure_docker_running()
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 
