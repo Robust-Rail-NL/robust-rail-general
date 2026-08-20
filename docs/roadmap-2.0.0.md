@@ -308,6 +308,15 @@ the filename that `run_evaluator.py` and the evaluation naming both understand.
 Things I (LP) noticed and want to write down so we won't forget:
 
 Generator:
+- [generator#12](https://github.com/Robust-Rail-NL/robust-rail-generator/issues/12):
+  `EvaluatorScenario` and `Scenario` represent the same concept twice —
+  `ScenarioGenerator` accumulates into the flat, `Train`-based
+  `EvaluatorScenario` shape, then `create_solver_format_scenario()` manually
+  converts it, field by field, into the `Scenario` shape actually written to
+  `scenario_*.json`. Kept in sync by hand, not by construction. Already
+  tracked as "Next steps" item 6 in `unified-schema-design.md`; purely
+  internal to the generator, doesn't touch the interchange schema, doesn't
+  gate 2.0.0.
 - Clean up the generator's README.md: it has a TODO that should be dealt with
 - Make sure the planner can also speak the new schema
 - Figure out what to do with the regression-baseline files in the generator repo
