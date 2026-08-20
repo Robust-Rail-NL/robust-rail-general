@@ -2,7 +2,9 @@
 """Run the full generator → solver → evaluator pipeline.
 
 `planner` is available as an alternative to `solver`: both produce plans for the
-evaluator to judge, by different means. See EXCLUSIVE_STEPS.
+evaluator to judge, by different means. See EXCLUSIVE_STEPS. --use-solver and
+--use-planner are shorthand for the two three-step chains this produces most
+often; --steps remains for anything else (a subset, a custom order).
 """
 
 import argparse
@@ -62,15 +64,26 @@ def main() -> None:
                              "unconditionally; 'local' is reserved for locally built images; "
                              "'2.0.0-assert' runs the evaluator with assertions enabled "
                              "for integration testing, and is not for baseline comparison).")
-    parser.add_argument("--steps", metavar="STEPS",
-                        default=",".join(DEFAULT_STEPS),
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--steps", metavar="STEPS", default=None,
                         help=f"Comma-separated list of steps to run (default: "
                              f"{','.join(DEFAULT_STEPS)}). Valid: {', '.join(ALL_STEPS)}. "
                              f"'planner' is an alternative to 'solver' and cannot be "
                              f"combined with it.")
+    group.add_argument("--use-solver", action="store_true",
+                        help=f"Shorthand for --steps {','.join(DEFAULT_STEPS)} (the default).")
+    group.add_argument("--use-planner", action="store_true",
+                        help="Shorthand for --steps generator,planner,evaluator.")
     args = parser.parse_args()
 
-    steps = [s.strip() for s in args.steps.split(",")]
+    if args.use_planner:
+        steps_arg = "generator,planner,evaluator"
+    elif args.use_solver or args.steps is None:
+        steps_arg = ",".join(DEFAULT_STEPS)
+    else:
+        steps_arg = args.steps
+
+    steps = [s.strip() for s in steps_arg.split(",")]
     unknown = [s for s in steps if s not in ALL_STEPS]
     if unknown:
         print(f"ERROR: unknown step(s): {', '.join(unknown)}. Valid: {', '.join(ALL_STEPS)}", file=sys.stderr)

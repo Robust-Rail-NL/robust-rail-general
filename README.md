@@ -67,12 +67,14 @@ or all at once:
 $ python3 run_pipeline.py
 ```
 
-`run_pipeline.py --steps generator,solver,evaluator` (the default) runs the
-full chain; pass a subset (e.g. `--steps generator,solver`) to stop early, or
-`--steps generator,planner,evaluator` to run the planner instead of the
-solver. `solver` and `planner` are mutually exclusive within one run — both
-write `plans/plan_<name>.json`, so running both over one location would leave
-one tool's output silently overwritten by the other's.
+`run_pipeline.py --use-solver` (the default) runs the full
+generator → solver → evaluator chain; `--use-planner` swaps in the planner for
+the same three steps. For anything else — a subset, a custom order — use
+`--steps` directly (e.g. `--steps generator,solver`), mutually exclusive with
+the two shorthand flags. `solver` and `planner` are mutually exclusive with
+*each other* within one run regardless of how you asked for them — both write
+`plans/plan_<name>.json`, so running both over one location would leave one
+tool's output silently overwritten by the other's.
 
 `clear.py` removes generated scenarios, plans and evaluations (`--dry-run` to
 preview, `--location` to restrict).
