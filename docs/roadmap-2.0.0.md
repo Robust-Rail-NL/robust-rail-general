@@ -7,11 +7,11 @@ The pipeline runs end-to-end on published images, all five repos have gating CI,
 and the release evidence is recorded under [Release evidence](#release-evidence)
 below.
 
-**`2.0.0-rc.1` is cut and fully verified** as of 2026-08-11: tagged across all
+**`2.0.0-rc.2` is cut and fully verified** as of 2026-08-20: tagged across all
 five repos, plain and assert pipelines both re-run against published images,
-every fixture plan byte-identical to the beta.5 run and every evaluation
-byte-identical between the plain and assert passes. See [rc.1 — cut and
-verified](#rc1--cut-and-verified).
+every fixture plan byte-identical to the `rc.1` baseline (itself byte-identical
+to beta.5) and every evaluation byte-identical between the plain and assert
+passes. See [rc.2 — cut and verified](#rc2--cut-and-verified).
 
 Everything else outstanding is either a decision with no defect behind it, or a
 known issue to name in the release notes. Three issues came out of the #11
@@ -45,14 +45,17 @@ the work happened at the time.
 
 ---
 
-## rc.1 — cut and verified
+## rc.2 — cut and verified
 
-All five repos tagged `2.0.0-rc.1`, one nameable candidate rather than
-per-repo tags. Both the plain and assert pipelines have run against published
-images with identical verdicts and byte-identical output — see [Re-verified on
-`hip:2.0.0-beta.5`](#re-verified-on-hip200-beta5) and [Re-verified on
-`2.0.0-rc.1`](#re-verified-on-200-rc1) for the evidence. Nothing left gating
-rc.1.
+All five repos tagged `2.0.0-rc.2`, one nameable candidate rather than
+per-repo tags. `rc.2` carries the `standingIndex` schema change over `rc.1`
+(`SCHEMA_CHANGELOG.md`'s "Unversioned — 2026-08-19" entry); both the plain
+and assert pipelines have re-run against published `rc.2` images with output
+byte-identical to `rc.1` throughout — see [Re-verified on
+`hip:2.0.0-beta.5`](#re-verified-on-hip200-beta5), [Re-verified on
+`2.0.0-rc.1`](#re-verified-on-200-rc1) and [Re-verified on
+`2.0.0-rc.2`](#re-verified-on-200-rc2) for the full evidence chain. Nothing
+left gating rc.2.
 
 The remaining opens below are decisions with no defect behind them, and known
 issues to name in the release notes — none block cutting `2.0.0` itself.
@@ -496,8 +499,8 @@ unrelated things). All 11 evaluation outputs byte-identical to the plain
 
 **The rc.1 gate is now fully closed**: every image is published, the pipeline
 has run against all of them, plain and assert agree, and every fixture plan
-matches beta.5. Nothing left under [Open — cutting
-rc.1](#open--cutting-rc1).
+matches beta.5. (Superseded by `rc.2`, above — this entry stays as the record
+of how `rc.1` itself was closed.)
 
 ### Re-verified on `2.0.0-rc.2`
 
@@ -555,17 +558,19 @@ below is done yet:
   and evaluator#6, and the two fixtures they permanently block
   (`6t_custom_example3`, `7t_custom_example1`) — otherwise "integration tests
   pass" reads as more true than it is.
-- **Update this repo's `README.md`.** Currently describes the two-file world
-  Phase 1 removed — it still documents `location_solver.json` and
-  `scenario_solver_*.json` existing alongside `scenario_*.json`. Needs a
-  rewrite to the current single-file pipeline, not a touch-up.
-- Retire the `legacy` entries from the `--version` selectors. (The
+- ~~Update this repo's `README.md`.~~ Done 2026-08-20: rewritten for the
+  single-file pipeline, historical two-file framing dropped rather than
+  footnoted.
+- `--version` now defaults to `2.0.0` instead of `legacy` (2026-08-20) —
+  `legacy` stopped working once Phase 1 moved these scripts to the unified
+  format unconditionally, so a default that reliably failed wasn't worth
+  keeping. Retiring the `legacy` choice outright is still open. (The
   `*-protobuf`/`*-pydantic` comparison directories were never committed —
   local scratch output only, deleted 2026-08-10. The comparison they produced
   is recorded in this file's git history, not in the files themselves.)
 - Mark the four PRs ready and merge them; delete `release/2.0.0` in each.
 - **Tag `generator:2.0.0`, `hip:2.0.0`, `tors:2.0.0` by re-tagging the
-  existing `rc.1` digests**, not rebuilding — same reasoning as moving the
+  existing `rc.2` digests**, not rebuilding — same reasoning as moving the
   `rc.1` tag itself onto the naming fix: the tag should point at the image
   that was actually verified, and a fresh build from the same commit is not
   guaranteed to be the same bytes.
