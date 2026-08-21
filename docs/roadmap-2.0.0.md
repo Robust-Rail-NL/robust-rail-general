@@ -7,17 +7,19 @@ The pipeline runs end-to-end on published images, all five repos have gating CI,
 and the release evidence is recorded under [Release evidence](#release-evidence)
 below.
 
-**`2.0.0-rc.2` is cut and fully verified** as of 2026-08-20: tagged across all
-five repos, plain and assert pipelines both re-run against published images,
-every fixture plan byte-identical to the `rc.1` baseline (itself byte-identical
-to beta.5) and every evaluation byte-identical between the plain and assert
-passes. See [rc.2 — cut and verified](#rc2--cut-and-verified).
+**`generator` is at `2.0.0-rc.4`, `hip`/`tors` at `2.0.0-rc.3`** as of
+2026-08-21 — two more schema-adjacent rc cuts after `rc.2`, both verified
+end-to-end. See [rc.4 (generator) / rc.3 (hip, tors) — cut and
+verified](#rc4-generator--rc3-hip-tors--cut-and-verified).
 
-**`generator:2.0.0`, `hip:2.0.0` and `tors:2.0.0` are tagged** as of
-2026-08-21 — re-tagged from the verified `rc.2` digests, confirmed identical
-by digest, `:latest` moved alongside. All four PRs sharing the interchange
-format are open and marked ready for review (not yet merged). See [Phase 4 —
-Stable release](#phase-4--stable-release) for what's left.
+**The `generator:2.0.0`/`hip:2.0.0`/`tors:2.0.0` and `:latest` tags cut
+2026-08-21 from the `rc.2` digests are now stale** — they predate the `rc.3`
+field drop and the `rc.4` trailing-newline fix, so they no longer match what
+`release/2.0.0` actually contains. Re-tagging (or rebuilding, for generator's
+already-diverged content) those three tags to the `rc.4`/`rc.3` digests is
+now part of what's left before merge — see [Phase 4 — Stable
+release](#phase-4--stable-release). All four PRs sharing the interchange
+format are open and marked ready for review (not yet merged).
 
 Everything else outstanding is either a decision with no defect behind it, or a
 known issue to name in the release notes. Three issues came out of the #11
@@ -51,17 +53,34 @@ the work happened at the time.
 
 ---
 
-## rc.2 — cut and verified
+## rc.4 (generator) / rc.3 (hip, tors) — cut and verified
 
-All five repos tagged `2.0.0-rc.2`, one nameable candidate rather than
-per-repo tags. `rc.2` carries the `standingIndex` schema change over `rc.1`
-(`SCHEMA_CHANGELOG.md`'s "Unversioned — 2026-08-19" entry); both the plain
-and assert pipelines have re-run against published `rc.2` images with output
-byte-identical to `rc.1` throughout — see [Re-verified on
-`hip:2.0.0-beta.5`](#re-verified-on-hip200-beta5), [Re-verified on
-`2.0.0-rc.1`](#re-verified-on-200-rc1) and [Re-verified on
-`2.0.0-rc.2`](#re-verified-on-200-rc2) for the full evidence chain. Nothing
-left gating rc.2.
+`rc.2` was the last point where all three tool repos shared one nameable rc
+number. Two more schema-adjacent changes landed after it, and — unlike
+`standingIndex`'s narrowing — both actually touched the committed fixture
+corpus in this repo:
+
+- **`rc.3`** (generator, hip, tors): `reversalDuration` and
+  `canDepartFromAnyTrack` dropped from the wire format entirely (see
+  generator's `SCHEMA_CHANGELOG.md`, "Unversioned — 2026-08-21"). Traced as
+  dead in all three repos — hip and tors needed no code change, but both got
+  matching `rc.3` tags anyway to keep every repo's version aligned with the
+  schema change, plus the inert DTO/fixture cleanup commits already made on
+  each. Because the fields are *removed*, not narrowed, `extra="forbid"`
+  meant every fixture still carrying either key (all null-valued) started
+  failing validation — 71 files across this repo needed the two keys
+  stripped, a mechanical, value-preserving edit.
+- **`rc.4`** (generator only): every generated JSON file now ends with a
+  trailing newline, matching what `scripts/export_schema.py` already did.
+  Pure formatting — no consumer's JSON parsing is affected — so hip and tors
+  stay on `rc.3`. 60 checked-in fixture files needed the same trailing
+  newline appended by hand, since the pipeline only regenerates
+  `scenarios/`, not `fixtures/`.
+
+Both re-run against published images with results matching the `rc.2`
+baseline exactly (counts, exit codes, `.err` content) — see [Re-verified on
+`2.0.0-rc.3`](#re-verified-on-200-rc3) and [Re-verified on
+`2.0.0-rc.4`](#re-verified-on-200-rc4). Nothing left gating either.
 
 The remaining opens below are decisions with no defect behind them, and known
 issues to name in the release notes — none block cutting `2.0.0` itself.
@@ -550,6 +569,52 @@ same plans against it. All 11 canonical evaluations byte-identical to the
 plain `rc.2` pass — no assertion fired. `rc.2` is now verified as fully as
 `rc.1` was: generator, solver and evaluator all checked, plain and assert.
 
+### Re-verified on `2.0.0-rc.3`
+
+`rc.3` drops `reversalDuration`/`canDepartFromAnyTrack` (see [rc.4
+(generator) / rc.3 (hip, tors) — cut and verified](#rc4-generator--rc3-hip-tors--cut-and-verified)
+above). Verified in two passes, adopting a faster method for the first time: build a
+native-arch image locally and validate with it before the slow multi-arch
+push, rather than waiting on the push to check anything.
+
+- **Fast local pass**: a plain (no `buildx`, no QEMU) `docker build` of
+  `tors:2.0.0-rc.3` finished in a couple of minutes, versus 20+ for the real
+  multi-arch push. Ran the evaluator against it on all 11 canonical plans:
+  exit codes and `.err` content byte-identical to the `rc.2` baseline; the
+  `.txt` trace files differ only by a **set-equal reordering** (same lines,
+  different order — confirmed by sorting both sides) of route/movement
+  listings. Running the same local binary twice back-to-back gave a 0-diff,
+  so the reordering is stable within a build but shifts between builds — see
+  "Why the evaluator's `.txt` output can reorder across builds" below.
+- **Published multi-arch images**: once `hip:2.0.0-rc.3` and
+  `tors:2.0.0-rc.3(-assert)` were pushed, re-ran the full
+  `generator->solver->evaluator` pipeline against them: same counts as every
+  prior run (11/11, 11/11, 8/11 exit-0, same three known-infeasible
+  scenarios). A plain-vs-assert comparison on `rc.3` showed identical `.err`
+  and exit codes, set-equal `.txt`, across all 10 KleineBinckhorst scenarios.
+
+**Why the evaluator's `.txt` output can reorder across builds.** cTORS mixes
+content-hashed and pointer-hashed `unordered_map`s keyed by `ShuntingUnit*`.
+Most (e.g. `State::shuntingUnitStates`) use a custom ID-based hash, stable
+across builds; at least one (`MoveHelper.cpp`'s `visitedNeighbors`) has no
+custom hash and falls back to the default pointer hash, whose bucket order
+depends on heap addresses — which shift whenever anything upstream changes
+allocation size, e.g. regenerating protobuf code after a `.proto` field is
+removed. Cosmetic, not a correctness regression: the `.err` output and exit
+codes, which is what the pipeline and CI actually gate on, are untouched.
+Treat any future `.txt`-only diff the same way — sort-compare before
+assuming a regression.
+
+### Re-verified on `2.0.0-rc.4`
+
+`rc.4` is generator-only (trailing newline after every generated JSON file,
+see above); hip and tors stay pinned to `rc.3`. Ran the full pipeline against
+`generator:2.0.0-rc.4` + the existing `rc.2` solver/evaluator images first
+(counts matched exactly, `.txt`/`.out` diffs were the same
+build-reordering/version-banner pattern as `rc.3`'s, `.err` untouched), then
+again after the `rc.3` solver/evaluator pins landed, with the same result.
+2026-08-21.
+
 ### What these runs do not cover
 
 - x86-64 only. arm64 is covered at the unit-test level (evaluator and solver CI
@@ -599,12 +664,12 @@ a coordination point and a CI run against the real merge target.
   full history, so this one merge covers both without a separate promotion.
   `dev` itself is being updated by hand, outside this release's merge
   sequence. Still open: merge all four, then delete `release/2.0.0` in each.
-- ~~Tag `generator:2.0.0`, `hip:2.0.0`, `tors:2.0.0` by re-tagging the
-  existing `rc.2` digests~~ Done 2026-08-21, confirmed by digest: `2.0.0` and
-  `2.0.0-rc.2` are byte-identical images in all three repos, not rebuilds.
-  `:latest` moved to `2.0.0` in all three as well, also confirmed by digest —
-  first stable tag of the release, per the "hold `latest` for the stable tag,
-  not the rc/beta line" decision.
+- Tag `generator:2.0.0`, `hip:2.0.0`, `tors:2.0.0` by re-tagging the
+  verified rc digests. Done once already (2026-08-21, confirmed by digest
+  against `rc.2`), but **now stale**: `rc.3` and `rc.4` landed after that
+  tagging, so `2.0.0`/`latest` no longer match `release/2.0.0`'s actual
+  content. Needs redoing against the `rc.4` (generator) / `rc.3` (hip, tors)
+  digests once no further rc is expected — still open.
 
 ---
 
