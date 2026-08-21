@@ -40,24 +40,6 @@ tools that consume it:
 Both were deferred deliberately rather than blocking 2.0.0. If you're running
 the full pipeline and see these two fail, this is why.
 
-### Two more schema-adjacent generator changes after the initial cut
-
-Two further generator changes landed after this file was first written, both
-requiring edits to the committed fixture corpus here even though neither
-changes any tool's runtime behavior:
-
-- `reversalDuration` and `canDepartFromAnyTrack` are dropped from the wire
-  format entirely (traced as dead in generator, solver and evaluator alike —
-  see generator's `SCHEMA_CHANGELOG.md`). Because `RailModel` forbids extra
-  fields, every fixture still carrying either key (all `null`-valued) failed
-  validation outright; 71 files had the two keys stripped.
-- Generated scenario JSON now ends with a trailing newline. 60 checked-in
-  fixture files that the pipeline doesn't regenerate got the same newline
-  appended by hand for consistency.
-
-Full verification evidence for both is in `docs/roadmap-2.0.0.md`'s
-[Release evidence](docs/roadmap-2.0.0.md#release-evidence) section.
-
 ### Fixture corpus and validation
 
 `sweep_seeds.py --save` classifies a configuration's outcomes across a range
@@ -67,6 +49,19 @@ of seeds into `Location_*/fixtures/{feasible,infeasible,unresolved}/`.
 from its Pydantic models, itself gated on that schema being fresh relative to
 the models — a stale schema doesn't fail validation, it validates against the
 wrong contract and passes, which is the failure mode worth guarding against.
+
+That gate is also why two further generator-side changes required edits
+across the fixture corpus here, even though neither changes any tool's
+runtime behavior. `reversalDuration` and `canDepartFromAnyTrack` are dropped
+from the wire format entirely (traced as dead in generator, solver and
+evaluator alike — see generator's `SCHEMA_CHANGELOG.md`); because `RailModel`
+forbids extra fields, every fixture still carrying either key (all
+`null`-valued) failed validation outright, so 71 files had the two keys
+stripped. Separately, generated scenario JSON now ends with a trailing
+newline; 60 checked-in fixture files that the pipeline doesn't regenerate got
+the same newline appended by hand for consistency. Full verification
+evidence for both is in `docs/roadmap-2.0.0.md`'s
+[Release evidence](docs/roadmap-2.0.0.md#release-evidence) section.
 
 ### Pipeline scripts
 
