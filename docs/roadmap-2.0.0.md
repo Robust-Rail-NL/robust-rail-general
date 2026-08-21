@@ -12,14 +12,12 @@ below.
 end-to-end. See [rc.4 (generator) / rc.3 (hip, tors) — cut and
 verified](#rc4-generator--rc3-hip-tors--cut-and-verified).
 
-**The `generator:2.0.0`/`hip:2.0.0`/`tors:2.0.0` and `:latest` tags cut
-2026-08-21 from the `rc.2` digests are now stale** — they predate the `rc.3`
-field drop and the `rc.4` trailing-newline fix, so they no longer match what
-`release/2.0.0` actually contains. Re-tagging (or rebuilding, for generator's
-already-diverged content) those three tags to the `rc.4`/`rc.3` digests is
-now part of what's left before merge — see [Phase 4 — Stable
-release](#phase-4--stable-release). All four PRs sharing the interchange
-format are open and marked ready for review (not yet merged).
+**`generator:2.0.0`, `hip:2.0.0` and `tors:2.0.0` are re-tagged** as of
+2026-08-21, this time from the `rc.4` (generator) / `rc.3` (hip, tors)
+digests — confirmed identical via `docker buildx imagetools inspect`,
+`:latest` moved alongside. All four PRs sharing the interchange format are
+open and marked ready for review (not yet merged). See [Phase 4 — Stable
+release](#phase-4--stable-release) for what's left.
 
 Everything else outstanding is either a decision with no defect behind it, or a
 known issue to name in the release notes. Three issues came out of the #11
@@ -664,12 +662,14 @@ a coordination point and a CI run against the real merge target.
   full history, so this one merge covers both without a separate promotion.
   `dev` itself is being updated by hand, outside this release's merge
   sequence. Still open: merge all four, then delete `release/2.0.0` in each.
-- Tag `generator:2.0.0`, `hip:2.0.0`, `tors:2.0.0` by re-tagging the
-  verified rc digests. Done once already (2026-08-21, confirmed by digest
-  against `rc.2`), but **now stale**: `rc.3` and `rc.4` landed after that
-  tagging, so `2.0.0`/`latest` no longer match `release/2.0.0`'s actual
-  content. Needs redoing against the `rc.4` (generator) / `rc.3` (hip, tors)
-  digests once no further rc is expected — still open.
+- ~~Tag `generator:2.0.0`, `hip:2.0.0`, `tors:2.0.0` by re-tagging the
+  verified rc digests~~ Done 2026-08-21 (a second time — the first tagging,
+  against `rc.2`, went stale once `rc.3`/`rc.4` landed). Used `docker buildx
+  imagetools create` to copy the multi-arch manifest list directly on the
+  registry rather than pull/rebuild, so the re-tag can't drift from the
+  source even for generator's amd64+arm64 index; confirmed by digest against
+  `generator:2.0.0-rc.4` and `hip:2.0.0-rc.3`/`tors:2.0.0-rc.3`. `:latest`
+  moved alongside in all three, also confirmed by digest.
 
 ---
 
