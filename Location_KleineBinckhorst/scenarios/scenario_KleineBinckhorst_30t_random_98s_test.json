@@ -5,7 +5,6 @@
             "typePrefix": "VIRM",
             "carriages": 4,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 280,
@@ -21,7 +20,6 @@
             "typePrefix": "VIRM",
             "carriages": 6,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 280,
@@ -37,7 +35,6 @@
             "typePrefix": "DDZ",
             "carriages": 4,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 261,
@@ -53,7 +50,6 @@
             "typePrefix": "DDZ",
             "carriages": 6,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 261,
@@ -69,7 +65,6 @@
             "typePrefix": "SLT",
             "carriages": 4,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 120,
@@ -85,7 +80,6 @@
             "typePrefix": "SLT",
             "carriages": 6,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 120,
@@ -101,7 +95,6 @@
             "typePrefix": "ICM",
             "carriages": 3,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 0,
@@ -117,7 +110,6 @@
             "typePrefix": "ICM",
             "carriages": 4,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 0,
@@ -133,7 +125,6 @@
             "typePrefix": "ICR",
             "carriages": 7,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 0,
@@ -149,7 +140,6 @@
             "typePrefix": "ICR",
             "carriages": 9,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 0,
@@ -165,7 +155,6 @@
             "typePrefix": "FFF",
             "carriages": 3,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 0,
@@ -181,7 +170,6 @@
             "typePrefix": "FFF",
             "carriages": 4,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 0,
@@ -197,7 +185,6 @@
             "typePrefix": "SNG",
             "carriages": 3,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 0,
@@ -213,7 +200,6 @@
             "typePrefix": "SNG",
             "carriages": 4,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 0,
@@ -229,7 +215,6 @@
             "typePrefix": "SGMM",
             "carriages": 2,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 0,
@@ -245,7 +230,6 @@
             "typePrefix": "SGMM",
             "carriages": 3,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 0,
@@ -261,7 +245,6 @@
             "typePrefix": "ICNG",
             "carriages": 5,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 0,
@@ -277,7 +260,6 @@
             "typePrefix": "ICNG",
             "carriages": 8,
             "length": 100.0,
-            "reversalDuration": null,
             "combineDuration": 180,
             "splitDuration": 120,
             "backNormTime": 0,
@@ -788,8 +770,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -805,8 +786,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -822,8 +802,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -839,8 +818,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -856,8 +834,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -873,8 +850,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -890,8 +866,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -907,8 +882,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -924,8 +898,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -941,8 +914,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -958,8 +930,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -975,8 +946,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -992,8 +962,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1009,8 +978,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1026,8 +994,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1043,8 +1010,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1060,8 +1026,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1077,8 +1042,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1094,8 +1058,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1111,8 +1074,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1128,8 +1090,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1145,8 +1106,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1162,8 +1122,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1179,8 +1138,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1196,8 +1154,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1213,8 +1170,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1230,8 +1186,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1247,8 +1202,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1264,8 +1218,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         },
         {
             "leaveTrackPart": 42,
@@ -1281,8 +1234,7 @@
                     "tasks": null
                 }
             ],
-            "standingIndex": null,
-            "canDepartFromAnyTrack": null
+            "standingIndex": null
         }
     ],
     "outStanding": [],
