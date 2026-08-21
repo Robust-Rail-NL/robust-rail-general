@@ -183,6 +183,8 @@ the Python bindings exist should decide.
 
 ### Where the exported schemas should live — resolved, post-2.0.0
 
+Tracked in [generator#14](https://github.com/Robust-Rail-NL/robust-rail-generator/issues/14).
+
 `validate-fixtures.yml` clones `robust-rail-generator` and reads `schema/` from
 the branch of the same name. Vendoring a copy here would be worse — a stale
 schema does not fail, it passes, having checked the wrong contract — so the
