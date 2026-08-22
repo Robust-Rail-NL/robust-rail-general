@@ -39,6 +39,15 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool) 
         print(f"  SKIP {plan.name}: no matching scenario_{name}.json", file=sys.stderr)
         return True  # not a failure — plan may predate the scenario file
 
+    # The evaluator needs this alongside location.json, not just
+    # location.json + scenario — without it the container fails deep inside
+    # TORS with a misleading "specified file '/app/database' does not
+    # exist" (it means config.json, not the mount itself).
+    if not (location_dir / "config.json").exists():
+        print(f"  SKIP {plan.name}: {location_dir}/config.json missing — "
+              f"required by the evaluator alongside location.json", file=sys.stderr)
+        return False
+
     eval_dir = location_dir / "evaluations"
     eval_dir.mkdir(exist_ok=True)
     out_file = eval_dir / f"eval_{name}.out"
