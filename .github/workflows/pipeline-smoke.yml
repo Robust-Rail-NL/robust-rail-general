@@ -1,0 +1,45 @@
+name: Pipeline smoke test
+
+# main and release/2.0.0 only: run_*.py's unified-format pipeline doesn't
+# work against dev's pre-unification (protobuf) world — see this repo's
+# branch policy in CLAUDE.md. Listing main here is inert until the 2.0.0
+# merge actually lands this file there — a workflow only fires for events on
+# a branch whose own tree already contains it, so this can't spuriously run
+# against pre-merge main.
+on:
+  push:
+    branches: [ "main", "release/2.0.0" ]
+  pull_request:
+    branches: [ "main", "release/2.0.0" ]
+  workflow_dispatch:
+
+jobs:
+  pipeline-smoke:
+    runs-on: ubuntu-latest
+    name: Run generator → solver → evaluator against one cheap fixture
+    timeout-minutes: 15
+    steps:
+    - uses: actions/checkout@v5
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    # Location_SimpleService is the cheapest fixture in the corpus (one
+    # config, one scenario, one plan). This exercises the real published
+    # Docker images end to end — generator, solver, evaluator — catching
+    # runtime failures (crashes, an incompatible --config schema) that
+    # validate-fixtures.yml's static JSON Schema check can't see. All three
+    # images are public on ghcr.io, so no registry auth is needed.
+    - name: Run the pipeline against Location_SimpleService
+      run: python3 run_pipeline.py --location Location_SimpleService --version 2.0.0
+
+    - name: Show solver/evaluator output on failure
+      if: failure()
+      run: |
+        for f in Location_SimpleService/plans/*.out Location_SimpleService/plans/*.err \
+                 Location_SimpleService/evaluations/*.out Location_SimpleService/evaluations/*.err; do
+          [ -f "$f" ] || continue
+          echo "=== $f ==="
+          cat "$f"
+        done
