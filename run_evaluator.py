@@ -12,7 +12,7 @@ from docker_utils import ensure_docker_running
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
     "legacy": "ghcr.io/robust-rail-nl/tors:1.3.1",
-    "2.0.0": "ghcr.io/robust-rail-nl/tors:2.0.0-rc.3",
+    "2.0.0": "ghcr.io/robust-rail-nl/tors:2.0.0",
     # The evaluator is the oracle the pipeline trusts, and its assertions build
     # produces the same verdicts and .err content as the plain one (verified
     # across all KleineBinckhorst scenarios — .txt trace files can differ in
@@ -21,7 +21,7 @@ DOCKER_IMAGE_VERSIONS = {
     # an abort rather than a verdict computed from corrupt state. A run that
     # trips one exits 134/139 with the assertion text in the .err file, which
     # reads very differently from an ordinary "plan is not valid".
-    "2.0.0-assert": "ghcr.io/robust-rail-nl/tors:2.0.0-rc.3-assert",
+    "2.0.0-assert": "ghcr.io/robust-rail-nl/tors:2.0.0-assert",
     "local": "tors:latest",
 }
 CONTAINER_DB = "/app/database"
