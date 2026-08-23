@@ -85,7 +85,6 @@ def _write_config(config_path: Path, scenario_name: str, plan_name: str, params:
         f'LocationPath: "{CONTAINER_DB}/location.json"\n'
         f'ScenarioPath: "{CONTAINER_DB}/scenarios/{scenario_name}"\n'
         f'PlanPath: "{CONTAINER_DB}/plans/{plan_name}"\n'
-        f'Mode: "{params.get("Mode", "Standard")}"\n'
         f'Seed: {params.get("Seed", 1)}\n'
         f'DebugLevel: {params.get("DebugLevel", 0)}\n'
         f'\n'
