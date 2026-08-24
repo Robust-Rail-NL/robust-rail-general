@@ -1,0 +1,958 @@
+{
+    "schemaVersion": 1,
+    "trainUnitTypes": [
+        {
+            "typePrefix": "VIRM",
+            "carriages": 4,
+            "length": 108.56,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 280,
+            "backAdditionTime": 25,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "VIRM",
+            "carriages": 6,
+            "length": 162.06,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 280,
+            "backAdditionTime": 24,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "DDZ",
+            "carriages": 4,
+            "length": 101.08,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 261,
+            "backAdditionTime": 30,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "DDZ",
+            "carriages": 6,
+            "length": 154.0,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 261,
+            "backAdditionTime": 23,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "SLT",
+            "carriages": 4,
+            "length": 69.36,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 120,
+            "backAdditionTime": 16,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "SLT",
+            "carriages": 6,
+            "length": 100.54,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 120,
+            "backAdditionTime": 15,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "ICM",
+            "carriages": 3,
+            "length": 80.6,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "ICM",
+            "carriages": 4,
+            "length": 107.1,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "ICR",
+            "carriages": 7,
+            "length": 222.6,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": true,
+            "isLoco": true,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "ICR",
+            "carriages": 9,
+            "length": 275.4,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": true,
+            "isLoco": true,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "FFF",
+            "carriages": 3,
+            "length": 63.2,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "FFF",
+            "carriages": 4,
+            "length": 80.7,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "SNG",
+            "carriages": 3,
+            "length": 59.5,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "SNG",
+            "carriages": 4,
+            "length": 75.7,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "SGMM",
+            "carriages": 2,
+            "length": 52.2,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "SGMM",
+            "carriages": 3,
+            "length": 78.69,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "ICNG",
+            "carriages": 5,
+            "length": 109.4,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        },
+        {
+            "typePrefix": "ICNG",
+            "carriages": 8,
+            "length": 164.9,
+            "combineDuration": 180,
+            "splitDuration": 120,
+            "backNormTime": 0,
+            "backAdditionTime": 0,
+            "travelSpeed": 10,
+            "startUpTime": 0,
+            "needsLoco": false,
+            "isLoco": false,
+            "needsElectricity": true,
+            "idPrefix": null
+        }
+    ],
+    "in": [
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 0,
+            "departure": 0,
+            "id": 2001,
+            "members": [
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": 1001,
+                    "tasks": [
+                        {
+                            "type": {
+                                "predefined": null,
+                                "other": "Reinigingsperron"
+                            },
+                            "duration": 600,
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ],
+                            "optional": false
+                        }
+                    ]
+                },
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": 1002,
+                    "tasks": [
+                        {
+                            "type": {
+                                "predefined": null,
+                                "other": "Reinigingsperron"
+                            },
+                            "duration": 600,
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ],
+                            "optional": false
+                        }
+                    ]
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 600,
+            "departure": 600,
+            "id": 2002,
+            "members": [
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 6,
+                    "id": 1003,
+                    "tasks": [
+                        {
+                            "type": {
+                                "predefined": null,
+                                "other": "Reinigingsperron"
+                            },
+                            "duration": 600,
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ],
+                            "optional": false
+                        }
+                    ]
+                },
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 6,
+                    "id": 1004,
+                    "tasks": [
+                        {
+                            "type": {
+                                "predefined": null,
+                                "other": "Reinigingsperron"
+                            },
+                            "duration": 600,
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ],
+                            "optional": false
+                        }
+                    ]
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 1200,
+            "departure": 1200,
+            "id": 2003,
+            "members": [
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": 1005,
+                    "tasks": []
+                },
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": 1006,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 1800,
+            "departure": 1800,
+            "id": 2004,
+            "members": [
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 4,
+                    "id": 1007,
+                    "tasks": []
+                },
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 4,
+                    "id": 1008,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 2400,
+            "departure": 2400,
+            "id": 2005,
+            "members": [
+                {
+                    "typePrefix": "VIRM",
+                    "carriages": 4,
+                    "id": 1009,
+                    "tasks": [
+                        {
+                            "type": {
+                                "predefined": null,
+                                "other": "Reinigingsperron"
+                            },
+                            "duration": 600,
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ],
+                            "optional": false
+                        }
+                    ]
+                },
+                {
+                    "typePrefix": "VIRM",
+                    "carriages": 4,
+                    "id": 1010,
+                    "tasks": [
+                        {
+                            "type": {
+                                "predefined": null,
+                                "other": "Reinigingsperron"
+                            },
+                            "duration": 600,
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ],
+                            "optional": false
+                        }
+                    ]
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 3000,
+            "departure": 3000,
+            "id": 2006,
+            "members": [
+                {
+                    "typePrefix": "VIRM",
+                    "carriages": 6,
+                    "id": 1011,
+                    "tasks": [
+                        {
+                            "type": {
+                                "predefined": null,
+                                "other": "Reinigingsperron"
+                            },
+                            "duration": 600,
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ],
+                            "optional": false
+                        }
+                    ]
+                },
+                {
+                    "typePrefix": "VIRM",
+                    "carriages": 6,
+                    "id": 1012,
+                    "tasks": [
+                        {
+                            "type": {
+                                "predefined": null,
+                                "other": "Reinigingsperron"
+                            },
+                            "duration": 600,
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ],
+                            "optional": false
+                        }
+                    ]
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 3600,
+            "departure": 3600,
+            "id": 2007,
+            "members": [
+                {
+                    "typePrefix": "ICM",
+                    "carriages": 3,
+                    "id": 1013,
+                    "tasks": []
+                },
+                {
+                    "typePrefix": "ICM",
+                    "carriages": 3,
+                    "id": 1014,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 4200,
+            "departure": 4200,
+            "id": 2008,
+            "members": [
+                {
+                    "typePrefix": "ICM",
+                    "carriages": 4,
+                    "id": 1015,
+                    "tasks": []
+                },
+                {
+                    "typePrefix": "ICM",
+                    "carriages": 4,
+                    "id": 1016,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 4800,
+            "departure": 4800,
+            "id": 2009,
+            "members": [
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": 1017,
+                    "tasks": [
+                        {
+                            "type": {
+                                "predefined": null,
+                                "other": "Reinigingsperron"
+                            },
+                            "duration": 600,
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ],
+                            "optional": false
+                        }
+                    ]
+                },
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": 1018,
+                    "tasks": [
+                        {
+                            "type": {
+                                "predefined": null,
+                                "other": "Reinigingsperron"
+                            },
+                            "duration": 600,
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ],
+                            "optional": false
+                        }
+                    ]
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 5400,
+            "departure": 5400,
+            "id": 2010,
+            "members": [
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": 1019,
+                    "tasks": []
+                },
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": 1020,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 6000,
+            "departure": 6000,
+            "id": 2011,
+            "members": [
+                {
+                    "typePrefix": "VIRM",
+                    "carriages": 4,
+                    "id": 1021,
+                    "tasks": [
+                        {
+                            "type": {
+                                "predefined": null,
+                                "other": "Reinigingsperron"
+                            },
+                            "duration": 600,
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ],
+                            "optional": false
+                        }
+                    ]
+                },
+                {
+                    "typePrefix": "VIRM",
+                    "carriages": 4,
+                    "id": 1022,
+                    "tasks": [
+                        {
+                            "type": {
+                                "predefined": null,
+                                "other": "Reinigingsperron"
+                            },
+                            "duration": 600,
+                            "requiredSkills": [
+                                "inwendige_reiniging"
+                            ],
+                            "optional": false
+                        }
+                    ]
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "entryTrackPart": 42,
+            "firstParkingTrackPart": 15,
+            "arrival": 6600,
+            "departure": 6600,
+            "id": 2012,
+            "members": [
+                {
+                    "typePrefix": "ICM",
+                    "carriages": 4,
+                    "id": 1023,
+                    "tasks": []
+                },
+                {
+                    "typePrefix": "ICM",
+                    "carriages": 4,
+                    "id": 1024,
+                    "tasks": []
+                }
+            ],
+            "standingIndex": null
+        }
+    ],
+    "inStanding": [],
+    "out": [
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 21600,
+            "departure": 21600,
+            "id": 3001,
+            "trainUnits": [
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 22200,
+            "departure": 22200,
+            "id": 3002,
+            "trainUnits": [
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 6,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 6,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 22800,
+            "departure": 22800,
+            "id": 3003,
+            "trainUnits": [
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 23400,
+            "departure": 23400,
+            "id": 3004,
+            "trainUnits": [
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 24000,
+            "departure": 24000,
+            "id": 3005,
+            "trainUnits": [
+                {
+                    "typePrefix": "VIRM",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "VIRM",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 24600,
+            "departure": 24600,
+            "id": 3006,
+            "trainUnits": [
+                {
+                    "typePrefix": "VIRM",
+                    "carriages": 6,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "VIRM",
+                    "carriages": 6,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 25200,
+            "departure": 25200,
+            "id": 3007,
+            "trainUnits": [
+                {
+                    "typePrefix": "ICM",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "ICM",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 25800,
+            "departure": 25800,
+            "id": 3008,
+            "trainUnits": [
+                {
+                    "typePrefix": "ICM",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "ICM",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 26400,
+            "departure": 26400,
+            "id": 3009,
+            "trainUnits": [
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "SLT",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 27000,
+            "departure": 27000,
+            "id": 3010,
+            "trainUnits": [
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "SNG",
+                    "carriages": 3,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 27600,
+            "departure": 27600,
+            "id": 3011,
+            "trainUnits": [
+                {
+                    "typePrefix": "VIRM",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "VIRM",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null
+        },
+        {
+            "leaveTrackPart": 42,
+            "lastParkingTrackPart": 15,
+            "arrival": 28200,
+            "departure": 28200,
+            "id": 3012,
+            "trainUnits": [
+                {
+                    "typePrefix": "ICM",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                },
+                {
+                    "typePrefix": "ICM",
+                    "carriages": 4,
+                    "id": null,
+                    "tasks": null
+                }
+            ],
+            "standingIndex": null
+        }
+    ],
+    "outStanding": [],
+    "startTime": 0,
+    "endTime": 28800,
+    "nonServiceTraffic": [],
+    "disabledTrackPart": [],
+    "workers": []
+}

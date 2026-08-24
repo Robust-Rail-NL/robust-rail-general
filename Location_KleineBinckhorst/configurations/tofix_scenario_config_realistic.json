@@ -1,0 +1,1042 @@
+{
+    "location": "KleineBinckhorst",
+    "start_time": 0,
+    "end_time": 90000,
+    "trains_given": true,
+    "use_default_material": true,
+    "perform_servicing": true,
+    "track_ids_used": false,
+    "min_gap_on_gateway": 1,
+    "custom_train_units": [
+        {
+            "id": 1000,
+            "type": "ICM-4",
+            "services": []
+        },
+        {
+            "id": 1001,
+            "type": "ICM-3",
+            "services": []
+        },
+        {
+            "id": 1002,
+            "type": "VIRM-4",
+            "services": []
+        },
+        {
+            "id": 1003,
+            "type": "ICM-3",
+            "services": []
+        },
+        {
+            "id": 1004,
+            "type": "ICM-3",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1005,
+            "type": "ICM-3",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1006,
+            "type": "ICM-4",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1007,
+            "type": "ICM-3",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1008,
+            "type": "ICM-3",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1009,
+            "type": "ICM-3",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1010,
+            "type": "SNG-4",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1011,
+            "type": "SNG-3",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1012,
+            "type": "ICM-3",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1013,
+            "type": "SNG-3",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1014,
+            "type": "SLT-6",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1015,
+            "type": "ICM-3",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1016,
+            "type": "ICM-4",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1017,
+            "type": "SNG-3",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1018,
+            "type": "SNG-4",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1019,
+            "type": "VIRM-4",
+            "services": []
+        },
+        {
+            "id": 1020,
+            "type": "ICM-3",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1021,
+            "type": "SNG-3",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1022,
+            "type": "VIRM-4",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1023,
+            "type": "SLT-4",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1024,
+            "type": "SLT-4",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1025,
+            "type": "SNG-4",
+            "services": []
+        },
+        {
+            "id": 1026,
+            "type": "ICM-4",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1027,
+            "type": "ICM-4",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1028,
+            "type": "ICM-4",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1029,
+            "type": "VIRM-4",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1030,
+            "type": "ICM-3",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1031,
+            "type": "ICM-4",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1032,
+            "type": "SLT-6",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1033,
+            "type": "SNG-3",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1034,
+            "type": "SNG-3",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1035,
+            "type": "SLT-6",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1036,
+            "type": "VIRM-6",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1037,
+            "type": "ICM-4",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1038,
+            "type": "ICM-4",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1039,
+            "type": "SNG-4",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1040,
+            "type": "ICM-3",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1041,
+            "type": "ICM-3",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1042,
+            "type": "SNG-3",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1043,
+            "type": "SNG-3",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1044,
+            "type": "SNG-3",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1045,
+            "type": "SLT-6",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1046,
+            "type": "SLT-6",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1047,
+            "type": "SLT-4",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1048,
+            "type": "SLT-4",
+            "services": [
+                "A-Controle",
+                "Binnenkant reiniging"
+            ]
+        },
+        {
+            "id": 1049,
+            "type": "SNG-3",
+            "services": [
+                "A-Controle"
+            ]
+        },
+        {
+            "id": 1050,
+            "type": "SNG-4",
+            "services": [
+                "A-Controle"
+            ]
+        }
+    ],
+    "custom_trains": [
+        {
+            "id": 2000,
+            "members": [
+                1000,
+                1001
+            ],
+            "start_at_track": "52",
+            "parking_index": 0
+        },
+        {
+            "id": 2001,
+            "members": [
+                1002
+            ],
+            "start_at_track": "52",
+            "parking_index": 2
+        },
+        {
+            "id": 2002,
+            "members": [
+                1003
+            ],
+            "start_at_track": "52",
+            "parking_index": 1
+        },
+        {
+            "id": 2003,
+            "members": [
+                1004,
+                1005
+            ],
+            "arrival_time": 6120,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2004,
+            "members": [
+                1006
+            ],
+            "arrival_time": 6420,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2005,
+            "members": [
+                1007,
+                1008
+            ],
+            "arrival_time": 8820,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2006,
+            "members": [
+                1009
+            ],
+            "arrival_time": 10200,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2007,
+            "members": [
+                1010
+            ],
+            "arrival_time": 11100,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2008,
+            "members": [
+                1011
+            ],
+            "arrival_time": 12900,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2009,
+            "members": [
+                1012
+            ],
+            "arrival_time": 13620,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2010,
+            "members": [
+                1013
+            ],
+            "arrival_time": 14700,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2011,
+            "members": [
+                1014
+            ],
+            "arrival_time": 15120,
+            "arrival_track": "425_sein436"
+        },
+        {
+            "id": 2012,
+            "members": [
+                1015
+            ],
+            "arrival_time": 15420,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2013,
+            "members": [
+                1016
+            ],
+            "arrival_time": 19200,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2014,
+            "members": [
+                1017,
+                1018
+            ],
+            "arrival_time": 24120,
+            "arrival_track": "425_sein436"
+        },
+        {
+            "id": 2015,
+            "members": [
+                1019
+            ],
+            "arrival_time": 40920,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2016,
+            "members": [
+                1020
+            ],
+            "arrival_time": 41340,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2017,
+            "members": [
+                1021
+            ],
+            "arrival_time": 41700,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2018,
+            "members": [
+                1022
+            ],
+            "arrival_time": 44400,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2019,
+            "members": [
+                1023,
+                1024
+            ],
+            "arrival_time": 44940,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2020,
+            "members": [
+                1025
+            ],
+            "arrival_time": 48900,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2021,
+            "members": [
+                1026
+            ],
+            "arrival_time": 42600,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2022,
+            "members": [
+                1027
+            ],
+            "arrival_time": 8400,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2023,
+            "members": [
+                1028
+            ],
+            "arrival_time": 45960,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2024,
+            "members": [
+                1029
+            ],
+            "arrival_time": 46200,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2025,
+            "members": [
+                1030,
+                1031
+            ],
+            "arrival_time": 46500,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2026,
+            "members": [
+                1032
+            ],
+            "arrival_time": 50460,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2027,
+            "members": [
+                1033,
+                1034
+            ],
+            "arrival_time": 52500,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2028,
+            "members": [
+                1035
+            ],
+            "arrival_time": 52920,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2029,
+            "members": [
+                1036
+            ],
+            "arrival_time": 57120,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2030,
+            "members": [
+                1037
+            ],
+            "arrival_time": 60600,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2031,
+            "members": [
+                1038
+            ],
+            "arrival_time": 62580,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2032,
+            "members": [
+                1039
+            ],
+            "arrival_time": 63960,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2033,
+            "members": [
+                1040,
+                1041
+            ],
+            "arrival_time": 65400,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2034,
+            "members": [
+                1042,
+                1043,
+                1044
+            ],
+            "arrival_time": 66300,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2035,
+            "members": [
+                1045,
+                1046
+            ],
+            "arrival_time": 67500,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2036,
+            "members": [
+                1047,
+                1048
+            ],
+            "arrival_time": 68520,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 2037,
+            "members": [
+                1049
+            ],
+            "arrival_time": 7500,
+            "arrival_track": "425_sein436"
+        },
+        {
+            "id": 2038,
+            "members": [
+                1050
+            ],
+            "arrival_time": 9300,
+            "arrival_track": "906a"
+        },
+        {
+            "id": 3000,
+            "member_types": [
+                "ICM-4",
+                "ICM-3"
+            ],
+            "departure_time": 600,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3001,
+            "member_types": [
+                "ICM-3"
+            ],
+            "departure_time": 1500,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3002,
+            "member_types": [
+                "VIRM-4"
+            ],
+            "departure_time": 2340,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3003,
+            "member_types": [
+                "ICM-3"
+            ],
+            "departure_time": 37140,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3004,
+            "member_types": [
+                "ICM-3"
+            ],
+            "departure_time": 27240,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3005,
+            "member_types": [
+                "ICM-4"
+            ],
+            "departure_time": 36600,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3006,
+            "member_types": [
+                "ICM-4"
+            ],
+            "departure_time": 34800,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3007,
+            "member_types": [
+                "ICM-3",
+                "ICM-3"
+            ],
+            "departure_time": 30840,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3008,
+            "member_types": [
+                "ICM-3"
+            ],
+            "departure_time": 33000,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3009,
+            "member_types": [
+                "SNG-4"
+            ],
+            "departure_time": 32100,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3010,
+            "member_types": [
+                "SNG-3"
+            ],
+            "departure_time": 26700,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3011,
+            "member_types": [
+                "ICM-3"
+            ],
+            "departure_time": 28620,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3012,
+            "member_types": [
+                "SNG-3"
+            ],
+            "departure_time": 24900,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3013,
+            "member_types": [
+                "SLT-6"
+            ],
+            "departure_time": 25800,
+            "departure_track": "425_sein436"
+        },
+        {
+            "id": 3014,
+            "member_types": [
+                "ICM-3"
+            ],
+            "departure_time": 27600,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3015,
+            "member_types": [
+                "ICM-4"
+            ],
+            "departure_time": 31260,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3016,
+            "member_types": [
+                "SNG-3"
+            ],
+            "departure_time": 30180,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3017,
+            "member_types": [
+                "SNG-4"
+            ],
+            "departure_time": 37500,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3018,
+            "member_types": [
+                "VIRM-4",
+                "VIRM-4"
+            ],
+            "departure_time": 66840,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3019,
+            "member_types": [
+                "ICM-3"
+            ],
+            "departure_time": 65580,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3020,
+            "member_types": [
+                "SNG-3",
+                "SNG-4"
+            ],
+            "departure_time": 58800,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3021,
+            "member_types": [
+                "ICM-4"
+            ],
+            "departure_time": 85200,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3022,
+            "member_types": [
+                "SLT-4",
+                "SLT-4"
+            ],
+            "departure_time": 86400,
+            "departure_track": "425_sein436"
+        },
+        {
+            "id": 3023,
+            "member_types": [
+                "ICM-4"
+            ],
+            "departure_time": 81960,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3024,
+            "member_types": [
+                "VIRM-4"
+            ],
+            "departure_time": 88740,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3025,
+            "member_types": [
+                "ICM-3",
+                "ICM-4"
+            ],
+            "departure_time": 83700,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3026,
+            "member_types": [
+                "SLT-6",
+                "SLT-6"
+            ],
+            "departure_time": 67740,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3027,
+            "member_types": [
+                "SNG-3",
+                "SNG-4"
+            ],
+            "departure_time": 81660,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3028,
+            "member_types": [
+                "SNG-3"
+            ],
+            "departure_time": 86100,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3029,
+            "member_types": [
+                "VIRM-6"
+            ],
+            "end_at_track": "52",
+            "parking_index": 0
+        },
+        {
+            "id": 3030,
+            "member_types": [
+                "ICM-4"
+            ],
+            "departure_time": 87900,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3031,
+            "member_types": [
+                "ICM-3",
+                "ICM-4"
+            ],
+            "departure_time": 87000,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3032,
+            "member_types": [
+                "ICM-3"
+            ],
+            "departure_time": 83340,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3033,
+            "member_types": [
+                "SNG-3",
+                "SNG-3",
+                "SNG-3"
+            ],
+            "departure_time": 80580,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3034,
+            "member_types": [
+                "SLT-6"
+            ],
+            "departure_time": 84480,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3035,
+            "member_types": [
+                "SLT-6"
+            ],
+            "departure_time": 79860,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3036,
+            "member_types": [
+                "SLT-4",
+                "SLT-4"
+            ],
+            "departure_time": 82320,
+            "departure_track": "906a"
+        },
+        {
+            "id": 3037,
+            "member_types": [
+                "SNG-3",
+                "SNG-4"
+            ],
+            "departure_time": 18000,
+            "departure_track": "425_sein436"
+        }
+    ],
+    "custom_servicing_tasks": [
+        {
+            "name": "A-Controle",
+            "type": "Monteur",
+            "duration": 3660,
+            "optional": false,
+            "required_skills": []
+        },
+        {
+            "name": "Binnenkant reiniging",
+            "type": "Reinigingsperron",
+            "duration": 1200,
+            "optional": false,
+            "required_skills": []
+        }
+    ]
+}
