@@ -49,9 +49,9 @@ CONTAINER_DB = "/app/database"
 #          departing train never moved — fine on SimpleService, dead on
 #          KleineBinckhorst.
 DOCKER_IMAGE_VERSIONS = {
-    "legacy": "ghcr.io/robust-rail-nl/planner:0.3.0",
-    "2.0.0": "ghcr.io/robust-rail-nl/planner:0.3.0",
-    "2.0.0-assert": "ghcr.io/robust-rail-nl/planner:0.3.0",
+    "legacy": "ghcr.io/robust-rail-nl/planner:0.4.0",
+    "2.0.0": "ghcr.io/robust-rail-nl/planner:0.4.0",
+    "2.0.0-assert": "ghcr.io/robust-rail-nl/planner:0.4.0",
     "local": "planner:latest",
 }
 
