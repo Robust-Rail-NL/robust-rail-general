@@ -1,2 +1,0 @@
-2422 : rail_4 (Arrival 00:25 - 00:25), rail_1 (Reinigingsperron 00:27 - 00:35), rail_1 (parking 00:35 - 00:35), rail_2 (departure 00:38 - 00:38)
-2301 : rail_5 (Arrival 00:31 - 00:31), rail_3 (parking 00:35 - 00:35), rail_3 (departure 00:35 - 00:35)

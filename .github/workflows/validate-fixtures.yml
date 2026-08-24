@@ -1,0 +1,69 @@
+name: Validate fixtures
+
+# release/2.0.0 is the shared integration branch for the 2.0.0 release; main is
+# kept stable for the planner team.
+on:
+  push:
+    branches: [ "main", "dev", "release/2.0.0" ]
+  pull_request:
+    branches: [ "main", "dev", "release/2.0.0" ]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate against the exported schemas
+    timeout-minutes: 15
+    steps:
+    - uses: actions/checkout@v5
+
+    # The schemas live in the generator. Reading them from a checkout couples
+    # the two repos; a copy vendored into this repo would instead go stale in
+    # silence. Neither is the end state — publishing them as a release artifact
+    # is (roadmap Phase 2) — but of the two, a coupling that is visible beats
+    # staleness that is not.
+    #
+    # The branch is not pinned, because a field-name change lands in the
+    # generator and here on the same branch, and validating the new fixtures
+    # against the base branch's schema measures the wrong thing entirely — it
+    # once reported 2/18 for a tree that was really at 10/18. Taking the branch
+    # of the same name works because every repo in this release uses one shared
+    # branch name; it is why they were renamed to release/2.0.0.
+    - name: Check out the generator
+      run: |
+        repo=https://github.com/Robust-Rail-NL/robust-rail-generator
+        ref="${{ github.head_ref || github.ref_name }}"
+        if ! git ls-remote --exit-code --heads "$repo" "$ref" >/dev/null 2>&1; then
+          echo "No generator branch '$ref'; falling back to release/2.0.0."
+          ref=release/2.0.0
+        fi
+        echo "Validating against generator@$ref"
+        git clone --quiet --depth 1 --branch "$ref" "$repo" generator
+
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        enable-cache: true
+
+    # Gating, unlike the validation below. A stale schema turns every check
+    # downstream into a check of the wrong thing, and it passes while doing so.
+    - name: Check the generator's schemas are not stale
+      working-directory: generator
+      run: |
+        uv sync --frozen
+        uv run --frozen python scripts/export_schema.py
+        git diff --exit-code schema/ \
+          || { echo "::error::the generator's schema/ is stale — re-export and commit it there before trusting this run"; exit 1; }
+
+    # Gating since 2026-08-08, when the last of the drift was cleared and every
+    # fixture validated. It ran report-only before that, at 2 of 18, on the
+    # reasoning that a permanently red check teaches everyone to ignore it — and
+    # it promptly did exactly that, staying green through a run that measured
+    # the fixtures against the wrong schema and said so only in the log.
+    #
+    # scenario_config_*.json is deliberately not covered: it has no schema, and
+    # check_config.py's tolerance of unknown keys is what lets the
+    # configurations carry their "intent" blocks.
+    - name: Validate the fixtures
+      run: |
+        uv run --with jsonschema python validate_json.py --schema-dir generator/schema

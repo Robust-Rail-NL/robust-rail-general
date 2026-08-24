@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
-"""Run the planner docker image on all scenario_solver_*.json files.
+"""Run the planner docker image on all scenario_*.json files.
 
-Replaces the HIP solver step: converts each solver-format scenario to PDDL,
-plans, and converts the result back to TORS JSON at plans/plan_<suffix>.json —
-the same output convention run_evaluator.py already consumes.
+An alternative to the HIP solver step, not an addition: it converts each
+scenario to PDDL, plans, and converts the result back to TORS JSON at
+plans/plan_<suffix>.json — the same output convention run_evaluator.py
+consumes, and the same filename run_solver.py writes. Running both against one
+location would have them overwrite each other, so run_pipeline.py refuses the
+combination.
+
+The image is built and published from ../planning-approach by its
+docker-push.sh.
 """
 
 import argparse
@@ -12,22 +18,46 @@ import subprocess
 import sys
 from pathlib import Path
 
+from docker_utils import ensure_docker_running
+
 ROOT = Path(__file__).parent
 CONTAINER_DB = "/app/database"
 
-# "protobuf"/"pydantic" mirror the other steps' --version choices so the
-# pipeline can pass --version uniformly, but no planner image is published
-# under either tag yet — the planner image is built locally (see
-# planning-approach-refactor/Dockerfile) until it's ready to publish.
-PLANNER_DOCKER_IMAGE_VERSIONS = {
-    "protobuf": "planner:latest",
-    "pydantic": "planner:latest",
+# Named DOCKER_IMAGE_VERSIONS like every other step's, because run_pipeline.py
+# reads that attribute by name to report which images a run will use. It was
+# PLANNER_DOCKER_IMAGE_VERSIONS, which made `--steps planner` an AttributeError.
+#
+# The keys mirror the other steps' --version choices so the pipeline can pass
+# --version uniformly, but they do not all mean something here:
+#
+# - "legacy" has no honest value. The planner step did not exist in 1.x, so
+#   there is no 1.x planner image to compare against. It maps to the current
+#   one rather than to a tag that was never built.
+# - "2.0.0-assert" likewise: the assertions builds are the evaluator's and the
+#   solver's. This image has no such variant, so the selector resolves to the
+#   plain image and the run stays comparable.
+#
+# The version is planning-approach's own (see its VERSION file), deliberately
+# not 2.0.0 — that number belongs to the repos sharing an interchange format.
+# 0.2.1 is the first image that plans every location. Neither predecessor is
+# worth pinning back to for a comparison run:
+#
+#   0.1.0  matched no pattern for the corridor model's compiled departure, so it
+#          dropped every plan's Exit and the moves leading to it, and reported
+#          success. Its plans stop at the last service task and are not solutions.
+#   0.2.0  emits whole plans but raises UnboundLocalError on any plan whose
+#          departing train never moved — fine on SimpleService, dead on
+#          KleineBinckhorst.
+DOCKER_IMAGE_VERSIONS = {
+    "legacy": "ghcr.io/robust-rail-nl/planner:0.3.0",
+    "2.0.0": "ghcr.io/robust-rail-nl/planner:0.3.0",
+    "2.0.0-assert": "ghcr.io/robust-rail-nl/planner:0.3.0",
     "local": "planner:latest",
 }
 
 
 def _scenario_name(scenario: Path) -> str:
-    return scenario.stem.removeprefix("scenario_solver_")
+    return scenario.stem.removeprefix("scenario_")
 
 
 def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner: str, dry_run: bool) -> bool:
@@ -39,7 +69,7 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner
         *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         docker_image,
-        "--location", f"{CONTAINER_DB}/location_solver.json",
+        "--location", f"{CONTAINER_DB}/location.json",
         "--scenario", f"{CONTAINER_DB}/scenarios/{scenario.name}",
         "--planner", planner,
         "--output", f"{CONTAINER_DB}/plans/{plan_name}",
@@ -82,17 +112,20 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Run the planner on all scenario_solver_*.json files."
+        description="Run the planner on all scenario_*.json files."
     )
     parser.add_argument("--dry-run", action="store_true",
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
-    parser.add_argument("--version", choices=PLANNER_DOCKER_IMAGE_VERSIONS.keys(), default="local",
+    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default="local",
                         help="Pick a docker image version.")
-    parser.add_argument("--planner", choices=["symbolic", "enhsp"], default="symbolic",
+    parser.add_argument("--planner", choices=["symbolic", "enhsp"], default="enhsp",
                         help="Planner implementation to use inside the container.")
     args = parser.parse_args()
+
+    if not args.dry_run:
+        ensure_docker_running()
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 
@@ -101,14 +134,23 @@ def main() -> None:
         if not loc.is_dir():
             print(f"WARNING: {loc} not found, skipping.", file=sys.stderr)
             continue
-        scenarios = sorted(loc.glob("scenarios/scenario_solver_*.json"))
+        scenarios = sorted(loc.glob("scenarios/scenario_*.json"))
         if not scenarios:
             continue
         print(f"\n{loc.name} ({len(scenarios)} scenario(s))")
         for scenario in scenarios:
             total += 1
-            if not _run_scenario(PLANNER_DOCKER_IMAGE_VERSIONS[args.version], loc, scenario, args.planner, args.dry_run):
+            if not _run_scenario(DOCKER_IMAGE_VERSIONS[args.version], loc, scenario, args.planner, args.dry_run):
                 errors += 1
+
+    if total == 0:
+        # This script spent the whole scenario-unification period globbing
+        # scenario_solver_*.json, a filename that stopped existing, and reported
+        # "Done: 0/0 succeeded" with exit 0 every time — indistinguishable from
+        # a clean run. Finding no work is nearly always a broken glob or a wrong
+        # --location rather than a real empty repo, so say so out loud.
+        print("WARNING: no scenarios/scenario_*.json found — nothing was planned.",
+              file=sys.stderr)
 
     print(f"\nDone: {total - errors}/{total} succeeded.")
     if errors:

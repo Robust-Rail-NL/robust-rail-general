@@ -1,0 +1,41 @@
+[last 40 of 9246 lines; regenerate the full trace by evaluating the scenario and plan beside this file]
+	906b	|  A <-- SU-3( 5 - 3 ) --- [-No action-] -> B --- Front train(3, SLT-4)
+			|  A <-- SU-13( 2 ) --- [-No action-] -> B --- Front train(2, SLT-4)
+
+	53	|  A <-- SU-1( 6 - 14 ) --- [-No action-] -> B --- Front train(14, SLT-4)
+
+	57	|  A <-- SU-7( 15 ) --- [-No action-] -> B --- Front train(15, SNG-3)
+
+	52	|  A <-- SU-10( 11 ) --- [-No action-] -> B --- Front train(11, SNG-3)
+			|  A <-- SU-11( 7 - 16 ) --- [-No action-] -> B --- Front train(16, SGMM-2)
+
+	59	|  A <-- SU-0( 9 - 0 ) --- [-No action-] -> B --- Front train(0, FFF-3)
+
+
+Next event at T5400: Outgoing train
+26 remaining events.
+
+No arrivals
+
+Departures:
+	T7200: 	ShuntingUnit-14 ((****, FFF-3)(****, FFF-3)) at 906a to Sein70
+	T8400: 	ShuntingUnit-15 ((****, SLT-4)(****, SLT-4)) at 906a to Sein70
+	T8700: 	ShuntingUnit-16 ((****, FFF-3)) at 906a to Sein70
+	T9600: 	ShuntingUnit-17 ((****, SLT-4)(****, SLT-4)) at 906a to Sein70
+	T6000: 	ShuntingUnit-18 ((****, SGMM-2)) at 906a to Sein70
+	T6900: 	ShuntingUnit-19 ((****, FFF-3)) at 906a to Sein70
+	T6600: 	ShuntingUnit-20 ((****, FFF-3)) at 906a to Sein70
+	T7800: 	ShuntingUnit-21 ((****, SNG-3)) at 906a to Sein70
+	T5700: 	ShuntingUnit-22 ((****, SNG-3)(****, SNG-3)) at 906a to Sein70
+	T9900: 	ShuntingUnit-23 ((****, SLT-4)(****, SLT-4)) at 906a to Sein70
+	T9000: 	ShuntingUnit-24 ((****, SNG-3)) at 906a to Sein70
+	T9300: 	ShuntingUnit-25 ((****, SGMM-2)(****, SGMM-2)) at 906a to Sein70
+	T8100: 	ShuntingUnit-26 ((****, SGMM-2)) at 906a to Sein70
+	T5400: 	ShuntingUnit-27 ((****, SLT-4)) at 906a to Sein70
+
+**********************************************************ACTION**********************************************************
+Applying action BeginMove: [2] at T5250 [5250-5250]
+**************************************************************************************************************************
+------------------------------------RESULT------------------------------------
+Scenario failed. Invalid action: The action is invalid. ShuntingUnit-ShuntingUnit-13 cannot leave Track 906b. One side is blocked by another train, the other side is a Bumper..
+------------------------------------------------------------------------------

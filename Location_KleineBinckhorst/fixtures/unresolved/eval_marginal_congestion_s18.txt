@@ -1,0 +1,41 @@
+[last 40 of 197 lines; regenerate the full trace by evaluating the scenario and plan beside this file]
++---------------------------+
+| Tracked Train     : 25
+| Is Train matched  : No
+| Action start time : 7560
+| Action end time   : 7560
+| Trains's departure: 6300
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 26
+| Is Train matched  : No
+| Action start time : 7560
+| Action end time   : 7560
+| Trains's departure: 10500
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+
++---------------------------+
+|     🚨 ERROR OCCURRED     |
++---------------------------+
+| Tracked Train     : 27
+| Is Train matched  : No
+| Action start time : 7560
+| Action end time   : 7560
+| Trains's departure: 7200
++---------------------------+
+| Error Suspected:  
+| Trains's departure mismatch 
+| with Action start/end time
++---------------------------+
+The plan is not valid

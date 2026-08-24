@@ -1,5 +1,0 @@
-2401 : 906a (Arrival 00:05 - 00:05), 52 (parking 00:08 - 00:37), 62 (Reinigingsperron 00:52 - 01:10), 52 (parking 01:24 - 01:24)
-2601 : 906a (Arrival 00:10 - 00:10), 59 (parking 00:15 - 00:18), 62 (Reinigingsperron 00:23 - 00:33), 59 (parking 00:37 - 01:00), 906a (departure 01:05 - 01:05)
-2801 : 906a (Arrival 00:15 - 00:15), 53 (parking 00:18 - 01:06), 906a (departure 01:10 - 01:10)
-2802 : 906a (Arrival 00:15 - 00:15), 53 (parking 00:18 - 01:06), 906a (departure 01:10 - 01:10)
-2901 : 52 (Arrival 00:00 - 00:52), 52 (parking 00:52 - 00:57), 906a (departure 01:00 - 01:00)

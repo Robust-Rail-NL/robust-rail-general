@@ -1,0 +1,41 @@
+[last 40 of 8688 lines; regenerate the full trace by evaluating the scenario and plan beside this file]
+			|  A <-- SU-6( 16 ) --- [-No action-] -> B --- Front train(16, SLT-4)
+			|  A <-- SU-3( 1 ) --- [-No action-] -> B --- Front train(1, SGMM-2)
+
+	55	|  A <-- SU-13( 17 - 6 ) --- [-No action-] -> B --- Front train(6, SLT-4)
+
+	52	|  A <-- SU-10( 12 ) --- [-No action-] -> B --- Front train(12, FFF-3)
+			|  A <-- SU-5( 15 ) --- [-No action-] -> B --- Front train(15, SNG-3)
+			|  A <-- SU-11( 13 - 11 ) --- [-No action-] -> B --- Front train(11, FFF-3)
+
+	906b	|  A <-- SU-2( 0 ) --- [-No action-] -> B --- Front train(0, SLT-4)
+			|  A <-- SU-7( 5 ) --- [-No action-] -> B --- Front train(5, SNG-3)
+
+
+Next event at T5250: Finish action Wait ShuntingUnit-7 for 4800 seconds
+27 remaining events.
+
+No arrivals
+
+Departures:
+	T6900: 	ShuntingUnit-14 ((****, SLT-4)) at 906a to Sein70
+	T9900: 	ShuntingUnit-15 ((****, SGMM-2)) at 906a to Sein70
+	T10200: 	ShuntingUnit-16 ((****, SLT-4)) at 906a to Sein70
+	T9300: 	ShuntingUnit-17 ((****, SGMM-2)) at 906a to Sein70
+	T7500: 	ShuntingUnit-18 ((****, FFF-3)) at 906a to Sein70
+	T5400: 	ShuntingUnit-19 ((****, SNG-3)) at 906a to Sein70
+	T7800: 	ShuntingUnit-20 ((****, SLT-4)) at 906a to Sein70
+	T9000: 	ShuntingUnit-21 ((****, SNG-3)) at 906a to Sein70
+	T9600: 	ShuntingUnit-22 ((****, FFF-3)(****, FFF-3)) at 906a to Sein70
+	T5700: 	ShuntingUnit-23 ((****, SGMM-2)) at 906a to Sein70
+	T8100: 	ShuntingUnit-24 ((****, FFF-3)) at 906a to Sein70
+	T8700: 	ShuntingUnit-25 ((****, FFF-3)(****, FFF-3)) at 906a to Sein70
+	T6600: 	ShuntingUnit-26 ((****, SNG-3)(****, SNG-3)) at 906a to Sein70
+	T6300: 	ShuntingUnit-27 ((****, SLT-4)(****, SLT-4)) at 906a to Sein70
+
+**********************************************************ACTION**********************************************************
+Applying action Move: [8, 9] along path 15 - 59 - 41 at T5100 [5100-5250]
+**************************************************************************************************************************
+------------------------------------RESULT------------------------------------
+Scenario failed. Invalid action: The action is invalid. Adding ShuntingUnit-ShuntingUnit-8 to Track 906b exceeds the maximum length (255.260000 > 255.000000).
+------------------------------------------------------------------------------

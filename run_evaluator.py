@@ -7,10 +7,21 @@ import subprocess
 import sys
 from pathlib import Path
 
+from docker_utils import ensure_docker_running
+
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
-    "protobuf": "ghcr.io/robust-rail-nl/tors:1.3.1",
-    "pydantic": "ghcr.io/robust-rail-nl/tors:2.0.0-alpha.4",
+    "legacy": "ghcr.io/robust-rail-nl/tors:1.3.1",
+    "2.0.0": "ghcr.io/robust-rail-nl/tors:2.0.0",
+    # The evaluator is the oracle the pipeline trusts, and its assertions build
+    # produces the same verdicts and .err content as the plain one (verified
+    # across all KleineBinckhorst scenarios — .txt trace files can differ in
+    # line order between separately-built binaries, see docs/roadmap-2.0.0.md,
+    # but never in content) while turning an internal invariant violation into
+    # an abort rather than a verdict computed from corrupt state. A run that
+    # trips one exits 134/139 with the assertion text in the .err file, which
+    # reads very differently from an ordinary "plan is not valid".
+    "2.0.0-assert": "ghcr.io/robust-rail-nl/tors:2.0.0-assert",
     "local": "tors:latest",
 }
 CONTAINER_DB = "/app/database"
@@ -27,6 +38,15 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool) 
     if not scenario.exists():
         print(f"  SKIP {plan.name}: no matching scenario_{name}.json", file=sys.stderr)
         return True  # not a failure — plan may predate the scenario file
+
+    # The evaluator needs this alongside location.json, not just
+    # location.json + scenario — without it the container fails deep inside
+    # TORS with a misleading "specified file '/app/database' does not
+    # exist" (it means config.json, not the mount itself).
+    if not (location_dir / "config.json").exists():
+        print(f"  SKIP {plan.name}: {location_dir}/config.json missing — "
+              f"required by the evaluator alongside location.json", file=sys.stderr)
+        return False
 
     eval_dir = location_dir / "evaluations"
     eval_dir.mkdir(exist_ok=True)
@@ -84,9 +104,14 @@ def main() -> None:
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
-    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='protobuf',
-                        help="Pick a docker image version ('local' is reserved for locally built images).")
+    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='2.0.0',
+                        help="Pick a docker image version ('legacy' no longer works against this "
+                             "repo's fixtures — Phase 1 moved run_*.py to the unified format "
+                             "unconditionally; 'local' is reserved for locally built images).")
     args = parser.parse_args()
+
+    if not args.dry_run:
+        ensure_docker_running()
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 

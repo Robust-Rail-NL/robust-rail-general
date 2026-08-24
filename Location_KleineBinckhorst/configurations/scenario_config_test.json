@@ -14,25 +14,40 @@
     "min_time_in_yard": 120,
     "mixed_traffic": false,
     "gateway": {
-        "arrival": ["15"],
-        "departure": ["15"]
+        "arrival": [
+            "15"
+        ],
+        "departure": [
+            "15"
+        ]
     },
     "train_unit_distribution": {
         "train_unit_types": [
-            "VIRM-4", "VIRM-6",
-            "DDZ-4", "DDZ-6",
-            "SLT-4", "SLT-6",
-            "ICM-3", "ICM-4",
-            "ICR-7", "ICR-9",
-            "FLIRT FFF-3", "FLIRT FFF-4",
-            "SNG-3", "SNG-4",
-            "SGMM-2", "SGMM-3",
-            "ICNG-5", "ICNG-8"
+            "VIRM-4",
+            "VIRM-6",
+            "DDZ-4",
+            "DDZ-6",
+            "SLT-4",
+            "SLT-6",
+            "ICM-3",
+            "ICM-4",
+            "ICR-7",
+            "ICR-9",
+            "FFF-3",
+            "FFF-4",
+            "SNG-3",
+            "SNG-4",
+            "SGMM-2",
+            "SGMM-3",
+            "ICNG-5",
+            "ICNG-8"
         ],
-        "units_per_composition": [1],
+        "units_per_composition": [
+            1
+        ],
         "super_type_ratio": 1.0,
-        "inStanding_ratio": 0.0,
-        "outStanding_ratio": 0.0
+        "instanding_ratio": 0.0,
+        "outstanding_ratio": 0.0
     },
     "custom_train_unit_types": [
         {
@@ -44,7 +59,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "VIRM4",
+            "typePrefix": "VIRM",
             "noDeparturePreparationLimit": 7200,
             "needsLoco": false,
             "isLoco": false,
@@ -60,7 +75,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "VIRM6",
+            "typePrefix": "VIRM",
             "noDeparturePreparationLimit": 7200,
             "needsLoco": false,
             "isLoco": false,
@@ -76,7 +91,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "DDZ4",
+            "typePrefix": "DDZ",
             "noDeparturePreparationLimit": 7200,
             "needsLoco": false,
             "isLoco": false,
@@ -92,7 +107,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "DDZ6",
+            "typePrefix": "DDZ",
             "noDeparturePreparationLimit": 7200,
             "needsLoco": false,
             "isLoco": false,
@@ -108,7 +123,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "SLT4",
+            "typePrefix": "SLT",
             "noDeparturePreparationLimit": 7200,
             "needsLoco": false,
             "isLoco": false,
@@ -124,7 +139,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "SLT6",
+            "typePrefix": "SLT",
             "noDeparturePreparationLimit": 7200,
             "needsLoco": false,
             "isLoco": false,
@@ -140,7 +155,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "ICM3",
+            "typePrefix": "ICM",
             "noDeparturePreparationLimit": 7200,
             "needsLoco": false,
             "isLoco": false
@@ -154,7 +169,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "ICM4",
+            "typePrefix": "ICM",
             "noDeparturePreparationLimit": 7200,
             "needsLoco": false,
             "isLoco": false
@@ -169,7 +184,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "ICR7",
+            "typePrefix": "ICR",
             "fullTypePrefix": "ICR7-TRAXX",
             "noDeparturePreparationLimit": 7200,
             "needsLoco": true,
@@ -185,7 +200,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "ICR9",
+            "typePrefix": "ICR",
             "fullTypePrefix": "ICR9-TRAXX",
             "noDeparturePreparationLimit": 7200,
             "needsLoco": true,
@@ -200,7 +215,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "FFF3",
+            "typePrefix": "FFF",
             "noDeparturePreparationLimit": 7200,
             "needsLoco": false,
             "isLoco": false
@@ -214,7 +229,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "FFF4",
+            "typePrefix": "FFF",
             "noDeparturePreparationLimit": 7200,
             "needsLoco": false,
             "isLoco": false
@@ -228,7 +243,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "SNG3",
+            "typePrefix": "SNG",
             "noDeparturePreparationLimit": 3600,
             "needsLoco": false,
             "isLoco": false
@@ -242,7 +257,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "SNG4",
+            "typePrefix": "SNG",
             "noDeparturePreparationLimit": 3600,
             "needsLoco": false,
             "isLoco": false
@@ -256,7 +271,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "SGMM2",
+            "typePrefix": "SGMM",
             "noDeparturePreparationLimit": 7200,
             "needsLoco": false,
             "isLoco": false
@@ -270,7 +285,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "SGMM3",
+            "typePrefix": "SGMM",
             "noDeparturePreparationLimit": 7200,
             "needsLoco": false,
             "isLoco": false
@@ -284,7 +299,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "ICNG5",
+            "typePrefix": "ICNG",
             "noDeparturePreparationLimit": 3600,
             "needsLoco": false,
             "isLoco": false
@@ -298,7 +313,7 @@
             "reversalBaseTime": 0,
             "reversalCarriageTime": 0,
             "needsElectricity": true,
-            "typePrefix": "ICNG8",
+            "typePrefix": "ICNG",
             "noDeparturePreparationLimit": 3600,
             "needsLoco": false,
             "isLoco": false

@@ -1,0 +1,47 @@
+{
+    "intent": {
+        "designed_for": "domain",
+        "expectation": "feasible for roughly a third of seeds; the rest are unknown rather than proven infeasible",
+        "exercises": "contention for yard capacity under a tight arrival rate, with composition length deliberately taken out of the picture",
+        "notes": [
+            "Material is restricted to the four shortest types, exactly as in feasible_small, so with units_per_composition [1,2] the longest train is 138.7 m and nothing here can ever fail on length. Whatever varies with the seed is contention, not size.",
+            "min_gap_on_gateway is 300 s against a 180-450 s move off the gateway, so an arriving train frequently cannot clear the track before the next one needs it. Arrival times are drawn without replacement from a 300 s grid over the first half of the horizon, giving 18 slots for 14 trains, so how tightly they cluster is up to the seed. These numbers were tuned empirically: 6 trains at 450 s was feasible for all of seeds 1-20, i.e. not marginal at all.",
+            "The observed failure mode was not the one this config was designed around. It was expected to strand trains on the gateway (Robust-Rail-NL/robust-rail-solver#13), but across seeds 1-20 not one failure was a gateway wait. Instead the solver overfills track 906b, a 255 m stub behind a buffer stop, and then cannot get trains back out: 'exceeds the maximum length', 'One side is blocked by another train', 'Both sides blocked'. That is the ordinary difficulty of a dead-end parking track, which makes this a better congestion fixture than intended \u2014 it does not depend on a known bug.",
+            "Failures are classified 'unknown', which is the honest verdict: the solver found no valid plan, but a heuristic failing to find one does not prove none exists. Several of these may well be plannable."
+        ]
+    },
+    "location": "KleineBinckhorst",
+    "start_time": 0,
+    "end_time": 10800,
+    "use_default_material": true,
+    "trains_given": false,
+    "perform_servicing": false,
+    "seed": 1,
+    "number_of_trains": 14,
+    "min_gap_on_gateway": 300,
+    "min_time_in_yard": 900,
+    "mixed_traffic": false,
+    "matching": 0,
+    "train_unit_distribution": {
+        "train_unit_types": [
+            "SGMM-2",
+            "SNG-3",
+            "FFF-3",
+            "SLT-4"
+        ],
+        "super_type_ratio": 1,
+        "units_per_composition": [
+            1,
+            2
+        ],
+        "matching_complexity": 0
+    },
+    "gateway": {
+        "arrival": [
+            "15"
+        ],
+        "departure": [
+            "15"
+        ]
+    }
+}

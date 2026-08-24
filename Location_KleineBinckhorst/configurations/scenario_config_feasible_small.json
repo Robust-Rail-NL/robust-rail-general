@@ -1,0 +1,46 @@
+{
+    "intent": {
+        "designed_for": "today",
+        "expectation": "feasible for essentially every seed",
+        "exercises": "an end-to-end valid plan: short compositions that fit the 255 m gateway, and arrivals spaced widely enough that no train has to stand on it",
+        "notes": [
+            "Train unit types are restricted to the four shortest (SGMM-2 52.2 m, SNG-3 59.5 m, FFF-3 63.2 m, SLT-4 69.4 m). With units_per_composition [1,2] the longest possible train is 138.7 m, well inside the 255 m gateway track 906a, so this config can never fail the way random_distribution1/2 and larger-example do.",
+            "min_gap_on_gateway is 900 s against a ~300-450 s move off the gateway. The slack is deliberate: it keeps arrivals far enough apart that no train has to stand on 906a waiting for its route into the yard, which Robust-Rail-NL/robust-rail-solver#13 would still reject because the gateway forbids parking. Tightening it is what makes the fixture harder, so it is the first knob to turn once #13 is fixed.",
+            "Measured 20/20 feasible over seeds 1-20; see docs/scenario-feasibility.md."
+        ]
+    },
+    "location": "KleineBinckhorst",
+    "start_time": 0,
+    "end_time": 10800,
+    "use_default_material": true,
+    "trains_given": false,
+    "perform_servicing": false,
+    "seed": 1,
+    "number_of_trains": 4,
+    "min_gap_on_gateway": 900,
+    "min_time_in_yard": 900,
+    "mixed_traffic": false,
+    "matching": 0,
+    "train_unit_distribution": {
+        "train_unit_types": [
+            "SGMM-2",
+            "SNG-3",
+            "FFF-3",
+            "SLT-4"
+        ],
+        "super_type_ratio": 1,
+        "units_per_composition": [
+            1,
+            2
+        ],
+        "matching_complexity": 0
+    },
+    "gateway": {
+        "arrival": [
+            "15"
+        ],
+        "departure": [
+            "15"
+        ]
+    }
+}

@@ -1,0 +1,41 @@
+[last 40 of 1805 lines; regenerate the full trace by evaluating the scenario and plan beside this file]
+Execute immediate events (2 events queued)
+Next event at T=9900: Outgoing train
+All shunting units are still active, but still 2 events available at T9660.
+Execute immediate events (1 events queued)
+Next event at T=9900: Finish action Move ShuntingUnit-3 to 906a (route: 54 - Wissel959 - 959_960 - Wissel960 - 960_961 - Wissel961 - 961_963 - Wissel963 - 906a)
+	Finishing action Move ShuntingUnit-3 to 906a (route: 54 - Wissel959 - 959_960 - Wissel960 - 960_961 - Wissel961 - 961_963 - Wissel963 - 906a)
+Step done.
+|---------------------------|
+|   State at T9900          |
+|---------------------------|
+ShuntingUnit-3: 
+	waiting		=	0
+	moving		=	1
+	begin moving	=	0
+	in neutral	=	0
+	front train	=	(3, SNG-3)
+	position	=	906a
+	previous	=	Wissel963
+	active actions	=	None
+	> (3, SNG-3): no tasks.
+	> (4, SNG-3): no tasks.
+
+Track occupations:
+	906a	|  A <-- SU-3( 3 - 4 ) --- [-No action-] -> B --- Front train(3, SNG-3)
+
+
+No events in the Event Queue
+
+No arrivals
+
+Departures:
+	T9900: 	ShuntingUnit-7 ((****, SNG-3)(****, SNG-3)) at 906a to Sein70
+
+**********************************************************ACTION**********************************************************
+Applying action Exit: [4, 3] at T9900 [9900-9900]
+**************************************************************************************************************************
+Execute immediate events (1 events queued)
+Next event at T=9900: Finish action Exit from ShuntingUnit-3 at 906a at T9900
+	Finishing action Exit from ShuntingUnit-3 at 906a at T9900
+Step done.
