@@ -247,10 +247,10 @@ own pass: packaging `scenario-planning-inputs` as an installable dependency
 matching the Docker-tag pinning already in force, and a decision on
 distribution mechanism (git dependency vs. a published package).
 
-### Renaming this repo to `robust-rail-general` — post-2.0.0
+### Renaming this repo to `robust-rail-general` — resolved 2026-08-26
 
-Under discussion. Checked what would actually break, across all four sibling
-repos, before treating it as a git-settings change:
+Done, post-2.0.0 as planned. Checked what would actually break, across all four
+sibling repos, before treating it as a git-settings change:
 
 - **Load-bearing, would break outright:** `robust-rail-generator/src/main.py`
   and `src/example.py` default `--path` to a sibling directory literally named
@@ -278,9 +278,16 @@ repos, before treating it as a git-settings change:
   already shared keep working. Existing local clones should still get
   `git remote set-url origin <new-url>` explicitly rather than rely on that.
 
-Sequence as a small coordinated PR in each affected repo (generator,
-planning-approach at minimum) alongside the rename itself, not as a rider on
-2.0.0.
+Sequenced as planned: `gh repo rename` first (old URL redirects), then the
+local clone's remote and directory, then the load-bearing fixes in the same
+pass — `robust-rail-generator`'s `src/main.py`/`src/example.py` default
+`--path`, and `planning-approach`'s `schema.yml`, `test_plan_schema.py`, plus
+the forward-looking doc/comment references in both repos (`README.md`,
+`SCHEMA_STATUS.md`, `pytest.ini`, `docker-entrypoint.sh`, `conftest.py`). The
+"present but not load-bearing" hardcoded paths above, and comments already
+phrased as historical ("this used to..." in the `convert_to_pddl` variants,
+`archive/`), were left alone — not broken by the rename, and rewriting them
+would blur what's current from what's a record of the past.
 
 ### ~~`planning-approach/pipeline.py`~~ — resolved 2026-08-10
 
