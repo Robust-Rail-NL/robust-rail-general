@@ -33,9 +33,12 @@ CONTAINER_DB = "/app/database"
 # - "legacy" has no honest value. The planner step did not exist in 1.x, so
 #   there is no 1.x planner image to compare against. It maps to the current
 #   one rather than to a tag that was never built.
-# - "2.0.0-assert" likewise: the assertions builds are the evaluator's and the
-#   solver's. This image has no such variant, so the selector resolves to the
-#   plain image and the run stays comparable.
+# - "stable-assert" likewise: the assertions builds are the evaluator's and
+#   the solver's. This image has no such variant, so the selector resolves to
+#   the plain image and the run stays comparable.
+# - "edge" likewise: only the solver has an edge channel. This image has no
+#   such variant, so the selector resolves to the plain image and the run
+#   stays comparable. See run_solver.py.
 #
 # The version is planning-approach's own (see its VERSION file), deliberately
 # not 2.0.0 — that number belongs to the repos sharing an interchange format.
@@ -50,8 +53,9 @@ CONTAINER_DB = "/app/database"
 #          KleineBinckhorst.
 DOCKER_IMAGE_VERSIONS = {
     "legacy": "ghcr.io/robust-rail-nl/planner:0.4.0",
-    "2.0.0": "ghcr.io/robust-rail-nl/planner:0.4.0",
-    "2.0.0-assert": "ghcr.io/robust-rail-nl/planner:0.4.0",
+    "stable": "ghcr.io/robust-rail-nl/planner:0.4.0",
+    "stable-assert": "ghcr.io/robust-rail-nl/planner:0.4.0",
+    "edge": "ghcr.io/robust-rail-nl/planner:0.4.0",
     "local": "planner:latest",
 }
 

@@ -12,19 +12,23 @@ from docker_utils import ensure_docker_running
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
     "legacy": "ghcr.io/robust-rail-nl/hip:1.4.2",
-    # Ahead of the generator's and evaluator's beta.3 because only this repo's
-    # source changed after that tag: the Deque fail-fast (641e380) and then the
-    # solver#11 fix (6317d8e..2bd3bf2). Versions are per-repo, not a release
-    # train: each tag describes its own source, and the --version key names a
-    # pipeline configuration rather than a shared number.
-    "2.0.0": "ghcr.io/robust-rail-nl/hip:2.0.0",
+    # Floats forward across ordinary releases rather than pinning one:
+    # docker-push.sh only tags :latest on a real X.Y.Z build, so this needs no
+    # update here when a new stable version ships. The --version key names a
+    # pipeline configuration rather than a literal version number.
+    "stable": "ghcr.io/robust-rail-nl/hip:latest",
     # Deliberately the plain image, not an -assert one. The solver is a
     # wall-clock-bounded local search, so an assertions-enabled build explores
     # less of the neighbourhood in the same budget and returns different plans
     # on any scenario that does not converge first — which would break the
-    # comparison against the legacy baseline. Run the -assert solver image
+    # comparison against the stable baseline. Run the -assert solver image
     # separately as a soak test (seed sweeps looking for a violation) instead.
-    "2.0.0-assert": "ghcr.io/robust-rail-nl/hip:2.0.0",
+    "stable-assert": "ghcr.io/robust-rail-nl/hip:latest",
+    # Newest push to the edge branch: fixes worth running before they've gone
+    # through PR review into main, not yet vetted enough to call stable.
+    # Floating tag, always overwritten — see docker-push.sh in
+    # robust-rail-solver.
+    "edge": "ghcr.io/robust-rail-nl/hip:edge",
     "local": "hip:latest",
 }
 CONTAINER_DB = "/app/database"
@@ -160,10 +164,11 @@ def main() -> None:
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory (e.g. Location_SimpleService).")
-    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='2.0.0',
+    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='stable',
                         help="Pick a docker image version ('legacy' no longer works against this "
                              "repo's fixtures — Phase 1 moved run_*.py to the unified format "
-                             "unconditionally; 'local' is reserved for locally built images).")
+                             "unconditionally; 'local' is reserved for locally built images; "
+                             "'edge' tracks the newest not-yet-vetted push to the edge branch).")
     args = parser.parse_args()
 
     if not args.dry_run:
