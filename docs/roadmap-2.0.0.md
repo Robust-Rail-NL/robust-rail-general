@@ -157,7 +157,6 @@ Solver / HIP:
 - The "merge coinciding Wait actions" commit (`e545f33`) seems to have partially
   lost its effectiveness: see differences between current and legacy (1.4.2) plan
   versions.
-- Look through `git diff` with `main` / `dev`.
 - `dotnet build` warnings-as-errors is a separate decision; the solver builds with
   two nullable warnings in `Initial/SimpleHeuristic.cs`.
 - Rename `ServiceSiteScheduling.NoProto` (`Location.cs`, `Scenario.cs`,
@@ -170,8 +169,7 @@ Solver / HIP:
   `Model` would collide with that in meaning, not just in name.
 
 Evaluator / TORS:
-- Look through `git diff` with `main` / `dev`.
-- See if we can get pyTORS to work? Probably not.
+- ~~See if we can get the Python version of TORS to work?~~ Not worth it; already retired. The Python code in this repo was very outdated. The most recent version of the code lives in [AlgTUDelft/cTORS](https://github.com/AlgTUDelft/cTORS) / [ReubenJ/cTORS](https://github.com/ReubenJ/cTORS).
 - **Do a focused session on TORS's own search mode.** TORS does not only replay
   and evaluate a plan; it can also generate one itself, and that looks to be what
   it was originally built for, with plan replay added later.
@@ -199,11 +197,6 @@ Evaluator / TORS:
 
 ## Cleanup pending
 
-- **Delete generator's stale `release/2.0.0` branch.** Fully merged into
-  `main` (confirmed via `git merge-base --is-ancestor` — `main` is a
-  fast-forward past it), just never deleted after the merge, unlike the other
-  four repos. `git push origin --delete release/2.0.0` in
-  `robust-rail-generator`.
 - **Retire the `legacy` `--version` choice outright.** It stopped working once
   Phase 1 moved these scripts to the unified format unconditionally; kept
   around as a documented dead end rather than removed. Still an open call.
