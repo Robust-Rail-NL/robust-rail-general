@@ -7,7 +7,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from docker_utils import ensure_docker_running
+from docker_utils import ensure_docker_running, pull_flag
 
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
@@ -60,6 +60,7 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool) 
 
     cmd = [
         "docker", "run", "--rm",
+        *pull_flag(docker_image),
         *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         docker_image,
