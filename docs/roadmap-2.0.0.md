@@ -2,27 +2,38 @@
 
 ## Status
 
-The unified interchange schema is frozen and implemented across all five repos.
-The pipeline runs end-to-end on published images, all five repos have gating CI,
-and the release evidence is recorded under [Release evidence](#release-evidence)
-below.
+**Shipped.** All four PRs sharing the interchange format merged into their
+repo's stable branch between 2026-08-14 and 2026-08-24 — this repo's own,
+[#8](https://github.com/Robust-Rail-NL/scenario-planning-inputs/pull/8),
+landed 2026-08-24 as `3fc9356`. `generator:2.0.0`, `hip:2.0.0` and
+`tors:2.0.0` are tagged from the verified `rc.4` (generator) / `rc.3` (hip,
+tors) digests, `:latest` moved alongside. `release/2.0.0` is deleted in
+solver, evaluator, planner and this repo; generator's remote copy is still
+present but fully merged into `main` (a stale-branch cleanup, not an
+outstanding merge — see [Phase 4](#phase-4--stable-release)).
 
-**`generator` is at `2.0.0-rc.4`, `hip`/`tors` at `2.0.0-rc.3`** as of
-2026-08-21 — two more schema-adjacent rc cuts after `rc.2`, both verified
-end-to-end. See [rc.4 (generator) / rc.3 (hip, tors) — cut and
-verified](#rc4-generator--rc3-hip-tors--cut-and-verified).
+Two renames followed, unrelated to the schema itself: this repo
+`scenario-planning-inputs` → `robust-rail-general` (2026-08-26) and
+`planning-approach` → `robust-rail-planner` (2026-08-27) — see [Renaming this
+repo to `robust-rail-general`](#renaming-this-repo-to-robust-rail-general--resolved-2026-08-26).
+Everything below in this file uses the old names where they were the names at
+the time; `CLAUDE.md`'s repo/branch table has the current ones.
 
-**`generator:2.0.0`, `hip:2.0.0` and `tors:2.0.0` are re-tagged** as of
-2026-08-21, this time from the `rc.4` (generator) / `rc.3` (hip, tors)
-digests — confirmed identical via `docker buildx imagetools inspect`,
-`:latest` moved alongside. All four PRs sharing the interchange format are
-open and marked ready for review (not yet merged). See [Phase 4 — Stable
-release](#phase-4--stable-release) for what's left.
+Everything that gated the release itself is closed. What's left below is
+either the historical record of how 2.0.0 was verified, or decisions
+explicitly deferred post-release (see [Open — decisions](#open--decisions));
+the [known issues](#open--known-issues-to-name-in-the-release-notes) are still
+open upstream (checked 2026-08-27) but none blocks the pipeline, same as at
+release time.
 
-Everything else outstanding is either a decision with no defect behind it, or a
-known issue to name in the release notes. Three issues came out of the #11
-investigation — solver#17, #18 and #19 — none of which blocks the pipeline; see
-the table below.
+**Post-2.0.0 work has started:** a `stable`/`edge` channel model for the HIP
+solver image (2026-08-26/27), so a fix can be published and run before it's
+gone through PR review into `main` — solver's `CONTRIBUTING.md` and
+`docker-push-edge.sh` on its new `edge` branch, and this repo's `run_*.py`
+`--version stable|edge` plus `docker_utils.pull_flag()` (`--pull always` for
+registry tags, so a floating tag like `:edge` is never served stale from
+cache). Out of scope for this file — it's the 2.0.0 record — and not written
+up anywhere longer-form than the git history itself.
 
 > Condensed 2026-08-09, when the remaining work became small enough that the
 > record of how we got here was crowding it out. Completed phases are summarised
@@ -661,16 +672,21 @@ a coordination point and a CI run against the real merge target.
   `*-protobuf`/`*-pydantic` comparison directories were never committed —
   local scratch output only, deleted 2026-08-10. The comparison they produced
   is recorded in this file's git history, not in the files themselves.)
-- ~~Mark the four PRs ready~~ Done 2026-08-21: all four are `draft=false`,
-  `state=OPEN`. **Not merged yet** — deliberately separate steps; merge order
-  still matters (generator's `main` before this repo's, see [Branch
-  naming](#branch-naming)), and this repo's PR has a known conflict with
-  `main` on `CLAUDE.md` to resolve first (see the PR body). solver#20 now
-  targets `main` directly rather than `dev` (retargeted 2026-08-21, before
-  any review — see `CLAUDE.md`): `release/2.0.0` already contains `dev`'s
-  full history, so this one merge covers both without a separate promotion.
-  `dev` itself is being updated by hand, outside this release's merge
-  sequence. Still open: merge all four, then delete `release/2.0.0` in each.
+- ~~Mark the four PRs ready~~ Done 2026-08-21: all four `draft=false`,
+  `state=OPEN`. solver#20 targeted `main` directly rather than `dev`
+  (retargeted 2026-08-21, before any review — see `CLAUDE.md`):
+  `release/2.0.0` already contained `dev`'s full history, so that one merge
+  covered both without a separate promotion. `dev` itself was updated by hand,
+  outside this release's merge sequence.
+- ~~Merge all four, then delete `release/2.0.0` in each~~ Done. Merged
+  generator, solver, evaluator and planner first (2026-08-14 through
+  2026-08-21), this repo's #8 last (2026-08-24) since it had the `CLAUDE.md`
+  conflict the note above flagged. `release/2.0.0` deleted afterward in
+  solver, evaluator, planner and this repo. **Not done in generator**: its
+  remote `release/2.0.0` branch is still present as of 2026-08-27 — confirmed
+  via `git merge-base --is-ancestor` that it's fully contained in `main`
+  (`main` is a fast-forward past it), so this is a leftover branch to delete,
+  not a missed merge. Left for whoever's next in that repo.
 - ~~Tag `generator:2.0.0`, `hip:2.0.0`, `tors:2.0.0` by re-tagging the
   verified rc digests~~ Done 2026-08-21 (a second time — the first tagging,
   against `rc.2`, went stale once `rc.3`/`rc.4` landed). Used `docker buildx
