@@ -11,7 +11,7 @@ branch and deleted when 2.0.0 ships.
 | `robust-rail-solver` | `main` | `release/2.0.0` |
 | `robust-rail-evaluator` | `main` | `release/2.0.0` |
 | `robust-rail-general` (this repo) | `main` | `release/2.0.0` |
-| `planning-approach` | `main` | `release/2.0.0` |
+| `robust-rail-planner` | `main` | `release/2.0.0` |
 
 Solver is the one repo with two stable-ish branches, `dev` and `main`, and the
 one place that needed a deliberate call rather than following the table:
