@@ -1,0 +1,33 @@
+[project]
+# Placeholder name/import path ("models") pending a naming decision tracked
+# in robust-rail-generator#14 — see docs/roadmap-2.0.0.md, "Where the exported
+# schemas should live". Rename this and src/models/ together once decided;
+# every internal import in src/models/ is relative, so nothing else changes.
+name = "models"
+version = "0.1.0"
+description = "Interchange schema (Location/Scenario/Plan) shared by the Robust Rail NL pipeline"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.16.3",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+# sys.path must be extended before the src-relative imports below it.
+"scripts/export_schema.py" = ["E402"]
