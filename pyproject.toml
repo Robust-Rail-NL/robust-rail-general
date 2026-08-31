@@ -12,6 +12,17 @@ dependencies = [
     "pydantic>=2",
 ]
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# This repo is more than the models package: run_*.py, Location_*/ fixtures,
+# docs/, etc. all live at the repo root too. Only src/robust_rail_models/
+# ships in the wheel — everything else stays out of what a dependent
+# actually installs.
+[tool.hatch.build.targets.wheel]
+packages = ["src/robust_rail_models"]
+
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
