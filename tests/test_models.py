@@ -6,7 +6,7 @@ import logging
 import pytest
 from pydantic import TypeAdapter, ValidationError
 
-from models.scenario import (
+from robust_rail_models.scenario import (
     IncomingTrain,
     IncomingTrainUnit,
     Scenario,
@@ -15,7 +15,7 @@ from models.scenario import (
     TrainUnit,
     TrainUnitType,
 )
-from models.scenario_config import (
+from robust_rail_models.scenario_config import (
     CustomTrainsConfig,
     GeneratedTrainsConfig,
     ScenarioConfig,

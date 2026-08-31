@@ -21,7 +21,7 @@ sys.path.insert(0, SRC_DIR)
 from pydantic import TypeAdapter
 from pydantic.json_schema import models_json_schema
 
-from models import Location, Plan, Scenario, ScenarioConfig
+from robust_rail_models import Location, Plan, Scenario, ScenarioConfig
 
 TITLE = "Robust Rail Interchange Schema"
 DESCRIPTION = (

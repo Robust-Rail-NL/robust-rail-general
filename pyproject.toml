@@ -1,9 +1,9 @@
 [project]
-# Placeholder name/import path ("models") pending a naming decision tracked
-# in robust-rail-generator#14 — see docs/roadmap-2.0.0.md, "Where the exported
-# schemas should live". Rename this and src/models/ together once decided;
-# every internal import in src/models/ is relative, so nothing else changes.
-name = "models"
+# Dist name matches the repo (referenced from the generator's dependency
+# declaration); the importable package is src/robust_rail_models/. Decided
+# in robust-rail-generator#14 — see docs/roadmap-2.0.0.md, "Where the
+# exported schemas should live".
+name = "robust-rail-general"
 version = "0.1.0"
 description = "Interchange schema (Location/Scenario/Plan) shared by the Robust Rail NL pipeline"
 readme = "README.md"
