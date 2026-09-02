@@ -391,13 +391,14 @@
         "plan": "plan_marginal_congestion_s01.json",
         "evaluation": "eval_marginal_congestion_s01.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-08-31",
       "images": {
-        "generator": "generator:latest",
-        "solver": "hip:latest",
-        "evaluator": "tors:latest"
+        "generator": "ghcr.io/robust-rail-nl/generator:2.0.0",
+        "solver": "ghcr.io/robust-rail-nl/hip:latest",
+        "evaluator": "ghcr.io/robust-rail-nl/tors:2.0.0"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 300,
+      "solver_iterations": 150000
     },
     "marginal_congestion_s02": {
       "config": "marginal_congestion",
@@ -448,13 +449,14 @@
         "plan": "plan_marginal_congestion_s04.json",
         "evaluation": "eval_marginal_congestion_s04.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-08-31",
       "images": {
-        "generator": "generator:latest",
-        "solver": "hip:latest",
-        "evaluator": "tors:latest"
+        "generator": "ghcr.io/robust-rail-nl/generator:2.0.0",
+        "solver": "ghcr.io/robust-rail-nl/hip:latest",
+        "evaluator": "ghcr.io/robust-rail-nl/tors:2.0.0"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 300,
+      "solver_iterations": 150000
     },
     "marginal_congestion_s05": {
       "config": "marginal_congestion",
@@ -467,13 +469,14 @@
         "plan": "plan_marginal_congestion_s05.json",
         "evaluation": "eval_marginal_congestion_s05.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-08-31",
       "images": {
-        "generator": "generator:latest",
-        "solver": "hip:latest",
-        "evaluator": "tors:latest"
+        "generator": "ghcr.io/robust-rail-nl/generator:2.0.0",
+        "solver": "ghcr.io/robust-rail-nl/hip:latest",
+        "evaluator": "ghcr.io/robust-rail-nl/tors:2.0.0"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 300,
+      "solver_iterations": 150000
     },
     "marginal_congestion_s06": {
       "config": "marginal_congestion",
@@ -505,13 +508,14 @@
         "plan": "plan_marginal_congestion_s07.json",
         "evaluation": "eval_marginal_congestion_s07.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-08-31",
       "images": {
-        "generator": "generator:latest",
-        "solver": "hip:latest",
-        "evaluator": "tors:latest"
+        "generator": "ghcr.io/robust-rail-nl/generator:2.0.0",
+        "solver": "ghcr.io/robust-rail-nl/hip:latest",
+        "evaluator": "ghcr.io/robust-rail-nl/tors:2.0.0"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 300,
+      "solver_iterations": 150000
     },
     "marginal_congestion_s08": {
       "config": "marginal_congestion",
@@ -581,13 +585,14 @@
         "plan": "plan_marginal_congestion_s11.json",
         "evaluation": "eval_marginal_congestion_s11.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-08-31",
       "images": {
-        "generator": "generator:latest",
-        "solver": "hip:latest",
-        "evaluator": "tors:latest"
+        "generator": "ghcr.io/robust-rail-nl/generator:2.0.0",
+        "solver": "ghcr.io/robust-rail-nl/hip:latest",
+        "evaluator": "ghcr.io/robust-rail-nl/tors:2.0.0"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 300,
+      "solver_iterations": 150000
     },
     "marginal_congestion_s12": {
       "config": "marginal_congestion",
@@ -619,13 +624,14 @@
         "plan": "plan_marginal_congestion_s13.json",
         "evaluation": "eval_marginal_congestion_s13.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-08-31",
       "images": {
-        "generator": "generator:latest",
-        "solver": "hip:latest",
-        "evaluator": "tors:latest"
+        "generator": "ghcr.io/robust-rail-nl/generator:2.0.0",
+        "solver": "ghcr.io/robust-rail-nl/hip:latest",
+        "evaluator": "ghcr.io/robust-rail-nl/tors:2.0.0"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 300,
+      "solver_iterations": 150000
     },
     "marginal_congestion_s14": {
       "config": "marginal_congestion",
@@ -638,13 +644,14 @@
         "plan": "plan_marginal_congestion_s14.json",
         "evaluation": "eval_marginal_congestion_s14.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-08-31",
       "images": {
-        "generator": "generator:latest",
-        "solver": "hip:latest",
-        "evaluator": "tors:latest"
+        "generator": "ghcr.io/robust-rail-nl/generator:2.0.0",
+        "solver": "ghcr.io/robust-rail-nl/hip:latest",
+        "evaluator": "ghcr.io/robust-rail-nl/tors:2.0.0"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 300,
+      "solver_iterations": 150000
     },
     "marginal_congestion_s15": {
       "config": "marginal_congestion",
@@ -657,13 +664,14 @@
         "plan": "plan_marginal_congestion_s15.json",
         "evaluation": "eval_marginal_congestion_s15.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-08-31",
       "images": {
-        "generator": "generator:latest",
-        "solver": "hip:latest",
-        "evaluator": "tors:latest"
+        "generator": "ghcr.io/robust-rail-nl/generator:2.0.0",
+        "solver": "ghcr.io/robust-rail-nl/hip:latest",
+        "evaluator": "ghcr.io/robust-rail-nl/tors:2.0.0"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 300,
+      "solver_iterations": 150000
     },
     "marginal_congestion_s16": {
       "config": "marginal_congestion",
@@ -676,13 +684,14 @@
         "plan": "plan_marginal_congestion_s16.json",
         "evaluation": "eval_marginal_congestion_s16.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-08-31",
       "images": {
-        "generator": "generator:latest",
-        "solver": "hip:latest",
-        "evaluator": "tors:latest"
+        "generator": "ghcr.io/robust-rail-nl/generator:2.0.0",
+        "solver": "ghcr.io/robust-rail-nl/hip:latest",
+        "evaluator": "ghcr.io/robust-rail-nl/tors:2.0.0"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 300,
+      "solver_iterations": 150000
     },
     "marginal_congestion_s17": {
       "config": "marginal_congestion",
@@ -695,13 +704,14 @@
         "plan": "plan_marginal_congestion_s17.json",
         "evaluation": "eval_marginal_congestion_s17.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-08-31",
       "images": {
-        "generator": "generator:latest",
-        "solver": "hip:latest",
-        "evaluator": "tors:latest"
+        "generator": "ghcr.io/robust-rail-nl/generator:2.0.0",
+        "solver": "ghcr.io/robust-rail-nl/hip:latest",
+        "evaluator": "ghcr.io/robust-rail-nl/tors:2.0.0"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 300,
+      "solver_iterations": 150000
     },
     "marginal_congestion_s18": {
       "config": "marginal_congestion",
@@ -714,13 +724,14 @@
         "plan": "plan_marginal_congestion_s18.json",
         "evaluation": "eval_marginal_congestion_s18.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-08-31",
       "images": {
-        "generator": "generator:latest",
-        "solver": "hip:latest",
-        "evaluator": "tors:latest"
+        "generator": "ghcr.io/robust-rail-nl/generator:2.0.0",
+        "solver": "ghcr.io/robust-rail-nl/hip:latest",
+        "evaluator": "ghcr.io/robust-rail-nl/tors:2.0.0"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 300,
+      "solver_iterations": 150000
     },
     "marginal_congestion_s19": {
       "config": "marginal_congestion",
@@ -733,13 +744,14 @@
         "plan": "plan_marginal_congestion_s19.json",
         "evaluation": "eval_marginal_congestion_s19.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-08-31",
       "images": {
-        "generator": "generator:latest",
-        "solver": "hip:latest",
-        "evaluator": "tors:latest"
+        "generator": "ghcr.io/robust-rail-nl/generator:2.0.0",
+        "solver": "ghcr.io/robust-rail-nl/hip:latest",
+        "evaluator": "ghcr.io/robust-rail-nl/tors:2.0.0"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 300,
+      "solver_iterations": 150000
     },
     "marginal_congestion_s20": {
       "config": "marginal_congestion",
@@ -752,13 +764,14 @@
         "plan": "plan_marginal_congestion_s20.json",
         "evaluation": "eval_marginal_congestion_s20.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-08-31",
       "images": {
-        "generator": "generator:latest",
-        "solver": "hip:latest",
-        "evaluator": "tors:latest"
+        "generator": "ghcr.io/robust-rail-nl/generator:2.0.0",
+        "solver": "ghcr.io/robust-rail-nl/hip:latest",
+        "evaluator": "ghcr.io/robust-rail-nl/tors:2.0.0"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 300,
+      "solver_iterations": 150000
     },
     "marginal_length_s01": {
       "config": "marginal_length",
