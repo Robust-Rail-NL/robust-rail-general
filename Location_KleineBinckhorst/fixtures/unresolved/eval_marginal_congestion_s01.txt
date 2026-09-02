@@ -1,15 +1,15 @@
 [last 40 of 8971 lines; regenerate the full trace by evaluating the scenario and plan beside this file]
-
-	53	|  A <-- SU-1( 18 ) --- [-No action-] -> B --- Front train(18, SLT-4)
-			|  A <-- SU-6( 0 - 2 ) --- [-No action-] -> B --- Front train(2, SNG-3)
 			|  A <-- SU-10( 7 - 15 ) --- [-No action-] -> B --- Front train(15, SGMM-2)
 			|  A <-- SU-7( 11 - 20 ) --- [-No action-] -> B --- Front train(20, FFF-3)
 
-	52	|  A <-- SU-8( 13 ) --- [-No action-] -> B --- Front train(13, SGMM-2)
-			|  A <-- SU-9( 14 ) --- [-No action-] -> B --- Front train(14, SLT-4)
+	54	|  A <-- SU-0( 10 ) --- [-No action-] -> B --- Front train(10, SNG-3)
+			|  A <-- SU-13( 6 - 4 ) --- [-No action-] -> B --- Front train(4, FFF-3)
 
 	59	|  A <-- SU-11( 19 ) --- [-No action-] -> B --- Front train(19, SLT-4)
 			|  A <-- SU-3( 21 ) --- [-No action-] -> B --- Front train(21, FFF-3)
+
+	906b	|  A <-- SU-4( 5 - 12 ) --- [-No action-] -> B --- Front train(12, FFF-3)
+			|  A <-- SU-5( 8 - 16 ) --- [-No action-] -> B --- Front train(16, SGMM-2)
 
 
 Next event at T5250: Finish action Wait ShuntingUnit-4 for 2400 seconds
