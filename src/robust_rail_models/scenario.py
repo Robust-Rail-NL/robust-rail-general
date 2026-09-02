@@ -144,26 +144,6 @@ class TrainRequest(RailModel):
     standing_index: Optional[NonNegativeInt] = Field(None, alias="standingIndex")
 
 
-class Train(RailModel):
-    """TEMPORARY: A train arriving at or already present in the shunting
-    yard, or a request for a train to depart from or remain in the shunting
-    yard.
-
-    Used for all of in (arriving), inStanding (already present), out
-    (departing) and outStanding (remaining) trains.
-    """
-
-    side_track_part: int = Field(alias="sideTrackPart")
-    parking_track_part: int = Field(alias="parkingTrackPart")
-    # None for standing trains (already present at scenario start / remaining
-    # at scenario end).
-    time: Optional[int] = None
-    id: Optional[int] = None
-    members: list[TrainUnit] = Field(default_factory=list)
-    standing_index: Optional[NonNegativeInt] = Field(None, alias="standingIndex")
-    minimum_duration: Optional[str] = Field(None, alias="minimumDuration")
-
-
 class ShuntingUnit(RailModel):
     """A combination of TrainUnits that moves as a single unit at some point
     in time.
@@ -359,61 +339,6 @@ class Scenario(SchemaVersioned):
         _validate_standing_group(
             self.out_standing,
             lambda t: t.last_parking_track_part,
-            "outStanding",
-            required=False,
-        )
-        return self
-
-
-class EvaluatorScenario(SchemaVersioned):
-    """TEMPORARY: The daily-varying part of the problem specification: which
-    trains arrive, depart, or remain in the shunting yard.  Deprecated, flat
-    version of `Scenario`.
-
-    Carries schemaVersion too: this is the shape that today's scenario_*.json
-    (the file the evaluator actually reads) is generated from, ahead of the
-    Phase 1 scenario unification that retires this class.
-
-    TODO: this and `Scenario` (and the manual field-by-field conversion
-    between them in ScenarioGenerator.create_solver_format_scenario) are the
-    same concept represented twice, kept in sync by hand. Retiring this class
-    means rewiring ScenarioGenerator to build Scenario/IncomingTrain/
-    TrainRequest directly instead of accumulating into this flat Train-based
-    shape first. See unified-schema-design.md, "Next steps" item 6.
-    """
-
-    def to_dict(self) -> dict:
-        return self.model_dump(by_alias=True, exclude_unset=False)
-
-    def to_json(self, **kwargs) -> str:
-        return self.model_dump_json(by_alias=True, exclude_unset=False, **kwargs)
-
-    train_unit_types: list[TrainUnitType] = Field(default_factory=list, alias="trainUnitTypes")
-
-    in_: list[Train] = Field(default_factory=list, alias="in")
-    in_standing: list[Train] = Field(default_factory=list, alias="inStanding")
-    out: list[Train] = Field(default_factory=list)
-    out_standing: list[Train] = Field(default_factory=list, alias="outStanding")
-
-    start_time: int = Field(alias="startTime")
-    end_time: int = Field(alias="endTime")
-
-    # Optional: generator/evaluator only.
-    non_service_traffic: list[NonServiceTraffic] = Field(default_factory=list, alias="nonServiceTraffic")
-    disabled_track_parts: list[DisabledTrackPart] = Field(default_factory=list, alias="disabledTrackPart")
-    workers: list[MemberOfStaff] = Field(default_factory=list)
-
-    @model_validator(mode="after")
-    def _validate_standing_order(self) -> "EvaluatorScenario":
-        _validate_standing_group(
-            self.in_standing,
-            lambda t: t.parking_track_part,
-            "inStanding",
-            required=True,
-        )
-        _validate_standing_group(
-            self.out_standing,
-            lambda t: t.parking_track_part,
             "outStanding",
             required=False,
         )
