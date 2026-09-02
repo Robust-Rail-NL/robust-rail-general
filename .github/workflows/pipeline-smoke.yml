@@ -1,16 +1,12 @@
 name: Pipeline smoke test
 
-# main and release/2.0.0 only: run_*.py's unified-format pipeline doesn't
-# work against dev's pre-unification (protobuf) world — see this repo's
-# branch policy in CLAUDE.md. Listing main here is inert until the 2.0.0
-# merge actually lands this file there — a workflow only fires for events on
-# a branch whose own tree already contains it, so this can't spuriously run
-# against pre-merge main.
+# main and edge (see CONTRIBUTING.md for the edge branch). dev is retired —
+# it predated the unified-format pipeline run_*.py now requires.
 on:
   push:
-    branches: [ "main", "release/2.0.0" ]
+    branches: [ "main", "edge" ]
   pull_request:
-    branches: [ "main", "release/2.0.0" ]
+    branches: [ "main", "edge" ]
   workflow_dispatch:
 
 jobs:

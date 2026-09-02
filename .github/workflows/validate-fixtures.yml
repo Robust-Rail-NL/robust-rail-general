@@ -1,12 +1,12 @@
 name: Validate fixtures
 
-# release/2.0.0 is the shared integration branch for the 2.0.0 release; main is
-# kept stable for the planner team.
+# edge is the fast/low-ceremony integration branch (see CONTRIBUTING.md);
+# main is kept stable for the planner team. dev is retired.
 on:
   push:
-    branches: [ "main", "dev", "release/2.0.0" ]
+    branches: [ "main", "edge" ]
   pull_request:
-    branches: [ "main", "dev", "release/2.0.0" ]
+    branches: [ "main", "edge" ]
   workflow_dispatch:
 
 jobs:
