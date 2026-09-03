@@ -9,25 +9,54 @@ below.
 
 ---
 
-## Known issues (open upstream, checked 2026-08-27)
+## Known issues (open upstream, checked 2026-09-03)
 
 | issue | effect |
 |---|---|
 | solver#13 | Solver parks on non-parking arrival tracks when it cannot move into the yard immediately. Blocks `6t_custom_example3`. |
-| solver#14 | outStanding trains have no deadline in the cost function, so plans over-run the scenario horizon for free. Produces the plan that trips evaluator#6. |
-| evaluator#6 | `EvaluatePlan` spins when the plan still has actions but the state is terminal, reporting the symptom rather than "plan extends past the horizon". Terminates via a safety valve; blocks nothing, but the diagnostic misleads. Blocks `7t_custom_example1`. |
+| solver#14 | outStanding trains have no deadline in the cost function, so plans over-run the scenario horizon for free. Produces the plan that trips evaluator#6. **Fixed on the `edge` channel** (image `2.0.0-edge+20260902.150f3c9`, pushed 2026-09-02); not yet in `stable`. See "solver#14 verified fixed on edge" below — fixing it was not enough on its own to make `7t_custom_example1` valid. |
+| evaluator#6 | `EvaluatePlan` spins when the plan still has actions but the state is terminal, reporting the symptom rather than "plan extends past the horizon". Terminates via a safety valve; blocks nothing, but the diagnostic misleads. Blocks `7t_custom_example1` under `stable`; no longer triggered once solver#14's fix is in play, since the overrun it was reacting to stops happening. |
 | evaluator#1 | Invalid JSON for PB parsing fails quietly. On the legacy `--plan_type Evaluator` path only. |
 | solver#17 | Solver and evaluator place a combined inStanding train's members at opposite ends of the track, so the solver routes a departing half out of the blocked end and calls the result feasible. Needs a decision on which convention is right, and probably a companion evaluator issue. |
 | solver#18 | Solver ignores `standingIndex`, so the order of several standing units on one track is not the one the scenario asked for. Latent in this corpus — every scenario leaves the field null. The evaluator does honour it. |
 | solver#19 | Question, not a defect: splitting a train in place costs no shunt move, and nothing prices the personnel it would need. |
+| *(untriaged)* | Once solver#14's overrun no longer masks it, TORS rejects `7t_custom_example1` with a different error: "departure mismatch" on the combined instanding pair and both outstanding units, all at the same action time. Not yet filed — see below. |
 
 None of #17, #18 or #19 blocks the pipeline. #17 needs a combined inStanding
 train that gets split, which no fixture has; #18 needs a non-null
 `standingIndex`, which no fixture has; #19 is a modelling question.
 
 `6t_custom_example3` and `7t_custom_example1` cannot produce a valid plan
-because of the two issues above and are expected to keep failing until they're
-fixed — named in `RELEASE_NOTES.md` for the same reason.
+under `stable` because of solver#13 and solver#14/evaluator#6 respectively,
+and are expected to keep failing there until those ship — named in
+`RELEASE_NOTES.md` for the same reason. `7t_custom_example1` needs more than
+solver#14 alone, though (see next).
+
+### solver#14 verified fixed on edge, but `7t_custom_example1` still isn't valid
+
+Checked 2026-09-03 by running the `edge`-channel solver against
+`7t_custom_example1` in isolation (a scratch location dir with just this one
+scenario, so the real fixture corpus wasn't touched), then the `stable`
+evaluator against the resulting plan.
+
+The overrun itself is gone: train 2401's last action previously ran
+`01:20–01:35` against the `01:20` (T4800) horizon; on `edge` it finishes
+`00:45–01:00`, comfortably inside it. The solver's own cost breakdown grew a
+new `oo` counter (`cr=0, dd=1, da=0, tlv=0, sm=5, rd=498.80, cd=0, um=0,
+oo=0`) that didn't exist before — matching the issue's suggested fix of
+costing outStanding overruns as their own counter.
+
+But TORS still calls the plan invalid, now for an unrelated reason that the
+overrun previously masked (evaluator#6 never even triggers under `edge`,
+since there's no more terminal-state mismatch to spin on): three "Trains's
+departure mismatch with Action start/end time" errors, all at action time
+`1830`, on `ShuntingUnit-4000` (the combined instanding pair 2801+2802,
+scheduled departure `1500`) and the two outstanding units `2001`/`3001`
+(recorded departure `0`). Whether this is a new regression from solver#14's
+fix (its own writeup mentions plan serialization changed for `StandOut`
+actions) or a pre-existing defect this scenario always had is not yet known —
+needs its own investigation and, likely, its own issue before
+`7t_custom_example1` can be called resolved.
 
 ---
 

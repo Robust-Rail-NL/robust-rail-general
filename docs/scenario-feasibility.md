@@ -80,7 +80,7 @@ have a verdict rather than a rate.
 | `10t_random_42s_distribution2` | infeasible | departure train 270.62 m > 255 m gateway |
 | `48t_custom_larger-example` | infeasible | arrival train 324.12 m > 255 m gateway (2 × VIRM-6) |
 | `6t_custom_example3` | unknown | train waits on the gateway; robust-rail-solver#13 |
-| `7t_custom_example1` | unknown | the solver services train 2401 until 5734 against a 4800 horizon, so the plan does not leave it standing at the end. outStanding trains carry no deadline in the cost function, so over-running is free |
+| `7t_custom_example1` | unknown | under `stable`: solver services train 2401 until 5734 against a 4800 horizon, no deadline for outStanding trains (solver#14). Fixed on `edge`, but a second, untriaged defect surfaces once that's fixed — see roadmap |
 | `8t_custom_example2` | **feasible** | valid as of evaluator `2bbad58`; exercises StandIn, Arrive, Exit and StandOut in one plan |
 | `30t_random_98s_test` | unknown | every train late both ways (`dd=30, da=29`); over-subscribed |
 | `simple_service_location_4t_custom_late` | unknown | departure-time mismatch, likely infeasible by design |
@@ -99,7 +99,11 @@ three predate the 2.0.0 migration.
   Tracked as robust-rail-solver#13. Blocks `6t_custom_example3`.
 - **outStanding trains carry no deadline in the solver's cost function**, so a
   plan may schedule work past the end of the scenario at no cost and still be
-  reported as unviolating. Blocks `7t_custom_example1`.
+  reported as unviolating. Blocks `7t_custom_example1` under `stable`. Fixed
+  on the `edge` channel (robust-rail-solver#14, verified 2026-09-03) — but
+  that alone doesn't make the scenario valid; see
+  [`roadmap-2.0.0.md`](roadmap-2.0.0.md#solver14-verified-fixed-on-edge-but-7t_custom_example1-still-isnt-valid)
+  for what else it still trips.
 Departure times must still match exactly — the evaluator requires an `Exit` at
 precisely the scheduled second — but that is no longer known to reject anything
 it should not. The one case that looked like a strictness problem was the wait
