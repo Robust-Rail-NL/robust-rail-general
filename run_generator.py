@@ -11,16 +11,15 @@ from docker_utils import ensure_docker_running, pull_flag
 
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
-    "legacy": "ghcr.io/robust-rail-nl/generator:1.2.2",
     "stable": "ghcr.io/robust-rail-nl/generator:2.0.0",
     # Same image: the generator has no assertions build. "stable-assert" names
     # a pipeline configuration — assert the evaluator, leave everything else
     # alone — rather than a per-tool build flag. See run_evaluator.py.
     "stable-assert": "ghcr.io/robust-rail-nl/generator:2.0.0",
-    # Same image again: only the solver has an edge channel. "edge" names a
-    # pipeline configuration — run the solver from its edge channel, leave
-    # generator and evaluator on stable — rather than a per-tool build flag.
-    # See run_solver.py.
+    # Same image again: the generator has no edge channel — the solver and
+    # evaluator both do. "edge" names a pipeline configuration — run those
+    # two from their edge channels, leave the generator on stable — rather
+    # than a per-tool build flag. See run_solver.py.
     "edge": "ghcr.io/robust-rail-nl/generator:2.0.0",
     "local": "generator:latest",
 }
@@ -87,9 +86,8 @@ def main() -> None:
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
     parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='stable',
-                        help="Pick a docker image version ('legacy' no longer works against this "
-                             "repo's fixtures — Phase 1 moved run_*.py to the unified format "
-                             "unconditionally; 'local' is reserved for locally built images).")
+                        help="Pick a docker image version ('local' is reserved for locally built "
+                             "images).")
     args = parser.parse_args()
 
     if not args.dry_run:

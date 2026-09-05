@@ -11,7 +11,6 @@ from docker_utils import ensure_docker_running, pull_flag
 
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
-    "legacy": "ghcr.io/robust-rail-nl/hip:1.4.2",
     # Floats forward across ordinary releases rather than pinning one:
     # docker-push.sh only tags :latest on a real X.Y.Z build, so this needs no
     # update here when a new stable version ships. The --version key names a
@@ -166,10 +165,9 @@ def main() -> None:
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory (e.g. Location_SimpleService).")
     parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='stable',
-                        help="Pick a docker image version ('legacy' no longer works against this "
-                             "repo's fixtures — Phase 1 moved run_*.py to the unified format "
-                             "unconditionally; 'local' is reserved for locally built images; "
-                             "'edge' tracks the newest not-yet-vetted push to the edge branch).")
+                        help="Pick a docker image version ('local' is reserved for locally built "
+                             "images; " "'edge' tracks the newest not-yet-vetted push to the edge "
+                             "branch).")
     args = parser.parse_args()
 
     if not args.dry_run:

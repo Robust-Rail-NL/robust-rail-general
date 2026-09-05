@@ -30,9 +30,6 @@ CONTAINER_DB = "/app/database"
 # The keys mirror the other steps' --version choices so the pipeline can pass
 # --version uniformly, but they do not all mean something here:
 #
-# - "legacy" has no honest value. The planner step did not exist in 1.x, so
-#   there is no 1.x planner image to compare against. It maps to the current
-#   one rather than to a tag that was never built.
 # - "stable-assert" likewise: the assertions builds are the evaluator's and
 #   the solver's. This image has no such variant, so the selector resolves to
 #   the plain image and the run stays comparable.
@@ -51,8 +48,9 @@ CONTAINER_DB = "/app/database"
 #   0.2.0  emits whole plans but raises UnboundLocalError on any plan whose
 #          departing train never moved — fine on SimpleService, dead on
 #          KleineBinckhorst.
+
+#TODO make 'stable' a floating version and always pull it
 DOCKER_IMAGE_VERSIONS = {
-    "legacy": "ghcr.io/robust-rail-nl/planner:0.4.0",
     "stable": "ghcr.io/robust-rail-nl/planner:0.4.0",
     "stable-assert": "ghcr.io/robust-rail-nl/planner:0.4.0",
     "edge": "ghcr.io/robust-rail-nl/planner:0.4.0",

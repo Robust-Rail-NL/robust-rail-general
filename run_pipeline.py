@@ -57,15 +57,13 @@ def main() -> None:
                         help="Pass --dry-run to each step.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
-    parser.add_argument("--version", choices=['legacy', 'stable', 'stable-assert', 'edge', 'local'],
+    parser.add_argument("--version", choices=['stable', 'stable-assert', 'edge', 'local'],
                         default='stable',
-                        help="Pick a docker image version ('legacy' no longer works against this "
-                             "repo's fixtures — Phase 1 moved run_*.py to the unified format "
-                             "unconditionally; 'local' is reserved for locally built images; "
-                             "'stable-assert' runs the evaluator with assertions enabled "
-                             "for integration testing, and is not for baseline comparison; "
-                             "'edge' runs the solver from its not-yet-vetted edge branch build "
-                             "while generator and evaluator stay on stable).")
+                        help="Pick a docker image version ('local' is reserved for locally built "
+                             "images; 'stable-assert' runs the evaluator with assertions enabled "
+                             "for integration testing, and is not for baseline comparison; 'edge' "
+                             "runs the solver and evaluator from their not-yet-vetted edge branch "
+                             "builds while generator stays on stable).")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--steps", metavar="STEPS", default=None,
                         help=f"Comma-separated list of steps to run (default: "
