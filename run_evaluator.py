@@ -7,11 +7,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-from docker_utils import ensure_docker_running, pull_flag
+from docker_utils import ensure_docker_running, ensure_pulled
 
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
-    "legacy": "ghcr.io/robust-rail-nl/tors:1.3.1",
     "stable": "ghcr.io/robust-rail-nl/tors:2.0.0",
     # The evaluator is the oracle the pipeline trusts, and its assertions build
     # produces the same verdicts and .err content as the plain one (verified
@@ -22,11 +21,11 @@ DOCKER_IMAGE_VERSIONS = {
     # trips one exits 134/139 with the assertion text in the .err file, which
     # reads very differently from an ordinary "plan is not valid".
     "stable-assert": "ghcr.io/robust-rail-nl/tors:2.0.0-assert",
-    # Same image as stable: only the solver has an edge channel. "edge" names
-    # a pipeline configuration — run the solver from its edge channel, leave
-    # generator and evaluator on stable — rather than a per-tool build flag.
-    # See run_solver.py.
-    "edge": "ghcr.io/robust-rail-nl/tors:2.0.0",
+    # The solver and evaluator both have an edge channel; only the generator
+    # stays pinned to stable. "edge" names a pipeline configuration — run the
+    # solver and evaluator from their edge channels, leave the generator on
+    # stable — rather than a per-tool build flag. See run_solver.py.
+    "edge": "ghcr.io/robust-rail-nl/tors:edge",
     "local": "tors:latest",
 }
 CONTAINER_DB = "/app/database"
@@ -60,7 +59,6 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool) 
 
     cmd = [
         "docker", "run", "--rm",
-        *pull_flag(docker_image),
         *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         docker_image,
@@ -111,13 +109,13 @@ def main() -> None:
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
     parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='stable',
-                        help="Pick a docker image version ('legacy' no longer works against this "
-                             "repo's fixtures — Phase 1 moved run_*.py to the unified format "
-                             "unconditionally; 'local' is reserved for locally built images).")
+                        help="Pick a docker image version ('local' is reserved for locally built "
+                             "images).")
     args = parser.parse_args()
 
     if not args.dry_run:
         ensure_docker_running()
+        ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 
