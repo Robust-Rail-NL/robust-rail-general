@@ -13,7 +13,7 @@ below.
 
 | issue | effect |
 |---|---|
-| solver#13 | Solver parks on non-parking arrival tracks when it cannot move into the yard immediately. Blocks `6t_custom_example3`. |
+| solver#13 | Solver parks on non-parking arrival tracks when it cannot move into the yard immediately. Blocked `6t_custom_example3` under `stable`/`edge`. **Fixed** by solver PR #13 (`68aa9d4`, "Give a delayed Arrival a real duration instead of a trailing Wait") with a companion evaluator PR #13 (`6851675`, "Let a replayed Arrive carry a duration instead of a trailing Wait") — both merged only into each repo's local `local-edge` branch as of 2026-09-04, not yet in `edge` or `stable`. See "solver#13 verified fixed on local-edge" below. |
 | solver#14 | outStanding trains have no deadline in the cost function, so plans over-run the scenario horizon for free. Produces the plan that trips evaluator#6. **Fixed on the `edge` channel** (image `2.0.0-edge+20260902.150f3c9`, pushed 2026-09-02); not yet in `stable`. See "solver#14 verified fixed on edge" below — fixing it was not enough on its own to make `7t_custom_example1` valid. |
 | evaluator#6 | `EvaluatePlan` spins when the plan still has actions but the state is terminal, reporting the symptom rather than "plan extends past the horizon". Terminates via a safety valve; blocks nothing, but the diagnostic misleads. Blocks `7t_custom_example1` under `stable`; no longer triggered once solver#14's fix is in play, since the overrun it was reacting to stops happening. |
 | evaluator#1 | Invalid JSON for PB parsing fails quietly. On the legacy `--plan_type Evaluator` path only. |
@@ -30,7 +30,9 @@ train that gets split, which no fixture has; #18 needs a non-null
 under `stable` because of solver#13 and solver#14/evaluator#6 respectively,
 and are expected to keep failing there until those ship — named in
 `RELEASE_NOTES.md` for the same reason. `7t_custom_example1` needs more than
-solver#14 alone, though (see next).
+solver#14 alone, though (see next). `6t_custom_example3`'s fix (solver#13) has
+been verified end to end on unmerged branches — see below — but likewise
+hasn't shipped to `edge` or `stable` yet.
 
 ### solver#14 verified fixed on edge, but `7t_custom_example1` still isn't valid
 
@@ -57,6 +59,60 @@ fix (its own writeup mentions plan serialization changed for `StandOut`
 actions) or a pre-existing defect this scenario always had is not yet known —
 needs its own investigation and, likely, its own issue before
 `7t_custom_example1` can be called resolved.
+
+### solver#13 verified fixed on local-edge, `6t_custom_example3` now valid
+
+Checked 2026-09-04 by running the *entire* fixture corpus (both locations, all
+12 scenarios — not just one scenario in isolation, unlike the solver#14 check
+above) with `run_pipeline.py --version stable` and then `--version local`,
+diffing evaluator verdicts and plan JSON between the two.
+
+"Local" here means images built from each repo's `local-edge` branch: an ad
+hoc branch, not part of the `stable`/`edge` channel model, that merges `edge`
+plus every currently-open bugfix PR for that repo, so several not-yet-reviewed
+fixes can be checked together before any of them lands on `edge`. Solver's
+`local-edge` is `edge` + PR #13 (`68aa9d4`) + PR #14 (`4d5b592`, already
+verified on `edge` separately, see above) + PR #30 (`c01e121`, a `SimulatedAnnealing`
+config-key rename, unrelated to any fixture outcome). Evaluator's `local-edge`
+is `edge` + the companion PR #13 fix (`6851675`) + `fix/silent-empty-protobuf-parse`
+(evaluator#1-adjacent; not exercised by this corpus). Generator and planner have
+no `local-edge` branch — their `local` images are plain rebuilds of `main`, and
+produced byte-identical scenarios to `stable`, as expected.
+
+`6t_custom_example3` flips from invalid to valid. Under `stable`/`edge` the
+plan contained an explicit `Wait` action on gateway track 906a (`startTime:
+900, endTime: 1110`), which the evaluator rejects outright since the gateway
+forbids parking. Under `local-edge` that action is gone: the delayed Arrival
+that used to end at `900` and hand off to the `Wait` now just runs to `1110`
+itself, exactly matching the fix's description (give the Arrival a real
+duration instead of a trailing `Wait`).
+
+Verdict changed for exactly one scenario here, `6t_custom_example3` (invalid
+→ valid). `7t_custom_example1`'s verdict is unchanged — still invalid — but
+for a different *reason* than under plain `edge`: the same three "departure
+mismatch" errors at action time `1830` as the 2026-09-03 check above, not the
+evaluator#6 spin. All other scenarios' verdicts are unchanged from `stable`.
+
+Plan content is a separate axis from verdict: 7 of the 12 fixture plans came
+out byte-different from their `stable` counterparts regardless of verdict —
+`10t_random_42s_distribution1`, `10t_random_42s_distribution2`,
+`48t_custom_larger-example` and `30t_random_98s_test` (all four an unchanged
+verdict, different plan bytes), plus `simple_service_location_4t_custom_late`
+(same), and the two scenarios above with a verdict or failure-reason change.
+This is consistent with solver#14's writeup noting a broader serialization
+change around outStanding/`StandOut` actions, not just its cost-function fix.
+The other 5 scenarios came out byte-identical:
+`24t_custom_kleinebinckhorst_absolute_seconds`, `4t_random_1s_feasible_small`,
+`2t_random_1s_marginal_length`, `8t_custom_example2`, and
+`14t_random_1s_marginal_congestion`.
+
+**Caveat:** `local-edge` is not a published or tagged image — it is a same-day
+local build off a branch merging open, unreviewed PRs, one level more
+provisional than `edge` itself. Read this as "the fix looks right and
+introduces no regression across the fixture corpus," not as a substitute for
+review or for the `edge`/`stable` promotion path. See
+[`pipeline-integration-testing.md`](pipeline-integration-testing.md) for how
+this kind of comparison is run in general.
 
 ---
 
@@ -243,9 +299,10 @@ before it's gone through PR review into `main`:
   `hip:edge`).
 - This repo: `run_*.py --version stable|edge` (renamed from `2.0.0`/
   `2.0.0-assert`; `edge` only has real meaning for the solver, the other
-  tools resolve it to their `stable` image) and `docker_utils.pull_flag()` —
-  `--pull always` for registry tags, so a floating tag like `:edge` is never
-  served stale from a local cache.
+  tools resolve it to their `stable` image) and `docker_utils.ensure_pulled()`
+  (originally `pull_flag()`, passing `--pull always` per `docker run`; changed
+  2026-09-07 to a single `docker pull` up front instead) — so a floating tag
+  like `:edge` is never served stale from a local cache.
 
 Not written up anywhere longer-form than the git history itself; worth its
 own doc if it grows more channels or more repos.

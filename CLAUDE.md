@@ -1,52 +1,49 @@
 ```markdown
 ## Repository branch awareness
 
-Five repos take part in the 2.0.0 release, and all of them use one shared
-integration branch: **`release/2.0.0`**. It is merged into each repo's stable
-branch and deleted when 2.0.0 ships.
+Five repos make up the pipeline. Run `git branch --show-current` in each
+before investigating code or assessing change impact — `main` means
+different things depending on the repo, and three of the five also run an
+`edge` channel with a different meaning per repo.
 
-| Repo | Stable branch | Release branch |
+| Repo | Branches that matter | Model |
 |---|---|---|
-| `robust-rail-generator` | `main` | `release/2.0.0` |
-| `robust-rail-solver` | `main` | `release/2.0.0` |
-| `robust-rail-evaluator` | `main` | `release/2.0.0` |
-| `robust-rail-general` (this repo) | `main` | `release/2.0.0` |
-| `robust-rail-planner` | `main` | `release/2.0.0` |
+| `robust-rail-generator` | `main` | reviewed-only; no `edge` channel |
+| `robust-rail-solver` | `main`, `edge` | `edge` is a floating `hip:edge` **image** channel (`stable`/`edge` docker tags) for running an unreviewed fix ahead of review; see its own `CONTRIBUTING.md` |
+| `robust-rail-evaluator` | `main`, `edge` | same model as the solver, `tors:edge` image |
+| `robust-rail-general` (this repo) | `main`, `edge` | `edge` is a **branch** channel, not an image one — this repo publishes no artifact of its own; see [CONTRIBUTING.md](CONTRIBUTING.md) |
+| `robust-rail-planner` | `main` | reviewed-only; no `edge` channel |
 
-Solver is the one repo with two stable-ish branches, `dev` and `main`, and the
-one place that needed a deliberate call rather than following the table:
-`release/2.0.0`'s PR (solver#20) targets `main` directly, not `dev` — it was
-opened against `dev` first, retargeted 2026-08-21 before any review landed.
-`release/2.0.0` already contains `dev`'s full history as an ancestor (~25
-pre-release commits: version bump, dockerization, arm64 support, refactors —
-never promoted to `main`), so merging straight into `main` brings that backlog
-along for free; no separate `dev`→`main` promotion needed. `dev` itself is
-being updated separately, by hand, outside a PR — not part of this release's
-merge sequence.
+The three `edge`s share a name and a branch-flow convention (feature branch →
+PR into `main`, optionally merged early into `edge` too via `git merge
+--no-ff`), but they are independent of each other — nothing links solver's
+`edge` to evaluator's or to this repo's, and there is no single shared
+integration branch across repos anymore.
 
-It was previously a different name per repo — `pydantic`, `noproto`,
-`new_schemas` — each named after an implementation detail rather than the goal.
-Renamed 2026-08-08. Older commits and docs still refer to the old names when
-describing where work happened; those are historical and correct as written.
-
-Run `git branch --show-current` before investigating code or assessing change
-impact. On a stable branch you are looking at protobuf-based code; on
-`release/2.0.0` at the JSON-schema code.
-
-The shared name is also load-bearing for CI: `validate-fixtures.yml` reads the
-generator's schemas from *the branch of the same name*, which only works because
-the name is the same everywhere.
+The interchange models (`Location`, `Scenario`, `Plan`, `ScenarioConfig`) live
+in this repo as `robust_rail_models` (moved out of the generator, PRs #9/#17,
+2026-09-02) — `robust-rail-generator` consumes them rather than owning them,
+and the schema this repo's fixtures validate against is this package's own
+build output, not a clone of another repo's branch.
 
 ## robust-rail-general branch policy
 
-`main` is kept stable for coordination with the separate planner team. It contains
-only design decisions (docs, config fixes) that do not break the existing pipeline.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full `main`/`edge` model.
+`main` stays reviewed-only — kept stable so the separate planner team can
+coordinate against it — and every change still goes through its own feature
+branch and PR into `main`. `edge` is for getting a not-yet-reviewed fix (a
+`run_planner.py` change, a new fixture, a docs update) running early, by also
+merging its feature branch into `edge` (`git merge --no-ff`) alongside the
+normal PR.
 
-`release/2.0.0` is where all Phase 1 and later implementation work lives:
-- `location_unified.json` renamed to `location.json`
-- `run_solver.py` reads `scenario_*.json` (unified) instead of `scenario_solver_*.json`
-- `run_planner.py` reads `location.json` instead of `location_solver.json`
-- Future: integration test results once solver and evaluator are updated
+## Pipeline integration testing
 
-All Phase 1 and later work in this repo goes on the `release/2.0.0` branch.
+See [docs/pipeline-integration-testing.md](docs/pipeline-integration-testing.md)
+for how to run and compare `stable`/`edge`/`local` pipeline outputs against
+each other (including the ad hoc `local-edge` branch convention for checking
+several unreviewed PRs together), and
+[docs/scenario-feasibility.md](docs/scenario-feasibility.md) /
+[docs/roadmap-2.0.0.md](docs/roadmap-2.0.0.md) for the expected outcome of
+each fixture scenario and known solver/evaluator defects to check results
+against.
 ```
