@@ -11,16 +11,16 @@ from docker_utils import ensure_docker_running, ensure_pulled
 
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
-    "stable": "ghcr.io/robust-rail-nl/generator:2.0.0",
+    "stable": "ghcr.io/robust-rail-nl/generator:latest",
     # Same image: the generator has no assertions build. "stable-assert" names
     # a pipeline configuration — assert the evaluator, leave everything else
     # alone — rather than a per-tool build flag. See run_evaluator.py.
-    "stable-assert": "ghcr.io/robust-rail-nl/generator:2.0.0",
+    "stable-assert": "ghcr.io/robust-rail-nl/generator:latest",
     # Same image again: the generator has no edge channel — the solver and
     # evaluator both do. "edge" names a pipeline configuration — run those
     # two from their edge channels, leave the generator on stable — rather
     # than a per-tool build flag. See run_solver.py.
-    "edge": "ghcr.io/robust-rail-nl/generator:2.0.0",
+    "edge": "ghcr.io/robust-rail-nl/generator:latest",
     "local": "generator:latest",
 }
 CONTAINER_DB = "/app/database"

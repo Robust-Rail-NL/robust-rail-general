@@ -11,7 +11,7 @@ from docker_utils import ensure_docker_running, ensure_pulled
 
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
-    "stable": "ghcr.io/robust-rail-nl/tors:2.0.0",
+    "stable": "ghcr.io/robust-rail-nl/tors:latest",
     # The evaluator is the oracle the pipeline trusts, and its assertions build
     # produces the same verdicts and .err content as the plain one (verified
     # across all KleineBinckhorst scenarios — .txt trace files can differ in
@@ -20,7 +20,7 @@ DOCKER_IMAGE_VERSIONS = {
     # an abort rather than a verdict computed from corrupt state. A run that
     # trips one exits 134/139 with the assertion text in the .err file, which
     # reads very differently from an ordinary "plan is not valid".
-    "stable-assert": "ghcr.io/robust-rail-nl/tors:2.0.0-assert",
+    "stable-assert": "ghcr.io/robust-rail-nl/tors:assert",
     # The solver and evaluator both have an edge channel; only the generator
     # stays pinned to stable. "edge" names a pipeline configuration — run the
     # solver and evaluator from their edge channels, leave the generator on

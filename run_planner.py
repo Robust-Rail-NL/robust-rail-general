@@ -62,11 +62,10 @@ DEFAULT_PLANNER_TIMEOUT = 600
 #          departing train never moved — fine on SimpleService, dead on
 #          KleineBinckhorst.
 
-#TODO make 'stable' a floating version and always pull it
 DOCKER_IMAGE_VERSIONS = {
-    "stable": "ghcr.io/robust-rail-nl/planner:0.4.0",
-    "stable-assert": "ghcr.io/robust-rail-nl/planner:0.4.0",
-    "edge": "ghcr.io/robust-rail-nl/planner:0.4.0",
+    "stable": "ghcr.io/robust-rail-nl/planner:latest",
+    "stable-assert": "ghcr.io/robust-rail-nl/planner:latest",
+    "edge": "ghcr.io/robust-rail-nl/planner:latest",
     "local": "planner:latest",
 }
 
