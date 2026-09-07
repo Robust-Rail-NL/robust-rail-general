@@ -6,17 +6,32 @@ import subprocess
 import sys
 
 
-def pull_flag(image: str) -> list[str]:
-    """--pull always for registry images, so a floating tag (hip:latest,
-    hip:edge, ...) is never silently served from a stale local cache — Docker's
-    own default (--pull missing) only pulls when the tag is absent locally, it
-    does not special-case :latest or re-check a tag it already has.
+def ensure_pulled(image: str) -> None:
+    """Pull once, up front, so a floating tag (hip:latest, hip:edge, ...) is
+    never silently served from a stale local cache — Docker's own default
+    (`docker run` with no --pull) only pulls when the tag is absent locally,
+    it does not special-case :latest or re-check a tag it already has.
 
-    Omitted for bare local-build tags (no "/", e.g. "hip:latest" built by
+    Called once per script invocation rather than passing `--pull always` to
+    every `docker run` in the per-scenario/plan/config loop below: the image
+    can't change mid-run, so re-checking the registry on every container start
+    was one redundant round-trip per fixture for no benefit.
+
+    Skipped for bare local-build tags (no "/", e.g. "hip:latest" built by
     docker-push.sh locally rather than pulled from ghcr.io): there is no
-    registry to check, and --pull always would just fail trying to find one.
+    registry to check, and `docker pull` would just fail trying to find one.
     """
-    return ["--pull", "always"] if "/" in image else []
+    if "/" not in image:
+        return
+
+    print(f"Pulling {image} ...")
+    result = subprocess.run(["docker", "pull", image], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    if result.returncode != 0:
+        print(f"ERROR: 'docker pull {image}' failed.", file=sys.stderr)
+        stderr = result.stderr.decode(errors="replace").strip()
+        if stderr:
+            print(f"  docker said: {stderr.splitlines()[-1]}", file=sys.stderr)
+        sys.exit(1)
 
 
 def ensure_docker_running() -> None:

@@ -7,7 +7,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from docker_utils import ensure_docker_running, pull_flag
+from docker_utils import ensure_docker_running, ensure_pulled
 
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
@@ -34,7 +34,6 @@ def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bo
     name = _config_name(config)
     cmd = [
         "docker", "run", "--rm",
-        *pull_flag(docker_image),
         *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         docker_image,
@@ -92,6 +91,7 @@ def main() -> None:
 
     if not args.dry_run:
         ensure_docker_running()
+        ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 
