@@ -19,7 +19,7 @@ import sys
 import uuid
 from pathlib import Path
 
-from docker_utils import ensure_docker_running, pull_flag
+from docker_utils import ensure_docker_running, ensure_pulled
 
 ROOT = Path(__file__).parent
 CONTAINER_DB = "/app/database"
@@ -43,9 +43,6 @@ DEFAULT_PLANNER_TIMEOUT = 600
 # The keys mirror the other steps' --version choices so the pipeline can pass
 # --version uniformly, but they do not all mean something here:
 #
-# - "legacy" has no honest value. The planner step did not exist in 1.x, so
-#   there is no 1.x planner image to compare against. It maps to the current
-#   one rather than to a tag that was never built.
 # - "stable-assert" likewise: the assertions builds are the evaluator's and
 #   the solver's. This image has no such variant, so the selector resolves to
 #   the plain image and the run stays comparable.
@@ -64,11 +61,11 @@ DEFAULT_PLANNER_TIMEOUT = 600
 #   0.2.0  emits whole plans but raises UnboundLocalError on any plan whose
 #          departing train never moved — fine on SimpleService, dead on
 #          KleineBinckhorst.
+
 DOCKER_IMAGE_VERSIONS = {
-    "legacy": "ghcr.io/robust-rail-nl/planner:0.4.0",
-    "stable": "ghcr.io/robust-rail-nl/planner:0.4.0",
-    "stable-assert": "ghcr.io/robust-rail-nl/planner:0.4.0",
-    "edge": "ghcr.io/robust-rail-nl/planner:0.4.0",
+    "stable": "ghcr.io/robust-rail-nl/planner:latest",
+    "stable-assert": "ghcr.io/robust-rail-nl/planner:latest",
+    "edge": "ghcr.io/robust-rail-nl/planner:latest",
     "local": "planner:latest",
 }
 
@@ -93,7 +90,6 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner
 
     cmd = [
         "docker", "run", "--rm",
-        *pull_flag(docker_image),
         "--name", container_name,
         *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
@@ -175,6 +171,7 @@ def main() -> None:
 
     if not args.dry_run:
         ensure_docker_running()
+        ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 

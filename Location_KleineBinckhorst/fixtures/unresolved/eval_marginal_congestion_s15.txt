@@ -2,11 +2,11 @@
 			|  A <-- SU-6( 16 ) --- [-No action-] -> B --- Front train(16, SLT-4)
 			|  A <-- SU-3( 1 ) --- [-No action-] -> B --- Front train(1, SGMM-2)
 
-	55	|  A <-- SU-13( 17 - 6 ) --- [-No action-] -> B --- Front train(6, SLT-4)
+	54	|  A <-- SU-0( 2 ) --- [-No action-] -> B --- Front train(2, SLT-4)
+			|  A <-- SU-4( 4 ) --- [-No action-] -> B --- Front train(4, FFF-3)
+			|  A <-- SU-9( 10 ) --- [-No action-] -> B --- Front train(10, SGMM-2)
 
-	52	|  A <-- SU-10( 12 ) --- [-No action-] -> B --- Front train(12, FFF-3)
-			|  A <-- SU-5( 15 ) --- [-No action-] -> B --- Front train(15, SNG-3)
-			|  A <-- SU-11( 13 - 11 ) --- [-No action-] -> B --- Front train(11, FFF-3)
+	59	|  A <-- SU-12( 7 - 14 ) --- [-No action-] -> B --- Front train(14, SNG-3)
 
 	906b	|  A <-- SU-2( 0 ) --- [-No action-] -> B --- Front train(0, SLT-4)
 			|  A <-- SU-7( 5 ) --- [-No action-] -> B --- Front train(5, SNG-3)
