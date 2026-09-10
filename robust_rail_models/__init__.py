@@ -9,7 +9,7 @@ from .location import (
     TrackPartType,
     WalkingDistanceEntry,
 )
-from .plan import Action, Plan
+from .plan import Action, Feasibility, Plan
 from .scenario import (
     DisabledTrackPart,
     IncomingTrain,
@@ -58,6 +58,7 @@ __all__ = [
     "DisabledTrackPart",
     "Plan",
     "Action",
+    "Feasibility",
     "ScenarioConfig",
     "CustomTrainsConfig",
     "GeneratedTrainsConfig",
