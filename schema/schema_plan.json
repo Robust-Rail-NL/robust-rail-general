@@ -73,6 +73,16 @@
       "title": "Action",
       "type": "object"
     },
+    "Feasibility": {
+      "description": "A producer's own verdict on whether its submitted Plan satisfies all\nhard constraints - not a claim about whether some other plan for the\nsame Scenario might exist. UNKNOWN is the default for a producer that\ndoesn't compute this (or a plan predating this field), not a third kind\nof \"maybe\".",
+      "enum": [
+        "Feasible",
+        "Infeasible",
+        "Unknown"
+      ],
+      "title": "Feasibility",
+      "type": "string"
+    },
     "PredefinedTaskType": {
       "enum": [
         "Move",
@@ -205,6 +215,46 @@
       },
       "title": "Actions",
       "type": "array"
+    },
+    "feasibility": {
+      "$ref": "#/$defs/Feasibility",
+      "default": "Unknown"
+    },
+    "producer": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Producer"
+    },
+    "cost": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Cost"
+    },
+    "costExplanation": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Costexplanation"
     }
   },
   "required": [
