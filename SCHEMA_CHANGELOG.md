@@ -8,10 +8,10 @@ wire format, and all three repos bump their local `EXPECTED_SCHEMA_VERSION`
 together when it does.
 
 Mismatch behaviour is warn-and-continue: a missing or unexpected
-`schemaVersion` produces a logged warning, not a hard reject. That default
-loosens starting at version 2 (see below): one specific plan shape becomes a
-hard reject, gated on the plan's own declared `schemaVersion` rather than on
-this mismatch warning.
+`schemaVersion` produces a logged warning, not a hard reject. That default is
+planned to loosen starting at version 2 (see below), once it lands: one
+specific plan shape will become a hard reject, gated on the plan's own
+declared `schemaVersion` rather than on this mismatch warning.
 
 Moved here from `robust-rail-generator` on 2026-09-10, alongside the rest of
 `src/models/` (see `docs/roadmap-2.0.0.md`, "Where the exported schemas
@@ -21,9 +21,19 @@ below predating the move still say "the generator" where that was
 accurate at the time; only the file's own location was stale, not what it
 says happened.
 
-## 2 — 2026-09-10
+## 2 — planned
 
-Three related changes, landed together:
+**Not yet released.** The three changes below are code-complete on branches
+across every affected repo (this one, `robust-rail-solver`,
+`robust-rail-evaluator`, `robust-rail-planner`) but none of it has merged to
+any repo's `main` yet — every producer and consumer still speaks
+`schemaVersion: 1` today. This entry is deliberately a separate commit on top
+of the "landed" wording (see that commit for the original text) rather than
+an edit to it, so that once schemaVersion 2 actually lands, reverting this
+commit and filling in the real date restores the original present-tense
+entry instead of requiring it to be rewritten from scratch.
+
+Three related changes, to land together:
 
 - `PredefinedTaskType.Walking` renamed to `Setback`. `Walking` named a
   shunting-unit reversal action after the crew's part in it (walking to the
