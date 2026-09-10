@@ -87,4 +87,4 @@ class Plan(SchemaVersioned):
     # SolutionCost.ToString() output ("Cost = 0.0 : 0.06 | cr=0, dd=0, ...").
     # Not structured: the term breakdown is producer-specific and isn't a
     # general interchange concept the way the total itself is.
-    cost_explanation: Optional[str] = Field(None, alias="costExplanation")
+    cost_details: Optional[str] = Field(None, alias="costDetails")
