@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 # Independent monotonic integer, decoupled from tool release versions.
 # Increments only on breaking schema changes. See SCHEMA_CHANGELOG.md.
-EXPECTED_SCHEMA_VERSION = 1
+EXPECTED_SCHEMA_VERSION = 2
 
 
 class RailModel(BaseModel):
