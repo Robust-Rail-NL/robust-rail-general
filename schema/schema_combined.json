@@ -607,7 +607,7 @@
           "default": null,
           "title": "Cost"
         },
-        "costExplanation": {
+        "costDetails": {
           "anyOf": [
             {
               "type": "string"
@@ -617,7 +617,7 @@
             }
           ],
           "default": null,
-          "title": "Costexplanation"
+          "title": "Costdetails"
         }
       },
       "required": [
