@@ -323,7 +323,7 @@ kept here rather than in the history file for anyone starting new work.
 | `trainUnitTypes` | Stays on `Scenario`, referenced from `TrainUnit` |
 | `Plan.trackParts` | Dropped — TORS loads infrastructure from `--path_location` |
 | `schemaVersion` | One shared monotonic integer across `Location`, `Scenario` and `Plan`, starting at 1; all bump together |
-| Version mismatch | **Warn and continue.** Never a hard reject. Each tool holds `EXPECTED_SCHEMA_VERSION` locally; `SCHEMA_CHANGELOG.md` in the generator records each bump |
+| Version mismatch | **Warn and continue.** Never a hard reject. Each tool holds `EXPECTED_SCHEMA_VERSION` locally; this repo's `SCHEMA_CHANGELOG.md` records each bump |
 | Every id | An `int`, including the composite ones |
 | Arrays of IDs | Always end in `IDs` — `memberIDs`, `parentIDs`, `relatedTrackPartIDs`. `IncomingTrain.members` and `Train.members` keep their names because they really do embed their units |
 | Retired proto fields | `reserved`, never freed, so a later field cannot inherit a number and meet an old message carrying the old meaning |
