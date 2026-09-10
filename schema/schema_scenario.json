@@ -698,7 +698,7 @@
   "description": "The daily-varying part of the problem specification: which trains\narrive, depart, or remain in the shunting yard.\n\nTODO: decide whether train_unit_types belongs here (normalized, referenced\nby name from TrainUnit) or embedded in each TrainUnit. Current decision:\nhere.",
   "properties": {
     "schemaVersion": {
-      "default": 1,
+      "default": 2,
       "title": "Schemaversion",
       "type": "integer"
     },

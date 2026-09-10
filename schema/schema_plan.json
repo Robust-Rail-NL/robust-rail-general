@@ -195,7 +195,7 @@
   "description": "The output of a shunting algorithm: an ordered list of actions.\n\nThere was a trackParts field here, carrying a copy of the Location's track\ngraph because the evaluator supposedly could not reach the original. That\ncondition no longer holds \u2014 run_evaluator.py passes --path_location\nalongside --path_plan \u2014 and in practice nothing ever wrote or read it.",
   "properties": {
     "schemaVersion": {
-      "default": 1,
+      "default": 2,
       "title": "Schemaversion",
       "type": "integer"
     },
