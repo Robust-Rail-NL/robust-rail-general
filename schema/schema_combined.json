@@ -581,12 +581,12 @@
         "Move",
         "Split",
         "Combine",
+        "Setback",
         "Wait",
         "Arrive",
         "Exit",
         "StandIn",
         "StandOut",
-        "Walking",
         "Break",
         "NonService"
       ],
