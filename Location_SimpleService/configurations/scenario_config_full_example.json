@@ -37,7 +37,7 @@
         },
         {
             "id": 2201,
-            "type": "SNG-3",
+            "type": "SNG-4",
             "services": []
         },
         {
@@ -47,7 +47,7 @@
         },
         {
             "id": 2301,
-            "type": "ICM-3",
+            "type": "ICM-4",
             "services": ["clean_train"]
         },
         {
@@ -88,14 +88,14 @@
         },
         {
             "id": 33334,
-            "member_types": ["ICM-4", "ICM-3"],
+            "member_types": ["ICM-4", "ICM-4"],
             "departure_time": 2800,
             "departure_track": "4",
             "side_track_part": "13"
         },
         {
             "id": 22223,
-            "member_types": ["SNG-4", "SNG-3"],
+            "member_types": ["SNG-4", "SNG-4"],
             "departure_time": 3000,
             "departure_track": "4",
             "side_track_part": "13"

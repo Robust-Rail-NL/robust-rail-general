@@ -332,7 +332,7 @@
             "members": [
                 {
                     "typePrefix": "SNG",
-                    "carriages": 3,
+                    "carriages": 4,
                     "id": 2201,
                     "tasks": []
                 },
@@ -354,7 +354,7 @@
             "members": [
                 {
                     "typePrefix": "ICM",
-                    "carriages": 3,
+                    "carriages": 4,
                     "id": 2301,
                     "tasks": [
                         {
@@ -409,7 +409,7 @@
                 },
                 {
                     "typePrefix": "ICM",
-                    "carriages": 3,
+                    "carriages": 4,
                     "id": null,
                     "tasks": null
                 }
@@ -431,7 +431,7 @@
                 },
                 {
                     "typePrefix": "SNG",
-                    "carriages": 3,
+                    "carriages": 4,
                     "id": null,
                     "tasks": null
                 }
