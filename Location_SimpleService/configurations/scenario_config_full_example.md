@@ -1,14 +1,14 @@
 # Expected plan
 
-Train 11111 arrives first with in front unit 2101 which requires servicing.
-Split 11111 on rail4, then service the front unit on rail1. 
-Meanwhile train 11112 arrives on rail4, couple with 2102. 
-Then, unit 2101 to rail3, combine with units 2102 and 2103.
-Meanwhile, train 22222 arrives on rail4, move it to rail5.
-Finally, train 33333 arrives on rail4, which must be serviced on rail1.
-Then, it departs again as train 33334.
-Then, train 22222 departs as train 22223, requiring a saw movement on rail1.
-Finally, train 11113 departs with three train units from rail3.
+- Train 11111 arrives first with in front unit 2101 which requires servicing.
+- <!-- Split 11111 on rail4, then service the front unit on rail1.  --> <not used because you can service the train for only one train unit - same as solver>
+- Meanwhile train 11112 arrives on rail4, couple with 2102. 
+- Then, unit 2101 to rail3, combine with units 2102 and 2103.
+- Meanwhile, train 22222 arrives on rail4, move it to rail5.
+- Finally, train 33333 arrives on rail4, which must be serviced on rail1.
+- Then, it departs again as train 33334.
+- Then, train 22222 departs as train 22223, requiring a saw movement on rail1.
+- Finally, train 11113 departs with three train units from rail3.
 
 ## Problems found in solver
 ```
