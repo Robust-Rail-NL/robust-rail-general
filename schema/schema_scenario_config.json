@@ -75,6 +75,18 @@
           "default": null,
           "title": "Track Ids Used"
         },
+        "min_gap_on_gateway": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min Gap On Gateway"
+        },
         "trains_given": {
           "const": true,
           "title": "Trains Given",
@@ -249,6 +261,18 @@
           "default": null,
           "title": "Track Ids Used"
         },
+        "min_gap_on_gateway": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min Gap On Gateway"
+        },
         "trains_given": {
           "const": false,
           "title": "Trains Given",
@@ -299,18 +323,6 @@
           ],
           "default": null,
           "title": "Matching"
-        },
-        "min_gap_on_gateway": {
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Min Gap On Gateway"
         },
         "min_time_in_yard": {
           "anyOf": [
