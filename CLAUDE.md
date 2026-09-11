@@ -3,7 +3,7 @@
 
 Five repos make up the pipeline. Run `git branch --show-current` in each
 before investigating code or assessing change impact — `main` means
-different things depending on the repo, and three of the five also run an
+different things depending on the repo, and four of the five also run an
 `edge` channel with a different meaning per repo.
 
 | Repo | Branches that matter | Model |
@@ -12,13 +12,13 @@ different things depending on the repo, and three of the five also run an
 | `robust-rail-solver` | `main`, `edge` | `edge` is a floating `hip:edge` **image** channel (`stable`/`edge` docker tags) for running an unreviewed fix ahead of review; see its own `CONTRIBUTING.md` |
 | `robust-rail-evaluator` | `main`, `edge` | same model as the solver, `tors:edge` image |
 | `robust-rail-general` (this repo) | `main`, `edge` | `edge` is a **branch** channel, not an image one — this repo publishes no artifact of its own; see [CONTRIBUTING.md](CONTRIBUTING.md) |
-| `robust-rail-planner` | `main` | reviewed-only; no `edge` channel |
+| `robust-rail-planner` | `main`, `edge` | same model as the solver, `planner:edge` image (added 2026-09-11; first image build in progress) |
 
-The three `edge`s share a name and a branch-flow convention (feature branch →
+The four `edge`s share a name and a branch-flow convention (feature branch →
 PR into `main`, optionally merged early into `edge` too via `git merge
 --no-ff`), but they are independent of each other — nothing links solver's
-`edge` to evaluator's or to this repo's, and there is no single shared
-integration branch across repos anymore.
+`edge` to evaluator's, the planner's, or to this repo's, and there is no
+single shared integration branch across repos anymore.
 
 The interchange models (`Location`, `Scenario`, `Plan`, `ScenarioConfig`) live
 in this repo as `robust_rail_models` (moved out of the generator, PRs #9/#17,

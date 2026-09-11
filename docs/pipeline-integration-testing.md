@@ -4,8 +4,9 @@ Each `run_*.py` script (and `run_pipeline.py`, which drives all of them) takes
 `--version` to pick which Docker images to run: `stable` (published, `docker
 pull`ed once up front so a floating tag is never served stale), `stable-assert`
 (evaluator with assertions, for catching corrupt-state verdicts rather than
-comparing baselines), `edge` (the solver's and evaluator's not-yet-reviewed
-channel; the generator has no `edge` channel and stays on `stable`), and `local` (bare tags — `generator:latest`,
+comparing baselines), `edge` (the solver's, planner's and evaluator's
+not-yet-reviewed channel; the generator has no `edge` channel and stays on
+`stable`), and `local` (bare tags — `generator:latest`,
 `hip:latest`, `tors:latest`, `planner:latest` — built and tagged on this
 machine, never pulled). This doc is about using `local` to verify a fix before
 it goes anywhere near `edge` or `stable`.
