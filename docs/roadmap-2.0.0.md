@@ -9,30 +9,31 @@ below.
 
 ---
 
-## Known issues (open upstream, checked 2026-09-03)
+## Known issues (open upstream, checked 2026-09-03; solver#13/#14 re-checked 2026-09-12 against shipped `stable`)
 
 | issue | effect |
 |---|---|
-| solver#13 | Solver parks on non-parking arrival tracks when it cannot move into the yard immediately. Blocked `6t_custom_example3` under `stable`/`edge`. **Fixed** by solver PR #13 (`68aa9d4`, "Give a delayed Arrival a real duration instead of a trailing Wait") with a companion evaluator PR #13 (`6851675`, "Let a replayed Arrive carry a duration instead of a trailing Wait") — both merged only into each repo's local `local-edge` branch as of 2026-09-04, not yet in `edge` or `stable`. See "solver#13 verified fixed on local-edge" below. |
-| solver#14 | outStanding trains have no deadline in the cost function, so plans over-run the scenario horizon for free. Produces the plan that trips evaluator#6. **Fixed on the `edge` channel** (image `2.0.0-edge+20260902.150f3c9`, pushed 2026-09-02); not yet in `stable`. See "solver#14 verified fixed on edge" below — fixing it was not enough on its own to make `7t_custom_example1` valid. |
-| evaluator#6 | `EvaluatePlan` spins when the plan still has actions but the state is terminal, reporting the symptom rather than "plan extends past the horizon". Terminates via a safety valve; blocks nothing, but the diagnostic misleads. Blocks `7t_custom_example1` under `stable`; no longer triggered once solver#14's fix is in play, since the overrun it was reacting to stops happening. |
+| solver#13 | Solver parks on non-parking arrival tracks when it cannot move into the yard immediately. Blocked `6t_custom_example3` under `stable`/`edge`. **Fixed and shipped** — solver PR #13 (`68aa9d4`, "Give a delayed Arrival a real duration instead of a trailing Wait") with a companion evaluator PR #13 (`6851675`) landed in solver/evaluator `2.1.0` (2026-09-11) and are now in `stable`. Re-verified directly against `stable` 2026-09-12 — see below. |
+| solver#14 | outStanding trains have no deadline in the cost function, so plans over-run the scenario horizon for free. Produces the plan that trips evaluator#6. **Fixed and shipped** in solver `2.1.0` (2026-09-11), now in `stable`. Re-verified directly against `stable` 2026-09-12 — fixing it still isn't enough on its own to make `7t_custom_example1` valid, see below. |
+| evaluator#6 | `EvaluatePlan` spins when the plan still has actions but the state is terminal, reporting the symptom rather than "plan extends past the horizon". Terminates via a safety valve; blocks nothing, but the diagnostic misleads. Still open (the spin bug itself isn't fixed) — but no longer triggered under `stable` now that solver#14 ships, since the overrun it was reacting to no longer happens. Confirmed 2026-09-12. |
 | evaluator#1 | Invalid JSON for PB parsing fails quietly. On the legacy `--plan_type Evaluator` path only. |
 | solver#17 | Solver and evaluator place a combined inStanding train's members at opposite ends of the track, so the solver routes a departing half out of the blocked end and calls the result feasible. Needs a decision on which convention is right, and probably a companion evaluator issue. |
-| solver#18 | Solver ignores `standingIndex`, so the order of several standing units on one track is not the one the scenario asked for. Latent in this corpus — every scenario leaves the field null. The evaluator does honour it. |
+| solver#18 | Solver ignores `standingIndex`, so the order of several standing units on one track is not the one the scenario asked for. **Fixed and shipped** in solver `2.1.0` too, but latent in this corpus regardless — every scenario here leaves the field null, so nothing to re-verify. The evaluator does honour it. |
 | solver#19 | Question, not a defect: splitting a train in place costs no shunt move, and nothing prices the personnel it would need. |
-| *(untriaged)* | Once solver#14's overrun no longer masks it, TORS rejects `7t_custom_example1` with a different error: "departure mismatch" on the combined instanding pair and both outstanding units, all at the same action time. Not yet filed — see below. |
+| evaluator#17 | Once solver#14's overrun no longer masks it, TORS rejects `7t_custom_example1` with a different error: "departure mismatch" on `ShuntingUnit-4000`, whose declared departure time doesn't match its plan action's — the evaluator has no way to accept a late departure the solver already prices as `dd=1`, rather than treating it as unrecoverable. Reconfirmed present under shipped `stable` (2.1.0), 2026-09-12, and now filed — the sole remaining blocker for this fixture. |
 
 None of #17, #18 or #19 blocks the pipeline. #17 needs a combined inStanding
 train that gets split, which no fixture has; #18 needs a non-null
 `standingIndex`, which no fixture has; #19 is a modelling question.
 
-`6t_custom_example3` and `7t_custom_example1` cannot produce a valid plan
-under `stable` because of solver#13 and solver#14/evaluator#6 respectively,
-and are expected to keep failing there until those ship — named in
-`RELEASE_NOTES.md` for the same reason. `7t_custom_example1` needs more than
-solver#14 alone, though (see next). `6t_custom_example3`'s fix (solver#13) has
-been verified end to end on unmerged branches — see below — but likewise
-hasn't shipped to `edge` or `stable` yet.
+Both fixtures were named in `RELEASE_NOTES.md`'s 2.0.0 known-limitations
+section as expected to fail under `stable`. As of solver/evaluator `2.1.0`
+(shipped 2026-09-11) that's no longer true for both, though not in the same
+way: `6t_custom_example3` now produces a valid plan under `stable` — solver#13
+is fully resolved. `7t_custom_example1` needed more than solver#14 alone: the
+free-overrun and the evaluator#6 spin are both gone, but the scenario still
+fails, now on the untriaged departure-mismatch defect (see below).
+`RELEASE_NOTES.md` has been updated to match.
 
 ### solver#14 verified fixed on edge, but `7t_custom_example1` still isn't valid
 
@@ -113,6 +114,43 @@ introduces no regression across the fixture corpus," not as a substitute for
 review or for the `edge`/`stable` promotion path. See
 [`pipeline-integration-testing.md`](pipeline-integration-testing.md) for how
 this kind of comparison is run in general.
+
+### solver#13 and solver#14 re-verified fixed on `stable` (2.1.0), 2026-09-12
+
+Both fixes shipped for real this time — solver/evaluator `2.1.0`, released
+2026-09-11 — rather than the `local-edge`/`edge` builds the two checks above
+were run against. Re-ran both scenarios in isolation (a scratch location dir,
+fixture corpus untouched) against `ghcr.io/robust-rail-nl/hip:latest` and
+`ghcr.io/robust-rail-nl/tors:latest`, both freshly pulled at `2.1.0`:
+
+- `6t_custom_example3`: **valid**. Confirms solver#13's fix holds under
+  `stable` proper, not just the `local-edge` build checked 2026-09-04.
+- `7t_custom_example1`: the solver's own cost breakdown now honestly reports
+  `dd=1` (previously a silent 0), and the evaluator no longer spins
+  (evaluator#6 not triggered) — the free overrun really is gone. But the plan
+  is still **not valid**: the same three "Trains's departure mismatch with
+  Action start/end time" errors as the 2026-09-03/04 checks, all at action
+  time `1830`, on `ShuntingUnit-4000` (declared departure `1500`) and
+  outstanding units `2001`/`3001` (declared departure `0`). Tried seeds 1-4;
+  all reproduce the identical `dd=1` outcome, so this isn't a seed-luck
+  artifact of the default 40-iteration TabuSearch budget — it's the same
+  untriaged defect as before, now confirmed present in the actual shipped
+  release rather than only on unmerged branches.
+
+  **2026-09-12, follow-up:** two of those three blocks (`2001`/`3001`) turned
+  out to be an evaluator diagnostic bug, not a real mismatch involving those
+  trains — they don't even share IDs with the action being evaluated.
+  Root-caused and fixed in
+  [robust-rail-evaluator#16](https://github.com/Robust-Rail-NL/robust-rail-evaluator/pull/16),
+  merged into `main` the same day and now in `tors:edge` too. `stable`
+  (`tors:latest`) is still `2.1.0` and will keep printing all three blocks
+  until the next evaluator release ships; running against `--version edge`
+  shows a single block for `ShuntingUnit-4000` only. Fixing the diagnostic
+  doesn't touch the actual defect above — `4000`'s declared departure still
+  doesn't match its plan action's time, and the evaluator still has no way
+  to accept a late departure the solver has already priced as `dd=1` rather
+  than treating it as unrecoverable — that part is still open, filed as
+  [robust-rail-evaluator#17](https://github.com/Robust-Rail-NL/robust-rail-evaluator/issues/17).
 
 ---
 

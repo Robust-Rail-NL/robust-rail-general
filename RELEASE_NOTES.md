@@ -40,6 +40,20 @@ tools that consume it:
 Both were deferred deliberately rather than blocking 2.0.0. If you're running
 the full pipeline and see these two fail, this is why.
 
+**Update, 2026-09-12:** solver/evaluator `2.1.0` (shipped 2026-09-11) fixes
+solver#13 and solver#14. Re-verified directly against `stable` today:
+
+- `6t_custom_example3` now produces a **valid plan**. solver#13 is fully
+  resolved — no longer a known limitation.
+- `7t_custom_example1` is **still not valid**, but for a different, better
+  reason: solver#14's fix means the solver no longer under-costs an
+  outStanding overrun for free, and the evaluator no longer spins on it
+  (evaluator#6 not triggered). Instead TORS now cleanly rejects the plan with
+  a "departure mismatch" error — a real, still-untriaged defect. See
+  [`docs/roadmap-2.0.0.md`](docs/roadmap-2.0.0.md) for the investigation and
+  [`docs/scenario-feasibility.md`](docs/scenario-feasibility.md) for the
+  fixture-level status.
+
 ### Fixture corpus and validation
 
 `sweep_seeds.py --save` classifies a configuration's outcomes across a range
