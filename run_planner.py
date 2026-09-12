@@ -46,9 +46,10 @@ DEFAULT_PLANNER_TIMEOUT = 600
 # - "stable-assert" likewise: the assertions builds are the evaluator's and
 #   the solver's. This image has no such variant, so the selector resolves to
 #   the plain image and the run stays comparable.
-# - "edge" likewise: only the solver has an edge channel. This image has no
-#   such variant, so the selector resolves to the plain image and the run
-#   stays comparable. See run_solver.py.
+# - "edge": newest push to the planner's own edge branch, not yet vetted
+#   enough to call stable. Floating tag, always overwritten — see
+#   docker-push-edge.sh in robust-rail-planner, same model as the solver's
+#   and evaluator's edge channels (see run_solver.py).
 #
 # The version is robust-rail-planner's own (see its VERSION file), deliberately
 # not 2.0.0 — that number belongs to the repos sharing an interchange format.
@@ -65,7 +66,7 @@ DEFAULT_PLANNER_TIMEOUT = 600
 DOCKER_IMAGE_VERSIONS = {
     "stable": "ghcr.io/robust-rail-nl/planner:latest",
     "stable-assert": "ghcr.io/robust-rail-nl/planner:latest",
-    "edge": "ghcr.io/robust-rail-nl/planner:latest",
+    "edge": "ghcr.io/robust-rail-nl/planner:edge",
     "local": "planner:latest",
 }
 

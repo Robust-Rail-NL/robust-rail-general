@@ -1,12 +1,14 @@
 name: Validate fixtures
 
 # edge is the fast/low-ceremony integration branch (see CONTRIBUTING.md);
-# main is kept stable for the planner team. dev is retired.
+# main is kept stable for the planner team. dev is retired. edge only ever
+# gains work via direct `git merge --no-ff`, never a GitHub PR targeting it,
+# so it's only listed under push, not pull_request.
 on:
   push:
     branches: [ "main", "edge" ]
   pull_request:
-    branches: [ "main", "edge" ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:

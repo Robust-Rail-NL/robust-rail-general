@@ -62,8 +62,8 @@ def main() -> None:
                         help="Pick a docker image version ('local' is reserved for locally built "
                              "images; 'stable-assert' runs the evaluator with assertions enabled "
                              "for integration testing, and is not for baseline comparison; 'edge' "
-                             "runs the solver and evaluator from their not-yet-vetted edge branch "
-                             "builds while generator stays on stable).")
+                             "runs the solver/planner and evaluator from their not-yet-vetted edge "
+                             "branch builds while generator stays on stable).")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--steps", metavar="STEPS", default=None,
                         help=f"Comma-separated list of steps to run (default: "

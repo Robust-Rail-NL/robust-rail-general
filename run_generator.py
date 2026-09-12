@@ -16,10 +16,10 @@ DOCKER_IMAGE_VERSIONS = {
     # a pipeline configuration — assert the evaluator, leave everything else
     # alone — rather than a per-tool build flag. See run_evaluator.py.
     "stable-assert": "ghcr.io/robust-rail-nl/generator:latest",
-    # Same image again: the generator has no edge channel — the solver and
-    # evaluator both do. "edge" names a pipeline configuration — run those
-    # two from their edge channels, leave the generator on stable — rather
-    # than a per-tool build flag. See run_solver.py.
+    # Same image again: the generator has no edge channel — the solver,
+    # planner and evaluator all do. "edge" names a pipeline configuration —
+    # run those from their edge channels, leave the generator on stable —
+    # rather than a per-tool build flag. See run_solver.py.
     "edge": "ghcr.io/robust-rail-nl/generator:latest",
     "local": "generator:latest",
 }
