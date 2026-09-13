@@ -80,9 +80,9 @@ have a verdict rather than a rate.
 | `10t_random_42s_distribution2` | infeasible | departure train 270.62 m > 255 m gateway |
 | `48t_custom_larger-example` | infeasible | arrival train 324.12 m > 255 m gateway (2 × VIRM-6) |
 | `24t_custom_kleinebinckhorst_absolute_seconds` | infeasible | arrival train 324.12 m > 255 m gateway (2 × VIRM-6), same overflow as `larger-example` on a different train |
-| `6t_custom_example3` | **feasible** under `stable` (2.1.0) | fixed by solver#13 (a delayed Arrival now gets a real duration instead of a trailing Wait); shipped 2026-09-11, re-verified directly against `stable` 2026-09-12, see roadmap |
+| `6t_custom_example3` | **feasible** under `stable` (2.1.0) | fixed by solver#13 (a delayed Arrival now gets a real duration instead of a trailing Wait); shipped 2026-09-11, re-verified directly against `stable` 2026-09-12, see roadmap. Currently invalid under `edge`, blocked by evaluator#18 (unrelated to solver#13) — see roadmap |
 | `7t_custom_example1` | unknown | solver#14 (no deadline for outStanding trains) shipped in `stable` 2.1.0 (2026-09-11) and no longer masks anything, but a second, untriaged defect (departure-mismatch) surfaces once that's fixed — see roadmap. Reconfirmed present against shipped `stable` 2.1.0, 2026-09-12 |
-| `8t_custom_example2` | **feasible** | valid as of evaluator `2bbad58`; exercises StandIn, Arrive, Exit and StandOut in one plan |
+| `8t_custom_example2` | **feasible** under `stable` | valid as of evaluator `2bbad58`; exercises StandIn, Arrive, Exit and StandOut in one plan. Currently invalid under `edge`, blocked by evaluator#18 — see roadmap |
 | `30t_random_98s_test` | unknown | every train late both ways (`dd=30, da=29`); over-subscribed |
 | `simple_service_location_4t_custom_late` | unknown | departure-time mismatch, likely infeasible by design |
 
@@ -92,7 +92,10 @@ fixed by the scenario and the train does not fit on it, so no plan can help.
 ## Known blockers
 
 Three defects stopped otherwise-reasonable scenarios from validating. All
-three predate the 2.0.0 migration; one is now resolved.
+three predate the 2.0.0 migration; one is now resolved. (A fourth,
+evaluator-only regression introduced by `edge`'s schema-v2/Setback work has
+since come and gone in favor of a fifth, previously-known defect — see
+[`roadmap-2.0.0.md`](roadmap-2.0.0.md#edge-vs-stable-rerun-2026-09-13-setbackparking-regression-fixed-a-second-defect-takes-its-place).)
 
 - **A train that waits on the gateway** was rejected, because the gateway forbids
   parking. It is not parked there by choice — it has arrived and not yet been
