@@ -7,9 +7,11 @@ import subprocess
 import sys
 from pathlib import Path
 
-from docker_utils import ensure_docker_running, ensure_pulled
+from scripts.docker_utils import ensure_docker_running, ensure_pulled
+from scripts.instance_filter import fail_no_match, instance_of, select
 
 ROOT = Path(__file__).parent
+INSTANCE_PREFIX = "plan_"
 DOCKER_IMAGE_VERSIONS = {
     "stable": "ghcr.io/robust-rail-nl/tors:latest",
     # The evaluator is the oracle the pipeline trusts, and its assertions build
@@ -32,7 +34,7 @@ CONTAINER_DB = "/app/database"
 
 
 def _scenario_name(plan: Path) -> str:
-    return plan.stem.removeprefix("plan_")
+    return instance_of(plan, INSTANCE_PREFIX)
 
 
 def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool) -> bool:
@@ -108,6 +110,10 @@ def main() -> None:
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
+    parser.add_argument("--instance", metavar="NAME",
+                        help="Restrict to a single plans/plan_<NAME>.json (a pasted filename works "
+                             "too). Accepts shell-style wildcards; exits non-zero if it matches "
+                             "nothing.")
     parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='stable',
                         help="Pick a docker image version ('local' is reserved for locally built "
                              "images).")
@@ -120,11 +126,14 @@ def main() -> None:
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 
     total, errors = 0, 0
+    available: list[str] = []
     for loc in locations:
         if not loc.is_dir():
             print(f"WARNING: {loc} not found, skipping.", file=sys.stderr)
             continue
         plans = sorted(loc.glob("plans/plan_*.json"))
+        available += [_scenario_name(p) for p in plans]
+        plans = select(plans, args.instance, INSTANCE_PREFIX)
         if not plans:
             continue
         print(f"\n{loc.name} ({len(plans)} plan(s))")
@@ -132,6 +141,9 @@ def main() -> None:
             total += 1
             if not _run_plan(DOCKER_IMAGE_VERSIONS[args.version], loc, plan, args.dry_run):
                 errors += 1
+
+    if args.instance and total == 0:
+        fail_no_match(args.instance, available)
 
     print(f"\nDone: {total - errors}/{total} succeeded.")
     if errors:

@@ -30,6 +30,11 @@ SCRIPTS = {
 # Rejected outright rather than documented: the failure is silent otherwise.
 EXCLUSIVE_STEPS = {"solver", "planner"}
 
+# Only the two plan-producing steps take --timeout. The generator and evaluator
+# are short, bounded conversions with nothing to cut short, and passing them a
+# flag they do not define would abort the pipeline on an argparse error.
+TIMEOUT_STEPS = {"solver", "planner"}
+
 
 def _load_versions(step: str, version_key: str) -> str:
     script = SCRIPTS[step]
@@ -57,6 +62,12 @@ def main() -> None:
                         help="Pass --dry-run to each step.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
+    parser.add_argument("--instance", metavar="NAME",
+                        help="Restrict to a single instance, passed on to every step. All four "
+                             "steps share one naming suffix (scenario_<NAME> -> plan_<NAME> -> "
+                             "eval_<NAME>), so one value selects the same instance throughout. "
+                             "Accepts shell-style wildcards; a step that matches nothing fails "
+                             "and aborts the pipeline.")
     parser.add_argument("--version", choices=['stable', 'stable-assert', 'edge', 'local'],
                         default='stable',
                         help="Pick a docker image version ('local' is reserved for locally built "
@@ -64,6 +75,14 @@ def main() -> None:
                              "for integration testing, and is not for baseline comparison; 'edge' "
                              "runs the solver/planner and evaluator from their not-yet-vetted edge "
                              "branch builds while generator stays on stable).")
+    parser.add_argument("--timeout", type=int, default=None, metavar="SECONDS",
+                        help="Wall-clock budget for whichever of solver/planner runs, enforced "
+                             "the same way for both: the container is killed once it expires. "
+                             "Passed only to those two steps. For the solver this is a SIGKILL "
+                             "that forfeits its best-so-far plan, so also raise "
+                             "SimulatedAnnealing.MaxDuration in config_solver.yaml above this "
+                             "value if you want the kill, rather than the solver's own budget, "
+                             "to be what binds.")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--steps", metavar="STEPS", default=None,
                         help=f"Comma-separated list of steps to run (default: "
@@ -103,6 +122,9 @@ def main() -> None:
     extra += ["--version", args.version]
     if args.location:
         extra += ["--location", args.location]
+    if args.instance:
+        extra += ["--instance", args.instance]
+    timeout_extra = ["--timeout", str(args.timeout)] if args.timeout is not None else []
 
     steps_str = " → ".join(steps)
     images = {step: _load_versions(step, args.version) for step in steps}
@@ -112,7 +134,7 @@ def main() -> None:
     print(f"  {version_summary}")
 
     for step in steps:
-        if not _run_step(step, extra):
+        if not _run_step(step, extra + (timeout_extra if step in TIMEOUT_STEPS else [])):
             print(f"\nPipeline aborted: step '{step}' failed.", file=sys.stderr)
             sys.exit(1)
 

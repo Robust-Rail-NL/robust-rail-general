@@ -1,8 +1,8 @@
 [project]
 # Dist name matches the repo (referenced from the generator's dependency
-# declaration); the importable package is src/robust_rail_models/. Decided
-# in robust-rail-generator#14 — see docs/roadmap-2.0.0.md, "Where the
-# exported schemas should live".
+# declaration); the importable package is robust_rail_models/ at the repo
+# root. Decided in robust-rail-generator#14 — see docs/roadmap-2.0.0.md,
+# "Where the exported schemas should live".
 name = "robust-rail-general"
 version = "0.1.1"
 description = "Interchange schema (Location/Scenario/Plan) shared by the Robust Rail NL pipeline"
@@ -16,12 +16,12 @@ dependencies = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-# This repo is more than the models package: run_*.py, Location_*/ fixtures,
-# docs/, etc. all live at the repo root too. Only src/robust_rail_models/
-# ships in the wheel — everything else stays out of what a dependent
-# actually installs.
+# This repo is more than the models package: run_*.py, scripts/, Location_*/
+# fixtures, docs/, etc. all sit at the repo root beside it. Only
+# robust_rail_models/ ships in the wheel — everything else stays out of what
+# a dependent actually installs.
 [tool.hatch.build.targets.wheel]
-packages = ["src/robust_rail_models"]
+packages = ["robust_rail_models"]
 
 [dependency-groups]
 dev = [
@@ -30,7 +30,7 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+pythonpath = ["."]
 testpaths = ["tests"]
 
 [tool.ruff]

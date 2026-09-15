@@ -4,6 +4,8 @@
 import shutil
 import subprocess
 import sys
+import uuid
+from pathlib import Path
 
 
 def ensure_pulled(image: str) -> None:
@@ -32,6 +34,44 @@ def ensure_pulled(image: str) -> None:
         if stderr:
             print(f"  docker said: {stderr.splitlines()[-1]}", file=sys.stderr)
         sys.exit(1)
+
+
+def container_name(prefix: str, instance: str) -> str:
+    """A unique --name for one container, so a timeout can target that container.
+
+    The uuid suffix (rather than just the instance name) avoids a "name already
+    in use" conflict when a previous run's container of the same name is still
+    being torn down.
+    """
+    return f"{prefix}-{instance}-{uuid.uuid4().hex[:8]}"
+
+
+def run_container(cmd: list[str], name: str, out_file: Path, err_file: Path,
+                  timeout: int | None) -> tuple[int | None, bool]:
+    """Run one `docker run --name <name> ...`, capturing stdout/stderr to files.
+
+    Returns (returncode, timed_out); returncode is None if the run raised
+    rather than exiting, in which case the exception is reported here.
+
+    On timeout the container is killed by name. subprocess's own timeout only
+    kills the local `docker run` client, not the container it started, which
+    keeps running under dockerd regardless — learned by hand on 2026-08-24,
+    when killing run_planner.py left a container running for hours until it was
+    separately `docker kill`ed. `--rm` still applies once the container stops,
+    so a plain kill is enough and no separate `docker rm` is needed.
+    """
+    returncode, timed_out = None, False
+    try:
+        with open(out_file, "w") as fout, open(err_file, "w") as ferr:
+            result = subprocess.run(cmd, stdout=fout, stderr=ferr, timeout=timeout)
+        returncode = result.returncode
+    except subprocess.TimeoutExpired:
+        timed_out = True
+        subprocess.run(["docker", "kill", name],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception as exc:
+        print(f"    ERROR: {exc}", file=sys.stderr)
+    return returncode, timed_out
 
 
 def ensure_docker_running() -> None:

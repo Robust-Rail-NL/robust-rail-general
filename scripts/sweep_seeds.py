@@ -32,7 +32,9 @@ from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
-ROOT = Path(__file__).parent
+# The repo root, one level up from scripts/: Location_* fixtures and the
+# run_*.py steps this drives both live there, not beside this file.
+ROOT = Path(__file__).resolve().parent.parent
 # Solver violation counters; a plan is unviolating only if all of them are zero.
 # cr (crossings), sm (shunt moves) and rd (routing duration) are costs, not
 # violations, so they are deliberately excluded.
@@ -255,9 +257,10 @@ def main() -> None:
 
         for seed in seeds:
             seeded = dict(config, seed=seed)
-            # The generator derives the scenario name from everything after
-            # "scenario_config_" in the config filename, so "_s<seed>" keeps
-            # outputs distinct per seed.
+            # run_generator.py names each scenario after everything following
+            # "scenario_config_" in the config filename, so "_s<seed>" is what
+            # keeps the seeds' outputs distinct — the seed is not otherwise
+            # part of the name.
             (work / "configurations" / f"scenario_config_{args.config}_s{seed}.json").write_text(
                 json.dumps(seeded, indent=4)
             )
@@ -271,10 +274,10 @@ def main() -> None:
 
         results = []
         for seed in seeds:
-            # Mirrors main.py's default naming: everything after "scenario_config_"
-            # in the per-seed config filename written above becomes the suffix.
-            # Note run_generator.py's .out/.err use a different, config-based name.
-            base = f"{config['location']}_{config['number_of_trains']}t_random_{seed}s_{args.config}_s{seed}"
+            # The suffix of the per-seed config written above, carried through
+            # unchanged by every step: scenario_<base>.json -> plan_<base>.json
+            # -> eval_<base>.txt, and run_generator.py's .out/.err too.
+            base = f"{args.config}_s{seed}"
             bucket, reason = _classify(work, base)
             results.append({"seed": seed, "outcome": bucket, "reason": reason, "base": base})
 

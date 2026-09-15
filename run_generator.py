@@ -7,9 +7,11 @@ import subprocess
 import sys
 from pathlib import Path
 
-from docker_utils import ensure_docker_running, ensure_pulled
+from scripts.docker_utils import ensure_docker_running, ensure_pulled
+from scripts.instance_filter import fail_no_match, instance_of, select
 
 ROOT = Path(__file__).parent
+INSTANCE_PREFIX = "scenario_config_"
 DOCKER_IMAGE_VERSIONS = {
     "stable": "ghcr.io/robust-rail-nl/generator:latest",
     # Same image: the generator has no assertions build. "stable-assert" names
@@ -27,7 +29,7 @@ CONTAINER_DB = "/app/database"
 
 
 def _config_name(config: Path) -> str:
-    return config.stem.removeprefix("scenario_config_")
+    return instance_of(config, INSTANCE_PREFIX)
 
 
 def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bool) -> bool:
@@ -39,6 +41,18 @@ def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bo
         docker_image,
         "--config", config.name,
         "--path", CONTAINER_DB,
+        # Name the output explicitly rather than letting the generator derive
+        # one. Left to itself, create_scenario_from_config() in
+        # robust-rail-generator's src/main.py builds the name out of the
+        # location, the train count and either "custom" or the seed, so
+        # scenario_config_marginal_congestion.json became
+        # scenario_KleineBinckhorst_14t_random_1s_marginal_congestion.json —
+        # a rule this repo could only mirror by reimplementing it (seed
+        # default included) and re-mirroring it on every generator change.
+        # Naming it here instead keeps one suffix across all four steps:
+        # scenario_<suffix> -> plan_<suffix> -> eval_<suffix>, so a single
+        # --instance value selects the same instance at every step.
+        "--scenario-file", f"scenario_{name}.json",
     ]
 
     print(f"  {config.name}  ->  scenario_{name}.json")
@@ -84,6 +98,10 @@ def main() -> None:
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
+    parser.add_argument("--instance", metavar="NAME",
+                        help="Restrict to a single configurations/scenario_config_<NAME>.json "
+                             "(a pasted filename works too). Accepts shell-style wildcards; exits "
+                             "non-zero if it matches nothing.")
     parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='stable',
                         help="Pick a docker image version ('local' is reserved for locally built "
                              "images).")
@@ -96,11 +114,14 @@ def main() -> None:
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 
     total, errors = 0, 0
+    available: list[str] = []
     for loc in locations:
         if not loc.is_dir():
             print(f"WARNING: {loc} not found, skipping.", file=sys.stderr)
             continue
         configs = sorted(loc.glob("configurations/scenario_config_*.json"))
+        available += [_config_name(c) for c in configs]
+        configs = select(configs, args.instance, INSTANCE_PREFIX)
         if not configs:
             continue
         print(f"\n{loc.name} ({len(configs)} config(s))")
@@ -108,6 +129,9 @@ def main() -> None:
             total += 1
             if not _run_config(DOCKER_IMAGE_VERSIONS[args.version], loc, config, args.dry_run):
                 errors += 1
+
+    if args.instance and total == 0:
+        fail_no_match(args.instance, available)
 
     print(f"\nDone: {total - errors}/{total} succeeded.")
     if errors:

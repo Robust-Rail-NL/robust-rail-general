@@ -5,8 +5,9 @@ import argparse
 import sys
 from pathlib import Path
 
-
-SCENARIO_PLANNING_INPUTS_DIR = Path(__file__).resolve().parent
+# The repo root, one level up from scripts/: the Location_* fixtures this
+# empties live there, not beside this file.
+SCENARIO_PLANNING_INPUTS_DIR = Path(__file__).resolve().parent.parent
 EMPTY_DIRS = ["evaluations", "plans", "scenarios"]
 
 

@@ -211,7 +211,7 @@
 		},
 		{
 			"startTime": 900,
-			"endTime": 900,
+			"endTime": 1110,
 			"taskType": {
 				"predefined": "Arrive",
 				"other": null
@@ -231,24 +231,6 @@
 					"id": 15
 				}
 			]
-		},
-		{
-			"startTime": 900,
-			"endTime": 1110,
-			"taskType": {
-				"predefined": "Wait",
-				"other": null
-			},
-			"shuntingUnit": {
-				"id": 2,
-				"memberIDs": [
-					2404
-				],
-				"parentIDs": [],
-				"childIDs": []
-			},
-			"location": 15,
-			"resources": []
 		},
 		{
 			"startTime": 1110,
