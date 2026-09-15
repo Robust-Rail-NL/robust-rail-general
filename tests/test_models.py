@@ -6,6 +6,7 @@ import logging
 import pytest
 from pydantic import TypeAdapter, ValidationError
 
+from robust_rail_models.plan import Feasibility, Plan
 from robust_rail_models.scenario import (
     IncomingTrain,
     IncomingTrainUnit,
@@ -75,6 +76,51 @@ class TestTaskSpec:
     def test_optional_present_when_explicitly_set(self):
         spec = TaskSpec(duration=60, optional=True)
         assert spec.to_dict()["optional"] is True
+
+
+class TestPlanFeasibilityAndCost:
+    def test_feasibility_defaults_to_unknown(self):
+        plan = Plan(actions=[])
+        assert plan.feasibility == Feasibility.UNKNOWN
+
+    def test_new_fields_omitted_from_wire_when_unset(self):
+        wire = Plan(actions=[]).to_dict()
+        assert "feasibility" not in wire
+        assert "producer" not in wire
+        assert "cost" not in wire
+        assert "costDetails" not in wire
+        assert "schemaVersion" in wire
+
+    def test_old_plan_without_new_fields_still_validates(self):
+        plan = Plan.model_validate({"schemaVersion": 2, "actions": []})
+        assert plan.feasibility == Feasibility.UNKNOWN
+        assert plan.producer is None
+        assert plan.cost is None
+        assert plan.cost_details is None
+
+    def test_new_fields_round_trip_through_wire_dict(self):
+        plan = Plan(
+            actions=[],
+            feasibility=Feasibility.FEASIBLE,
+            producer="robust-rail-solver 2.0.0",
+            cost=12.5,
+            cost_details="Cost = 12.5 : cr=0, dd=0",
+        )
+        wire = plan.to_dict()
+        assert wire["feasibility"] == "Feasible"
+        assert wire["producer"] == "robust-rail-solver 2.0.0"
+        assert wire["cost"] == 12.5
+        assert wire["costDetails"] == "Cost = 12.5 : cr=0, dd=0"
+
+        reloaded = Plan.model_validate(wire)
+        assert reloaded.feasibility == Feasibility.FEASIBLE
+        assert reloaded.producer == plan.producer
+        assert reloaded.cost == plan.cost
+        assert reloaded.cost_details == plan.cost_details
+
+    def test_cost_details_alias_accepts_wire_camelcase(self):
+        plan = Plan.model_validate({"actions": [], "costDetails": "x"})
+        assert plan.cost_details == "x"
 
 
 def _scenario(**overrides):
