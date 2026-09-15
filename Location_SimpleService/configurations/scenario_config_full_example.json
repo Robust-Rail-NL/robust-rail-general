@@ -1,0 +1,111 @@
+{
+    "location": "simple_service_location",
+    "start_time": 0,
+    "end_time": 3600,
+    "min_gap_on_gateway": 100,
+    "track_ids_used": true,
+    "use_default_material": true,
+    "trains_given": true,
+    "perform_servicing": true,
+    "partial_matching_given": false,
+    "partial_plan_given": false,
+    "through_traffic_given": false,
+    "custom_servicing_tasks": [
+        {
+            "name": "clean_train",
+            "type": "Reinigingsperron",
+            "optional": false,
+            "duration": 500,
+            "required_skills": ["inwendige_reiniging"]
+        }
+    ],
+    "custom_train_units": [
+        {
+            "id": 2101,
+            "type": "SLT-4",
+            "services": ["clean_train"]
+        },
+        {
+            "id": 2102,
+            "type": "SLT-4",
+            "services": []
+        },
+        {
+            "id": 2103,
+            "type": "SLT-4",
+            "services": []
+        },
+        {
+            "id": 2201,
+            "type": "SNG-4",
+            "services": []
+        },
+        {
+            "id": 2202,
+            "type": "SNG-4",
+            "services": []
+        },
+        {
+            "id": 2301,
+            "type": "ICM-4",
+            "services": ["clean_train"]
+        },
+        {
+            "id": 2302,
+            "type": "ICM-4",
+            "services": ["clean_train"]
+        }
+    ],
+    "custom_trains": [
+        {
+            "id": 11111,
+            "members": [2101,2102],
+            "arrival_time": 500,
+            "arrival_track": "4",
+            "side_track_part": "13"
+        },
+        {
+            "id": 11112,
+            "members": [2103],
+            "arrival_time": 1300,
+            "arrival_track": "4",
+            "side_track_part": "13"
+        },
+        {
+            "id": 22222,
+            "members": [2201,2202],
+            "arrival_time": 1500,
+            "arrival_track": "4",
+            "side_track_part": "13"
+
+        },
+        {
+            "id": 33333,
+            "members": [2301,2302],
+            "arrival_time": 1700,
+            "arrival_track": "4",
+            "side_track_part": "13"
+        },
+        {
+            "id": 33334,
+            "member_types": ["ICM-4", "ICM-4"],
+            "departure_time": 2800,
+            "departure_track": "4",
+            "side_track_part": "13"
+        },
+        {
+            "id": 22223,
+            "member_types": ["SNG-4", "SNG-4"],
+            "departure_time": 3000,
+            "departure_track": "4",
+            "side_track_part": "13"
+        },
+        {
+            "id": 11113,
+            "member_types": ["SLT-4", "SLT-4", "SLT-4"],
+            "departure_time": 3300,
+            "departure_track": "4",
+            "side_track_part": "13"
+        }
+    ]
+}

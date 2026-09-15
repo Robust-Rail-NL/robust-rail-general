@@ -2,8 +2,8 @@
 +---------------------------+
 | Tracked Train     : 25
 | Is Train matched  : Yes
-| Action start time : 8520
-| Action end time   : 8520
+| Action start time : 8460
+| Action end time   : 8460
 | Trains's departure: 7800
 +---------------------------+
 | Error Suspected:  
@@ -16,8 +16,8 @@
 +---------------------------+
 | Tracked Train     : 26
 | Is Train matched  : No
-| Action start time : 8520
-| Action end time   : 8520
+| Action start time : 8460
+| Action end time   : 8460
 | Trains's departure: 10500
 +---------------------------+
 | Error Suspected:  
@@ -30,8 +30,8 @@
 +---------------------------+
 | Tracked Train     : 27
 | Is Train matched  : No
-| Action start time : 8520
-| Action end time   : 8520
+| Action start time : 8460
+| Action end time   : 8460
 | Trains's departure: 6900
 +---------------------------+
 | Error Suspected:  

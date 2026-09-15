@@ -8,21 +8,20 @@ import subprocess
 import sys
 from pathlib import Path
 
-from docker_utils import ensure_docker_running, pull_flag
+from docker_utils import ensure_docker_running, ensure_pulled
 
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
-    "legacy": "ghcr.io/robust-rail-nl/generator:1.2.2",
-    "stable": "ghcr.io/robust-rail-nl/generator:2.0.0",
+    "stable": "ghcr.io/robust-rail-nl/generator:latest",
     # Same image: the generator has no assertions build. "stable-assert" names
     # a pipeline configuration — assert the evaluator, leave everything else
     # alone — rather than a per-tool build flag. See run_evaluator.py.
-    "stable-assert": "ghcr.io/robust-rail-nl/generator:2.0.0",
-    # Same image again: only the solver has an edge channel. "edge" names a
-    # pipeline configuration — run the solver from its edge channel, leave
-    # generator and evaluator on stable — rather than a per-tool build flag.
-    # See run_solver.py.
-    "edge": "ghcr.io/robust-rail-nl/generator:2.0.0",
+    "stable-assert": "ghcr.io/robust-rail-nl/generator:latest",
+    # Same image again: the generator has no edge channel — the solver,
+    # planner and evaluator all do. "edge" names a pipeline configuration —
+    # run those from their edge channels, leave the generator on stable —
+    # rather than a per-tool build flag. See run_solver.py.
+    "edge": "ghcr.io/robust-rail-nl/generator:latest",
     "local": "generator:latest",
 }
 CONTAINER_DB = "/app/database"
@@ -37,7 +36,6 @@ def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bo
     name = _config_name(config)
     cmd = [
         "docker", "run", "--rm",
-        *pull_flag(docker_image),
         *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         # A second, more specific mount overlays just the configurations/
@@ -95,9 +93,8 @@ def main() -> None:
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory.")
     parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='stable',
-                        help="Pick a docker image version ('legacy' no longer works against this "
-                             "repo's fixtures — Phase 1 moved run_*.py to the unified format "
-                             "unconditionally; 'local' is reserved for locally built images).")
+                        help="Pick a docker image version ('local' is reserved for locally built "
+                             "images).")
     parser.add_argument("--config-dir", metavar="DIR", type=Path,
                         help="Use scenario_config_*.json files from this directory instead of "
                              "<location>/configurations/ (requires --location). Overlays the "
@@ -112,6 +109,7 @@ def main() -> None:
 
     if not args.dry_run:
         ensure_docker_running()
+        ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 

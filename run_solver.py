@@ -12,12 +12,11 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
-from docker_utils import ensure_docker_running, run_with_timeout, pull_flag
+from docker_utils import ensure_docker_running, ensure_pulled, run_with_timeout
 
 ROOT = Path(__file__).parent
 DOCKER_IMAGE_VERSIONS = {
-    "legacy": "ghcr.io/robust-rail-nl/hip:1.4.2",
-    # Should float forward across ordinary releases rather than pinning one:
+    # Floats forward across ordinary releases rather than pinning one:
     # docker-push.sh only tags :latest on a real X.Y.Z build, so this needs no
     # update here when a new stable version ships. The --version key names a
     # pipeline configuration rather than a literal version number.
@@ -124,7 +123,6 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run
 
     cmd = [
         "docker", "run", "--rm",
-        *pull_flag(docker_image),
         *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         docker_image,
@@ -258,10 +256,9 @@ def main() -> None:
     parser.add_argument("--location", metavar="NAME",
                         help="Restrict to a single Location_* directory (e.g. Location_SimpleService).")
     parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='stable',
-                        help="Pick a docker image version ('legacy' no longer works against this "
-                             "repo's fixtures — Phase 1 moved run_*.py to the unified format "
-                             "unconditionally; 'local' is reserved for locally built images; "
-                             "'edge' tracks the newest not-yet-vetted push to the edge branch).")
+                        help="Pick a docker image version ('local' is reserved for locally built "
+                             "images; " "'edge' tracks the newest not-yet-vetted push to the edge "
+                             "branch).")
     parser.add_argument("--scenario", metavar="NAME",
                         help="Run a single scenario instead of every scenario_*.json under "
                              "the location (requires --location and --output-dir).")
@@ -296,6 +293,7 @@ def main() -> None:
 
     if not args.dry_run:
         ensure_docker_running()
+        ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
 
     if args.scenario:
         loc = ROOT / args.location

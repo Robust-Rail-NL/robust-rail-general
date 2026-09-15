@@ -9,25 +9,188 @@ below.
 
 ---
 
-## Known issues (open upstream, checked 2026-08-27)
+## Known issues (open upstream, checked 2026-09-03; solver#13/#14 re-checked 2026-09-12 against shipped `stable`)
 
 | issue | effect |
 |---|---|
-| solver#13 | Solver parks on non-parking arrival tracks when it cannot move into the yard immediately. Blocks `6t_custom_example3`. |
-| solver#14 | outStanding trains have no deadline in the cost function, so plans over-run the scenario horizon for free. Produces the plan that trips evaluator#6. |
-| evaluator#6 | `EvaluatePlan` spins when the plan still has actions but the state is terminal, reporting the symptom rather than "plan extends past the horizon". Terminates via a safety valve; blocks nothing, but the diagnostic misleads. Blocks `7t_custom_example1`. |
+| solver#13 | Solver parks on non-parking arrival tracks when it cannot move into the yard immediately. Blocked `6t_custom_example3` under `stable`/`edge`. **Fixed and shipped** — solver PR #13 (`68aa9d4`, "Give a delayed Arrival a real duration instead of a trailing Wait") with a companion evaluator PR #13 (`6851675`) landed in solver/evaluator `2.1.0` (2026-09-11) and are now in `stable`. Re-verified directly against `stable` 2026-09-12 — see below. |
+| solver#14 | outStanding trains have no deadline in the cost function, so plans over-run the scenario horizon for free. Produces the plan that trips evaluator#6. **Fixed and shipped** in solver `2.1.0` (2026-09-11), now in `stable`. Re-verified directly against `stable` 2026-09-12 — fixing it still isn't enough on its own to make `7t_custom_example1` valid, see below. |
+| evaluator#6 | `EvaluatePlan` spins when the plan still has actions but the state is terminal, reporting the symptom rather than "plan extends past the horizon". Terminates via a safety valve; blocks nothing, but the diagnostic misleads. Still open (the spin bug itself isn't fixed) — but no longer triggered under `stable` now that solver#14 ships, since the overrun it was reacting to no longer happens. Confirmed 2026-09-12. |
 | evaluator#1 | Invalid JSON for PB parsing fails quietly. On the legacy `--plan_type Evaluator` path only. |
 | solver#17 | Solver and evaluator place a combined inStanding train's members at opposite ends of the track, so the solver routes a departing half out of the blocked end and calls the result feasible. Needs a decision on which convention is right, and probably a companion evaluator issue. |
-| solver#18 | Solver ignores `standingIndex`, so the order of several standing units on one track is not the one the scenario asked for. Latent in this corpus — every scenario leaves the field null. The evaluator does honour it. |
+| solver#18 | Solver ignores `standingIndex`, so the order of several standing units on one track is not the one the scenario asked for. **Fixed and shipped** in solver `2.1.0` too, but latent in this corpus regardless — every scenario here leaves the field null, so nothing to re-verify. The evaluator does honour it. |
 | solver#19 | Question, not a defect: splitting a train in place costs no shunt move, and nothing prices the personnel it would need. |
+| evaluator#17 | Once solver#14's overrun no longer masks it, TORS rejects `7t_custom_example1` with a different error: "departure mismatch" on `ShuntingUnit-4000`, whose declared departure time doesn't match its plan action's — the evaluator has no way to accept a late departure the solver already prices as `dd=1`, rather than treating it as unrecoverable. Reconfirmed present under shipped `stable` (2.1.0), 2026-09-12, and now filed — the sole remaining blocker for this fixture. |
+| evaluator#13 (fixed on `edge`) | `legal_on_parking_track_rule` rejected the `EndMove` a schema-v2 plan's Setback conversion synthesizes before it, on the reversal track — treating a unit about to reverse and carry straight on as if it were parking there. Regressed `6t_custom_example3` and `8t_custom_example2` under `edge`'s schema-v2/Setback work (found 2026-09-12, see below). **Fixed and merged into `edge`** 2026-09-13 (`af6ce88`, generalizing the existing Exit exemption to also cover Setback) — both fixtures get past this rejection now. Not yet in `stable`. |
+| evaluator#18 | `MoveActionGenerator` recomputes a replayed multi-hop `Move`'s duration as a fixed per-track-type sum instead of trusting the plan's own declared duration; on a long enough route the sum overruns the plan's window, and the next queued action for that unit (typically `EndMove`) fails with a misleading "already active" error. Filed 2026-09-13. Now the sole blocker for both `6t_custom_example3` and `8t_custom_example2` under `edge`, confirmed 2026-09-13 — see below. |
 
 None of #17, #18 or #19 blocks the pipeline. #17 needs a combined inStanding
 train that gets split, which no fixture has; #18 needs a non-null
 `standingIndex`, which no fixture has; #19 is a modelling question.
 
-`6t_custom_example3` and `7t_custom_example1` cannot produce a valid plan
-because of the two issues above and are expected to keep failing until they're
-fixed — named in `RELEASE_NOTES.md` for the same reason.
+Both fixtures were named in `RELEASE_NOTES.md`'s 2.0.0 known-limitations
+section as expected to fail under `stable`. As of solver/evaluator `2.1.0`
+(shipped 2026-09-11) that's no longer true for both, though not in the same
+way: `6t_custom_example3` now produces a valid plan under `stable` — solver#13
+is fully resolved. `7t_custom_example1` needed more than solver#14 alone: the
+free-overrun and the evaluator#6 spin are both gone, but the scenario still
+fails, now on the untriaged departure-mismatch defect (see below).
+`RELEASE_NOTES.md` has been updated to match.
+
+### solver#14 verified fixed on edge, but `7t_custom_example1` still isn't valid
+
+Checked 2026-09-03 by running the `edge`-channel solver against
+`7t_custom_example1` in isolation (a scratch location dir with just this one
+scenario, so the real fixture corpus wasn't touched), then the `stable`
+evaluator against the resulting plan.
+
+The overrun itself is gone: train 2401's last action previously ran
+`01:20–01:35` against the `01:20` (T4800) horizon; on `edge` it finishes
+`00:45–01:00`, comfortably inside it. The solver's own cost breakdown grew a
+new `oo` counter (`cr=0, dd=1, da=0, tlv=0, sm=5, rd=498.80, cd=0, um=0,
+oo=0`) that didn't exist before — matching the issue's suggested fix of
+costing outStanding overruns as their own counter.
+
+But TORS still calls the plan invalid, now for an unrelated reason that the
+overrun previously masked (evaluator#6 never even triggers under `edge`,
+since there's no more terminal-state mismatch to spin on): three "Trains's
+departure mismatch with Action start/end time" errors, all at action time
+`1830`, on `ShuntingUnit-4000` (the combined instanding pair 2801+2802,
+scheduled departure `1500`) and the two outstanding units `2001`/`3001`
+(recorded departure `0`). Whether this is a new regression from solver#14's
+fix (its own writeup mentions plan serialization changed for `StandOut`
+actions) or a pre-existing defect this scenario always had is not yet known —
+needs its own investigation and, likely, its own issue before
+`7t_custom_example1` can be called resolved.
+
+### solver#13 verified fixed on local-edge, `6t_custom_example3` now valid
+
+Checked 2026-09-04 by running the *entire* fixture corpus (both locations, all
+12 scenarios — not just one scenario in isolation, unlike the solver#14 check
+above) with `run_pipeline.py --version stable` and then `--version local`,
+diffing evaluator verdicts and plan JSON between the two.
+
+"Local" here means images built from each repo's `local-edge` branch: an ad
+hoc branch, not part of the `stable`/`edge` channel model, that merges `edge`
+plus every currently-open bugfix PR for that repo, so several not-yet-reviewed
+fixes can be checked together before any of them lands on `edge`. Solver's
+`local-edge` is `edge` + PR #13 (`68aa9d4`) + PR #14 (`4d5b592`, already
+verified on `edge` separately, see above) + PR #30 (`c01e121`, a `SimulatedAnnealing`
+config-key rename, unrelated to any fixture outcome). Evaluator's `local-edge`
+is `edge` + the companion PR #13 fix (`6851675`) + `fix/silent-empty-protobuf-parse`
+(evaluator#1-adjacent; not exercised by this corpus). Generator and planner have
+no `local-edge` branch — their `local` images are plain rebuilds of `main`, and
+produced byte-identical scenarios to `stable`, as expected.
+
+`6t_custom_example3` flips from invalid to valid. Under `stable`/`edge` the
+plan contained an explicit `Wait` action on gateway track 906a (`startTime:
+900, endTime: 1110`), which the evaluator rejects outright since the gateway
+forbids parking. Under `local-edge` that action is gone: the delayed Arrival
+that used to end at `900` and hand off to the `Wait` now just runs to `1110`
+itself, exactly matching the fix's description (give the Arrival a real
+duration instead of a trailing `Wait`).
+
+Verdict changed for exactly one scenario here, `6t_custom_example3` (invalid
+→ valid). `7t_custom_example1`'s verdict is unchanged — still invalid — but
+for a different *reason* than under plain `edge`: the same three "departure
+mismatch" errors at action time `1830` as the 2026-09-03 check above, not the
+evaluator#6 spin. All other scenarios' verdicts are unchanged from `stable`.
+
+Plan content is a separate axis from verdict: 7 of the 12 fixture plans came
+out byte-different from their `stable` counterparts regardless of verdict —
+`10t_random_42s_distribution1`, `10t_random_42s_distribution2`,
+`48t_custom_larger-example` and `30t_random_98s_test` (all four an unchanged
+verdict, different plan bytes), plus `simple_service_location_4t_custom_late`
+(same), and the two scenarios above with a verdict or failure-reason change.
+This is consistent with solver#14's writeup noting a broader serialization
+change around outStanding/`StandOut` actions, not just its cost-function fix.
+The other 5 scenarios came out byte-identical:
+`24t_custom_kleinebinckhorst_absolute_seconds`, `4t_random_1s_feasible_small`,
+`2t_random_1s_marginal_length`, `8t_custom_example2`, and
+`14t_random_1s_marginal_congestion`.
+
+**Caveat:** `local-edge` is not a published or tagged image — it is a same-day
+local build off a branch merging open, unreviewed PRs, one level more
+provisional than `edge` itself. Read this as "the fix looks right and
+introduces no regression across the fixture corpus," not as a substitute for
+review or for the `edge`/`stable` promotion path. See
+[`pipeline-integration-testing.md`](pipeline-integration-testing.md) for how
+this kind of comparison is run in general.
+
+### solver#13 and solver#14 re-verified fixed on `stable` (2.1.0), 2026-09-12
+
+Both fixes shipped for real this time — solver/evaluator `2.1.0`, released
+2026-09-11 — rather than the `local-edge`/`edge` builds the two checks above
+were run against. Re-ran both scenarios in isolation (a scratch location dir,
+fixture corpus untouched) against `ghcr.io/robust-rail-nl/hip:latest` and
+`ghcr.io/robust-rail-nl/tors:latest`, both freshly pulled at `2.1.0`:
+
+- `6t_custom_example3`: **valid**. Confirms solver#13's fix holds under
+  `stable` proper, not just the `local-edge` build checked 2026-09-04.
+- `7t_custom_example1`: the solver's own cost breakdown now honestly reports
+  `dd=1` (previously a silent 0), and the evaluator no longer spins
+  (evaluator#6 not triggered) — the free overrun really is gone. But the plan
+  is still **not valid**: the same three "Trains's departure mismatch with
+  Action start/end time" errors as the 2026-09-03/04 checks, all at action
+  time `1830`, on `ShuntingUnit-4000` (declared departure `1500`) and
+  outstanding units `2001`/`3001` (declared departure `0`). Tried seeds 1-4;
+  all reproduce the identical `dd=1` outcome, so this isn't a seed-luck
+  artifact of the default 40-iteration TabuSearch budget — it's the same
+  untriaged defect as before, now confirmed present in the actual shipped
+  release rather than only on unmerged branches.
+
+  **2026-09-12, follow-up:** two of those three blocks (`2001`/`3001`) turned
+  out to be an evaluator diagnostic bug, not a real mismatch involving those
+  trains — they don't even share IDs with the action being evaluated.
+  Root-caused and fixed in
+  [robust-rail-evaluator#16](https://github.com/Robust-Rail-NL/robust-rail-evaluator/pull/16),
+  merged into `main` the same day and now in `tors:edge` too. `stable`
+  (`tors:latest`) is still `2.1.0` and will keep printing all three blocks
+  until the next evaluator release ships; running against `--version edge`
+  shows a single block for `ShuntingUnit-4000` only. Fixing the diagnostic
+  doesn't touch the actual defect above — `4000`'s declared departure still
+  doesn't match its plan action's time, and the evaluator still has no way
+  to accept a late departure the solver has already priced as `dd=1` rather
+  than treating it as unrecoverable — that part is still open, filed as
+  [robust-rail-evaluator#17](https://github.com/Robust-Rail-NL/robust-rail-evaluator/issues/17).
+
+### `edge` vs `stable` rerun, 2026-09-13: Setback/parking regression fixed, a second defect takes its place
+
+Rerun of the full fixture corpus (`run_pipeline.py --version stable` then
+`--version edge`) after a new `tors:edge` build landed
+(`2.1.0-edge+20260913.ee6d0b9`, solver/`hip:edge` unchanged since the previous
+check). Same procedure as the `local-edge` check above, but against the real
+`edge` channel.
+
+`6t_custom_example3` and `8t_custom_example2` — the two fixtures found broken
+under `edge` by the schema-v2/Setback work (spurious `EndMove` rejected by
+`legal_on_parking_track_rule` on the reversal track, see evaluator#13 above) —
+no longer hit that rejection: `af6ce88` fixed it, confirmed by its absence
+from both `.txt` traces. But both are **still invalid** under `edge`, now on a
+different, previously-known-but-unfixed defect: evaluator#18. Both traces end
+identically in shape — an `EndMove` for the same shunting unit that a `Move`
+action further up the list is still "active" for:
+
+- `6t_custom_example3`: `EndMove: [2401]` at `T2224` fails — `Move
+  ShuntingUnit-2000 to 61` (a 19-hop route) is still active; the plan declares
+  that Move `1778`–`2224` (446 s), the engine's own recomputed duration runs
+  64 s past that (`Finish action ... at T2288`).
+- `8t_custom_example2`: same shape — `EndMove: [2401]` at `T3154` against a
+  still-active `Move ShuntingUnit-2000 to 62`, engine finish at `T3168` (14 s
+  overrun).
+
+This is [evaluator#18](https://github.com/Robust-Rail-NL/robust-rail-evaluator/issues/18),
+already filed before this check (`MoveActionGenerator` sums a fixed
+per-track-type duration instead of trusting the plan's own declared duration
+— invisible on short routes where the sum undershoots, surfacing exactly like
+this on a long enough one where it overshoots). Both fixtures' plans route
+through a comparably long multi-hop `Move`, matching the pattern the issue
+describes. Neither fixture is expected to validate until evaluator#18 lands.
+
+No other fixture's verdict changed between `stable` and this `edge` build.
+Working tree restored to `stable` state (tracked `scenarios/`/`plans/`
+checked out, gitignored `evaluations/` and pipeline byproducts left as normal
+run output) — see [`pipeline-integration-testing.md`](pipeline-integration-testing.md).
 
 ---
 
@@ -214,9 +377,10 @@ before it's gone through PR review into `main`:
   `hip:edge`).
 - This repo: `run_*.py --version stable|edge` (renamed from `2.0.0`/
   `2.0.0-assert`; `edge` only has real meaning for the solver, the other
-  tools resolve it to their `stable` image) and `docker_utils.pull_flag()` —
-  `--pull always` for registry tags, so a floating tag like `:edge` is never
-  served stale from a local cache.
+  tools resolve it to their `stable` image) and `docker_utils.ensure_pulled()`
+  (originally `pull_flag()`, passing `--pull always` per `docker run`; changed
+  2026-09-07 to a single `docker pull` up front instead) — so a floating tag
+  like `:edge` is never served stale from a local cache.
 
 Not written up anywhere longer-form than the git history itself; worth its
 own doc if it grows more channels or more repos.
@@ -237,7 +401,7 @@ kept here rather than in the history file for anyone starting new work.
 | `trainUnitTypes` | Stays on `Scenario`, referenced from `TrainUnit` |
 | `Plan.trackParts` | Dropped — TORS loads infrastructure from `--path_location` |
 | `schemaVersion` | One shared monotonic integer across `Location`, `Scenario` and `Plan`, starting at 1; all bump together |
-| Version mismatch | **Warn and continue.** Never a hard reject. Each tool holds `EXPECTED_SCHEMA_VERSION` locally; `SCHEMA_CHANGELOG.md` in the generator records each bump |
+| Version mismatch | **Warn and continue.** Never a hard reject. Each tool holds `EXPECTED_SCHEMA_VERSION` locally; this repo's `SCHEMA_CHANGELOG.md` records each bump |
 | Every id | An `int`, including the composite ones |
 | Arrays of IDs | Always end in `IDs` — `memberIDs`, `parentIDs`, `relatedTrackPartIDs`. `IncomingTrain.members` and `Train.members` keep their names because they really do embed their units |
 | Retired proto fields | `reserved`, never freed, so a later field cannot inherit a number and meet an old message carrying the old meaning |

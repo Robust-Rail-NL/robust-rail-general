@@ -1,15 +1,15 @@
 [last 40 of 9830 lines; regenerate the full trace by evaluating the scenario and plan beside this file]
 
-	906b	|  A <-- SU-13( 2 - 18 ) --- [-No action-] -> B --- Front train(18, SLT-4)
-			|  A <-- SU-11( 16 ) --- [-No action-] -> B --- Front train(16, SNG-3)
+	54	|  A <-- SU-4( 7 - 3 ) --- [-No action-] -> B --- Front train(3, SGMM-2)
+			|  A <-- SU-3( 14 - 15 ) --- [-No action-] -> B --- Front train(15, FFF-3)
 
-	53	|  A <-- SU-6( 9 ) --- [-No action-] -> B --- Front train(9, SNG-3)
-			|  A <-- SU-12( 10 ) --- [-No action-] -> B --- Front train(10, SLT-4)
-
-	52	|  A <-- SU-1( 1 - 19 ) --- [-No action-] -> B --- Front train(19, SLT-4)
-			|  A <-- SU-2( 6 ) --- [-No action-] -> B --- Front train(6, SGMM-2)
+	56	|  A <-- SU-5( 12 ) --- [-No action-] -> B --- Front train(12, FFF-3)
+			|  A <-- SU-10( 5 - 13 ) --- [-No action-] -> B --- Front train(13, FFF-3)
 
 	59	|  A <-- SU-9( 8 - 4 ) --- [-No action-] -> B --- Front train(4, FFF-3)
+
+	906b	|  A <-- SU-13( 2 - 18 ) --- [-No action-] -> B --- Front train(18, SLT-4)
+			|  A <-- SU-11( 16 ) --- [-No action-] -> B --- Front train(16, SNG-3)
 
 
 Next event at T5400: Outgoing train

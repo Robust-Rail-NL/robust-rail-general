@@ -23,10 +23,22 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
-from docker_utils import ensure_docker_running, run_with_timeout, pull_flag
+from docker_utils import ensure_docker_running, ensure_pulled, run_with_timeout
 
 ROOT = Path(__file__).parent
 CONTAINER_DB = "/app/database"
+
+# ENHSP either solves or OOMs within ~20s on the largest fixture we have
+# (marginal_congestion_s12: 16.7s grounding before the heap runs out), and
+# every solved fixture-scale instance finishes in single-digit-to-teens of
+# seconds. A run with no bound instead of failing loudly can run for hours: a
+# non-fixture stress scenario once searched for 3h40m+ without converging
+# (KleineBinckhorst_10t_random_42s_random_distribution2, 2026-08-24) and had
+# to be killed by hand. 600s (10 minutes, per the planner team) leaves ~30x
+# headroom over anything that has ever actually solved on this location,
+# while still cutting off a genuine non-convergence in minutes rather than
+# hours.
+DEFAULT_PLANNER_TIMEOUT = 600
 
 # Named DOCKER_IMAGE_VERSIONS like every other step's, because run_pipeline.py
 # reads that attribute by name to report which images a run will use. It was
@@ -35,15 +47,13 @@ CONTAINER_DB = "/app/database"
 # The keys mirror the other steps' --version choices so the pipeline can pass
 # --version uniformly, but they do not all mean something here:
 #
-# - "legacy" has no honest value. The planner step did not exist in 1.x, so
-#   there is no 1.x planner image to compare against. It maps to the current
-#   one rather than to a tag that was never built.
 # - "stable-assert" likewise: the assertions builds are the evaluator's and
 #   the solver's. This image has no such variant, so the selector resolves to
 #   the plain image and the run stays comparable.
-# - "edge" likewise: only the solver has an edge channel. This image has no
-#   such variant, so the selector resolves to the plain image and the run
-#   stays comparable. See run_solver.py.
+# - "edge": newest push to the planner's own edge branch, not yet vetted
+#   enough to call stable. Floating tag, always overwritten — see
+#   docker-push-edge.sh in robust-rail-planner, same model as the solver's
+#   and evaluator's edge channels (see run_solver.py).
 #
 # The version is robust-rail-planner's own (see its VERSION file), deliberately
 # not 2.0.0 — that number belongs to the repos sharing an interchange format.
@@ -56,11 +66,11 @@ CONTAINER_DB = "/app/database"
 #   0.2.0  emits whole plans but raises UnboundLocalError on any plan whose
 #          departing train never moved — fine on SimpleService, dead on
 #          KleineBinckhorst.
+
 DOCKER_IMAGE_VERSIONS = {
-    "legacy": "ghcr.io/robust-rail-nl/planner:0.4.0",
-    "stable": "ghcr.io/robust-rail-nl/planner:0.4.0",
-    "stable-assert": "ghcr.io/robust-rail-nl/planner:0.4.0",
-    "edge": "ghcr.io/robust-rail-nl/planner:0.4.0",
+    "stable": "ghcr.io/robust-rail-nl/planner:latest",
+    "stable-assert": "ghcr.io/robust-rail-nl/planner:latest",
+    "edge": "ghcr.io/robust-rail-nl/planner:edge",
     "local": "planner:latest",
 }
 
@@ -69,13 +79,23 @@ def _scenario_name(scenario: Path) -> str:
     return scenario.stem.removeprefix("scenario_")
 
 
-def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner: str, dry_run: bool) -> bool:
+def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner: str, dry_run: bool,
+                   timeout: int) -> bool:
     name = _scenario_name(scenario)
     plan_name = f"plan_{name}.json"
+    # Named so a timeout can target this exact container: subprocess.run's own
+    # timeout only kills the local `docker run` client, not the container it
+    # started, which keeps running under dockerd regardless. Learned by hand
+    # on 2026-08-24 — killing the run_planner.py process left the container
+    # running for hours until it was separately `docker kill`ed. The uuid
+    # suffix (not just the scenario name) avoids a "name already in use"
+    # conflict if a previous run's container of the same name is still being
+    # torn down.
+    container_name = f"planner-{name}-{uuid.uuid4().hex[:8]}"
 
     cmd = [
         "docker", "run", "--rm",
-        *pull_flag(docker_image),
+        "--name", container_name,
         *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         docker_image,
@@ -87,7 +107,7 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner
 
     print(f"  {scenario.name}  ->  {plan_name}")
     if dry_run:
-        print(f"    [dry-run] {' '.join(cmd)}")
+        print(f"    [dry-run] {' '.join(cmd)}  (timeout={timeout}s)")
         return True
 
     plans_dir = location_dir / "plans"
@@ -97,25 +117,39 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner
 
     returncode = None
     ok = False
+    timed_out = False
     try:
         with open(out_file, "w") as fout, open(err_file, "w") as ferr:
-            result = subprocess.run(cmd, stdout=fout, stderr=ferr)
+            result = subprocess.run(cmd, stdout=fout, stderr=ferr, timeout=timeout)
         returncode = result.returncode
         ok = returncode == 0
+    except subprocess.TimeoutExpired:
+        timed_out = True
+        # The docker CLI client is already dead (subprocess.run killed it to
+        # raise this); the container it started is not. --rm still applies
+        # once it's stopped, so a plain kill is enough — no separate rm.
+        subprocess.run(["docker", "kill", container_name],
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except Exception as exc:
         print(f"    ERROR: {exc}", file=sys.stderr)
 
     with open(err_file, "a") as f:
-        f.write(f"--- exit: {returncode if returncode is not None else 'error'}\n")
+        if timed_out:
+            f.write(f"--- timeout: killed after {timeout}s (container {container_name})\n")
+        else:
+            f.write(f"--- exit: {returncode if returncode is not None else 'error'}\n")
     out_lines = len(out_file.read_text().splitlines()) if out_file.exists() else 0
     err_lines = len(err_file.read_text().splitlines()) if err_file.exists() else 0
     if ok and err_lines <= 1:
         err_file.unlink(missing_ok=True)
         err_lines = 0
     err_part = f"  stderr: {err_lines}L" if err_lines else ""
-    print(f"    stdout: {out_lines}L{err_part}  (exit {returncode})")
+    status = f"TIMEOUT after {timeout}s" if timed_out else f"exit {returncode}"
+    print(f"    stdout: {out_lines}L{err_part}  ({status})")
 
-    if not ok and returncode is not None:
+    if timed_out:
+        print(f"    TIMEOUT after {timeout}s, container killed", file=sys.stderr)
+    elif not ok and returncode is not None:
         print(f"    FAILED (exit {returncode})", file=sys.stderr)
     return ok
 
@@ -211,6 +245,12 @@ def main() -> None:
                              "ENHSP's own --timeout flag is parsed by its CLI but never read "
                              "by its search code (verified against hstairs/enhsp enhsp-20), "
                              "so it does not actually bound anything.")
+    parser.add_argument("--planner-timeout", type=int, default=DEFAULT_PLANNER_TIMEOUT, metavar="SECONDS",
+                        help=f"Kill a single scenario's planner container after this many "
+                             f"seconds (default: {DEFAULT_PLANNER_TIMEOUT}). Guards against a "
+                             f"search that never converges; every fixture-scale instance that "
+                             f"has ever actually solved on this repo's locations finished in "
+                             f"well under a minute.")
     args = parser.parse_args()
 
     if bool(args.scenario) != bool(args.output_dir):
@@ -222,6 +262,7 @@ def main() -> None:
 
     if not args.dry_run:
         ensure_docker_running()
+        ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
 
     if args.scenario:
         loc = ROOT / args.location
@@ -250,7 +291,8 @@ def main() -> None:
         print(f"\n{loc.name} ({len(scenarios)} scenario(s))")
         for scenario in scenarios:
             total += 1
-            if not _run_scenario(DOCKER_IMAGE_VERSIONS[args.version], loc, scenario, args.planner, args.dry_run):
+            if not _run_scenario(DOCKER_IMAGE_VERSIONS[args.version], loc, scenario, args.planner, args.dry_run,
+                                  args.planner_timeout):
                 errors += 1
 
     if total == 0:

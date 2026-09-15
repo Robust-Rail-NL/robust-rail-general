@@ -1,12 +1,12 @@
 [last 40 of 9261 lines; regenerate the full trace by evaluating the scenario and plan beside this file]
-			|  A <-- SU-11( 18 ) --- [-No action-] -> B --- Front train(18, SNG-3)
 
-	55	|  A <-- SU-6( 12 - 19 ) --- [-No action-] -> B --- Front train(19, SNG-3)
+	57	|  A <-- SU-7( 8 ) --- [-No action-] -> B --- Front train(8, SLT-4)
 
-	52	|  A <-- SU-8( 15 - 10 ) --- [-No action-] -> B --- Front train(10, FFF-3)
-			|  A <-- SU-3( 6 - 3 ) --- [-No action-] -> B --- Front train(3, SGMM-2)
-			|  A <-- SU-12( 14 ) --- [-No action-] -> B --- Front train(14, FFF-3)
-			|  A <-- SU-0( 9 - 22 ) --- [-No action-] -> B --- Front train(22, SLT-4)
+	54	|  A <-- SU-9( 17 - 20 ) --- [-No action-] -> B --- Front train(20, FFF-3)
+			|  A <-- SU-10( 11 ) --- [-No action-] -> B --- Front train(11, SNG-3)
+
+	59	|  A <-- SU-4( 0 - 1 ) --- [-No action-] -> B --- Front train(1, SLT-4)
+			|  A <-- SU-5( 16 ) --- [-No action-] -> B --- Front train(16, FFF-3)
 
 	906b	|  A <-- SU-13( 21 - 13 ) --- [-No action-] -> B --- Front train(13, SLT-4)
 			|  A <-- SU-1( 7 - 2 ) --- [-No action-] -> B --- Front train(2, SGMM-2)

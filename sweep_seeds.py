@@ -201,7 +201,15 @@ def main() -> None:
     parser.add_argument("--version", default="local",
                         help="Docker image version passed to each step (default: local).")
     parser.add_argument("--max-duration", type=int, default=20,
-                        help="Solver MaxDuration in seconds per seed (default: 20).")
+                        help="Solver MaxDuration in seconds per seed (default: 20). Rarely the "
+                             "binding constraint: see --iterations.")
+    parser.add_argument("--iterations", type=int, default=15000,
+                        help="SimulatedAnnealing.IterationsUntilReset (default: 15000). Despite "
+                             "the name, this is the search's hard iteration cap "
+                             "(HIP's Program.cs passes it positionally as the 'iterations' "
+                             "argument, not as a reset threshold), and it's usually what ends "
+                             "the search long before --max-duration's wall-clock ceiling does. "
+                             "HIP's own no-config default is 150000.")
     parser.add_argument("--json", metavar="FILE", help="Write the per-seed results as JSON.")
     parser.add_argument("--save", action="store_true",
                         help="Save each seed's scenario, plan and evaluation under "
@@ -240,7 +248,7 @@ def main() -> None:
             f"TabuSearch:\n  Iterations: 40\n  IterationsUntilReset: 100\n"
             f"  TabuListLength: 16\n  Bias: 0.5\n\n"
             f"SimulatedAnnealing:\n  MaxDuration: {args.max_duration}\n"
-            f"  StopWhenFeasible: true\n  IterationsUntilReset: 15000\n"
+            f"  StopWhenFeasible: true\n  IterationsUntilReset: {args.iterations}\n"
             f"  T: 15\n  A: 0.97\n  Q: 2000\n  Reset: 2000\n  Bias: 0.2\n"
             f"  IntensifyOnImprovement: false\n"
         )
@@ -319,6 +327,7 @@ def main() -> None:
                     "measured": measured,
                     "images": images,
                     "solver_max_duration": args.max_duration,
+                    "solver_iterations": args.iterations,
                 }
 
             manifest["note"] = (
@@ -341,6 +350,7 @@ def main() -> None:
                     "config": args.config,
                     "version": args.version,
                     "max_duration": args.max_duration,
+                    "iterations": args.iterations,
                     "counts": dict(counts),
                     "results": results,
                 },

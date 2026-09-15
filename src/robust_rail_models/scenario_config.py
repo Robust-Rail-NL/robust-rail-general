@@ -92,6 +92,13 @@ class _ScenarioConfigBase(RailModel):
 
     track_ids_used: Optional[bool] = None
 
+    # Reads like a generated-trains-only knob (it sizes gaps between drawn
+    # arrivals/departures), but main.py's time-window-sufficiency check runs
+    # before the trains_given branch and uses it either way, defaulting to 300
+    # via check_config.py when absent — including for custom trains. Belongs
+    # here, not on GeneratedTrainsConfig, for that reason.
+    min_gap_on_gateway: Optional[int] = None
+
 
 class CustomTrainsConfig(_ScenarioConfigBase):
     """trains_given=true: the trains are spelled out rather than drawn.
@@ -119,7 +126,6 @@ class GeneratedTrainsConfig(_ScenarioConfigBase):
     train_unit_distribution: Optional[TrainUnitDistribution] = None
     gateway: Optional[Gateway] = None
     matching: Optional[int] = None
-    min_gap_on_gateway: Optional[int] = None
     min_time_in_yard: Optional[int] = None
     mixed_traffic: Optional[bool] = None
     seed: Optional[int] = None
