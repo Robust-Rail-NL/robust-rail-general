@@ -277,10 +277,10 @@ def main() -> None:
                              "--solver-version rather than sharing it (they used to be tied "
                              "together, both defaulting into the same 2.0.0 family) so the "
                              "scenario-generation step can be pinned or bumped independently of "
-                             "the solve step. One of legacy/stable/stable-assert/edge/local -- "
+                             "the solve step. One of stable/stable-assert/edge/local -- "
                              "see run_generator.py --help.")
     parser.add_argument("--solver-version", default="stable",
-                        help="Docker image version for the solver. One of legacy/stable/"
+                        help="Docker image version for the solver. One of stable/"
                              "stable-assert/edge/local -- see run_solver.py --help.")
     parser.add_argument("--planner-version", default="local",
                         help="Docker image version for the planner -- robust-rail-planner has "
