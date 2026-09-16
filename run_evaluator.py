@@ -2,9 +2,12 @@
 """Run the TORS evaluator docker image on all plan files that have a matching scenario."""
 
 import argparse
+import json
 import os
 import subprocess
 import sys
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 from scripts.docker_utils import ensure_docker_running, ensure_pulled
@@ -102,6 +105,108 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool) 
     return ok
 
 
+def _classify_verdict(out_text: str, err_text: str, txt_text: str) -> tuple[str, str]:
+    """Read the evaluator's own verdict out of its output.
+
+    The same string checks scripts/sweep_seeds.py's _classify uses, kept in
+    step with it deliberately: in EVAL_AND_STORE mode the rejection reason goes
+    to the result file rather than stdout, so txt_text has to be read too.
+    """
+    for line in (err_text + out_text).splitlines():
+        if "Issue detected with the Scenario" in line:
+            return "rejected", line.split("Scenario:", 1)[-1].strip()
+    if "The plan is valid" in out_text:
+        return "accepted", ""
+    reason = next(
+        (
+            ln.split("The action is invalid.", 1)[-1].strip().rstrip(".")
+            for ln in (out_text + txt_text).splitlines()
+            if "Scenario failed" in ln
+        ),
+        None,
+    )
+    if reason is not None:
+        return "rejected", reason
+    if txt_text.strip():
+        return "rejected", "plan rejected"
+    return "error", "evaluator produced no readable verdict"
+
+
+def _run_plan_single(docker_image: str, location_dir: Path, plan: Path, scenario: Path,
+                     version: str, dry_run: bool) -> dict:
+    """Evaluate one plan wherever it lives, writing its verdict beside it.
+
+    For plans under a run_solver.py/run_planner.py --output-dir: eval.out,
+    eval.err, eval.txt and eval_result.json land next to that attempt's own
+    plan.json and result.json, rather than in location_dir/evaluations/ where a
+    solver run and a planner run of the same instance would collide.
+
+    eval_result.json carries the "solved" verdict, and it is the only thing
+    that does — a solver or planner exit code of 0 means the tool finished, not
+    that its plan holds up.
+    """
+    plan = plan.resolve()
+    plan_dir = plan.parent
+
+    cmd = [
+        "docker", "run", "--rm",
+        *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
+        "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
+        "--mount", f"type=bind,source={plan_dir},target=/app/planio",
+        docker_image,
+        "--mode", "EVAL_AND_STORE",
+        "--path_location", CONTAINER_DB,
+        "--path_scenario", f"{CONTAINER_DB}/scenarios/{scenario.name}",
+        "--path_plan", f"/app/planio/{plan.name}",
+        "--path_eval_result", "/app/planio/eval.txt",
+        "--plan_type", "Solver",
+    ]
+
+    print(f"  {plan}  ->  {plan_dir}/eval_result.json")
+    if dry_run:
+        print(f"    [dry-run] {' '.join(cmd)}")
+        return {}
+
+    out_file, err_file = plan_dir / "eval.out", plan_dir / "eval.err"
+    txt_file = plan_dir / "eval.txt"
+    start, start_iso = time.monotonic(), datetime.now(timezone.utc).isoformat()
+    returncode = None
+    try:
+        with open(out_file, "w") as fout, open(err_file, "w") as ferr:
+            result = subprocess.run(cmd, stdout=fout, stderr=ferr)
+        returncode = result.returncode
+    except Exception as exc:
+        print(f"    ERROR: {exc}", file=sys.stderr)
+
+    def _read(path: Path) -> str:
+        return path.read_text(errors="replace") if path.exists() else ""
+
+    verdict, reason = _classify_verdict(_read(out_file), _read(err_file), _read(txt_file))
+    record = {
+        "instance": instance_of(scenario, "scenario_"),
+        "location": location_dir.name,
+        "scenario": scenario.name,
+        "plan": str(plan),
+        "version": version,
+        "image": docker_image,
+        "command": cmd,
+        "start_time": start_iso,
+        "end_time": datetime.now(timezone.utc).isoformat(),
+        "wall_seconds": round(time.monotonic() - start, 3),
+        "exit_code": returncode,
+        "verdict": verdict,
+        "solved": verdict == "accepted",
+        "reason": reason,
+    }
+    (plan_dir / "eval_result.json").write_text(json.dumps(record, indent=2) + "\n")
+
+    print(f"    exit {returncode}  verdict={verdict}  solved={record['solved']}  "
+          f"wall={record['wall_seconds']:.1f}s")
+    if returncode != 0:
+        print(f"    FAILED (exit {returncode})", file=sys.stderr)
+    return record
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Run the TORS evaluator on all plans that have a matching scenario."
@@ -114,14 +219,45 @@ def main() -> None:
                         help="Restrict to a single plans/plan_<NAME>.json (a pasted filename works "
                              "too). Accepts shell-style wildcards; exits non-zero if it matches "
                              "nothing.")
+    parser.add_argument("--plan", metavar="FILE", type=Path,
+                        help="Evaluate this one plan file wherever it lives — typically a "
+                             "plan.json under a run_solver.py/run_planner.py --output-dir. "
+                             "eval.out/.err/.txt and eval_result.json are written beside it "
+                             "instead of into <location>/evaluations/. Requires --location and "
+                             "--instance (to find the matching scenario).")
+    parser.add_argument("--no-pull", action="store_true",
+                        help="Skip the up-front 'docker pull'. For a driver like "
+                             "run_experiment.py that invokes this script once per attempt: it "
+                             "pulls each image once itself, and without this every invocation "
+                             "would re-check the registry -- hundreds of round-trips for an "
+                             "image that cannot change mid-run, and hundreds of chances for a "
+                             "flaky registry to abort the sweep.")
     parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='stable',
                         help="Pick a docker image version ('local' is reserved for locally built "
                              "images).")
     args = parser.parse_args()
 
+    if args.plan:
+        if not args.location or not args.instance:
+            parser.error("--plan requires --location and --instance: the plan lives outside the "
+                         "location, so neither the scenario nor the location can be inferred "
+                         "from its path.")
+        if not args.dry_run and not args.plan.exists():
+            parser.error(f"No such plan file: {args.plan}")
+
     if not args.dry_run:
         ensure_docker_running()
-        ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
+        if not args.no_pull:
+            ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
+
+    if args.plan:
+        loc = ROOT / args.location
+        scenario = loc / "scenarios" / f"scenario_{args.instance}.json"
+        if not args.dry_run and not scenario.exists():
+            sys.exit(f"ERROR: no matching scenario for --instance {args.instance!r}: {scenario}")
+        record = _run_plan_single(DOCKER_IMAGE_VERSIONS[args.version], loc, args.plan, scenario,
+                                  args.version, args.dry_run)
+        sys.exit(0 if (not record or record.get("verdict") != "error") else 1)
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 

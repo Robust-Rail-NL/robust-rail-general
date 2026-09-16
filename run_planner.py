@@ -13,8 +13,11 @@ docker-push.sh.
 """
 
 import argparse
+import json
 import os
 import sys
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 from scripts.docker_utils import container_name, ensure_docker_running, ensure_pulled, run_container
@@ -127,6 +130,78 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner
     return ok
 
 
+def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, planner: str,
+                         output_dir: Path, version: str, dry_run: bool,
+                         timeout: int | None = None) -> dict:
+    """Run one scenario into output_dir, and return/record what happened.
+
+    Mirrors run_solver.py's --output-dir mode so the two tools' single-instance
+    output is laid out identically for a solver-vs-planner comparison: the same
+    plan.json, the same result.json keys, differing only in <tool>.out/.err.
+
+    There is no --max-duration counterpart here. ENHSP's own -timeout option is
+    dead code on the enhsp-20 branch this image builds from (parsed into a
+    private field, never read — the search dispatch drops it), so an external
+    kill is the only budget the planner can actually be held to. The asymmetry
+    is real and worth remembering when reading a comparison: the solver stops
+    at its budget and still writes its best plan, while the planner is killed
+    and writes nothing.
+    """
+    output_dir = output_dir.resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+    cname = container_name("planner", _scenario_name(scenario))
+
+    cmd = [
+        "docker", "run", "--rm", "--name", cname,
+        *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
+        "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
+        "--mount", f"type=bind,source={output_dir},target=/app/output",
+        docker_image,
+        "--location", f"{CONTAINER_DB}/location.json",
+        "--scenario", f"{CONTAINER_DB}/scenarios/{scenario.name}",
+        "--planner", planner,
+        "--output", "/app/output/plan.json",
+    ]
+
+    plan_path = output_dir / "plan.json"
+    print(f"  {scenario.name}  ->  {plan_path}")
+    if dry_run:
+        print(f"    [dry-run] {' '.join(cmd)}  (timeout={timeout}s)")
+        return {}
+
+    out_file, err_file = output_dir / "planner.out", output_dir / "planner.err"
+    start, start_iso = time.monotonic(), datetime.now(timezone.utc).isoformat()
+    returncode, timed_out = run_container(cmd, cname, out_file, err_file, timeout)
+
+    plan_produced = plan_path.exists() and plan_path.stat().st_size > 0
+    record = {
+        "instance": _scenario_name(scenario),
+        "tool": "planner",
+        "planner_impl": planner,
+        "location": location_dir.name,
+        "scenario": scenario.name,
+        "version": version,
+        "image": docker_image,
+        "command": cmd,
+        "max_duration": timeout,
+        "start_time": start_iso,
+        "end_time": datetime.now(timezone.utc).isoformat(),
+        "wall_seconds": round(time.monotonic() - start, 3),
+        "exit_code": returncode,
+        "timed_out": timed_out,
+        "plan_produced": plan_produced,
+    }
+    (output_dir / "result.json").write_text(json.dumps(record, indent=2) + "\n")
+
+    print(f"    exit {returncode}  timed_out={timed_out}  plan_produced={plan_produced}  "
+          f"wall={record['wall_seconds']:.1f}s")
+    if timed_out:
+        print(f"    TIMEOUT after {timeout}s, container killed", file=sys.stderr)
+    elif returncode != 0:
+        print(f"    FAILED (exit {returncode})", file=sys.stderr)
+    return record
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Run the planner on all scenario_*.json files."
@@ -139,10 +214,27 @@ def main() -> None:
                         help="Restrict to a single scenarios/scenario_<NAME>.json (a pasted "
                              "filename works too). Accepts shell-style wildcards; exits non-zero "
                              "if it matches nothing.")
+    parser.add_argument("--no-pull", action="store_true",
+                        help="Skip the up-front 'docker pull'. For a driver like "
+                             "run_experiment.py that invokes this script once per attempt: it "
+                             "pulls each image once itself, and without this every invocation "
+                             "would re-check the registry -- hundreds of round-trips for an "
+                             "image that cannot change mid-run, and hundreds of chances for a "
+                             "flaky registry to abort the sweep.")
     parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default="local",
                         help="Pick a docker image version.")
     parser.add_argument("--planner", choices=["symbolic", "enhsp"], default="enhsp",
                         help="Planner implementation to use inside the container.")
+    parser.add_argument("--output-dir", metavar="DIR", type=Path,
+                        help="Write plan.json, planner.out/.err and result.json here instead of "
+                             "into <location>/plans/ (requires --instance to name a single "
+                             "scenario). Same per-attempt layout run_solver.py --output-dir "
+                             "produces, which is what run_experiment.py drives.")
+    parser.add_argument("--max-duration", type=int, dest="timeout", metavar="SECONDS",
+                        help="Alias for --timeout, so run_experiment.py can pass one budget flag "
+                             "to both tools. Unlike the solver's --max-duration this can only be "
+                             "an external kill: ENHSP's own -timeout is dead code on the branch "
+                             "this image builds from.")
     parser.add_argument("--timeout", "--planner-timeout", type=int, dest="timeout",
                         default=DEFAULT_PLANNER_TIMEOUT, metavar="SECONDS",
                         help=f"Kill a single scenario's planner container after this many "
@@ -154,9 +246,14 @@ def main() -> None:
                              f"comparison. --planner-timeout is kept as an alias.")
     args = parser.parse_args()
 
+    if args.output_dir and not args.instance:
+        parser.error("--output-dir requires --instance: it holds one attempt's plan.json and "
+                     "result.json, so it must name a single scenario.")
+
     if not args.dry_run:
         ensure_docker_running()
-        ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
+        if not args.no_pull:
+            ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 
@@ -170,6 +267,17 @@ def main() -> None:
         available += [_scenario_name(s) for s in scenarios]
         scenarios = select(scenarios, args.instance, INSTANCE_PREFIX)
         if not scenarios:
+            continue
+        if args.output_dir:
+            if len(scenarios) > 1:
+                sys.exit(f"ERROR: --instance {args.instance!r} matched {len(scenarios)} scenarios; "
+                         f"--output-dir holds one attempt. Narrow it to exactly one.")
+            total += 1
+            record = _run_scenario_single(DOCKER_IMAGE_VERSIONS[args.version], loc, scenarios[0],
+                                          args.planner, args.output_dir, args.version,
+                                          args.dry_run, args.timeout)
+            if record and not record.get("plan_produced"):
+                errors += 1
             continue
         print(f"\n{loc.name} ({len(scenarios)} scenario(s))")
         for scenario in scenarios:
