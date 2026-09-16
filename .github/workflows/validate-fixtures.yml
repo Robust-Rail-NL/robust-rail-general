@@ -51,4 +51,4 @@ jobs:
     # configurations carry their "intent" blocks.
     - name: Validate the fixtures
       run: |
-        uv run --with jsonschema python validate_json.py --schema-dir schema
+        uv run --with jsonschema python scripts/validate_json.py --schema-dir schema
