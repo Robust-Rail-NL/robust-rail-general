@@ -141,6 +141,13 @@ def _resolve_images(version: str) -> dict[str, str]:
     """The image each step would use, for the manifest."""
     import importlib.util
 
+    # run_*.py do `from scripts.docker_utils import ...`, an absolute import
+    # that only resolves with the repo root on sys.path — true when they run as
+    # __main__ via subprocess (cwd=ROOT puts it there), not true for this
+    # in-process load, so add it here too.
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+
     images = {}
     for step in ("generator", "solver", "evaluator"):
         spec = importlib.util.spec_from_file_location(step, ROOT / f"run_{step}.py")
