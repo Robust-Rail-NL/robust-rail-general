@@ -35,6 +35,7 @@ DOCKER_IMAGE_VERSIONS = {
     "local": "hip:latest",
 }
 CONTAINER_DB = "/app/database"
+CONTAINER_OUT = "/app/output"
 TEMP_CONFIG = "config_solver_run.yaml"
 
 
@@ -223,16 +224,7 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
     """
     output_dir = output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-    # PID-suffixed so concurrent single-instance runs against one location never
-    # share this file. The batch loop never runs scenarios in parallel, so
-    # TEMP_CONFIG's fixed name was never a problem there.
-    config_path = location_dir / f"config_solver_run.{os.getpid()}.yaml"
-    # --max-duration is the solver's own budget, not an external kill: it stops
-    # the annealing cleanly at that point and still writes its best plan. The
-    # run_container timeout below is a backstop above it, for a container that
-    # wedges rather than one that merely runs long — a SIGKILL would forfeit
-    # the plan, which is exactly what would make a solver-vs-planner comparison
-    # unfair. See --max-duration's help.
+    config_path = output_dir / TEMP_CONFIG
     params = _apply_overrides(_parse_config(location_dir / "config_solver.yaml"),
                               max_duration, seed)
     seed_used = params.get("Seed", 1)
@@ -242,9 +234,9 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
         "docker", "run", "--rm", "--name", cname,
         *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
-        "--mount", f"type=bind,source={output_dir},target=/app/output",
+        "--mount", f"type=bind,source={output_dir},target={CONTAINER_OUT}",
         docker_image,
-        f"--config={CONTAINER_DB}/{config_path.name}",
+        f"--config={CONTAINER_OUT}/{config_path.name}",
     ]
 
     plan_path = output_dir / "plan.json"
@@ -253,13 +245,10 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
         print(f"    [dry-run] {' '.join(cmd)}")
         return {}
 
-    _write_config(config_path, scenario.name, "/app/output/plan.json", params)
+    _write_config(config_path, scenario.name, f"{CONTAINER_OUT}/plan.json", params)
     out_file, err_file = output_dir / "solver.out", output_dir / "solver.err"
     start, start_iso = time.monotonic(), datetime.now(timezone.utc).isoformat()
-    try:
-        returncode, timed_out = run_container(cmd, cname, out_file, err_file, _backstop(max_duration))
-    finally:
-        config_path.unlink(missing_ok=True)
+    returncode, timed_out = run_container(cmd, cname, out_file, err_file, _backstop(max_duration))
 
     plan_produced = plan_path.exists() and plan_path.stat().st_size > 0
     record = {
