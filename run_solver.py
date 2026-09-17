@@ -208,7 +208,7 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run
 
 def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, output_dir: Path,
                          version: str, dry_run: bool, max_duration: int | None = None,
-                         seed: int | None = None) -> dict:
+                         seed: int | None = None, timeout: int | None = None) -> dict:
     """Run one scenario into output_dir, and return/record what happened.
 
     For experiment runs (run_experiment.py), which need each (instance, tool)
@@ -248,7 +248,7 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
     _write_config(config_path, scenario.name, f"{CONTAINER_OUT}/plan.json", params)
     out_file, err_file = output_dir / "solver.out", output_dir / "solver.err"
     start, start_iso = time.monotonic(), datetime.now(timezone.utc).isoformat()
-    returncode, timed_out = run_container(cmd, cname, out_file, err_file, _backstop(max_duration))
+    returncode, timed_out = run_container(cmd, cname, out_file, err_file, timeout or _backstop(max_duration))
 
     plan_produced = plan_path.exists() and plan_path.stat().st_size > 0
     record = {
@@ -357,7 +357,7 @@ def main() -> None:
             total += 1
             record = _run_scenario_single(DOCKER_IMAGE_VERSIONS[args.version], loc, scenarios[0],
                                           args.output_dir, args.version, args.dry_run,
-                                          args.max_duration, args.seed)
+                                          args.max_duration, args.seed, args.timeout)
             if record and not record.get("plan_produced"):
                 errors += 1
             continue
