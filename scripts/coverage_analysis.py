@@ -33,7 +33,14 @@ import sys
 from math import comb
 from pathlib import Path
 
-import report_results as rr
+# A bare `import report_results` only resolves because Python auto-prepends a
+# script's own directory to sys.path when it's run directly as
+# `python scripts/coverage_analysis.py`; loading this module in-process
+# instead (as scripts/sweep_seeds.py's _resolve_images used to for run_*.py)
+# would raise ModuleNotFoundError. Import it the same absolute way run_*.py
+# import scripts.docker_utils, with the repo root added for the same reason.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import scripts.report_results as rr
 
 Z_95 = 1.96
 
