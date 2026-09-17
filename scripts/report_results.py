@@ -16,8 +16,11 @@ everything downstream treats a 5-seed local_search the same as a solitary one.
                       actually used, plan_found (did the tool itself produce a
                       plan.json -- independent of what the evaluator later says
                       about it), timed_out, valid_plan (the evaluator's verdict
-                      on that plan -- blank if no plan was ever produced to
-                      evaluate), plan_length, move_actions and non_wait_actions
+                      on that plan: yes/no, blank if no plan was ever produced
+                      to evaluate, or "error" if the evaluator itself crashed
+                      or produced no readable verdict -- kept apart from "no"
+                      since that is not a determination the plan was invalid),
+                      plan_length, move_actions and non_wait_actions
                       (counted from plan.json's own "actions" list -- total
                       actions, how many have taskType.predefined == "Move",
                       and how many do NOT have taskType.predefined == "Wait";
@@ -115,7 +118,12 @@ def _tool_row(instance: str, tool: str, tool_dir: Path) -> dict:
         "seed": result.get("seed", ""),
         "plan_found": "yes" if result.get("plan_produced") else "no",
         "timed_out": "yes" if result.get("timed_out") else "no",
-        "valid_plan": "yes" if verdict == "accepted" else ("no" if verdict else ""),
+        "valid_plan": (
+            "yes" if verdict == "accepted"
+            else "error" if verdict == "error"
+            else "no" if verdict
+            else ""
+        ),
         "plan_length": plan_length if plan_length is not None else "",
         "move_actions": move_actions if move_actions is not None else "",
         "non_wait_actions": non_wait_actions if non_wait_actions is not None else "",
