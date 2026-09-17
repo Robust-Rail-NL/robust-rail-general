@@ -8,10 +8,11 @@ often; --steps remains for anything else (a subset, a custom order).
 """
 
 import argparse
-import importlib.util
 import subprocess
 import sys
 from pathlib import Path
+
+from scripts.docker_utils import load_image_versions
 
 ROOT = Path(__file__).parent
 ALL_STEPS = ["generator", "solver", "planner", "evaluator"]
@@ -37,11 +38,7 @@ TIMEOUT_STEPS = {"solver", "planner"}
 
 
 def _load_versions(step: str, version_key: str) -> str:
-    script = SCRIPTS[step]
-    spec = importlib.util.spec_from_file_location(f"_{step}", script)
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod.DOCKER_IMAGE_VERSIONS.get(version_key, "?")
+    return load_image_versions(SCRIPTS[step]).get(version_key, "?")
 
 
 def _run_step(step: str, extra_args: list[str]) -> bool:

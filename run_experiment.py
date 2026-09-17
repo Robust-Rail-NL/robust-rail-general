@@ -41,7 +41,6 @@ reaching one -- a live view of how far a long run has gotten.
 
 import argparse
 import csv
-import importlib.util
 import json
 import subprocess
 import sys
@@ -49,7 +48,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
-from scripts.docker_utils import ensure_docker_running, ensure_pulled  # noqa: E402
+from scripts.docker_utils import ensure_docker_running, ensure_pulled, load_image_versions  # noqa: E402
 
 # --tools/result.json still say "solver"/"planner" (they name the script, and
 # the tool field run_solver.py and run_planner.py themselves write), but the
@@ -76,10 +75,7 @@ def _pull_once(steps: dict) -> None:
     """
     seen = set()
     for script, version in steps.items():
-        spec = importlib.util.spec_from_file_location(f"_{script}", ROOT / script)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        image = module.DOCKER_IMAGE_VERSIONS[version]
+        image = load_image_versions(ROOT / script)[version]
         if image not in seen:
             seen.add(image)
             ensure_pulled(image)

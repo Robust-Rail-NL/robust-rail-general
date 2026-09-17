@@ -35,6 +35,8 @@ from pathlib import Path
 # The repo root, one level up from scripts/: Location_* fixtures and the
 # run_*.py steps this drives both live there, not beside this file.
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+from scripts.docker_utils import load_image_versions  # noqa: E402
 # Solver violation counters; a plan is unviolating only if all of them are zero.
 # cr (crossings), sm (shunt moves) and rd (routing duration) are costs, not
 # violations, so they are deliberately excluded.
@@ -139,22 +141,10 @@ SAVE_DIRS = {"feasible": "feasible", "infeasible": "infeasible", "unknown": "unr
 
 def _resolve_images(version: str) -> dict[str, str]:
     """The image each step would use, for the manifest."""
-    import importlib.util
-
-    # run_*.py do `from scripts.docker_utils import ...`, an absolute import
-    # that only resolves with the repo root on sys.path — true when they run as
-    # __main__ via subprocess (cwd=ROOT puts it there), not true for this
-    # in-process load, so add it here too.
-    if str(ROOT) not in sys.path:
-        sys.path.insert(0, str(ROOT))
-
-    images = {}
-    for step in ("generator", "solver", "evaluator"):
-        spec = importlib.util.spec_from_file_location(step, ROOT / f"run_{step}.py")
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        images[step] = module.DOCKER_IMAGE_VERSIONS.get(version, "?")
-    return images
+    return {
+        step: load_image_versions(ROOT / f"run_{step}.py").get(version, "?")
+        for step in ("generator", "solver", "evaluator")
+    }
 
 
 # Lines of the evaluation kept. The evaluator writes a full simulation trace,

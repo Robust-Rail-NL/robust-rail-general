@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Shared helpers for the run_generator/run_solver/run_evaluator/run_planner scripts."""
 
+import importlib.util
 import shutil
 import subprocess
 import sys
@@ -34,6 +35,30 @@ def ensure_pulled(image: str) -> None:
         if stderr:
             print(f"  docker said: {stderr.splitlines()[-1]}", file=sys.stderr)
         sys.exit(1)
+
+
+def load_image_versions(script_path: Path) -> dict[str, str]:
+    """Load a run_*.py's DOCKER_IMAGE_VERSIONS dict without running its CLI.
+
+    Used by scripts/sweep_seeds.py (for the manifest), run_pipeline.py (to
+    print/pass through what a --version resolves to) and run_experiment.py
+    (to pull each image once up front) — three independent copies of this
+    before being consolidated here. run_*.py are scripts meant to run as
+    __main__, not package members, so this loads one in-process via importlib
+    instead of a normal import.
+
+    Each run_*.py does `from scripts.docker_utils import ...`, an absolute
+    import that only resolves with the repo root on sys.path — true when it
+    runs as __main__ via subprocess (cwd=ROOT puts it there), not true for
+    this in-process load, so ensure it here too.
+    """
+    root = script_path.resolve().parent
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
+    spec = importlib.util.spec_from_file_location(script_path.stem, script_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.DOCKER_IMAGE_VERSIONS
 
 
 def container_name(prefix: str, instance: str) -> str:
