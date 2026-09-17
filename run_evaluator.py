@@ -252,7 +252,30 @@ def main() -> None:
 
     if args.plan:
         loc = ROOT / args.location
-        scenario = loc / "scenarios" / f"scenario_{args.instance}.json"
+        # Resolve --instance the same way the batch path below does (select()
+        # against scripts/instance_filter.py, wildcards and pasted filenames
+        # included) rather than pasting it straight into a path — a raw paste
+        # broke both of those for this one flag combination. Strip either a
+        # scenario_ or plan_ prefix before matching: the natural filename to
+        # paste here is --plan's own (plan_<name>.json), which sits right in
+        # the same command, not the scenario's.
+        name = args.instance.removesuffix(".json")
+        for stray_prefix in ("scenario_", "plan_"):
+            name = name.removeprefix(stray_prefix)
+        candidates = sorted(loc.glob("scenarios/scenario_*.json"))
+        scenarios = select(candidates, name, "scenario_")
+        if len(scenarios) == 1:
+            scenario = scenarios[0]
+        elif scenarios:
+            sys.exit(f"ERROR: --instance {args.instance!r} matched {len(scenarios)} scenarios; "
+                     f"--plan evaluates one. Narrow it to exactly one.")
+        elif args.dry_run:
+            # Nothing to glob against yet (e.g. a dry run against a location with
+            # no scenarios/ generated) -- fall back to the same normalization
+            # select() applies, so the printed command still reflects --instance.
+            scenario = loc / "scenarios" / f"scenario_{name}.json"
+        else:
+            fail_no_match(args.instance, [instance_of(p, "scenario_") for p in candidates])
         if not args.dry_run and not scenario.exists():
             sys.exit(f"ERROR: no matching scenario for --instance {args.instance!r}: {scenario}")
         record = _run_plan_single(DOCKER_IMAGE_VERSIONS[args.version], loc, args.plan, scenario,
