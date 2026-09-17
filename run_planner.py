@@ -230,12 +230,12 @@ def main() -> None:
                              "into <location>/plans/ (requires --instance to name a single "
                              "scenario). Same per-attempt layout run_solver.py --output-dir "
                              "produces, which is what run_experiment.py drives.")
-    parser.add_argument("--max-duration", type=int, dest="timeout", metavar="SECONDS",
-                        help="Alias for --timeout, so run_experiment.py can pass one budget flag "
-                             "to both tools. Unlike the solver's --max-duration this can only be "
-                             "an external kill: ENHSP's own -timeout is dead code on the branch "
-                             "this image builds from.")
-    parser.add_argument("--timeout", "--planner-timeout", type=int, dest="timeout",
+    # --max-duration is an alias, not a second budget concept: unlike the
+    # solver, there is no separate graceful-stop mode here to alias away from
+    # (ENHSP's own -timeout is dead code on the branch this image builds
+    # from), so both names drive the same external kill. One add_argument
+    # call for both means one default and no dest collision to work around.
+    parser.add_argument("--timeout", "--max-duration", type=int, dest="timeout",
                         default=DEFAULT_PLANNER_TIMEOUT, metavar="SECONDS",
                         help=f"Kill a single scenario's planner container after this many "
                              f"seconds (default: {DEFAULT_PLANNER_TIMEOUT}). Guards against a "
@@ -243,7 +243,8 @@ def main() -> None:
                              f"has ever actually solved on this repo's locations finished in "
                              f"well under a minute. run_solver.py takes the same flag, so both "
                              f"can be held to one wall-clock budget for a like-for-like "
-                             f"comparison. --planner-timeout is kept as an alias.")
+                             f"comparison; --max-duration is kept as an alias so "
+                             f"run_experiment.py can pass one flag name to both tools.")
     args = parser.parse_args()
 
     if args.output_dir and not args.instance:
