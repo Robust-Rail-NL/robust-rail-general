@@ -44,6 +44,8 @@ import csv
 import json
 import subprocess
 import sys
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -54,6 +56,14 @@ from scripts.docker_utils import ensure_docker_running, ensure_pulled, load_imag
 # the tool field run_solver.py and run_planner.py themselves write), but the
 # per-instance output directory is named after the search approach instead.
 FOLDER_NAMES = {"solver": "local_search", "planner": "planning"}
+
+# Guards progress.csv: with --jobs > 1, several instances' worker threads call
+# _write_progress concurrently, and each rewrites the whole file from scratch
+# -- without this, two threads opening it "w" at the same time could interleave
+# writes into a half-truncated file. all_results itself needs no such guard:
+# each instance owns a disjoint sub-dict (all_results.setdefault(instance, {})),
+# so concurrent reads/writes never touch the same key.
+_progress_lock = threading.Lock()
 
 # A certification pass is conventionally run at a multiple of the main budget,
 # not the same T -- so the default threshold isn't just --max-duration itself.
@@ -137,7 +147,7 @@ def _write_progress(out_dir: Path, instances: list, all_results: dict, num_seeds
     local_search shows "k/N" until all N seeds for that instance are done, then
     "done" -- planning never has seeds, so it's unaffected.
     """
-    with open(out_dir / "progress.csv", "w", newline="") as f:
+    with _progress_lock, open(out_dir / "progress.csv", "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["instance", "local_search", "planning"])
         writer.writeheader()
         for instance in instances:
@@ -315,7 +325,18 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true",
                         help="Print docker commands without executing them (evaluator steps are "
                              "skipped, since a dry run never produces a plan to evaluate).")
+    parser.add_argument("--jobs", type=int, default=1, metavar="N",
+                        help="Run N instances concurrently (default: 1, sequential). Each "
+                             "instance writes into its own <output-dir>/<instance>/ subtree and "
+                             "gets its own uniquely-named containers (see "
+                             "scripts/docker_utils.container_name), so instances never collide "
+                             "with each other. Each attempt still blocks on its own docker "
+                             "container, so this only helps when the host has spare CPU/IO to "
+                             "run several at once. Ignored under --dry-run, which stays "
+                             "sequential so its printed commands are easy to read in order.")
     args = parser.parse_args()
+    if args.jobs < 1:
+        sys.exit("--jobs must be at least 1.")
 
     loc = ROOT / args.location
     if not loc.is_dir():
@@ -377,11 +398,21 @@ def main() -> None:
     if not args.dry_run:
         out_dir.mkdir(parents=True, exist_ok=True)
         _write_progress(out_dir, instances, all_results, args.num_seeds)
-    for instance in instances:
+    def run_one(instance: str) -> None:
         _run_instance(args.location, instance, tools, out_dir,
                       args.solver_version, args.planner_version, args.evaluator_version,
                       args.force, args.dry_run, args.max_duration, args.seed, args.num_seeds,
                       all_results, instances)
+
+    if args.jobs > 1 and not args.dry_run:
+        with ThreadPoolExecutor(max_workers=args.jobs) as pool:
+            # list(), not just submit(): forces every future's result (or
+            # exception) before moving on to the summary below, the same as the
+            # sequential loop would.
+            list(pool.map(run_one, instances))
+    else:
+        for instance in instances:
+            run_one(instance)
 
     print("\n--- Summary ---", flush=True)
     for instance, per_tool in all_results.items():
