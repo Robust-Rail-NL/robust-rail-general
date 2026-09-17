@@ -31,21 +31,31 @@ generator `0597a6a`, solver `c913c91`, evaluator `e8c3c91`, solver
 | location | configuration | seeds | feasible | infeasible | unknown |
 |---|---|---|---|---|---|
 | KleineBinckhorst | `feasible_small` | 1–20 | 20 (100%) | 0 | 0 |
-| KleineBinckhorst | `marginal_length` | 1–20 | 12 (60%) | 8 (40%) | 0 |
+| KleineBinckhorst | `marginal_length` | 1–20 | 20 (100%) | 0 | 0 |
 | KleineBinckhorst | `marginal_congestion` | 1–20 | 7 (35%) | 0 | 13 (65%) |
 
-The two marginal configurations fail in quite different ways, and the
-difference is the point.
+`feasible_small` and `marginal_congestion` are still the 2026-08-07 measurement.
+`marginal_length` was re-swept 2026-09-16 (`generator:latest`, `hip:latest`,
+`tors:latest`, solver `MaxDuration: 15`) after gateway `906a` (track id 15) was
+widened from 255 m to 326 m (`Location_KleineBinckhorst/location.json`) and now
+clears every seed. Fixture files and `measured`/`images` in
+`fixtures/manifest.json` were refreshed to match; nothing else in this table
+changed. The same widening also affects the "Fixed-scenario fixtures" below.
 
-`marginal_length` varies one thing: whether the drawn compositions fit the
-255 m gateway. Its material is a single super type with two sub types of very
-different length, so a two-unit train fits only if both draws are the shorter
-one. Every failure is therefore a scenario-level rejection — a *proof*, with no
-`unknown` verdicts at all. Note the rate was not predicted correctly
-beforehand: a per-train fit probability of about 0.625 suggests roughly 39%
-feasible for two trains, against 60% measured. The arithmetic was close enough
-to pick sensible parameters and not close enough to trust, which is the reason
-these rates are measured rather than derived.
+The two marginal configurations used to fail in quite different ways, and the
+difference was the point.
+
+`marginal_length` originally varied one thing: whether the drawn compositions
+fit the 255 m gateway. Its material is a single super type with two sub types
+of very different length, so a two-unit train fit only if both draws were the
+shorter one. Every failure was therefore a scenario-level rejection — a
+*proof*, with no `unknown` verdicts at all. Note the rate was not predicted
+correctly beforehand: a per-train fit probability of about 0.625 suggests
+roughly 39% feasible for two trains, against 60% measured (at 255 m). The
+arithmetic was close enough to pick sensible parameters and not close enough to
+trust, which is the reason these rates are measured rather than derived. **This
+paragraph is now historical**: with the gateway at 326 m both sub types always
+fit, so the configuration no longer produces a failure to measure a rate from.
 
 `marginal_congestion` holds length constant and varies arrival pressure. It was
 built expecting trains to be stranded on the gateway, and that is not what
@@ -76,23 +86,32 @@ have a verdict rather than a rate.
 
 | scenario | outcome | note |
 |---|---|---|
-| `10t_random_42s_distribution1` | infeasible | arrival train 270.62 m > 255 m gateway (VIRM-4 + VIRM-6) |
-| `10t_random_42s_distribution2` | infeasible | departure train 270.62 m > 255 m gateway |
-| `48t_custom_larger-example` | infeasible | arrival train 324.12 m > 255 m gateway (2 × VIRM-6) |
-| `24t_custom_kleinebinckhorst_absolute_seconds` | infeasible | arrival train 324.12 m > 255 m gateway (2 × VIRM-6), same overflow as `larger-example` on a different train |
-| `6t_custom_example3` | **feasible** under `stable` (2.1.0) | fixed by solver#13 (a delayed Arrival now gets a real duration instead of a trailing Wait); shipped 2026-09-11, re-verified directly against `stable` 2026-09-12, see roadmap |
+| `10t_random_42s_distribution1` | infeasible | Gateway `906a` widened 255→326 m 2026-09-16 (see "Measured rates" above) invalidated the old "arrival train 270.62 m > 255 m" reason, but the scenario is still a proof under the new limit: departure train 432.68 m > 326 m gateway (track id 15). Re-verified 2026-09-16. |
+| `10t_random_42s_distribution2` | unknown | No longer a length proof: the departure train now fits the widened 326 m gateway. The solved plan is instead rejected by the evaluator on a departure-time mismatch (`Tracked Train: 12`, action time 7410 vs. declared departure 8700) — the same symptom class as evaluator#17, not independently triaged. Re-verified 2026-09-16. |
+| `48t_custom_larger-example` | unknown | No longer a length proof: both compositions now fit the widened gateway. The evaluator instead crashes while scoring the solved plan (`Invalid argument: unordered_map::at`, reported via stderr but exit 0) — no verdict produced, untriaged. Re-verified 2026-09-16. |
+| `24t_custom_kleinebinckhorst_absolute_seconds` | unknown | No longer a length proof: the arrival train now fits the widened gateway. The solved plan is instead rejected further downstream: `Adding ShuntingUnit-ShuntingUnit-2006 to Track 62 exceeds the maximum length (525.200000 > 247.000000)` — a plan-dependent overfill that the old gateway rejection previously masked, untriaged. Re-verified 2026-09-16. |
+| `6t_custom_example3` | **feasible** under `stable` (2.1.0) | fixed by solver#13 (a delayed Arrival now gets a real duration instead of a trailing Wait); shipped 2026-09-11, re-verified directly against `stable` 2026-09-12, see roadmap. Currently invalid under `edge`, blocked by evaluator#18 (unrelated to solver#13) — see roadmap |
 | `7t_custom_example1` | unknown | solver#14 (no deadline for outStanding trains) shipped in `stable` 2.1.0 (2026-09-11) and no longer masks anything, but a second, untriaged defect (departure-mismatch) surfaces once that's fixed — see roadmap. Reconfirmed present against shipped `stable` 2.1.0, 2026-09-12 |
-| `8t_custom_example2` | **feasible** | valid as of evaluator `2bbad58`; exercises StandIn, Arrive, Exit and StandOut in one plan |
+| `8t_custom_example2` | **feasible** under `stable` | valid as of evaluator `2bbad58`; exercises StandIn, Arrive, Exit and StandOut in one plan. Currently invalid under `edge`, blocked by evaluator#18 — see roadmap |
 | `30t_random_98s_test` | unknown | every train late both ways (`dd=30, da=29`); over-subscribed |
 | `simple_service_location_4t_custom_late` | unknown | departure-time mismatch, likely infeasible by design |
 
-The four `infeasible` verdicts are proofs: the arrival or departure track is
-fixed by the scenario and the train does not fit on it, so no plan can help.
+Only `10t_random_42s_distribution1` is still an `infeasible` proof: the arrival
+or departure track is fixed by the scenario and the train does not fit on it,
+so no plan can help. The other three lost their proof when gateway `906a`
+(track id 15) was widened from 255 m to 326 m 2026-09-16 — both composition
+lengths that used to overflow it (270.62 m and 324.12 m) now fit — and each
+surfaced a different, previously-masked failure further into the pipeline; see
+the notes above. None of those three are known blockers yet, just re-verified
+symptoms.
 
 ## Known blockers
 
 Three defects stopped otherwise-reasonable scenarios from validating. All
-three predate the 2.0.0 migration; one is now resolved.
+three predate the 2.0.0 migration; one is now resolved. (A fourth,
+evaluator-only regression introduced by `edge`'s schema-v2/Setback work has
+since come and gone in favor of a fifth, previously-known defect — see
+[`roadmap-2.0.0.md`](roadmap-2.0.0.md#edge-vs-stable-rerun-2026-09-13-setbackparking-regression-fixed-a-second-defect-takes-its-place).)
 
 - **A train that waits on the gateway** was rejected, because the gateway forbids
   parking. It is not parked there by choice — it has arrived and not yet been

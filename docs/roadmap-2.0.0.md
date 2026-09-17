@@ -7,6 +7,11 @@ file now holds only what's still open — kept short on the assumption most of
 it either closes out or goes stale; check the dates before trusting anything
 below.
 
+See [`roadmap.md`](roadmap.md) for the current cross-repo picture — loose
+ends, priorities, and longer-term outlook. This file stays as the detailed
+2.0.0-era record (the known-issues table and the resolved-decisions
+reference) that `roadmap.md` links back into rather than duplicating.
+
 ---
 
 ## Known issues (open upstream, checked 2026-09-03; solver#13/#14 re-checked 2026-09-12 against shipped `stable`)
@@ -21,6 +26,8 @@ below.
 | solver#18 | Solver ignores `standingIndex`, so the order of several standing units on one track is not the one the scenario asked for. **Fixed and shipped** in solver `2.1.0` too, but latent in this corpus regardless — every scenario here leaves the field null, so nothing to re-verify. The evaluator does honour it. |
 | solver#19 | Question, not a defect: splitting a train in place costs no shunt move, and nothing prices the personnel it would need. |
 | evaluator#17 | Once solver#14's overrun no longer masks it, TORS rejects `7t_custom_example1` with a different error: "departure mismatch" on `ShuntingUnit-4000`, whose declared departure time doesn't match its plan action's — the evaluator has no way to accept a late departure the solver already prices as `dd=1`, rather than treating it as unrecoverable. Reconfirmed present under shipped `stable` (2.1.0), 2026-09-12, and now filed — the sole remaining blocker for this fixture. |
+| evaluator#13 (fixed on `edge`) | `legal_on_parking_track_rule` rejected the `EndMove` a schema-v2 plan's Setback conversion synthesizes before it, on the reversal track — treating a unit about to reverse and carry straight on as if it were parking there. Regressed `6t_custom_example3` and `8t_custom_example2` under `edge`'s schema-v2/Setback work (found 2026-09-12, see below). **Fixed and merged into `edge`** 2026-09-13 (`af6ce88`, generalizing the existing Exit exemption to also cover Setback) — both fixtures get past this rejection now. Not yet in `stable`. |
+| evaluator#18 (fixed on `edge`) | `MoveActionGenerator` recomputes a replayed multi-hop `Move`'s duration as a fixed per-track-type sum instead of trusting the plan's own declared duration; on a long enough route the sum overruns the plan's window, and the next queued action for that unit (typically `EndMove`) fails with a misleading "already active" error. Filed 2026-09-13, was the sole blocker for both `6t_custom_example3` and `8t_custom_example2` under `edge` (see above section). **Fixed and merged into `main`, then `edge`** the same day (`aa499be`) — both fixtures confirmed valid again, see below. Not yet in `stable`. |
 
 None of #17, #18 or #19 blocks the pipeline. #17 needs a combined inStanding
 train that gets split, which no fixture has; #18 needs a non-null
@@ -151,6 +158,73 @@ fixture corpus untouched) against `ghcr.io/robust-rail-nl/hip:latest` and
   to accept a late departure the solver has already priced as `dd=1` rather
   than treating it as unrecoverable — that part is still open, filed as
   [robust-rail-evaluator#17](https://github.com/Robust-Rail-NL/robust-rail-evaluator/issues/17).
+
+### `edge` vs `stable` rerun, 2026-09-13: Setback/parking regression fixed, a second defect takes its place
+
+Rerun of the full fixture corpus (`run_pipeline.py --version stable` then
+`--version edge`) after a new `tors:edge` build landed
+(`2.1.0-edge+20260913.ee6d0b9`, solver/`hip:edge` unchanged since the previous
+check). Same procedure as the `local-edge` check above, but against the real
+`edge` channel.
+
+`6t_custom_example3` and `8t_custom_example2` — the two fixtures found broken
+under `edge` by the schema-v2/Setback work (spurious `EndMove` rejected by
+`legal_on_parking_track_rule` on the reversal track, see evaluator#13 above) —
+no longer hit that rejection: `af6ce88` fixed it, confirmed by its absence
+from both `.txt` traces. But both are **still invalid** under `edge`, now on a
+different, previously-known-but-unfixed defect: evaluator#18. Both traces end
+identically in shape — an `EndMove` for the same shunting unit that a `Move`
+action further up the list is still "active" for:
+
+- `6t_custom_example3`: `EndMove: [2401]` at `T2224` fails — `Move
+  ShuntingUnit-2000 to 61` (a 19-hop route) is still active; the plan declares
+  that Move `1778`–`2224` (446 s), the engine's own recomputed duration runs
+  64 s past that (`Finish action ... at T2288`).
+- `8t_custom_example2`: same shape — `EndMove: [2401]` at `T3154` against a
+  still-active `Move ShuntingUnit-2000 to 62`, engine finish at `T3168` (14 s
+  overrun).
+
+This is [evaluator#18](https://github.com/Robust-Rail-NL/robust-rail-evaluator/issues/18),
+already filed before this check (`MoveActionGenerator` sums a fixed
+per-track-type duration instead of trusting the plan's own declared duration
+— invisible on short routes where the sum undershoots, surfacing exactly like
+this on a long enough one where it overshoots). Both fixtures' plans route
+through a comparably long multi-hop `Move`, matching the pattern the issue
+describes. Neither fixture is expected to validate until evaluator#18 lands.
+
+No other fixture's verdict changed between `stable` and this `edge` build.
+Working tree restored to `stable` state (tracked `scenarios/`/`plans/`
+checked out, gitignored `evaluations/` and pipeline byproducts left as normal
+run output) — see [`pipeline-integration-testing.md`](pipeline-integration-testing.md).
+
+### evaluator#18 fixed, both fixtures re-verified, 2026-09-13
+
+`MultiMove` now carries an optional plan-declared duration
+(`cTORS/include/Action.h`), `MoveActionGenerator` uses it when present instead
+of always recomputing the fixed per-track-type sum, and
+`POSAction::CreatePOSAction` threads the plan's `minimumDuration` through —
+the same replay-vs-search carve-out `Wait` and `Arrive` already had (see the
+"Evaluator / TORS" entry under Open loose ends below). Landed as `aa499be`,
+fast-forwarded directly onto evaluator `main`, then merged into `edge`
+(`fb431ab`) the same day. Covered by a new regression test in
+`cTORSTest/RulesTest.cpp`, verified to fail without the fix and pass with it.
+
+Re-verified both previously-blocked fixtures directly: regenerated
+`6t_custom_example3` and `8t_custom_example2`'s plans via
+`run_solver.py --version edge` (fresh solver output, not the checked-in
+`plans/*.json` snapshots, which predate solver#13's fix and would otherwise
+hit an unrelated, already-fixed gateway-parking rejection first), then
+evaluated both against a locally-built evaluator binary at `aa499be` (the
+`tors:edge` image rebuild was still in flight at the time of this check).
+Both now report **"The plan is valid."** — no `EndMove`/"already active"
+error, confirming the fix holds for exactly the routes that exposed it.
+Working tree restored afterward; no fixture `plans/*.json` changed as a
+result of this check (the freshly-regenerated ones were reverted, not
+committed).
+
+Not yet re-verified against the actual `tors:edge` image or against `stable`
+(the fix isn't in a tagged release yet) — worth a follow-up full-corpus rerun
+once `tors:edge` finishes rebuilding, to confirm nothing else regressed.
 
 ---
 

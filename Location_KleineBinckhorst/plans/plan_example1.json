@@ -27,7 +27,7 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": 2,
+				"id": 3,
 				"memberIDs": [
 					2802
 				],
@@ -114,13 +114,13 @@
 		},
 		{
 			"startTime": 0,
-			"endTime": 870,
+			"endTime": 1410,
 			"taskType": {
 				"predefined": "Wait",
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": 2,
+				"id": 3,
 				"memberIDs": [
 					2802
 				],
@@ -132,7 +132,7 @@
 		},
 		{
 			"startTime": 450,
-			"endTime": 1080,
+			"endTime": 1410,
 			"taskType": {
 				"predefined": "Wait",
 				"other": null
@@ -173,7 +173,7 @@
 		},
 		{
 			"startTime": 600,
-			"endTime": 870,
+			"endTime": 810,
 			"taskType": {
 				"predefined": "Move",
 				"other": null
@@ -182,6 +182,90 @@
 				"id": 1,
 				"memberIDs": [
 					2401
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 15,
+			"resources": [
+				{
+					"kind": "trackPart",
+					"id": 59
+				},
+				{
+					"kind": "trackPart",
+					"id": 24
+				},
+				{
+					"kind": "trackPart",
+					"id": 58
+				},
+				{
+					"kind": "trackPart",
+					"id": 23
+				},
+				{
+					"kind": "trackPart",
+					"id": 57
+				},
+				{
+					"kind": "trackPart",
+					"id": 2
+				}
+			]
+		},
+		{
+			"startTime": 810,
+			"endTime": 1830,
+			"taskType": {
+				"predefined": "Wait",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 1,
+				"memberIDs": [
+					2401
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 2,
+			"resources": []
+		},
+		{
+			"startTime": 900,
+			"endTime": 900,
+			"taskType": {
+				"predefined": "Arrive",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 2,
+				"memberIDs": [
+					2601
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 42,
+			"resources": [
+				{
+					"kind": "trackPart",
+					"id": 15
+				}
+			]
+		},
+		{
+			"startTime": 900,
+			"endTime": 1410,
+			"taskType": {
+				"predefined": "Move",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 2,
+				"memberIDs": [
+					2601
 				],
 				"parentIDs": [],
 				"childIDs": []
@@ -226,19 +310,51 @@
 				},
 				{
 					"kind": "trackPart",
-					"id": 4
+					"id": 21
+				},
+				{
+					"kind": "trackPart",
+					"id": 66
+				},
+				{
+					"kind": "trackPart",
+					"id": 8
+				},
+				{
+					"kind": "trackPart",
+					"id": 67
+				},
+				{
+					"kind": "trackPart",
+					"id": 27
+				},
+				{
+					"kind": "trackPart",
+					"id": 69
+				},
+				{
+					"kind": "trackPart",
+					"id": 26
+				},
+				{
+					"kind": "trackPart",
+					"id": 68
+				},
+				{
+					"kind": "trackPart",
+					"id": 10
 				}
 			]
 		},
 		{
-			"startTime": 870,
-			"endTime": 1080,
+			"startTime": 1410,
+			"endTime": 1410,
 			"taskType": {
 				"predefined": "Wait",
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": 2,
+				"id": 3,
 				"memberIDs": [
 					2802
 				],
@@ -249,84 +365,8 @@
 			"resources": []
 		},
 		{
-			"startTime": 870,
-			"endTime": 3870,
-			"taskType": {
-				"predefined": "Wait",
-				"other": null
-			},
-			"shuntingUnit": {
-				"id": 1,
-				"memberIDs": [
-					2401
-				],
-				"parentIDs": [],
-				"childIDs": []
-			},
-			"location": 4,
-			"resources": []
-		},
-		{
-			"startTime": 900,
-			"endTime": 900,
-			"taskType": {
-				"predefined": "Arrive",
-				"other": null
-			},
-			"shuntingUnit": {
-				"id": 3,
-				"memberIDs": [
-					2601
-				],
-				"parentIDs": [],
-				"childIDs": []
-			},
-			"location": 42,
-			"resources": [
-				{
-					"kind": "trackPart",
-					"id": 15
-				}
-			]
-		},
-		{
-			"startTime": 900,
-			"endTime": 1080,
-			"taskType": {
-				"predefined": "Move",
-				"other": null
-			},
-			"shuntingUnit": {
-				"id": 3,
-				"memberIDs": [
-					2601
-				],
-				"parentIDs": [],
-				"childIDs": []
-			},
-			"location": 15,
-			"resources": [
-				{
-					"kind": "trackPart",
-					"id": 59
-				},
-				{
-					"kind": "trackPart",
-					"id": 24
-				},
-				{
-					"kind": "trackPart",
-					"id": 58
-				},
-				{
-					"kind": "trackPart",
-					"id": 1
-				}
-			]
-		},
-		{
-			"startTime": 1080,
-			"endTime": 1260,
+			"startTime": 1410,
+			"endTime": 1590,
 			"taskType": {
 				"predefined": "Combine",
 				"other": null
@@ -345,14 +385,14 @@
 			"resources": []
 		},
 		{
-			"startTime": 1080,
-			"endTime": 1260,
+			"startTime": 1410,
+			"endTime": 1590,
 			"taskType": {
 				"predefined": "Combine",
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": 2,
+				"id": 3,
 				"memberIDs": [
 					2802
 				],
@@ -365,26 +405,31 @@
 			"resources": []
 		},
 		{
-			"startTime": 1080,
-			"endTime": 1500,
+			"startTime": 1410,
+			"endTime": 2310,
 			"taskType": {
-				"predefined": "Wait",
-				"other": null
+				"predefined": null,
+				"other": "Reinigingsperron"
 			},
 			"shuntingUnit": {
-				"id": 3,
+				"id": 2,
 				"memberIDs": [
 					2601
 				],
 				"parentIDs": [],
 				"childIDs": []
 			},
-			"location": 1,
-			"resources": []
+			"location": 10,
+			"resources": [
+				{
+					"kind": "facility",
+					"id": 72
+				}
+			]
 		},
 		{
-			"startTime": 1260,
-			"endTime": 1500,
+			"startTime": 1590,
+			"endTime": 1830,
 			"taskType": {
 				"predefined": "Move",
 				"other": null
@@ -397,7 +442,7 @@
 				],
 				"parentIDs": [
 					0,
-					2
+					3
 				],
 				"childIDs": []
 			},
@@ -438,8 +483,8 @@
 			]
 		},
 		{
-			"startTime": 1500,
-			"endTime": 1500,
+			"startTime": 1830,
+			"endTime": 1830,
 			"taskType": {
 				"predefined": "Exit",
 				"other": null
@@ -452,7 +497,7 @@
 				],
 				"parentIDs": [
 					0,
-					2
+					3
 				],
 				"childIDs": []
 			},
@@ -465,22 +510,30 @@
 			]
 		},
 		{
-			"startTime": 1500,
-			"endTime": 2400,
+			"startTime": 1830,
+			"endTime": 2734,
 			"taskType": {
 				"predefined": "Move",
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": 3,
+				"id": 1,
 				"memberIDs": [
-					2601
+					2401
 				],
 				"parentIDs": [],
 				"childIDs": []
 			},
-			"location": 1,
+			"location": 2,
 			"resources": [
+				{
+					"kind": "trackPart",
+					"id": 57
+				},
+				{
+					"kind": "trackPart",
+					"id": 23
+				},
 				{
 					"kind": "trackPart",
 					"id": 58
@@ -572,16 +625,34 @@
 			]
 		},
 		{
-			"startTime": 2400,
-			"endTime": 3300,
+			"startTime": 2310,
+			"endTime": 2734,
+			"taskType": {
+				"predefined": "Wait",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 2,
+				"memberIDs": [
+					2601
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 10,
+			"resources": []
+		},
+		{
+			"startTime": 2734,
+			"endTime": 3634,
 			"taskType": {
 				"predefined": null,
 				"other": "Reinigingsperron"
 			},
 			"shuntingUnit": {
-				"id": 3,
+				"id": 1,
 				"memberIDs": [
-					2601
+					2401
 				],
 				"parentIDs": [],
 				"childIDs": []
@@ -595,188 +666,6 @@
 			]
 		},
 		{
-			"startTime": 3300,
-			"endTime": 3870,
-			"taskType": {
-				"predefined": "Move",
-				"other": null
-			},
-			"shuntingUnit": {
-				"id": 3,
-				"memberIDs": [
-					2601
-				],
-				"parentIDs": [],
-				"childIDs": []
-			},
-			"location": 11,
-			"resources": [
-				{
-					"kind": "trackPart",
-					"id": 61
-				},
-				{
-					"kind": "trackPart",
-					"id": 25
-				},
-				{
-					"kind": "trackPart",
-					"id": 60
-				},
-				{
-					"kind": "trackPart",
-					"id": 12
-				},
-				{
-					"kind": "trackPart",
-					"id": 60
-				},
-				{
-					"kind": "trackPart",
-					"id": 25
-				},
-				{
-					"kind": "trackPart",
-					"id": 61
-				},
-				{
-					"kind": "trackPart",
-					"id": 10
-				}
-			]
-		},
-		{
-			"startTime": 3870,
-			"endTime": 4834,
-			"taskType": {
-				"predefined": "Move",
-				"other": null
-			},
-			"shuntingUnit": {
-				"id": 1,
-				"memberIDs": [
-					2401
-				],
-				"parentIDs": [],
-				"childIDs": []
-			},
-			"location": 4,
-			"resources": [
-				{
-					"kind": "trackPart",
-					"id": 55
-				},
-				{
-					"kind": "trackPart",
-					"id": 20
-				},
-				{
-					"kind": "trackPart",
-					"id": 56
-				},
-				{
-					"kind": "trackPart",
-					"id": 22
-				},
-				{
-					"kind": "trackPart",
-					"id": 57
-				},
-				{
-					"kind": "trackPart",
-					"id": 23
-				},
-				{
-					"kind": "trackPart",
-					"id": 58
-				},
-				{
-					"kind": "trackPart",
-					"id": 24
-				},
-				{
-					"kind": "trackPart",
-					"id": 59
-				},
-				{
-					"kind": "trackPart",
-					"id": 15
-				},
-				{
-					"kind": "trackPart",
-					"id": 59
-				},
-				{
-					"kind": "trackPart",
-					"id": 24
-				},
-				{
-					"kind": "trackPart",
-					"id": 58
-				},
-				{
-					"kind": "trackPart",
-					"id": 23
-				},
-				{
-					"kind": "trackPart",
-					"id": 57
-				},
-				{
-					"kind": "trackPart",
-					"id": 22
-				},
-				{
-					"kind": "trackPart",
-					"id": 56
-				},
-				{
-					"kind": "trackPart",
-					"id": 20
-				},
-				{
-					"kind": "trackPart",
-					"id": 55
-				},
-				{
-					"kind": "trackPart",
-					"id": 21
-				},
-				{
-					"kind": "trackPart",
-					"id": 66
-				},
-				{
-					"kind": "trackPart",
-					"id": 8
-				},
-				{
-					"kind": "trackPart",
-					"id": 67
-				},
-				{
-					"kind": "trackPart",
-					"id": 27
-				},
-				{
-					"kind": "trackPart",
-					"id": 69
-				},
-				{
-					"kind": "trackPart",
-					"id": 26
-				},
-				{
-					"kind": "trackPart",
-					"id": 68
-				},
-				{
-					"kind": "trackPart",
-					"id": 11
-				}
-			]
-		},
-		{
 			"startTime": 4800,
 			"endTime": 4800,
 			"taskType": {
@@ -784,7 +673,7 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": 3,
+				"id": 2,
 				"memberIDs": [
 					2601
 				],
@@ -799,47 +688,6 @@
 			"endTime": 4800,
 			"taskType": {
 				"predefined": "StandOut",
-				"other": null
-			},
-			"shuntingUnit": {
-				"id": 1,
-				"memberIDs": [
-					2401
-				],
-				"parentIDs": [],
-				"childIDs": []
-			},
-			"location": 11,
-			"resources": []
-		},
-		{
-			"startTime": 4834,
-			"endTime": 5734,
-			"taskType": {
-				"predefined": null,
-				"other": "Reinigingsperron"
-			},
-			"shuntingUnit": {
-				"id": 1,
-				"memberIDs": [
-					2401
-				],
-				"parentIDs": [],
-				"childIDs": []
-			},
-			"location": 11,
-			"resources": [
-				{
-					"kind": "facility",
-					"id": 72
-				}
-			]
-		},
-		{
-			"startTime": 5734,
-			"endTime": 5734,
-			"taskType": {
-				"predefined": "Move",
 				"other": null
 			},
 			"shuntingUnit": {

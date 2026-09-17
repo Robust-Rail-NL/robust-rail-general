@@ -784,13 +784,14 @@
         "plan": "plan_marginal_length_s01.json",
         "evaluation": "eval_marginal_length_s01.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s02": {
       "config": "marginal_length",
@@ -803,13 +804,14 @@
         "plan": "plan_marginal_length_s02.json",
         "evaluation": "eval_marginal_length_s02.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s03": {
       "config": "marginal_length",
@@ -822,49 +824,54 @@
         "plan": "plan_marginal_length_s03.json",
         "evaluation": "eval_marginal_length_s03.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s04": {
       "config": "marginal_length",
       "seed": 4,
-      "outcome": "infeasible",
-      "reason": "The length of the arrival train [1]: 270.620000 is greater than the length of the track's [15] it arrives:255.000000",
-      "directory": "infeasible",
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
       "files": {
         "scenario": "scenario_marginal_length_s04.json",
-        "plan": "plan_marginal_length_s04.json"
+        "plan": "plan_marginal_length_s04.json",
+        "evaluation": "eval_marginal_length_s04.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s05": {
       "config": "marginal_length",
       "seed": 5,
-      "outcome": "infeasible",
-      "reason": "The length of the arrival train [0]: 270.620000 is greater than the length of the track's [15] it arrives:255.000000",
-      "directory": "infeasible",
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
       "files": {
         "scenario": "scenario_marginal_length_s05.json",
-        "plan": "plan_marginal_length_s05.json"
+        "plan": "plan_marginal_length_s05.json",
+        "evaluation": "eval_marginal_length_s05.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s06": {
       "config": "marginal_length",
@@ -877,13 +884,14 @@
         "plan": "plan_marginal_length_s06.json",
         "evaluation": "eval_marginal_length_s06.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s07": {
       "config": "marginal_length",
@@ -896,13 +904,14 @@
         "plan": "plan_marginal_length_s07.json",
         "evaluation": "eval_marginal_length_s07.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s08": {
       "config": "marginal_length",
@@ -915,85 +924,94 @@
         "plan": "plan_marginal_length_s08.json",
         "evaluation": "eval_marginal_length_s08.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s09": {
       "config": "marginal_length",
       "seed": 9,
-      "outcome": "infeasible",
-      "reason": "The length of the arrival train [1]: 270.620000 is greater than the length of the track's [15] it arrives:255.000000",
-      "directory": "infeasible",
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
       "files": {
         "scenario": "scenario_marginal_length_s09.json",
-        "plan": "plan_marginal_length_s09.json"
+        "plan": "plan_marginal_length_s09.json",
+        "evaluation": "eval_marginal_length_s09.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s10": {
       "config": "marginal_length",
       "seed": 10,
-      "outcome": "infeasible",
-      "reason": "The length of the arrival train [1]: 270.620000 is greater than the length of the track's [15] it arrives:255.000000",
-      "directory": "infeasible",
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
       "files": {
         "scenario": "scenario_marginal_length_s10.json",
-        "plan": "plan_marginal_length_s10.json"
+        "plan": "plan_marginal_length_s10.json",
+        "evaluation": "eval_marginal_length_s10.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s11": {
       "config": "marginal_length",
       "seed": 11,
-      "outcome": "infeasible",
-      "reason": "The length of the arrival train [1]: 270.620000 is greater than the length of the track's [15] it arrives:255.000000",
-      "directory": "infeasible",
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
       "files": {
         "scenario": "scenario_marginal_length_s11.json",
-        "plan": "plan_marginal_length_s11.json"
+        "plan": "plan_marginal_length_s11.json",
+        "evaluation": "eval_marginal_length_s11.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s12": {
       "config": "marginal_length",
       "seed": 12,
-      "outcome": "infeasible",
-      "reason": "The length of the arrival train [0]: 270.620000 is greater than the length of the track's [15] it arrives:255.000000",
-      "directory": "infeasible",
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
       "files": {
         "scenario": "scenario_marginal_length_s12.json",
-        "plan": "plan_marginal_length_s12.json"
+        "plan": "plan_marginal_length_s12.json",
+        "evaluation": "eval_marginal_length_s12.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s13": {
       "config": "marginal_length",
@@ -1006,13 +1024,14 @@
         "plan": "plan_marginal_length_s13.json",
         "evaluation": "eval_marginal_length_s13.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s14": {
       "config": "marginal_length",
@@ -1025,13 +1044,14 @@
         "plan": "plan_marginal_length_s14.json",
         "evaluation": "eval_marginal_length_s14.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s15": {
       "config": "marginal_length",
@@ -1044,49 +1064,54 @@
         "plan": "plan_marginal_length_s15.json",
         "evaluation": "eval_marginal_length_s15.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s16": {
       "config": "marginal_length",
       "seed": 16,
-      "outcome": "infeasible",
-      "reason": "The length of the arrival train [0]: 324.120000 is greater than the length of the track's [15] it arrives:255.000000",
-      "directory": "infeasible",
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
       "files": {
         "scenario": "scenario_marginal_length_s16.json",
-        "plan": "plan_marginal_length_s16.json"
+        "plan": "plan_marginal_length_s16.json",
+        "evaluation": "eval_marginal_length_s16.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s17": {
       "config": "marginal_length",
       "seed": 17,
-      "outcome": "infeasible",
-      "reason": "The length of the arrival train [0]: 270.620000 is greater than the length of the track's [15] it arrives:255.000000",
-      "directory": "infeasible",
+      "outcome": "feasible",
+      "reason": "solver plan unviolating, evaluator confirms valid",
+      "directory": "feasible",
       "files": {
         "scenario": "scenario_marginal_length_s17.json",
-        "plan": "plan_marginal_length_s17.json"
+        "plan": "plan_marginal_length_s17.json",
+        "evaluation": "eval_marginal_length_s17.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s18": {
       "config": "marginal_length",
@@ -1099,13 +1124,14 @@
         "plan": "plan_marginal_length_s18.json",
         "evaluation": "eval_marginal_length_s18.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s19": {
       "config": "marginal_length",
@@ -1118,13 +1144,14 @@
         "plan": "plan_marginal_length_s19.json",
         "evaluation": "eval_marginal_length_s19.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     },
     "marginal_length_s20": {
       "config": "marginal_length",
@@ -1137,13 +1164,14 @@
         "plan": "plan_marginal_length_s20.json",
         "evaluation": "eval_marginal_length_s20.txt"
       },
-      "measured": "2026-08-08",
+      "measured": "2026-09-16",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
         "evaluator": "tors:latest"
       },
-      "solver_max_duration": 15
+      "solver_max_duration": 15,
+      "solver_iterations": 15000
     }
   },
   "note": "Classification is recorded per fixture, and the directory mirrors it. 'feasible' and 'infeasible' do not rot: the first is witnessed by the plan saved beside it, the second is a scenario-level rejection and so a proof. 'unresolved' means this pipeline could not confirm a plan, which is a statement about the tools rather than the scenario \u2014 re-run the sweep after a solver or evaluator fix and some may move."
