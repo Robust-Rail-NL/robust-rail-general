@@ -76,10 +76,10 @@ the two shorthand flags. `solver` and `planner` are mutually exclusive with
 `plans/plan_<name>.json`, so running both over one location would leave one
 tool's output silently overwritten by the other's.
 
-`clear.py` removes generated scenarios, plans and evaluations (`--dry-run` to
-preview, `--location` to restrict).
+`scripts/clear.py` removes generated scenarios, plans and evaluations
+(`--dry-run` to preview, `--location` to restrict).
 
-`sweep_seeds.py --location <NAME> --config <config-name> --seeds 1-20` runs one
+`scripts/sweep_seeds.py --location <NAME> --config <config-name> --seeds 1-20` runs one
 configuration across a range of seeds and classifies each outcome, always via
 the solver (not the planner). The seed only varies the *generator* step — it's
 embedded in each per-seed `scenario_config_*.json` and controls the random
@@ -93,8 +93,8 @@ sweep. `--save` writes the classified fixtures into
 `fixtures/` is validated in CI (`.github/workflows/validate-fixtures.yml`)
 against the JSON Schema `robust-rail-generator` exports from its Pydantic
 models, gated on that schema itself being fresh relative to the models it was
-exported from. `validate_json.py --schema-dir <path>` runs the same check
-locally.
+exported from. `scripts/validate_json.py --schema-dir <path>` runs the same
+check locally.
 
 ## Location files
 

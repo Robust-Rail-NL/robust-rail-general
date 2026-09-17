@@ -23,9 +23,16 @@ Against the previous image this is a large move on both axes:
 
 ## The length constraint is now modelled
 
+**Stale as of 2026-09-16**: gateway `906a` (track 15) was widened from 255 m to
+326 m that day, so the boundary and the 8/8 "infeasible, all unsolvable" verdict
+below no longer hold — see `docs/scenario-feasibility.md`, which shows 3 of
+those same instances are no longer length-infeasible at all. This section is
+kept as-measured against the 2026-08-14 image and the pre-widening `location.json`,
+not updated in place.
+
 The previous image had no notion of whether an arriving train fits the track it
-arrives on, so it planned straight through provably infeasible scenarios. It now
-discriminates exactly on the 255 m gateway (`906a`, track 15):
+arrives on, so it planned straight through provably infeasible scenarios. It
+then discriminated exactly on the (now superseded) 255 m gateway (`906a`, track 15):
 
 | max arrival length | fits? | instances | verdict |
 |---|---|---|---|
