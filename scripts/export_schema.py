@@ -14,9 +14,10 @@ import json
 import os
 import sys
 
-SRC_DIR = os.path.join(os.path.dirname(__file__), "..", "src")
+REPO_DIR = os.path.join(os.path.dirname(__file__), "..")
 SCHEMA_DIR = os.path.join(os.path.dirname(__file__), "..", "schema")
-sys.path.insert(0, SRC_DIR)
+# robust_rail_models sits at the repo root, so that is what goes on the path.
+sys.path.insert(0, REPO_DIR)
 
 from pydantic import TypeAdapter
 from pydantic.json_schema import models_json_schema

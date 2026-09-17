@@ -22,7 +22,9 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-ROOT = Path(__file__).parent
+# The repo root, one level up from scripts/: the Location_* fixtures this
+# validates live there, not beside this file.
+ROOT = Path(__file__).resolve().parent.parent
 
 # Which schema validates which fixtures, relative to a Location_* directory.
 #

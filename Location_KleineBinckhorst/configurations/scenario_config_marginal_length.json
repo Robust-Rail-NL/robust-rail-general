@@ -1,10 +1,10 @@
 {
     "intent": {
         "designed_for": "domain",
-        "expectation": "feasible for some seeds only; infeasibility is provable rather than merely unproven",
-        "exercises": "the boundary of what fits the 255 m gateway, so that the seed decides the outcome",
+        "expectation": "STALE as of 2026-09-16: gateway 906a was widened from 255 m to 326 m, so both previously-failing draws now fit and this config is feasible for every seed — see docs/scenario-feasibility.md. Originally designed to be feasible for some seeds only, with infeasibility provable; the notes below describe that pre-widening design and still explain the material choice.",
+        "exercises": "originally the boundary of what fits the 255 m gateway, so that the seed decided the outcome — no longer a boundary now that the gateway is 326 m",
         "notes": [
-            "The material is restricted to one super type with two sub types of very different length: VIRM-4 at 108.56 m and VIRM-6 at 162.06 m. With units_per_composition [1,2] a train is one unit (always fits) or two, and a pair fits only if both draws are VIRM-4: 4+4 = 217.1 m fits, 4+6 = 270.6 m and 6+6 = 324.1 m do not. So each train fits with probability about 0.625 and the scenario is feasible only when every train does.",
+            "The material is restricted to one super type with two sub types of very different length: VIRM-4 at 108.56 m and VIRM-6 at 162.06 m. With units_per_composition [1,2] a train is one unit (always fits) or two, and at the old 255 m gateway, a pair fit only if both draws were VIRM-4 (4+4 = 217.1 m; 4+6 = 270.6 m and 6+6 = 324.1 m did not). At the current 326 m gateway all three combinations fit. So each train fits with probability about 0.625 and the scenario is feasible only when every train does.",
             "Everything else is deliberately copied from feasible_small — same gateway spacing, same horizon, no servicing — so that the seed varies exactly one thing: whether the drawn compositions fit. Do not tighten min_gap_on_gateway here; that would confound length with congestion, which is what marginal_congestion is for.",
             "An infeasible outcome here is a proof, not an opinion: the evaluator rejects the scenario before considering any plan, because a train cannot fit on the track it is scheduled to arrive at or depart from."
         ]

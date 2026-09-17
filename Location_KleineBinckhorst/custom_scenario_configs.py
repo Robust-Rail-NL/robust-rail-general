@@ -3,7 +3,10 @@
 
 Iterates over every combination of (number of trains) x (instances) x
 (matching strategy) and writes one config per combination into
-configurations/. Use run_generator.py to actually run the generator on them.
+configurations/, or configurations/<--subfolder>/ if given. Use
+run_generator.py to actually run the generator on them, or point
+run_experiment.py's --config-dir at the subfolder to scope a whole
+generate+solve+plan+evaluate run to just this sweep.
 """
 
 import argparse
@@ -15,13 +18,13 @@ CONFIG_DIR = ROOT / "configurations"
 
 MATCHING_NAME_TO_ID = {"FIFO": 0, "random": 1, "LIFO": 2}
 
-DEFAULT_NUMBER_OF_TRAINS = [5, 10, 15, 20, 25, 30, 31, 32, 33, 34, 35]
+DEFAULT_NUMBER_OF_TRAINS = [5, 10, 15, 20, 25, 30]
 DEFAULT_NUMBER_OF_INSTANCES = 10
 DEFAULT_MATCHINGS = ["FIFO", "random", "LIFO"]
 DEFAULT_SEED = 42
-DEFAULT_TIME_WINDOW_PER_TRAIN = 86400
+DEFAULT_TIME_WINDOW_PER_TRAIN = 600
 DEFAULT_MIN_GAP_ON_GATEWAY = 180
-DEFAULT_TRAIN_UNIT_TYPES = ["VIRM-4", "VIRM-6", "ICM-3", "ICM-4", "SNG-3", "SNG-4", "SLT-4", "SLT-6"]
+DEFAULT_TRAIN_UNIT_TYPES = ["VIRM-4", "VIRM-6", "ICM-3", "ICM-4", "SNG-3", "SNG-4", "SLT-4", "SLT-6", "DDZ-4", "DDZ-6"]
 DEFAULT_SUPER_TYPE_RATIO = 0.5
 DEFAULT_UNITS_PER_COMPOSITION = [1, 2, 3]
 DEFAULT_MATCHING_COMPLEXITY = 0.3
@@ -98,6 +101,12 @@ def main() -> None:
                         help=f"Instanding ratio (default: {DEFAULT_INSTANDING_RATIO}).")
     parser.add_argument("--outstanding-ratio", type=float, default=default("outstanding_ratio"),
                         help=f"Outstanding ratio (default: {DEFAULT_OUTSTANDING_RATIO}).")
+    parser.add_argument("--subfolder", metavar="NAME",
+                        help="Write configs into configurations/<NAME>/ instead of directly "
+                             "into configurations/ -- keeps one sweep's configs separate from "
+                             "another's (or from the curated example configs already there), "
+                             "and gives run_experiment.py's --config-dir a self-contained "
+                             "directory to point at: --config-dir configurations/<NAME>.")
     args = parser.parse_args()
 
     invalid_matchings = set(args.matchings) - MATCHING_NAME_TO_ID.keys()
@@ -112,7 +121,8 @@ def main() -> None:
         f"{len(args.matchings)} matching(s)."
     )
 
-    CONFIG_DIR.mkdir(exist_ok=True)
+    config_dir = (CONFIG_DIR / args.subfolder) if args.subfolder else CONFIG_DIR
+    config_dir.mkdir(parents=True, exist_ok=True)
     written = 0
     for j, n in enumerate(args.number_of_trains):
         end_time = n * args.time_window_per_train
@@ -146,12 +156,12 @@ def main() -> None:
                 }
 
                 out_name = f"scenario_config_custom_{n}_{matching}_{i}.json"
-                out_path = CONFIG_DIR / out_name
+                out_path = config_dir / out_name
                 with open(out_path, "w") as f:
                     json.dump(config, f, indent=4)
                 written += 1
 
-    print(f"Wrote {written} config(s) to {CONFIG_DIR.relative_to(ROOT)}/")
+    print(f"Wrote {written} config(s) to {config_dir.relative_to(ROOT)}/")
 
 
 if __name__ == "__main__":
