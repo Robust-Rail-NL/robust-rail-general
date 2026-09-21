@@ -138,6 +138,25 @@ def _instances_from_configs(config_dir: Path) -> list:
             for c in sorted(config_dir.glob("scenario_config_*.json"))]
 
 
+def _by_size(loc: Path, instances: list, config_dir: Path | None) -> list:
+    def trains(instance: str) -> float:
+        configs = [loc / "configurations" / f"scenario_config_{instance}.json"]
+        if config_dir:
+            configs.insert(0, config_dir / f"scenario_config_{instance}.json")
+        for path in configs:
+            try:
+                return float(json.loads(path.read_text())["number_of_trains"])
+            except (OSError, ValueError, KeyError, TypeError):
+                pass
+        try:
+            scenario = json.loads((loc / "scenarios" / f"scenario_{instance}.json").read_text())
+            return float(len(scenario.get("in") or []) + len(scenario.get("inStanding") or []))
+        except (OSError, ValueError):
+            return float("inf")
+
+    return sorted(instances, key=trains)
+
+
 def _write_progress(out_dir: Path, instances: list, all_results: dict, num_seeds=None) -> None:
     """Rewrite progress.csv from the current in-memory results -- called after
     every (instance, tool[, seed]) attempt finishes, so it always reflects
@@ -399,8 +418,11 @@ def main() -> None:
         if missing:
             sys.exit(f"Generator produced no scenario for: {', '.join(missing)}")
 
+    instances = _by_size(loc, instances, args.config_dir)
+
     out_dir = Path(args.output_dir)
-    print(f"Running {len(instances)} instance(s) x {tools} against {loc.name}...\n", flush=True)
+    print(f"Running {len(instances)} instance(s) x {tools} against {loc.name}, "
+          f"smallest first...\n", flush=True)
 
     all_results = {}
     if not args.dry_run:
