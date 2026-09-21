@@ -175,7 +175,7 @@ def _version_for(tool: str, solver_version: str, planner_version: str) -> str:
 
 
 def _run_tool(tool: str, location: str, instance: str, out_dir: Path, version: str,
-              force: bool, dry_run: bool, max_duration, seed) -> dict:
+              force: bool, dry_run: bool, max_duration, seed, planner_impl) -> dict:
     result_path = out_dir / "result.json"
     if result_path.exists() and not force:
         print(f"  SKIP {tool} (result.json exists): {out_dir}")
@@ -194,6 +194,8 @@ def _run_tool(tool: str, location: str, instance: str, out_dir: Path, version: s
         *(["--max-duration", str(max_duration)] if max_duration is not None else []),
         # --seed is solver-only; run_planner.py has no seed concept at all.
         *(["--seed", str(seed)] if seed is not None and tool == "solver" else []),
+        # --planner is planner-only; run_solver.py has no such flag at all.
+        *(["--planner", planner_impl] if tool == "planner" else []),
     ], cwd=ROOT)
     return json.loads(result_path.read_text()) if result_path.exists() else {
         "instance": instance, "tool": tool, "plan_produced": False,
@@ -220,11 +222,11 @@ def _run_evaluator(location: str, instance: str, plan_path: Path, version: str,
 
 def _run_and_record(tool: str, location: str, instance: str, tool_dir: Path,
                     solver_version: str, planner_version: str, evaluator_version: str,
-                    force: bool, dry_run: bool, max_duration, seed, results: dict,
+                    force: bool, dry_run: bool, max_duration, seed, planner_impl, results: dict,
                     key: str) -> None:
     version = _version_for(tool, solver_version, planner_version)
     run_result = _run_tool(tool, location, instance, tool_dir, version, force, dry_run,
-                           max_duration, seed)
+                           max_duration, seed, planner_impl)
     eval_result = None
     # A dry run never produces a real plan.json, so there is nothing for the
     # evaluator to dry-run against either -- skip it rather than have it fail a
@@ -246,7 +248,7 @@ def _run_and_record(tool: str, location: str, instance: str, tool_dir: Path,
 
 def _run_instance(location: str, instance: str, tools: list, out_dir: Path,
                   solver_version: str, planner_version: str, evaluator_version: str,
-                  force: bool, dry_run: bool, max_duration, seed, num_seeds,
+                  force: bool, dry_run: bool, max_duration, seed, num_seeds, planner_impl,
                   all_results: dict, all_instances: list) -> None:
     results = all_results.setdefault(instance, {})
     for tool in tools:
@@ -255,14 +257,15 @@ def _run_instance(location: str, instance: str, tools: list, out_dir: Path,
                 tool_dir = out_dir / instance / FOLDER_NAMES[tool] / f"seed{s}"
                 _run_and_record(tool, location, instance, tool_dir,
                                 solver_version, planner_version, evaluator_version,
-                                force, dry_run, max_duration, s, results, f"solver_seed{s}")
+                                force, dry_run, max_duration, s, planner_impl, results,
+                                f"solver_seed{s}")
                 if not dry_run:
                     _write_progress(out_dir, all_instances, all_results, num_seeds)
         else:
             tool_dir = out_dir / instance / FOLDER_NAMES[tool]
             _run_and_record(tool, location, instance, tool_dir,
                             solver_version, planner_version, evaluator_version,
-                            force, dry_run, max_duration, seed, results, tool)
+                            force, dry_run, max_duration, seed, planner_impl, results, tool)
             if not dry_run:
                 _write_progress(out_dir, all_instances, all_results, num_seeds)
 
@@ -296,6 +299,11 @@ def main() -> None:
                         help="Docker image version for the planner -- robust-rail-planner has its "
                              "own independent version line (default: local, i.e. whatever "
                              "'docker build -t planner:latest .' produced). See run_planner.py.")
+    parser.add_argument("--planner", choices=["symbolic", "symbolic-rail", "enhsp"],
+                        default="symbolic-rail",
+                        help="Planner implementation to use inside the container (planner tool "
+                             "only; ignored when --tools excludes planner). See run_planner.py "
+                             "--help.")
     parser.add_argument("--evaluator-version", default="stable",
                         help="Docker image version for the evaluator -- kept separately settable "
                              "rather than inheriting the solver's. See run_evaluator.py --help.")
@@ -402,7 +410,7 @@ def main() -> None:
         _run_instance(args.location, instance, tools, out_dir,
                       args.solver_version, args.planner_version, args.evaluator_version,
                       args.force, args.dry_run, args.max_duration, args.seed, args.num_seeds,
-                      all_results, instances)
+                      args.planner, all_results, instances)
 
     if args.jobs > 1 and not args.dry_run:
         with ThreadPoolExecutor(max_workers=args.jobs) as pool:

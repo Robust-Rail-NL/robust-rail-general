@@ -223,8 +223,11 @@ def main() -> None:
                              "flaky registry to abort the sweep.")
     parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default="local",
                         help="Pick a docker image version.")
-    parser.add_argument("--planner", choices=["symbolic", "enhsp"], default="enhsp",
-                        help="Planner implementation to use inside the container.")
+    parser.add_argument("--planner", choices=["symbolic", "symbolic-rail", "enhsp"],
+                        default="symbolic-rail",
+                        help="Planner implementation to use inside the container. 'symbolic-rail' "
+                             "is the same Julia script as 'symbolic' but with the rail-specific "
+                             "heuristic mode (see plan/symbolic_planner.jl in robust-rail-planner).")
     parser.add_argument("--output-dir", metavar="DIR", type=Path,
                         help="Write plan.json, planner.out/.err and result.json here instead of "
                              "into <location>/plans/ (requires --instance to name a single "
