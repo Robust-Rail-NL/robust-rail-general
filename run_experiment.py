@@ -308,22 +308,23 @@ def main() -> None:
                              "instances run afterward to this subset -- the way a custom instance "
                              "set is run. Mutually exclusive with --instance.")
     parser.add_argument("--output-dir", required=True, metavar="DIR")
-    parser.add_argument("--generator-version", default="stable",
+    parser.add_argument("--generator-version", default="edge",
                         help="Docker image version for the generator -- kept separate from "
                              "--solver-version so scenario generation can be pinned or bumped "
-                             "independently of the solve step. See run_generator.py --help.")
-    parser.add_argument("--solver-version", default="stable",
+                             "independently of the solve step. The generator has no edge channel "
+                             "of its own (see run_generator.py), so 'edge' here resolves to the "
+                             "same image as 'stable'. See run_generator.py --help.")
+    parser.add_argument("--solver-version", default="edge",
                         help="Docker image version for the solver. See run_solver.py --help.")
-    parser.add_argument("--planner-version", default="local",
+    parser.add_argument("--planner-version", default="edge",
                         help="Docker image version for the planner -- robust-rail-planner has its "
-                             "own independent version line (default: local, i.e. whatever "
-                             "'docker build -t planner:latest .' produced). See run_planner.py.")
+                             "own independent version line. See run_planner.py --help.")
     parser.add_argument("--planner", choices=["symbolic", "symbolic-rail", "enhsp"],
                         default="symbolic-rail",
                         help="Planner implementation to use inside the container (planner tool "
                              "only; ignored when --tools excludes planner). See run_planner.py "
                              "--help.")
-    parser.add_argument("--evaluator-version", default="stable",
+    parser.add_argument("--evaluator-version", default="edge",
                         help="Docker image version for the evaluator -- kept separately settable "
                              "rather than inheriting the solver's. See run_evaluator.py --help.")
     parser.add_argument("--max-duration", type=int, metavar="SECONDS",

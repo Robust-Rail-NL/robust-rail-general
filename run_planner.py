@@ -88,6 +88,7 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner
         "docker", "run", "--rm",
         "--name", cname,
         *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
+        "--env", "JULIA_DEPOT_PATH=/tmp/julia-depot:/opt/julia-depot",
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         docker_image,
         "--location", f"{CONTAINER_DB}/location.json",
@@ -154,6 +155,10 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
     cmd = [
         "docker", "run", "--rm", "--name", cname,
         *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
+        # See the matching comment in _run_scenario: without this, Julia's
+        # precompile-cache write into the image's root-owned JULIA_DEPOT_PATH
+        # fails with EACCES under --user, for any --planner value.
+        "--env", "JULIA_DEPOT_PATH=/tmp/julia-depot:/opt/julia-depot",
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         "--mount", f"type=bind,source={output_dir},target=/app/output",
         docker_image,
