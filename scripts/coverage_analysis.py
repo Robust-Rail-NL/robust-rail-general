@@ -77,11 +77,11 @@ def _tool_solved(instance_dir: Path, folder: str) -> bool:
     instance per solver, and a solver that finds a plan on any one of its
     seeds has covered that instance.
     """
-    direct = rr._read_json(instance_dir / folder / "eval_result.json")
+    direct = rr.read_json(instance_dir / folder / "eval_result.json")
     if direct:
         return bool(direct.get("solved"))
     return any(
-        rr._read_json(seed_dir / "eval_result.json").get("solved")
+        rr.read_json(seed_dir / "eval_result.json").get("solved")
         for seed_dir in sorted((instance_dir / folder).glob("seed*"))
     )
 
@@ -150,7 +150,7 @@ def main() -> None:
         planner_all.append(solved_planner)
         # certify_threshold doesn't affect classification, only the "tested"
         # flag this script doesn't use -- any value is fine here.
-        classification = rr._instance_feasibility(
+        classification = rr.instance_feasibility(
             instance_dir.name, instance_dir, certify_threshold=0
         )["classification"]
         if classification == "feasible":

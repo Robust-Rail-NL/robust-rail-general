@@ -4,54 +4,42 @@
 import argparse
 import json
 import os
-import subprocess
 import sys
 import time
 from datetime import datetime, timezone
+from itertools import chain
 from pathlib import Path
 
-from scripts.docker_utils import ensure_docker_running, ensure_pulled
+from scripts.docker_utils import (
+    container_name,
+    ensure_docker_running,
+    ensure_pulled,
+    finish_capture,
+    run_container,
+)
 from scripts.instance_filter import fail_no_match, instance_of, select
 
 ROOT = Path(__file__).parent
 INSTANCE_PREFIX = "plan_"
 DOCKER_IMAGE_VERSIONS = {
     "stable": "ghcr.io/robust-rail-nl/tors:latest",
-    # The evaluator is the oracle the pipeline trusts, and its assertions build
-    # produces the same verdicts and .err content as the plain one (verified
-    # across all KleineBinckhorst scenarios — .txt trace files can differ in
-    # line order between separately-built binaries, see docs/roadmap-2.0.0.md,
-    # but never in content) while turning an internal invariant violation into
-    # an abort rather than a verdict computed from corrupt state. A run that
-    # trips one exits 134/139 with the assertion text in the .err file, which
-    # reads very differently from an ordinary "plan is not valid".
     "stable-assert": "ghcr.io/robust-rail-nl/tors:assert",
-    # The solver and evaluator both have an edge channel; only the generator
-    # stays pinned to stable. "edge" names a pipeline configuration — run the
-    # solver and evaluator from their edge channels, leave the generator on
-    # stable — rather than a per-tool build flag. See run_solver.py.
     "edge": "ghcr.io/robust-rail-nl/tors:edge",
     "local": "tors:latest",
 }
 CONTAINER_DB = "/app/database"
 
-
-def _scenario_name(plan: Path) -> str:
-    return instance_of(plan, INSTANCE_PREFIX)
-
+def _instance_name(path: Path) -> str:
+    return instance_of(path, INSTANCE_PREFIX)
 
 def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool) -> bool:
-    name = _scenario_name(plan)
+    name = _instance_name(plan)
     scenario = location_dir / "scenarios" / f"scenario_{name}.json"
 
     if not scenario.exists():
         print(f"  SKIP {plan.name}: no matching scenario_{name}.json", file=sys.stderr)
-        return True  # not a failure — plan may predate the scenario file
+        return True
 
-    # The evaluator needs this alongside location.json, not just
-    # location.json + scenario — without it the container fails deep inside
-    # TORS with a misleading "specified file '/app/database' does not
-    # exist" (it means config.json, not the mount itself).
     if not (location_dir / "config.json").exists():
         print(f"  SKIP {plan.name}: {location_dir}/config.json missing — "
               f"required by the evaluator alongside location.json", file=sys.stderr)
@@ -62,8 +50,10 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool) 
     out_file = eval_dir / f"eval_{name}.out"
     err_file = eval_dir / f"eval_{name}.err"
 
+    cname = container_name("evaluator", name)
     cmd = [
         "docker", "run", "--rm",
+        "--name", cname,
         *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         docker_image,
@@ -80,23 +70,11 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool) 
         print(f"    [dry-run] {' '.join(cmd)}")
         return True
 
-    returncode = None
-    ok = False
-    try:
-        with open(out_file, "w") as fout, open(err_file, "w") as ferr:
-            result = subprocess.run(cmd, stdout=fout, stderr=ferr)
-        returncode = result.returncode
-        ok = returncode == 0
-    except Exception as exc:
-        print(f"    ERROR: {exc}", file=sys.stderr)
+    returncode, _ = run_container(cmd, cname, out_file, err_file, None)
+    ok = returncode == 0
 
-    with open(err_file, "a") as f:
-        f.write(f"--- exit: {returncode if returncode is not None else 'error'}\n")
-    out_lines = len(out_file.read_text().splitlines()) if out_file.exists() else 0
-    err_lines = len(err_file.read_text().splitlines()) if err_file.exists() else 0
-    if ok and err_lines <= 1:
-        err_file.unlink(missing_ok=True)
-        err_lines = 0
+    footer = f"--- exit: {returncode if returncode is not None else 'error'}"
+    out_lines, err_lines = finish_capture(out_file, err_file, footer, ok)
     err_part = f"  stderr: {err_lines}L" if err_lines else ""
     print(f"    stdout: {out_lines}L{err_part}  (exit {returncode})")
 
@@ -106,13 +84,7 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool) 
 
 
 def _classify_verdict(out_text: str, err_text: str, txt_text: str) -> tuple[str, str]:
-    """Read the evaluator's own verdict out of its output.
-
-    The same string checks scripts/sweep_seeds.py's _classify uses, kept in
-    step with it deliberately: in EVAL_AND_STORE mode the rejection reason goes
-    to the result file rather than stdout, so txt_text has to be read too.
-    """
-    for line in (err_text + out_text).splitlines():
+    for line in chain(err_text.splitlines(), out_text.splitlines()):
         if "Issue detected with the Scenario" in line:
             return "rejected", line.split("Scenario:", 1)[-1].strip()
     if "The plan is valid" in out_text:
@@ -120,7 +92,7 @@ def _classify_verdict(out_text: str, err_text: str, txt_text: str) -> tuple[str,
     reason = next(
         (
             ln.split("The action is invalid.", 1)[-1].strip().rstrip(".")
-            for ln in (out_text + txt_text).splitlines()
+            for ln in chain(out_text.splitlines(), txt_text.splitlines())
             if "Scenario failed" in ln
         ),
         None,
@@ -134,22 +106,13 @@ def _classify_verdict(out_text: str, err_text: str, txt_text: str) -> tuple[str,
 
 def _run_plan_single(docker_image: str, location_dir: Path, plan: Path, scenario: Path,
                      version: str, dry_run: bool) -> dict:
-    """Evaluate one plan wherever it lives, writing its verdict beside it.
-
-    For plans under a run_solver.py/run_planner.py --output-dir: eval.out,
-    eval.err, eval.txt and eval_result.json land next to that attempt's own
-    plan.json and result.json, rather than in location_dir/evaluations/ where a
-    solver run and a planner run of the same instance would collide.
-
-    eval_result.json carries the "solved" verdict, and it is the only thing
-    that does — a solver or planner exit code of 0 means the tool finished, not
-    that its plan holds up.
-    """
     plan = plan.resolve()
     plan_dir = plan.parent
+    cname = container_name("evaluator", instance_of(scenario, "scenario_"))
 
     cmd = [
         "docker", "run", "--rm",
+        "--name", cname,
         *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
         "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
         "--mount", f"type=bind,source={plan_dir},target=/app/planio",
@@ -170,13 +133,7 @@ def _run_plan_single(docker_image: str, location_dir: Path, plan: Path, scenario
     out_file, err_file = plan_dir / "eval.out", plan_dir / "eval.err"
     txt_file = plan_dir / "eval.txt"
     start, start_iso = time.monotonic(), datetime.now(timezone.utc).isoformat()
-    returncode = None
-    try:
-        with open(out_file, "w") as fout, open(err_file, "w") as ferr:
-            result = subprocess.run(cmd, stdout=fout, stderr=ferr)
-        returncode = result.returncode
-    except Exception as exc:
-        print(f"    ERROR: {exc}", file=sys.stderr)
+    returncode, _ = run_container(cmd, cname, out_file, err_file, None)
 
     def _read(path: Path) -> str:
         return path.read_text(errors="replace") if path.exists() else ""
@@ -227,12 +184,10 @@ def main() -> None:
                              "--instance (to find the matching scenario).")
     parser.add_argument("--no-pull", action="store_true",
                         help="Skip the up-front 'docker pull'. For a driver like "
-                             "run_experiment.py that invokes this script once per attempt: it "
-                             "pulls each image once itself, and without this every invocation "
-                             "would re-check the registry -- hundreds of round-trips for an "
-                             "image that cannot change mid-run, and hundreds of chances for a "
-                             "flaky registry to abort the sweep.")
-    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='stable',
+                             "run_experiment.py that invokes this script once per attempt and "
+                             "pulls each image once itself — without it, every invocation would "
+                             "re-check the registry for an image that cannot change mid-run.")
+    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default="stable",
                         help="Pick a docker image version ('local' is reserved for locally built "
                              "images).")
     args = parser.parse_args()
@@ -252,13 +207,6 @@ def main() -> None:
 
     if args.plan:
         loc = ROOT / args.location
-        # Resolve --instance the same way the batch path below does (select()
-        # against scripts/instance_filter.py, wildcards and pasted filenames
-        # included) rather than pasting it straight into a path — a raw paste
-        # broke both of those for this one flag combination. Strip either a
-        # scenario_ or plan_ prefix before matching: the natural filename to
-        # paste here is --plan's own (plan_<name>.json), which sits right in
-        # the same command, not the scenario's.
         name = args.instance.removesuffix(".json")
         for stray_prefix in ("scenario_", "plan_"):
             name = name.removeprefix(stray_prefix)
@@ -270,9 +218,6 @@ def main() -> None:
             sys.exit(f"ERROR: --instance {args.instance!r} matched {len(scenarios)} scenarios; "
                      f"--plan evaluates one. Narrow it to exactly one.")
         elif args.dry_run:
-            # Nothing to glob against yet (e.g. a dry run against a location with
-            # no scenarios/ generated) -- fall back to the same normalization
-            # select() applies, so the printed command still reflects --instance.
             scenario = loc / "scenarios" / f"scenario_{name}.json"
         else:
             fail_no_match(args.instance, [instance_of(p, "scenario_") for p in candidates])
@@ -291,7 +236,7 @@ def main() -> None:
             print(f"WARNING: {loc} not found, skipping.", file=sys.stderr)
             continue
         plans = sorted(loc.glob("plans/plan_*.json"))
-        available += [_scenario_name(p) for p in plans]
+        available += [_instance_name(p) for p in plans]
         plans = select(plans, args.instance, INSTANCE_PREFIX)
         if not plans:
             continue

@@ -2,6 +2,7 @@
 """Shared helpers for the run_generator/run_solver/run_evaluator/run_planner scripts."""
 
 import importlib.util
+import os
 import shutil
 import subprocess
 import sys
@@ -10,20 +11,6 @@ from pathlib import Path
 
 
 def ensure_pulled(image: str) -> None:
-    """Pull once, up front, so a floating tag (hip:latest, hip:edge, ...) is
-    never silently served from a stale local cache — Docker's own default
-    (`docker run` with no --pull) only pulls when the tag is absent locally,
-    it does not special-case :latest or re-check a tag it already has.
-
-    Called once per script invocation rather than passing `--pull always` to
-    every `docker run` in the per-scenario/plan/config loop below: the image
-    can't change mid-run, so re-checking the registry on every container start
-    was one redundant round-trip per fixture for no benefit.
-
-    Skipped for bare local-build tags (no "/", e.g. "hip:latest" built by
-    docker-push.sh locally rather than pulled from ghcr.io): there is no
-    registry to check, and `docker pull` would just fail trying to find one.
-    """
     if "/" not in image:
         return
 
@@ -38,20 +25,6 @@ def ensure_pulled(image: str) -> None:
 
 
 def load_image_versions(script_path: Path) -> dict[str, str]:
-    """Load a run_*.py's DOCKER_IMAGE_VERSIONS dict without running its CLI.
-
-    Used by scripts/sweep_seeds.py (for the manifest), run_pipeline.py (to
-    print/pass through what a --version resolves to) and run_experiment.py
-    (to pull each image once up front) — three independent copies of this
-    before being consolidated here. run_*.py are scripts meant to run as
-    __main__, not package members, so this loads one in-process via importlib
-    instead of a normal import.
-
-    Each run_*.py does `from scripts.docker_utils import ...`, an absolute
-    import that only resolves with the repo root on sys.path — true when it
-    runs as __main__ via subprocess (cwd=ROOT puts it there), not true for
-    this in-process load, so ensure it here too.
-    """
     root = script_path.resolve().parent
     if str(root) not in sys.path:
         sys.path.insert(0, str(root))
@@ -62,45 +35,13 @@ def load_image_versions(script_path: Path) -> dict[str, str]:
 
 
 def container_name(prefix: str, instance: str) -> str:
-    """A unique --name for one container, so a timeout can target that container.
-
-    The uuid suffix (rather than just the instance name) avoids a "name already
-    in use" conflict when a previous run's container of the same name is still
-    being torn down.
-    """
     return f"{prefix}-{instance}-{uuid.uuid4().hex[:8]}"
 
-
-# Docker Desktop on macOS can insist a bind source does not exist while it is
-# plainly present on the host, failing the run with exit 125 in 0.0s.
-#
-# Measured on 2026-09-15: deleting a directory and recreating it poisons every
-# path *beneath* it, not just the path itself. A brand-new child of a recreated
-# ancestor fails, and keeps failing. So `rm -rf runs/` followed by a run into
-# runs/<fresh timestamp>/... fails on every attempt — which looks exactly like
-# the tool failing to produce a plan, and quietly fills an experiment with
-# plan_produced=False instead of crashing.
-#
-# Of the remedies tried against a poisoned ancestor, only one works:
-#
-#   sleep 5s                 FAIL      writing a file into it   FAIL
-#   stat()/listdir() on it   FAIL      bind-mounting it         ok
-#
-# Mounting the ancestor refreshes it, and its children then mount normally.
-# Hence _warm_bind below, run only after a failure has already happened.
 MOUNT_RACE_MESSAGE = "bind source path does not exist"
 MOUNT_RACE_EXIT = 125
 
 
 def _warm_bind(source: Path, image: str) -> None:
-    """Bind-mount `source` and each ancestor under the working directory once.
-
-    The exit codes are ignored on purpose: the container is expected to fail
-    (it gets no sensible arguments), and it is the successful *mount* that
-    refreshes Docker's view, not anything the container does. Bounded to the
-    working directory so this never mounts / or a home directory, and given a
-    short timeout in case an image waits for input when run bare.
-    """
     root = Path.cwd().resolve()
     chain = [d for d in [*reversed(source.parents), source]
              if d == root or root in d.parents]
@@ -117,11 +58,6 @@ def _warm_bind(source: Path, image: str) -> None:
 
 
 def _failed_bind_source(stderr: str) -> Path | None:
-    """The bind source docker named in a 125, if that is what it complained about.
-
-    Docker Desktop reports the path as the VM sees it, under /host_mnt, so that
-    prefix has to come off before the result names anything on this filesystem.
-    """
     for line in stderr.splitlines():
         if MOUNT_RACE_MESSAGE in line:
             path = line.split(MOUNT_RACE_MESSAGE, 1)[1].strip(": ")
@@ -131,22 +67,6 @@ def _failed_bind_source(stderr: str) -> Path | None:
 
 def run_container(cmd: list[str], name: str, out_file: Path, err_file: Path,
                   timeout: int | None) -> tuple[int | None, bool]:
-    """Run one `docker run --name <name> ...`, capturing stdout/stderr to files.
-
-    Returns (returncode, timed_out); returncode is None if the run raised
-    rather than exiting, in which case the exception is reported here.
-
-    On timeout the container is killed by name. subprocess's own timeout only
-    kills the local `docker run` client, not the container it started, which
-    keeps running under dockerd regardless — learned by hand on 2026-08-24,
-    when killing run_planner.py left a container running for hours until it was
-    separately `docker kill`ed. `--rm` still applies once the container stops,
-    so a plain kill is enough and no separate `docker rm` is needed.
-
-    A bind source docker cannot see (see MOUNT_RACE_MESSAGE) is warmed and
-    retried once. Safe to retry because the container never started: nothing
-    ran, nothing was written, and both output files are reopened truncated.
-    """
     returncode, timed_out = _run_once(cmd, name, out_file, err_file, timeout)
     if returncode == MOUNT_RACE_EXIT and not timed_out:
         stderr = err_file.read_text(errors="replace") if err_file.exists() else ""
@@ -165,11 +85,6 @@ def run_container(cmd: list[str], name: str, out_file: Path, err_file: Path,
 
 
 def _image_of(cmd: list[str]) -> str:
-    """The image in a `docker run ... <image> [args]` command line.
-
-    It is the first bare word after the flags: every option this module emits
-    before it either starts with "--" or is that option's own value.
-    """
     skip_next = False
     for token in cmd[2:]:
         if skip_next:
@@ -198,13 +113,38 @@ def _run_once(cmd: list[str], name: str, out_file: Path, err_file: Path,
     return returncode, timed_out
 
 
-def ensure_docker_running() -> None:
-    """Exit with a clear message if docker isn't installed or the daemon isn't reachable.
+def _count_lines(path: Path) -> int:
+    try:
+        with open(path, "rb") as f:
+            count = sum(chunk.count(b"\n") for chunk in iter(lambda: f.read(1 << 20), b""))
+    except OSError:
+        return 0
+    return count if _ends_with_newline(path) else count + 1
 
-    Without this, a dead daemon shows up as every single docker run failing with
-    exit 125 and near-empty stderr, which looks identical to a scenario/config
-    problem and sends people chasing the wrong thing.
-    """
+
+def _ends_with_newline(path: Path) -> bool:
+    try:
+        with open(path, "rb") as f:
+            f.seek(-1, os.SEEK_END)
+            return f.read(1) == b"\n"
+    except OSError:
+        return True
+
+
+def finish_capture(out_file: Path, err_file: Path, footer: str, ok: bool) -> tuple[int, int]:
+    had_stderr = err_file.exists() and err_file.stat().st_size > 0
+    if ok and not had_stderr:
+        err_file.unlink(missing_ok=True)
+        return _count_lines(out_file), 0
+
+    with open(err_file, "a") as f:
+        if had_stderr and not _ends_with_newline(err_file):
+            f.write("\n")
+        f.write(footer if footer.endswith("\n") else footer + "\n")
+    return _count_lines(out_file), _count_lines(err_file)
+
+
+def ensure_docker_running() -> None:
     if shutil.which("docker") is None:
         print("ERROR: 'docker' command not found. Is Docker installed and on your PATH?",
               file=sys.stderr)

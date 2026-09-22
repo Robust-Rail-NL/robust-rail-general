@@ -37,6 +37,20 @@ everything downstream treats a 5-seed local_search the same as a solitary one.
                       "tested" -- re-attempted at or above --certify-threshold
                       seconds, the closest thing to a certification pass this
                       pipeline has.
+  --solver-failures-csv / --planner-failures-csv
+                      One row per (instance, tool) attempt that did NOT end
+                      with an accepted plan -- instance, tool (carries the
+                      seed suffix, e.g. "local_search_seed3"), seed, reason,
+                      and seconds (the tool's own wall_seconds, i.e. how long
+                      it ran before this outcome -- not the evaluator's,
+                      which is typically much shorter and less telling).
+                      reason is the evaluator's own "reason" (the same text
+                      tally_failures.py classifies) when a plan was produced
+                      and rejected, or one synthesized from result.json
+                      (timed_out / exit_code) when no plan was ever produced
+                      to evaluate. A tool split its own file rather than one
+                      shared failures.csv, matching --runs-csv already
+                      splitting by tool via its "tool" column.
 
 eval_result.json's own "verdict" field does not currently distinguish a
 scenario-level rejection from an ordinary plan rejection (both come out as
@@ -55,8 +69,19 @@ from pathlib import Path
 # approach, not the script/--tools name.
 TOOL_FOLDERS = ("local_search", "planning")
 
+DEFAULT_CERTIFY_THRESHOLD = 1800
 
-def _read_json(path: Path) -> dict:
+# Shared with run_experiment.py, which appends rows in these same shapes while a
+# sweep runs before this module recompiles all four files at the end.
+RUN_FIELDNAMES = [
+    "instance", "tool", "seed", "plan_found", "timed_out", "valid_plan",
+    "plan_length", "move_actions", "non_wait_actions", "seconds",
+]
+FEASIBILITY_FIELDNAMES = ["instance", "classification", "tested"]
+FAILURE_FIELDNAMES = ["instance", "tool", "seed", "reason", "seconds"]
+
+
+def read_json(path: Path) -> dict:
     return json.loads(path.read_text()) if path.exists() else {}
 
 
@@ -94,7 +119,7 @@ def _plan_stats(tool_dir: Path) -> tuple:
     taskType.predefined == "Wait". (None, None, None) if there's no plan to
     count.
     """
-    plan = _read_json(tool_dir / "plan.json")
+    plan = read_json(tool_dir / "plan.json")
     actions = plan.get("actions")
     if actions is None:
         return None, None, None
@@ -103,19 +128,46 @@ def _plan_stats(tool_dir: Path) -> tuple:
     return len(actions), moves, non_waits
 
 
-def _tool_row(instance: str, tool: str, tool_dir: Path) -> dict:
-    result = _read_json(tool_dir / "result.json")
-    if not result:
+def failure_reason(result: dict, eval_result: dict) -> str | None:
+    """None if this attempt was not a failure (a plan was produced and the
+    evaluator accepted it). Otherwise a short one-line reason: the evaluator's
+    own "reason" (the same text tally_failures.py classifies) when a plan was
+    produced and rejected, or one synthesized from the tool's own result.json
+    (timed_out / exit_code) when no plan was ever produced to evaluate.
+    """
+    if not result.get("plan_produced"):
+        if result.get("timed_out"):
+            duration = result.get("max_duration")
+            return f"timed out after {duration}s" if duration is not None else "timed out"
+        exit_code = result.get("exit_code")
+        return f"tool exited {exit_code}, no plan produced" if exit_code else "no plan produced"
+    verdict = eval_result.get("verdict")
+    if verdict == "accepted":
         return None
+    return eval_result.get("reason") or (
+        f"evaluator verdict: {verdict}" if verdict else "evaluator produced no verdict"
+    )
 
-    eval_result = _read_json(tool_dir / "eval_result.json")
+
+def tool_rows(instance: str, tool: str, tool_dir: Path) -> tuple:
+    """(run_row, failure_row) for one actual run, from a single read of
+    result.json/eval_result.json. run_row is None if result.json doesn't
+    exist yet (nothing has finished here). failure_row is None whenever
+    run_row's own valid_plan is "yes" -- see failure_reason.
+    """
+    result = read_json(tool_dir / "result.json")
+    if not result:
+        return None, None
+
+    eval_result = read_json(tool_dir / "eval_result.json")
     verdict = eval_result.get("verdict")
     plan_length, move_actions, non_wait_actions = _plan_stats(tool_dir)
+    seed = result.get("seed", "")
 
-    return {
+    run_row = {
         "instance": instance,
         "tool": tool,
-        "seed": result.get("seed", ""),
+        "seed": seed,
         "plan_found": "yes" if result.get("plan_produced") else "no",
         "timed_out": "yes" if result.get("timed_out") else "no",
         "valid_plan": (
@@ -130,14 +182,24 @@ def _tool_row(instance: str, tool: str, tool_dir: Path) -> dict:
         "seconds": result.get("wall_seconds", ""),
     }
 
+    reason = failure_reason(result, eval_result)
+    failure_row = None if reason is None else {
+        "instance": instance,
+        "tool": tool,
+        "seed": seed,
+        "reason": reason,
+        "seconds": result.get("wall_seconds", ""),
+    }
+    return run_row, failure_row
 
-def _instance_feasibility(instance: str, instance_dir: Path, certify_threshold: int) -> dict:
+
+def instance_feasibility(instance: str, instance_dir: Path, certify_threshold: int) -> dict:
     any_solved = False
     any_infeasible = False
     any_certified = False
     for _, tool_dir in _tool_dirs(instance_dir):
-        result = _read_json(tool_dir / "result.json")
-        eval_result = _read_json(tool_dir / "eval_result.json")
+        result = read_json(tool_dir / "result.json")
+        eval_result = read_json(tool_dir / "eval_result.json")
         if eval_result.get("solved"):
             any_solved = True
         if _scenario_level_rejection(tool_dir):
@@ -171,7 +233,14 @@ def main() -> None:
     parser.add_argument("--feasibility-csv", type=Path, default=Path("feasibility.csv"),
                         help="Path to write the per-instance feasibility report "
                              "(default: feasibility.csv).")
-    parser.add_argument("--certify-threshold", type=int, default=1800, metavar="SECONDS",
+    parser.add_argument("--solver-failures-csv", type=Path, default=Path("solver_failures.csv"),
+                        help="Path to write local_search (solver) failure reasons "
+                             "(default: solver_failures.csv).")
+    parser.add_argument("--planner-failures-csv", type=Path, default=Path("planner_failures.csv"),
+                        help="Path to write planning (planner) failure reasons "
+                             "(default: planner_failures.csv).")
+    parser.add_argument("--certify-threshold", type=int, default=DEFAULT_CERTIFY_THRESHOLD,
+                        metavar="SECONDS",
                         help="An unresolved instance is marked 'tested' if any of its recorded "
                              "runs used --max-duration at or above this (default: 1800).")
     args = parser.parse_args()
@@ -184,35 +253,40 @@ def main() -> None:
         sys.exit(f"No instance directories found under {args.results_dir}")
 
     run_rows = []
+    solver_failure_rows = []
+    planner_failure_rows = []
     feasibility_rows = []
     for instance_dir in instance_dirs:
         instance = instance_dir.name
         for tool_label, tool_dir in _tool_dirs(instance_dir):
-            row = _tool_row(instance, tool_label, tool_dir)
-            if row:
-                run_rows.append(row)
+            run_row, failure_row = tool_rows(instance, tool_label, tool_dir)
+            if run_row:
+                run_rows.append(run_row)
+            if failure_row:
+                # tool_label carries the seed suffix for solver (local_search,
+                # local_search_seed3, ...) but is exactly "planning" for the
+                # planner -- matches TOOL_FOLDERS/_tool_dirs above.
+                failures = solver_failure_rows if tool_label.startswith("local_search") else planner_failure_rows
+                failures.append(failure_row)
         feasibility_rows.append(
-            _instance_feasibility(instance, instance_dir, args.certify_threshold)
+            instance_feasibility(instance, instance_dir, args.certify_threshold)
         )
 
-    with open(args.runs_csv, "w", newline="") as f:
-        writer = csv.DictWriter(
-            f,
-            fieldnames=[
-                "instance", "tool", "seed", "plan_found", "timed_out", "valid_plan",
-                "plan_length", "move_actions", "non_wait_actions", "seconds",
-            ],
-        )
-        writer.writeheader()
-        writer.writerows(run_rows)
-
-    with open(args.feasibility_csv, "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["instance", "classification", "tested"])
-        writer.writeheader()
-        writer.writerows(feasibility_rows)
+    for path, fieldnames, rows in (
+        (args.runs_csv, RUN_FIELDNAMES, run_rows),
+        (args.feasibility_csv, FEASIBILITY_FIELDNAMES, feasibility_rows),
+        (args.solver_failures_csv, FAILURE_FIELDNAMES, solver_failure_rows),
+        (args.planner_failures_csv, FAILURE_FIELDNAMES, planner_failure_rows),
+    ):
+        with open(path, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(rows)
 
     print(f"Wrote {len(run_rows)} run(s) to {args.runs_csv}")
     print(f"Wrote {len(feasibility_rows)} instance(s) to {args.feasibility_csv}")
+    print(f"Wrote {len(solver_failure_rows)} solver failure(s) to {args.solver_failures_csv}")
+    print(f"Wrote {len(planner_failure_rows)} planner failure(s) to {args.planner_failures_csv}")
 
 
 if __name__ == "__main__":

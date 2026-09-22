@@ -1,0 +1,33 @@
+{
+    "name": "example",
+    "location": "Location_KleineBinckhorst",
+
+    "tools": ["solver", "planner"],
+    "planner": "symbolic-rail",
+    "max_duration": 600,
+    "num_seeds": 5,
+    "jobs": 1,
+    "versions": {
+        "generator": "edge",
+        "solver": "edge",
+        "planner": "edge",
+        "evaluator": "edge"
+    },
+
+    "scenarios": {
+        "number_of_trains": [5, 10, 15, 20],
+        "number_of_instances": 5,
+        "matchings": ["FIFO", "random", "LIFO"],
+        "seed": 42,
+        "time_window_per_train": 360,
+        "mixed_traffic": false,
+        "min_gap_on_gateway": 180,
+        "perform_servicing": false,
+        "train_unit_types": ["VIRM-4", "VIRM-6", "ICM-3", "ICM-4", "SNG-3", "SNG-4", "SLT-4", "SLT-6"],
+        "super_type_ratio": 0.5,
+        "units_per_composition": [1, 2, 3],
+        "matching_complexity": 0.3,
+        "instanding_ratio": 0.3,
+        "outstanding_ratio": 0.1
+    }
+}
