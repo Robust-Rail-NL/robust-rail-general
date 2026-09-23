@@ -8,6 +8,7 @@ engine take an explicit `engine` argument rather than reading a global, and
 default to "docker" so every existing call site keeps working unchanged.
 """
 
+import argparse
 import importlib.util
 import os
 import shutil
@@ -16,6 +17,26 @@ import subprocess
 import sys
 import uuid
 from pathlib import Path
+
+# Shared by scripts/stage_apptainer_images.py (where it pulls to) and every
+# run_*.py's --sif-cache-dir default (where it reads from) -- one literal
+# instead of five copies that could drift apart.
+DEFAULT_SIF_CACHE_DIR = Path.home() / "apptainer-images"
+
+
+def add_engine_args(parser: argparse.ArgumentParser) -> None:
+    """Add the --engine/--sif-cache-dir pair every run_*.py and
+    run_experiment.py takes, so the choices, help text and default cache dir
+    live in one place instead of five near-identical copies.
+    """
+    parser.add_argument("--engine", choices=["docker", "apptainer"], default="docker",
+                        help="Container engine to run images under (default: docker). "
+                             "'apptainer' is for a SLURM cluster with no docker daemon -- "
+                             "scripts/stage_apptainer_images.py must be run first (on a host "
+                             "with internet access) to populate --sif-cache-dir.")
+    parser.add_argument("--sif-cache-dir", type=Path, default=DEFAULT_SIF_CACHE_DIR, metavar="DIR",
+                        help=f"Where apptainer images are cached (default: {DEFAULT_SIF_CACHE_DIR}). "
+                             "Ignored under --engine docker.")
 
 
 def ensure_pulled(image: str) -> None:
@@ -63,16 +84,21 @@ def sif_path(image: str, cache_dir: Path) -> Path:
     return cache_dir / sif_filename(image)
 
 
-def ensure_sif_present(image: str, cache_dir: Path) -> Path:
+def ensure_sif_present(image: str, cache_dir: Path, *, strict: bool = True) -> Path:
     """Resolve image -> its cached .sif, without ever trying to pull it.
 
     For the apptainer path on a SLURM compute node, which has no internet
     (see scripts/stage_apptainer_images.py) -- unlike ensure_pulled's docker
     path, there is no network fallback here. A missing .sif is a hard error
     pointing at the staging script, not something to silently fix mid-job.
+
+    strict=False (for a --dry-run preview) skips that check and just returns
+    the path a real run would resolve to, staged or not -- matching docker's
+    own --dry-run, which never checks that an image has actually been pulled
+    either. A real run always wants strict=True.
     """
     path = sif_path(image, cache_dir)
-    if not path.exists():
+    if strict and not path.exists():
         sys.exit(f"ERROR: {path} not staged. Run scripts/stage_apptainer_images.py "
                  f"first (missing image: {image}).")
     return path
@@ -155,7 +181,8 @@ def container_name(prefix: str, instance: str) -> str:
 
 
 def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args: list[str], *,
-                  name: str | None = None, cache_dir: Path | None = None) -> list[str]:
+                  name: str | None = None, cache_dir: Path | None = None,
+                  strict: bool = True) -> list[str]:
     """Build one container invocation's argv, docker or apptainer, from engine-
     neutral pieces: mounts as (host source, in-container target) pairs, plus
     the image's own argv.
@@ -175,7 +202,8 @@ def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args:
     instead), and it already runs as the invoking user. Just `apptainer exec`
     plus one --bind per mount pair and the resolved .sif (via
     ensure_sif_present, so a missing image fails here with a clear message
-    rather than deeper inside a cryptic apptainer error).
+    rather than deeper inside a cryptic apptainer error -- unless strict=False,
+    which a --dry-run preview wants: see ensure_sif_present).
     """
     if engine == "docker":
         cmd = ["docker", "run", "--rm"]
@@ -190,7 +218,7 @@ def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args:
     if engine == "apptainer":
         if cache_dir is None:
             raise ValueError("build_run_cmd(engine='apptainer') requires cache_dir")
-        sif = ensure_sif_present(image, cache_dir)
+        sif = ensure_sif_present(image, cache_dir, strict=strict)
         cmd = ["apptainer", "exec"]
         for source, target in mounts:
             cmd += ["--bind", f"{source}:{target}"]

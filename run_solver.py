@@ -3,13 +3,14 @@
 
 import argparse
 import json
-import os
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from scripts.docker_utils import container_name, ensure_docker_running, ensure_pulled, run_container
+from scripts.docker_utils import (
+    add_engine_args, build_run_cmd, container_name, ensure_pulled, ensure_runtime_ready, run_container,
+)
 from scripts.instance_filter import fail_no_match, instance_of, select
 
 ROOT = Path(__file__).parent
@@ -146,21 +147,18 @@ def _plan_name(scenario: Path) -> str:
 
 def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run: bool,
                   timeout: int | None, max_duration: int | None = None,
-                  seed: int | None = None) -> bool:
+                  seed: int | None = None, engine: str = "docker",
+                  cache_dir: Path | None = None) -> bool:
     plan_name = _plan_name(scenario)
     config_path = location_dir / TEMP_CONFIG
     params = _apply_overrides(_parse_config(location_dir / "config_solver.yaml"),
                               max_duration, seed)
     cname = container_name("solver", _scenario_name(scenario))
 
-    cmd = [
-        "docker", "run", "--rm",
-        "--name", cname,
-        *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
-        "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
-        docker_image,
-        f"--config={CONTAINER_DB}/{TEMP_CONFIG}",
-    ]
+    mounts = [(location_dir.resolve(), CONTAINER_DB)]
+    args = [f"--config={CONTAINER_DB}/{TEMP_CONFIG}"]
+    cmd = build_run_cmd(engine, docker_image, mounts, args, name=cname, cache_dir=cache_dir,
+                        strict=not dry_run)
 
     print(f"  {scenario.name}  ->  {plan_name}")
     if dry_run:
@@ -176,7 +174,7 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run
 
     _write_config(config_path, scenario.name, f"{CONTAINER_DB}/plans/{plan_name}", params)
     try:
-        returncode, timed_out = run_container(cmd, cname, out_file, err_file, timeout)
+        returncode, timed_out = run_container(cmd, cname, out_file, err_file, timeout, engine)
     finally:
         config_path.unlink(missing_ok=True)
     ok = returncode == 0
@@ -208,7 +206,8 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run
 
 def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, output_dir: Path,
                          version: str, dry_run: bool, max_duration: int | None = None,
-                         seed: int | None = None, timeout: int | None = None) -> dict:
+                         seed: int | None = None, timeout: int | None = None,
+                         engine: str = "docker", cache_dir: Path | None = None) -> dict:
     """Run one scenario into output_dir, and return/record what happened.
 
     For experiment runs (run_experiment.py), which need each (instance, tool)
@@ -230,14 +229,10 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
     seed_used = params.get("Seed", 1)
     cname = container_name("solver", _scenario_name(scenario))
 
-    cmd = [
-        "docker", "run", "--rm", "--name", cname,
-        *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
-        "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
-        "--mount", f"type=bind,source={output_dir},target={CONTAINER_OUT}",
-        docker_image,
-        f"--config={CONTAINER_OUT}/{config_path.name}",
-    ]
+    mounts = [(location_dir.resolve(), CONTAINER_DB), (output_dir, CONTAINER_OUT)]
+    args = [f"--config={CONTAINER_OUT}/{config_path.name}"]
+    cmd = build_run_cmd(engine, docker_image, mounts, args, name=cname, cache_dir=cache_dir,
+                        strict=not dry_run)
 
     plan_path = output_dir / "plan.json"
     print(f"  {scenario.name}  ->  {plan_path}")
@@ -248,7 +243,8 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
     _write_config(config_path, scenario.name, f"{CONTAINER_OUT}/plan.json", params)
     out_file, err_file = output_dir / "solver.out", output_dir / "solver.err"
     start, start_iso = time.monotonic(), datetime.now(timezone.utc).isoformat()
-    returncode, timed_out = run_container(cmd, cname, out_file, err_file, timeout or _backstop(max_duration))
+    returncode, timed_out = run_container(cmd, cname, out_file, err_file,
+                                          timeout or _backstop(max_duration), engine)
 
     plan_produced = plan_path.exists() and plan_path.stat().st_size > 0
     record = {
@@ -326,6 +322,7 @@ def main() -> None:
                         help="Pick a docker image version ('local' is reserved for locally built "
                              "images; " "'edge' tracks the newest not-yet-vetted push to the edge "
                              "branch).")
+    add_engine_args(parser)
     args = parser.parse_args()
 
     if args.output_dir and not args.instance:
@@ -333,8 +330,8 @@ def main() -> None:
                      "result.json, so it must name a single scenario.")
 
     if not args.dry_run:
-        ensure_docker_running()
-        if not args.no_pull:
+        ensure_runtime_ready(args.engine)
+        if args.engine == "docker" and not args.no_pull:
             ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
@@ -357,7 +354,8 @@ def main() -> None:
             total += 1
             record = _run_scenario_single(DOCKER_IMAGE_VERSIONS[args.version], loc, scenarios[0],
                                           args.output_dir, args.version, args.dry_run,
-                                          args.max_duration, args.seed, args.timeout)
+                                          args.max_duration, args.seed, args.timeout,
+                                          args.engine, args.sif_cache_dir)
             if record and not record.get("plan_produced"):
                 errors += 1
             continue
@@ -366,7 +364,7 @@ def main() -> None:
             total += 1
             if not _run_scenario(DOCKER_IMAGE_VERSIONS[args.version], loc, scenario, args.dry_run,
                                  args.timeout or _backstop(args.max_duration),
-                                 args.max_duration, args.seed):
+                                 args.max_duration, args.seed, args.engine, args.sif_cache_dir):
                 errors += 1
 
     if args.instance and total == 0:

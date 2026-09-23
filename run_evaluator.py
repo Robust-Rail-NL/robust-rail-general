@@ -3,14 +3,13 @@
 
 import argparse
 import json
-import os
 import subprocess
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from scripts.docker_utils import ensure_docker_running, ensure_pulled
+from scripts.docker_utils import add_engine_args, build_run_cmd, ensure_pulled, ensure_runtime_ready
 from scripts.instance_filter import fail_no_match, instance_of, select
 
 ROOT = Path(__file__).parent
@@ -40,7 +39,8 @@ def _scenario_name(plan: Path) -> str:
     return instance_of(plan, INSTANCE_PREFIX)
 
 
-def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool) -> bool:
+def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool,
+             engine: str = "docker", cache_dir: Path | None = None) -> bool:
     name = _scenario_name(plan)
     scenario = location_dir / "scenarios" / f"scenario_{name}.json"
 
@@ -62,11 +62,8 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool) 
     out_file = eval_dir / f"eval_{name}.out"
     err_file = eval_dir / f"eval_{name}.err"
 
-    cmd = [
-        "docker", "run", "--rm",
-        *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
-        "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
-        docker_image,
+    mounts = [(location_dir.resolve(), CONTAINER_DB)]
+    args = [
         "--mode", "EVAL_AND_STORE",
         "--path_location", CONTAINER_DB,
         "--path_scenario", f"{CONTAINER_DB}/scenarios/scenario_{name}.json",
@@ -74,6 +71,7 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool) 
         "--path_eval_result", f"{CONTAINER_DB}/evaluations/eval_{name}.txt",
         "--plan_type", "Solver",
     ]
+    cmd = build_run_cmd(engine, docker_image, mounts, args, cache_dir=cache_dir, strict=not dry_run)
 
     print(f"  {plan.name}  ->  evaluations/eval_{name}.txt")
     if dry_run:
@@ -133,7 +131,8 @@ def _classify_verdict(out_text: str, err_text: str, txt_text: str) -> tuple[str,
 
 
 def _run_plan_single(docker_image: str, location_dir: Path, plan: Path, scenario: Path,
-                     version: str, dry_run: bool) -> dict:
+                     version: str, dry_run: bool, engine: str = "docker",
+                     cache_dir: Path | None = None) -> dict:
     """Evaluate one plan wherever it lives, writing its verdict beside it.
 
     For plans under a run_solver.py/run_planner.py --output-dir: eval.out,
@@ -148,12 +147,8 @@ def _run_plan_single(docker_image: str, location_dir: Path, plan: Path, scenario
     plan = plan.resolve()
     plan_dir = plan.parent
 
-    cmd = [
-        "docker", "run", "--rm",
-        *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
-        "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
-        "--mount", f"type=bind,source={plan_dir},target=/app/planio",
-        docker_image,
+    mounts = [(location_dir.resolve(), CONTAINER_DB), (plan_dir, "/app/planio")]
+    args = [
         "--mode", "EVAL_AND_STORE",
         "--path_location", CONTAINER_DB,
         "--path_scenario", f"{CONTAINER_DB}/scenarios/{scenario.name}",
@@ -161,6 +156,7 @@ def _run_plan_single(docker_image: str, location_dir: Path, plan: Path, scenario
         "--path_eval_result", "/app/planio/eval.txt",
         "--plan_type", "Solver",
     ]
+    cmd = build_run_cmd(engine, docker_image, mounts, args, cache_dir=cache_dir, strict=not dry_run)
 
     print(f"  {plan}  ->  {plan_dir}/eval_result.json")
     if dry_run:
@@ -235,6 +231,7 @@ def main() -> None:
     parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='stable',
                         help="Pick a docker image version ('local' is reserved for locally built "
                              "images).")
+    add_engine_args(parser)
     args = parser.parse_args()
 
     if args.plan:
@@ -246,8 +243,8 @@ def main() -> None:
             parser.error(f"No such plan file: {args.plan}")
 
     if not args.dry_run:
-        ensure_docker_running()
-        if not args.no_pull:
+        ensure_runtime_ready(args.engine)
+        if args.engine == "docker" and not args.no_pull:
             ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
 
     if args.plan:
@@ -279,7 +276,7 @@ def main() -> None:
         if not args.dry_run and not scenario.exists():
             sys.exit(f"ERROR: no matching scenario for --instance {args.instance!r}: {scenario}")
         record = _run_plan_single(DOCKER_IMAGE_VERSIONS[args.version], loc, args.plan, scenario,
-                                  args.version, args.dry_run)
+                                  args.version, args.dry_run, args.engine, args.sif_cache_dir)
         sys.exit(0 if (not record or record.get("verdict") != "error") else 1)
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
@@ -298,7 +295,8 @@ def main() -> None:
         print(f"\n{loc.name} ({len(plans)} plan(s))")
         for plan in plans:
             total += 1
-            if not _run_plan(DOCKER_IMAGE_VERSIONS[args.version], loc, plan, args.dry_run):
+            if not _run_plan(DOCKER_IMAGE_VERSIONS[args.version], loc, plan, args.dry_run,
+                             args.engine, args.sif_cache_dir):
                 errors += 1
 
     if args.instance and total == 0:

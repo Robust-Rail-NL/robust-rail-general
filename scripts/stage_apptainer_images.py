@@ -32,9 +32,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from scripts.docker_utils import apptainer_pull, ensure_runtime_ready, load_image_versions  # noqa: E402
-
-DEFAULT_CACHE_DIR = Path.home() / "apptainer-images"
+from scripts.docker_utils import (  # noqa: E402
+    DEFAULT_SIF_CACHE_DIR, apptainer_pull, ensure_runtime_ready, load_image_versions,
+)
 
 # script name -> the --version value(s) a normal sweep actually needs staged.
 # Order here is only for a stable, readable print order below.
@@ -51,8 +51,8 @@ def main() -> None:
         description="Pull every apptainer .sif image the pipeline needs into a shared cache, "
                     "once, from a host with internet access (e.g. a DelftBlue login node)."
     )
-    parser.add_argument("--cache-dir", type=Path, default=DEFAULT_CACHE_DIR, metavar="DIR",
-                        help=f"Where to write .sif files (default: {DEFAULT_CACHE_DIR}). Must be "
+    parser.add_argument("--cache-dir", type=Path, default=DEFAULT_SIF_CACHE_DIR, metavar="DIR",
+                        help=f"Where to write .sif files (default: {DEFAULT_SIF_CACHE_DIR}). Must be "
                              "readable from every compute node a job array will run on -- /home, "
                              "not /scratch, on DelftBlue (see __scratch/"
                              "slurm-apptainer-status.md for why).")
