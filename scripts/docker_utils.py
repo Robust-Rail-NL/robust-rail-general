@@ -198,11 +198,18 @@ def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args:
 
     apptainer: none of the above are meaningful -- there is no daemon to
     --rm from, no --name to kill by (run_container kills the process group
-    instead), and it already runs as the invoking user. Just `apptainer exec`
-    plus one --bind per mount pair and the resolved .sif (via
-    ensure_sif_present, so a missing image fails here with a clear message
-    rather than deeper inside a cryptic apptainer error -- unless strict=False,
-    which a --dry-run preview wants: see ensure_sif_present).
+    instead), and it already runs as the invoking user. `apptainer run`, not
+    `exec`: every image here (generator/solver/planner/evaluator) is built
+    with a Docker ENTRYPOINT, and `args` are meant as arguments *to* it (the
+    same contract `docker run <image> <args>` has) -- `apptainer run`
+    invokes the .sif's converted-from-ENTRYPOINT runscript with `args`
+    appended, where `apptainer exec` would instead try to execute `args[0]`
+    itself as a command inside the container, which is never what an
+    `--config`/`--mode`/etc. flag is. One --bind per mount pair and the
+    resolved .sif (via ensure_sif_present, so a missing image fails here
+    with a clear message rather than deeper inside a cryptic apptainer error
+    -- unless strict=False, which a --dry-run preview wants: see
+    ensure_sif_present).
     """
     if engine == "docker":
         cmd = ["docker", "run", "--rm"]
@@ -218,7 +225,7 @@ def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args:
         if cache_dir is None:
             raise ValueError("build_run_cmd(engine='apptainer') requires cache_dir")
         sif = ensure_sif_present(image, cache_dir, strict=strict)
-        cmd = ["apptainer", "exec"]
+        cmd = ["apptainer", "run"]
         for source, target in mounts:
             cmd += ["--bind", f"{source}:{target}"]
         cmd += [str(sif), *args]

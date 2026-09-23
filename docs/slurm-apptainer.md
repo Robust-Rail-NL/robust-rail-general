@@ -20,6 +20,16 @@ by hand, so the two engines' differences live in one place:
 - No `--user uid:gid` under apptainer — it already runs as the invoking user.
 - `--mount type=bind,source=A,target=B` (docker) becomes `--bind A:B`
   (apptainer).
+- `docker run <image> <args>` (docker) becomes `apptainer run <sif> <args>`
+  (apptainer) — **not** `apptainer exec`. Every image here has a Docker
+  `ENTRYPOINT`, and each script's `args` (`--config ...`, `--mode ...`, etc.)
+  are meant as arguments *to* it, exactly like `docker run`'s own contract.
+  `apptainer run` invokes the `.sif`'s converted-from-`ENTRYPOINT` runscript
+  with `args` appended; `apptainer exec` ignores the entrypoint and tries to
+  execute `args[0]` itself as a command, which a `--flag` never is. For a
+  bare sanity check of a staged image (no args, entrypoint's own default
+  behaviour), `apptainer run <sif>` is also the right command — it needs no
+  in-container executable path, unlike `exec`.
 - Pulling is stateful and file-based under apptainer (`apptainer pull`
   produces a real `.sif` you have to name and cache yourself), unlike
   docker's invisible daemon-managed pull cache. See "Staging" below.
@@ -115,7 +125,7 @@ started.
   deliberately, rather than running with a guessed number.
   `--account=research-eemcs-st` is filled in.
 - Nothing here has yet run against a real DelftBlue login or compute node
-  end to end, or through a real `apptainer pull`/`apptainer exec` in this
+  end to end, or through a real `apptainer pull`/`apptainer run` in this
   code path — only unit- and mock-level testing so far. Recommended order
   for a first real trial: stage images for real, run `run_generator.py
   --engine apptainer` by hand on the login node, then a small manually
