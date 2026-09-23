@@ -40,6 +40,13 @@
 #SBATCH --output=slurm-logs/aggregate_%j.out
 #SBATCH --error=slurm-logs/aggregate_%j.err
 
+# Before `set -euo pipefail` -- see run_experiment_array.sbatch's own
+# comment on why (Lmod's `module` function vs. set -u) and
+# docs/slurm-apptainer.md's "Prerequisites" for the >=3.12 requirement this
+# is working around.
+module load 2026 cpu
+module load python/3.13.12
+
 set -euo pipefail
 
 OUTPUT_DIR="$1"

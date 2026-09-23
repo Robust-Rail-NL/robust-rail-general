@@ -201,12 +201,23 @@ started.
   `--mem`) — `sbatch` will refuse to submit until these are filled in,
   deliberately, rather than running with a guessed number.
   `--account=research-eemcs-st` is filled in.
-- Staging (`scripts/stage_apptainer_images.py`) and a bare `apptainer run
-  <sif>` sanity check have been run for real on DelftBlue's login node
-  (2026-09-24) — that's what caught the `--pwd`/`WORKDIR` bug above.
-  `run_generator.py --engine apptainer` with real arguments, the manifest/
-  array/aggregation path, and anything on a compute node are still untried.
-  Recommended order for the rest: `run_generator.py --engine apptainer` by
-  hand on the login node, then a small manually submitted array (one or two
-  instances) once the partition/walltime/mem/cpu values are known, before
-  trusting it with a full sweep.
+- Run for real on DelftBlue's login node (2026-09-24): staging, a bare
+  `apptainer run <sif>` sanity check (caught the `--pwd`/`WORKDIR` and
+  `--writable-tmpfs` bugs above), `run_generator.py --engine apptainer`
+  with real arguments, and `run_experiment.py --engine apptainer` end to
+  end for one instance. The manifest/array/aggregation path, and anything
+  running on an actual *compute* node, are still untried.
+- `run_experiment_array.sbatch`/`aggregate.sbatch` now `module load 2026
+  cpu` + `module load python/3.13.12` before `set -euo pipefail` (added
+  2026-09-24, once the >=3.12 requirement above was understood) -- but
+  this is inference from what worked on the *login* node, not something
+  confirmed inside an actual batch job on a compute node yet. If a compute
+  node's module tree or default environment differs, this may need
+  adjusting; check the array task's own `slurm-logs/%A_%a.err` for a
+  version-mismatch `TypeError` (see "Prerequisites") if a job fails
+  mysteriously at import time.
+- Recommended order for the rest: a small manually submitted array (one or
+  two instances) once the partition/walltime/mem/cpu values are known,
+  ideally preceded by an interactive compute-node allocation (`srun --pty
+  bash`) to confirm apptainer and the module loads above both work away
+  from the login node -- before trusting any of this with a full sweep.
