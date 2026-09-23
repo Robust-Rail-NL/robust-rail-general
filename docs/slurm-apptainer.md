@@ -111,11 +111,26 @@ as an opaque "not staged" error.
 
 ## Staging images
 
-SLURM compute nodes have no internet access, so every image a run needs has
-to already be sitting in the `.sif` cache before any job is submitted.
-`scripts/stage_apptainer_images.py` does this: run it once, by hand, on a
-host that does have internet — a DelftBlue login node, confirmed 2026-09-22
-to run apptainer directly with no `module load` needed.
+Every image a run needs is staged into a `.sif` cache before any job is
+submitted, via `scripts/stage_apptainer_images.py` run once by hand on the
+login node (confirmed 2026-09-22 to run apptainer directly with no `module
+load` needed).
+
+This was originally written assuming SLURM compute nodes have no internet
+access at all -- **not confirmed**: an interactive `srun` session on
+`compute-p1` (2026-09-25) reached both `ghcr.io` and a general internet
+host (`curl -sI` to each succeeded), contradicting that assumption, at
+least for that partition. Whether this holds cluster-wide (or was
+`compute-p1`-specific) wasn't checked further, and DelftBlue has no
+documented network-isolation policy for compute nodes the way it has a
+`/scratch` storage one (see "Storage" below) -- worth confirming with
+DelftBlue's own docs/support before relying on either way. Staging upfront
+stays the right call regardless of the answer: avoiding a few hundred
+array tasks each hitting the registry independently (redundant round-trips
+for an image that cannot change mid-run, registry flakiness able to abort
+an unrelated task, the same reasoning `run_experiment.py`'s own
+`_pull_once` already uses for docker) is worth doing whether or not it's
+also a hard requirement.
 
 It resolves `--<tool>-version` (comma-separated) through each `run_*.py`'s
 own `DOCKER_IMAGE_VERSIONS`, de-duplicates by resolved image before pulling
@@ -205,19 +220,18 @@ started.
   `apptainer run <sif>` sanity check (caught the `--pwd`/`WORKDIR` and
   `--writable-tmpfs` bugs above), `run_generator.py --engine apptainer`
   with real arguments, and `run_experiment.py --engine apptainer` end to
-  end for one instance. The manifest/array/aggregation path, and anything
-  running on an actual *compute* node, are still untried.
-- `run_experiment_array.sbatch`/`aggregate.sbatch` now `module load 2026
-  cpu` + `module load python/3.13.12` before `set -euo pipefail` (added
-  2026-09-24, once the >=3.12 requirement above was understood) -- but
-  this is inference from what worked on the *login* node, not something
-  confirmed inside an actual batch job on a compute node yet. If a compute
-  node's module tree or default environment differs, this may need
-  adjusting; check the array task's own `slurm-logs/%A_%a.err` for a
-  version-mismatch `TypeError` (see "Prerequisites") if a job fails
-  mysteriously at import time.
-- Recommended order for the rest: a small manually submitted array (one or
-  two instances) once the partition/walltime/mem/cpu values are known,
-  ideally preceded by an interactive compute-node allocation (`srun --pty
-  bash`) to confirm apptainer and the module loads above both work away
-  from the login node -- before trusting any of this with a full sweep.
+  end for one instance.
+- Run for real on an interactive `compute-p1` allocation (2026-09-25,
+  `srun --partition=compute-p1 ... --pty bash`): apptainer itself, the
+  `module load 2026 cpu` / `python/3.13.12` combo (confirmed working away
+  from the login node, not just inferred), the `.sif` cache visible at
+  `~/apptainer-images` (confirms the shared-filesystem assumption), and
+  `scripts/slurm_run_task.py --index 0 ...` run directly -- the exact code
+  an array task executes, and it worked end to end (solver produced a
+  plan, evaluator scored it). This is as close to "the real thing worked"
+  as it gets without an actual `sbatch --array` submission.
+- Still genuinely untried: an actual `sbatch --array` submission and the
+  aggregation job. Blocked on the partition/walltime/mem/cpu placeholders
+  above.
+- Recommended next step: a small manually submitted array (one or two
+  instances) once those values are known.
