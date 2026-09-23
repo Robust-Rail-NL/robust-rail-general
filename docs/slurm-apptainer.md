@@ -30,6 +30,19 @@ by hand, so the two engines' differences live in one place:
   bare sanity check of a staged image (no args, entrypoint's own default
   behaviour), `apptainer run <sif>` is also the right command — it needs no
   in-container executable path, unlike `exec`.
+- Docker starts a container in the image's own Dockerfile `WORKDIR`;
+  apptainer does not — it mirrors the *host's* current working directory
+  inside the container instead. Every one of these images' `ENTRYPOINT`s is
+  a path relative to its `WORKDIR` (generator's `python src/main.py`,
+  solver's `dotnet ServiceSiteScheduling.dll`, evaluator's `build/TORS`), so
+  without correcting this, the entrypoint fails looking for that relative
+  path under wherever apptainer happened to be invoked from, not the image's
+  own directory. Each `run_*.py` defines its own `CONTAINER_WORKDIR`
+  constant (`/app` for generator/solver/planner, `/workspace` for the
+  evaluator — its Dockerfile differs) and passes it as `build_run_cmd`'s
+  `workdir` argument, which becomes apptainer's `--pwd`; docker ignores it,
+  since it never needed the correction. Caught 2026-09-24 running a bare
+  `apptainer run <sif>` sanity check by hand on DelftBlue.
 - Pulling is stateful and file-based under apptainer (`apptainer pull`
   produces a real `.sif` you have to name and cache yourself), unlike
   docker's invisible daemon-managed pull cache. See "Staging" below.
@@ -124,10 +137,12 @@ started.
   `--mem`) — `sbatch` will refuse to submit until these are filled in,
   deliberately, rather than running with a guessed number.
   `--account=research-eemcs-st` is filled in.
-- Nothing here has yet run against a real DelftBlue login or compute node
-  end to end, or through a real `apptainer pull`/`apptainer run` in this
-  code path — only unit- and mock-level testing so far. Recommended order
-  for a first real trial: stage images for real, run `run_generator.py
-  --engine apptainer` by hand on the login node, then a small manually
-  submitted array (one or two instances) once the partition/walltime/mem/cpu
-  values are known, before trusting it with a full sweep.
+- Staging (`scripts/stage_apptainer_images.py`) and a bare `apptainer run
+  <sif>` sanity check have been run for real on DelftBlue's login node
+  (2026-09-24) — that's what caught the `--pwd`/`WORKDIR` bug above.
+  `run_generator.py --engine apptainer` with real arguments, the manifest/
+  array/aggregation path, and anything on a compute node are still untried.
+  Recommended order for the rest: `run_generator.py --engine apptainer` by
+  hand on the login node, then a small manually submitted array (one or two
+  instances) once the partition/walltime/mem/cpu values are known, before
+  trusting it with a full sweep.

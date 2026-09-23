@@ -25,6 +25,10 @@ DOCKER_IMAGE_VERSIONS = {
     "local": "generator:latest",
 }
 CONTAINER_DB = "/app/database"
+# apptainer-only (see docker_utils.build_run_cmd's workdir param): the
+# generator image's own Dockerfile WORKDIR, which its ENTRYPOINT ("python
+# src/main.py") is relative to.
+CONTAINER_WORKDIR = "/app"
 
 
 def _config_name(config: Path) -> str:
@@ -59,7 +63,8 @@ def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bo
         # --instance value selects the same instance at every step.
         "--scenario-file", f"scenario_{name}.json",
     ]
-    cmd = build_run_cmd(engine, docker_image, mounts, args, cache_dir=cache_dir, strict=not dry_run)
+    cmd = build_run_cmd(engine, docker_image, mounts, args, cache_dir=cache_dir, strict=not dry_run,
+                        workdir=CONTAINER_WORKDIR)
 
     print(f"  {config.name}  ->  scenario_{name}.json")
     if dry_run:

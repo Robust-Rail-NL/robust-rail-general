@@ -33,6 +33,11 @@ DOCKER_IMAGE_VERSIONS = {
     "local": "tors:latest",
 }
 CONTAINER_DB = "/app/database"
+# apptainer-only (see docker_utils.build_run_cmd's workdir param): the
+# evaluator image's own Dockerfile WORKDIR, which its ENTRYPOINT
+# ("build/TORS") is relative to. Note this differs from the other three
+# images (/app) -- the evaluator's Dockerfile uses /workspace.
+CONTAINER_WORKDIR = "/workspace"
 
 
 def _scenario_name(plan: Path) -> str:
@@ -71,7 +76,8 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool,
         "--path_eval_result", f"{CONTAINER_DB}/evaluations/eval_{name}.txt",
         "--plan_type", "Solver",
     ]
-    cmd = build_run_cmd(engine, docker_image, mounts, args, cache_dir=cache_dir, strict=not dry_run)
+    cmd = build_run_cmd(engine, docker_image, mounts, args, cache_dir=cache_dir, strict=not dry_run,
+                        workdir=CONTAINER_WORKDIR)
 
     print(f"  {plan.name}  ->  evaluations/eval_{name}.txt")
     if dry_run:
@@ -156,7 +162,8 @@ def _run_plan_single(docker_image: str, location_dir: Path, plan: Path, scenario
         "--path_eval_result", "/app/planio/eval.txt",
         "--plan_type", "Solver",
     ]
-    cmd = build_run_cmd(engine, docker_image, mounts, args, cache_dir=cache_dir, strict=not dry_run)
+    cmd = build_run_cmd(engine, docker_image, mounts, args, cache_dir=cache_dir, strict=not dry_run,
+                        workdir=CONTAINER_WORKDIR)
 
     print(f"  {plan}  ->  {plan_dir}/eval_result.json")
     if dry_run:

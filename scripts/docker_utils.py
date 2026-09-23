@@ -182,7 +182,7 @@ def container_name(prefix: str, instance: str) -> str:
 
 def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args: list[str], *,
                   name: str | None = None, cache_dir: Path | None = None,
-                  strict: bool = True) -> list[str]:
+                  strict: bool = True, workdir: str | None = None) -> list[str]:
     """Build one container invocation's argv, docker or apptainer, from engine-
     neutral pieces: mounts as (host source, in-container target) pairs, plus
     the image's own argv.
@@ -210,6 +210,18 @@ def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args:
     with a clear message rather than deeper inside a cryptic apptainer error
     -- unless strict=False, which a --dry-run preview wants: see
     ensure_sif_present).
+
+    workdir sets --pwd, apptainer-only (docker already starts in the image's
+    own WORKDIR on its own). Needed because apptainer, unlike docker, does
+    NOT default to the image's configured WORKDIR -- it mirrors the *host's*
+    current working directory inside the container instead, which breaks
+    every one of these entrypoints, all of which use a path relative to a
+    WORKDIR baked into their Dockerfile (e.g. generator's `python
+    src/main.py`, expecting to run from /app): without --pwd, that resolves
+    against wherever the container was invoked from on the host, not /app,
+    and fails with a "no such file" naming a path that was never meant to
+    exist. Caught 2026-09-24 running a bare `apptainer run <sif>` sanity
+    check by hand -- see docs/slurm-apptainer.md.
     """
     if engine == "docker":
         cmd = ["docker", "run", "--rm"]
@@ -226,6 +238,8 @@ def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args:
             raise ValueError("build_run_cmd(engine='apptainer') requires cache_dir")
         sif = ensure_sif_present(image, cache_dir, strict=strict)
         cmd = ["apptainer", "run"]
+        if workdir is not None:
+            cmd += ["--pwd", workdir]
         for source, target in mounts:
             cmd += ["--bind", f"{source}:{target}"]
         cmd += [str(sif), *args]

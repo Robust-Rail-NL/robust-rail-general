@@ -37,6 +37,10 @@ DOCKER_IMAGE_VERSIONS = {
 }
 CONTAINER_DB = "/app/database"
 CONTAINER_OUT = "/app/output"
+# apptainer-only (see docker_utils.build_run_cmd's workdir param): the
+# solver image's own Dockerfile WORKDIR, which its ENTRYPOINT ("dotnet
+# ServiceSiteScheduling.dll") is relative to.
+CONTAINER_WORKDIR = "/app"
 TEMP_CONFIG = "config_solver_run.yaml"
 
 
@@ -158,7 +162,7 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run
     mounts = [(location_dir.resolve(), CONTAINER_DB)]
     args = [f"--config={CONTAINER_DB}/{TEMP_CONFIG}"]
     cmd = build_run_cmd(engine, docker_image, mounts, args, name=cname, cache_dir=cache_dir,
-                        strict=not dry_run)
+                        strict=not dry_run, workdir=CONTAINER_WORKDIR)
 
     print(f"  {scenario.name}  ->  {plan_name}")
     if dry_run:
@@ -232,7 +236,7 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
     mounts = [(location_dir.resolve(), CONTAINER_DB), (output_dir, CONTAINER_OUT)]
     args = [f"--config={CONTAINER_OUT}/{config_path.name}"]
     cmd = build_run_cmd(engine, docker_image, mounts, args, name=cname, cache_dir=cache_dir,
-                        strict=not dry_run)
+                        strict=not dry_run, workdir=CONTAINER_WORKDIR)
 
     plan_path = output_dir / "plan.json"
     print(f"  {scenario.name}  ->  {plan_path}")

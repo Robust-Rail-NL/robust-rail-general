@@ -73,6 +73,11 @@ DOCKER_IMAGE_VERSIONS = {
     "edge": "ghcr.io/robust-rail-nl/planner:edge",
     "local": "planner:latest",
 }
+# apptainer-only (see docker_utils.build_run_cmd's workdir param): the
+# planner image's own Dockerfile WORKDIR. Its ENTRYPOINT is an absolute path
+# (/app/docker-entrypoint.sh), so this isn't needed to find the entrypoint
+# itself, but the script it runs may still depend on cwd internally.
+CONTAINER_WORKDIR = "/app"
 
 
 def _scenario_name(scenario: Path) -> str:
@@ -93,7 +98,7 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner
         "--output", f"{CONTAINER_DB}/plans/{plan_name}",
     ]
     cmd = build_run_cmd(engine, docker_image, mounts, args, name=cname, cache_dir=cache_dir,
-                        strict=not dry_run)
+                        strict=not dry_run, workdir=CONTAINER_WORKDIR)
 
     print(f"  {scenario.name}  ->  {plan_name}")
     if dry_run:
@@ -159,7 +164,7 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
         "--output", "/app/output/plan.json",
     ]
     cmd = build_run_cmd(engine, docker_image, mounts, args, name=cname, cache_dir=cache_dir,
-                        strict=not dry_run)
+                        strict=not dry_run, workdir=CONTAINER_WORKDIR)
 
     plan_path = output_dir / "plan.json"
     print(f"  {scenario.name}  ->  {plan_path}")
