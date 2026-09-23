@@ -216,20 +216,6 @@ started.
   `--mem`) — `sbatch` will refuse to submit until these are filled in,
   deliberately, rather than running with a guessed number.
   `--account=research-eemcs-st` is filled in.
-- Run for real on DelftBlue's login node (2026-09-24): staging, a bare
-  `apptainer run <sif>` sanity check (caught the `--pwd`/`WORKDIR` and
-  `--writable-tmpfs` bugs above), `run_generator.py --engine apptainer`
-  with real arguments, and `run_experiment.py --engine apptainer` end to
-  end for one instance.
-- Run for real on an interactive `compute-p1` allocation (2026-09-25,
-  `srun --partition=compute-p1 ... --pty bash`): apptainer itself, the
-  `module load 2026 cpu` / `python/3.13.12` combo (confirmed working away
-  from the login node, not just inferred), the `.sif` cache visible at
-  `~/apptainer-images` (confirms the shared-filesystem assumption), and
-  `scripts/slurm_run_task.py --index 0 ...` run directly -- the exact code
-  an array task executes, and it worked end to end (solver produced a
-  plan, evaluator scored it). This is as close to "the real thing worked"
-  as it gets without an actual `sbatch --array` submission.
 - Still genuinely untried: an actual `sbatch --array` submission and the
   aggregation job. Blocked on the partition/walltime/mem/cpu placeholders
   above.
