@@ -43,6 +43,18 @@ by hand, so the two engines' differences live in one place:
   `workdir` argument, which becomes apptainer's `--pwd`; docker ignores it,
   since it never needed the correction. Caught 2026-09-24 running a bare
   `apptainer run <sif>` sanity check by hand on DelftBlue.
+- A `.sif`'s squashfs is read-only by default; docker gives every container
+  its own writable layer automatically, with no volumes needed. The solver
+  in particular always writes debug snapshots to a hardcoded, non-
+  configurable `./tmp_plans/` internally (HIP's `Program.cs`/
+  `TabuSearch.cs`), which fails outright ("Read-only file system") without
+  correcting for this — also caught 2026-09-24, running the bare `hip-
+  stable.sif` sanity check. Fixed with `apptainer run --writable-tmpfs`,
+  unconditionally for every apptainer invocation (not just the solver's):
+  an ephemeral in-memory overlay across the whole container filesystem,
+  equivalent to docker's free writable layer. Any of these images could
+  plausibly have similar internal scratch-write behaviour that hasn't been
+  audited for, hence unconditional rather than solver-only.
 - Pulling is stateful and file-based under apptainer (`apptainer pull`
   produces a real `.sif` you have to name and cache yourself), unlike
   docker's invisible daemon-managed pull cache. See "Staging" below.

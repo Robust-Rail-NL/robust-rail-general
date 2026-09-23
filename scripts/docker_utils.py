@@ -205,11 +205,20 @@ def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args:
     invokes the .sif's converted-from-ENTRYPOINT runscript with `args`
     appended, where `apptainer exec` would instead try to execute `args[0]`
     itself as a command inside the container, which is never what an
-    `--config`/`--mode`/etc. flag is. One --bind per mount pair and the
-    resolved .sif (via ensure_sif_present, so a missing image fails here
-    with a clear message rather than deeper inside a cryptic apptainer error
-    -- unless strict=False, which a --dry-run preview wants: see
-    ensure_sif_present).
+    `--config`/`--mode`/etc. flag is. Always `--writable-tmpfs`: a .sif's
+    squashfs is read-only by default, unlike docker's own writable container
+    layer (which every docker run gets automatically, with no volumes
+    needed) -- the solver in particular always writes debug snapshots to a
+    hardcoded, non-configurable `./tmp_plans/` internally (see HIP's
+    Program.cs/TabuSearch.cs), which fails outright without this. An
+    ephemeral in-memory overlay across the whole container filesystem is the
+    equivalent of docker's free writable layer: any of these images could
+    plausibly have similar internal scratch-write behaviour we haven't
+    audited for, so it's unconditional rather than solver-only. One --bind
+    per mount pair and the resolved .sif (via ensure_sif_present, so a
+    missing image fails here with a clear message rather than deeper inside
+    a cryptic apptainer error -- unless strict=False, which a --dry-run
+    preview wants: see ensure_sif_present).
 
     workdir sets --pwd, apptainer-only (docker already starts in the image's
     own WORKDIR on its own). Needed because apptainer, unlike docker, does
@@ -237,7 +246,7 @@ def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args:
         if cache_dir is None:
             raise ValueError("build_run_cmd(engine='apptainer') requires cache_dir")
         sif = ensure_sif_present(image, cache_dir, strict=strict)
-        cmd = ["apptainer", "run"]
+        cmd = ["apptainer", "run", "--writable-tmpfs"]
         if workdir is not None:
             cmd += ["--pwd", workdir]
         for source, target in mounts:
