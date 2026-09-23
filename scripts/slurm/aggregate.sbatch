@@ -11,8 +11,8 @@
 #
 # Runs report_results.py + coverage_analysis.py over --output-dir exactly as
 # run_experiment.py's own sequential path does at the end of a run, then
-# copies the whole tree to $2. That copy is not optional: see __scratch/
-# slurm-apptainer-status.md's storage decision -- DelftBlue's /scratch has no
+# copies the whole tree to $2. That copy is not optional: see
+# docs/slurm-apptainer.md's storage section -- DelftBlue's /scratch has no
 # confirmed purge policy yet, but the login banner itself signals one is
 # coming ("The usage of /scratch still needs to be reduced..."), and a
 # completed, untouched sweep sitting there is exactly the "inactive data" it
@@ -27,10 +27,9 @@
 # applies unless you set this explicitly.
 #
 # TODO: same as run_experiment_array.sbatch -- partition/QOS/walltime/mem
-# are placeholders pending the collaborator (see __scratch/
-# slurm-apptainer-status.md). This job is far lighter than an array task
-# (just report generation + an rsync), so its resource needs are smaller,
-# but still unmeasured.
+# are placeholders pending the collaborator (see docs/slurm-apptainer.md).
+# This job is far lighter than an array task (just report generation + an
+# rsync), so its resource needs are smaller, but still unmeasured.
 
 #SBATCH --job-name=robust-rail-experiment-aggregate
 #SBATCH --account=research-eemcs-st

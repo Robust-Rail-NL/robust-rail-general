@@ -3,12 +3,12 @@
 
 Run once, by hand, on a host with internet access -- a DelftBlue login node,
 confirmed 2026-09-22 to run apptainer directly with no `module load` needed
-(see __scratch/slurm-apptainer-status.md). SLURM compute nodes have none, so
-every image a job array will need has to already be sitting in the cache
-before any job is submitted: scripts.docker_utils.ensure_sif_present (what
-build_run_cmd's apptainer path calls) never falls back to pulling on its own
--- a missing .sif there is a hard error pointing back at this script, not
-something a compute node fixes for itself.
+(see docs/slurm-apptainer.md). SLURM compute nodes have none, so every image
+a job array will need has to already be sitting in the cache before any job
+is submitted: scripts.docker_utils.ensure_sif_present (what build_run_cmd's
+apptainer path calls) never falls back to pulling on its own -- a missing
+.sif there is a hard error pointing back at this script, not something a
+compute node fixes for itself.
 
 Mirrors run_experiment.py's own _pull_once: images are resolved from each
 run_*.py's own DOCKER_IMAGE_VERSIONS (the single source of truth for what a
@@ -16,9 +16,9 @@ run_*.py's own DOCKER_IMAGE_VERSIONS (the single source of truth for what a
 several version names can resolve to the identical image -- e.g. the
 generator's stable/stable-assert/edge all do.
 
-No --version local equivalent: decided against one (see __scratch/
-slurm-apptainer-status.md) since only registry images matter for a cluster
-run. --evaluator-version defaults to staging both stable and stable-assert,
+No --version local equivalent: decided against one (see docs/
+slurm-apptainer.md) since only registry images matter for a cluster run.
+--evaluator-version defaults to staging both stable and stable-assert,
 not just one: a full solver/planner comparison run needs both eventually,
 just never in the same run_evaluator.py invocation (its --version takes one
 value at a time). Measured 2026-09-22: generator + hip stable + tors
@@ -54,8 +54,7 @@ def main() -> None:
     parser.add_argument("--cache-dir", type=Path, default=DEFAULT_SIF_CACHE_DIR, metavar="DIR",
                         help=f"Where to write .sif files (default: {DEFAULT_SIF_CACHE_DIR}). Must be "
                              "readable from every compute node a job array will run on -- /home, "
-                             "not /scratch, on DelftBlue (see __scratch/"
-                             "slurm-apptainer-status.md for why).")
+                             "not /scratch, on DelftBlue (see docs/slurm-apptainer.md for why).")
     parser.add_argument("--generator-version", default=",".join(DEFAULT_VERSIONS["run_generator.py"]),
                         metavar="V[,V...]",
                         help="Comma-separated --version value(s) to stage for run_generator.py "

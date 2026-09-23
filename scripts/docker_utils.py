@@ -118,10 +118,10 @@ def apptainer_pull(image: str, cache_dir: Path, force: bool = False) -> Path | N
 
     Skipped, like ensure_pulled, for bare local-build tags (no "/"): there is
     no registry to pull from, and this repo's apptainer path has no
-    equivalent of docker's --version local (see __scratch/
-    slurm-apptainer-status.md) -- returns None rather than erroring, since a
-    caller passing one through anyway (e.g. a stray --version local) should
-    just see it skipped, not fail the whole staging run.
+    equivalent of docker's --version local (see docs/slurm-apptainer.md) --
+    returns None rather than erroring, since a caller passing one through
+    anyway (e.g. a stray --version local) should just see it skipped, not
+    fail the whole staging run.
     """
     if "/" not in image:
         print(f"  Skipping {image} (bare local tag -- nothing to pull).")
@@ -188,9 +188,8 @@ def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args:
     the image's own argv.
 
     Replaces each run_*.py's own inline `cmd = ["docker", "run", ...]`
-    construction (not yet rewired to call this -- see __scratch/
-    slurm-apptainer-status.md's "Job-array fan-out" step) with one place that
-    knows both engines' flag syntax.
+    construction with one place that knows both engines' flag syntax -- see
+    docs/slurm-apptainer.md for the full picture.
 
     docker: --rm, --name (only if given -- generator/evaluator never pass
     one, only solver/planner do, for run_container's kill-by-name timeout),

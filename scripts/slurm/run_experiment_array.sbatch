@@ -23,8 +23,8 @@
 #
 # TODO before this is actually runnable: partition/QOS and walltime/mem/cpu
 # below are placeholders -- still pending input from the collaborator who
-# runs this (see __scratch/slurm-apptainer-status.md). --account is filled
-# in (Léon's own value).
+# runs this (see docs/slurm-apptainer.md). --account is filled in (Léon's
+# own value).
 
 #SBATCH --job-name=robust-rail-experiment
 #SBATCH --account=research-eemcs-st

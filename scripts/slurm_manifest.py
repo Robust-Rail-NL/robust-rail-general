@@ -3,9 +3,9 @@
 line per SLURM array task index -- for scripts/slurm_run_task.py to read.
 
 Run after run_generator.py has already produced every scenario (on DelftBlue
-that happens directly on the login node -- see __scratch/
-slurm-apptainer-status.md) and before submitting the array job: this only
-enumerates work, it runs nothing itself.
+that happens directly on the login node -- see docs/slurm-apptainer.md) and
+before submitting the array job: this only enumerates work, it runs nothing
+itself.
 
 Reuses run_experiment.py's own instance resolution (_instances_from_configs)
 and mirrors _run_instance's per-tool/per-seed loop exactly, rather than
