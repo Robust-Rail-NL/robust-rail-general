@@ -203,6 +203,14 @@ started.
    to `$SLURM_ARRAY_TASK_ID`) and calls `run_experiment.py`'s own
    `_run_and_record` directly — the same solver/planner-then-evaluator
    sequence a local run uses, not a reimplementation of it.
+
+   `scripts/slurm_run_task.py` itself — the exact code each array task
+   runs — was confirmed working end to end on a real DelftBlue compute node
+   (`compute-p1`, interactive `srun`, 2026-09-25): `python3
+   scripts/slurm_run_task.py --index 0 --manifest <tasks.tsv> --location
+   <NAME> --output-dir <dir>` produced a plan (solver) and scored it
+   (evaluator), both exiting cleanly. What's still untried is `sbatch
+   --array` itself doing the scheduling/indexing — see "Known gaps".
 5. **Submit the aggregation job**, depending on the array job:
    `sbatch --dependency=afterok:<array_job_id> scripts/slurm/aggregate.sbatch
    <output-dir> <home-dest>`. Runs `report_results.py` +
