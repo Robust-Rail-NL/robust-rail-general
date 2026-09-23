@@ -6,6 +6,23 @@ engine, apptainer, for running the same pipeline on a SLURM cluster with no
 docker daemon on its compute nodes — DelftBlue, specifically. Docker stays
 the default; nothing changes for a normal local run.
 
+## Prerequisites on DelftBlue
+
+`pyproject.toml` requires Python `>=3.12`; DelftBlue's default `python3`
+(3.9.25 as of 2026-09-24) doesn't meet it, and every `run_*.py`/`docker_utils.py`
+import fails immediately with a `TypeError` on an `X | None` type hint,
+pointing at whatever line happens to define one first -- not an error about
+Python versions at all, easy to mistake for a real bug. A new-enough Python
+is available, but hidden behind a hierarchical Lmod module (found via
+`module spider python`, the same way apptainer's own `module spider`
+discovery works, if it's ever needed):
+```bash
+module load 2026 cpu
+module load python/3.13.12
+```
+apptainer itself needed no `module load` (confirmed 2026-09-22, directly on
+`PATH`) -- only Python did.
+
 ## The engine abstraction
 
 Every script takes `--engine {docker,apptainer}` (default `docker`) and
