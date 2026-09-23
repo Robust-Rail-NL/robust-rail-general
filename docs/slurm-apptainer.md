@@ -9,7 +9,7 @@ the default; nothing changes for a normal local run.
 ## Prerequisites on DelftBlue
 
 `pyproject.toml` requires Python `>=3.12`; DelftBlue's default `python3`
-(3.9.25 as of 2026-09-24) doesn't meet it, and every `run_*.py`/`docker_utils.py`
+(3.9.25 as of 2026-09-23) doesn't meet it, and every `run_*.py`/`docker_utils.py`
 import fails immediately with a `TypeError` on an `X | None` type hint,
 pointing at whatever line happens to define one first -- not an error about
 Python versions at all, easy to mistake for a real bug. A new-enough Python
@@ -58,14 +58,14 @@ by hand, so the two engines' differences live in one place:
   constant (`/app` for generator/solver/planner, `/workspace` for the
   evaluator — its Dockerfile differs) and passes it as `build_run_cmd`'s
   `workdir` argument, which becomes apptainer's `--pwd`; docker ignores it,
-  since it never needed the correction. Caught 2026-09-24 running a bare
+  since it never needed the correction. Caught 2026-09-23 running a bare
   `apptainer run <sif>` sanity check by hand on DelftBlue.
 - A `.sif`'s squashfs is read-only by default; docker gives every container
   its own writable layer automatically, with no volumes needed. The solver
   in particular always writes debug snapshots to a hardcoded, non-
   configurable `./tmp_plans/` internally (HIP's `Program.cs`/
   `TabuSearch.cs`), which fails outright ("Read-only file system") without
-  correcting for this — also caught 2026-09-24, running the bare `hip-
+  correcting for this — also caught 2026-09-23, running the bare `hip-
   stable.sif` sanity check. Fixed with `apptainer run --writable-tmpfs`,
   unconditionally for every apptainer invocation (not just the solver's):
   an ephemeral in-memory overlay across the whole container filesystem,
@@ -96,7 +96,7 @@ by hand, so the two engines' differences live in one place:
   SLURM's own cgroup-based job containment, which reaches every process in a
   job step regardless of our own process-group structure. This only bites
   interactive, manual testing on a login node -- exactly what you'd be doing
-  to sanity-check before handing this off. Found 2026-09-24 running a
+  to sanity-check before handing this off. Found 2026-09-23 running a
   planner sanity check by hand on DelftBlue.
 - The macOS Docker-Desktop bind-mount-race workaround in `docker_utils.py` is
   docker-only and inert under apptainer.
@@ -118,7 +118,7 @@ load` needed).
 
 This was originally written assuming SLURM compute nodes have no internet
 access at all -- **not confirmed**: an interactive `srun` session on
-`compute-p1` (2026-09-25) reached both `ghcr.io` and a general internet
+`compute-p1` (2026-09-23) reached both `ghcr.io` and a general internet
 host (`curl -sI` to each succeeded), contradicting that assumption, at
 least for that partition. Whether this holds cluster-wide (or was
 `compute-p1`-specific) wasn't checked further, and DelftBlue has no
@@ -149,7 +149,7 @@ planner's Julia runtime included.
 
 Separately, `apptainer pull` also populates apptainer's own layer/download
 cache at `~/.apptainer` (1.3GiB after staging the default set on
-2026-09-24) — distinct from the `.sif` cache above, and not read at all by
+2026-09-23) — distinct from the `.sif` cache above, and not read at all by
 `apptainer run`/`exec` against an already-built `.sif`; it only speeds up a
 *future* re-stage. Safe to reclaim any time with `apptainer cache clean`
 (everything in it is already baked into the staged `.sif` files), and worth
@@ -206,7 +206,7 @@ started.
 
    `scripts/slurm_run_task.py` itself — the exact code each array task
    runs — was confirmed working end to end on a real DelftBlue compute node
-   (`compute-p1`, interactive `srun`, 2026-09-25): `python3
+   (`compute-p1`, interactive `srun`, 2026-09-23): `python3
    scripts/slurm_run_task.py --index 0 --manifest <tasks.tsv> --location
    <NAME> --output-dir <dir>` produced a plan (solver) and scored it
    (evaluator), both exiting cleanly. What's still untried is `sbatch

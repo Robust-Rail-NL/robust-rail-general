@@ -229,7 +229,7 @@ def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args:
     src/main.py`, expecting to run from /app): without --pwd, that resolves
     against wherever the container was invoked from on the host, not /app,
     and fails with a "no such file" naming a path that was never meant to
-    exist. Caught 2026-09-24 running a bare `apptainer run <sif>` sanity
+    exist. Caught 2026-09-23 running a bare `apptainer run <sif>` sanity
     check by hand -- see docs/slurm-apptainer.md.
     """
     if engine == "docker":
