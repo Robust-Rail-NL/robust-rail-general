@@ -61,7 +61,26 @@ by hand, so the two engines' differences live in one place:
 - Timeout handling (`docker_utils.run_container`) kills a docker container by
   name (it lives under `dockerd`, a separate process tree an ordinary kill
   can't reach), but for apptainer the invoked process *is* the container, so
-  killing its whole process group is enough on its own.
+  killing its whole process group is enough on its own. That relies on
+  `_run_once` launching it with `start_new_session=True` (its own session,
+  detached from the terminal) so the process-group kill has something clean
+  to target -- side effect: if you run something under `--engine apptainer`
+  interactively on a login node, Ctrl-Z/Ctrl-C only reaches the outer
+  `python3 run_*.py` driver, never the `apptainer run ...` process (and
+  whatever it launches, e.g. ENHSP's `java`) it started, since that's no
+  longer in the terminal's own foreground process group. It'll keep running,
+  invisible, until it finishes or is found and killed directly:
+  ```bash
+  ps -ef | grep -E 'apptainer|java' | grep -v grep
+  ps -o pgid= -p <pid>      # get its process group id
+  kill -9 -- -<pgid>        # kill the whole group, not just one pid
+  ```
+  Doesn't affect the real SLURM path: `scancel`/a walltime kill goes through
+  SLURM's own cgroup-based job containment, which reaches every process in a
+  job step regardless of our own process-group structure. This only bites
+  interactive, manual testing on a login node -- exactly what you'd be doing
+  to sanity-check before handing this off. Found 2026-09-24 running a
+  planner sanity check by hand on DelftBlue.
 - The macOS Docker-Desktop bind-mount-race workaround in `docker_utils.py` is
   docker-only and inert under apptainer.
 
@@ -95,6 +114,22 @@ tool's edge channel; `--force` re-pulls.
 Measured 2026-09-22 on DelftBlue: that default 5-image set is 607MiB total —
 about 2% of `/home`'s 30GiB quota, lighter than expected even with the
 planner's Julia runtime included.
+
+Separately, `apptainer pull` also populates apptainer's own layer/download
+cache at `~/.apptainer` (1.3GiB after staging the default set on
+2026-09-24) — distinct from the `.sif` cache above, and not read at all by
+`apptainer run`/`exec` against an already-built `.sif`; it only speeds up a
+*future* re-stage. Safe to reclaim any time with `apptainer cache clean`
+(everything in it is already baked into the staged `.sif` files), and worth
+redirecting to `/scratch` for future staging runs rather than letting it
+compete with `/home`'s quota:
+```bash
+export APPTAINER_CACHEDIR=/scratch/$USER/.apptainer-cache
+```
+Deliberately not something `stage_apptainer_images.py` sets itself — a
+`/scratch/<username>/...` path is personal and DelftBlue-specific, not
+something a shared, checked-in script should assume (same reasoning as the
+`ghcr.io` credential helper being personal dotfiles rather than repo code).
 
 ## Storage: `.sif` cache on `/home`, `--output-dir` on `/scratch`
 
