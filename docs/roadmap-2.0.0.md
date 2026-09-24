@@ -28,10 +28,13 @@ reference) that `roadmap.md` links back into rather than duplicating.
 | evaluator#17 | Once solver#14's overrun no longer masks it, TORS rejects `7t_custom_example1` with a different error: "departure mismatch" on `ShuntingUnit-4000`, whose declared departure time doesn't match its plan action's — the evaluator has no way to accept a late departure the solver already prices as `dd=1`, rather than treating it as unrecoverable. Reconfirmed present under shipped `stable` (2.1.0), 2026-09-12, and now filed — the sole remaining blocker for this fixture. |
 | evaluator#13 (fixed on `edge`) | `legal_on_parking_track_rule` rejected the `EndMove` a schema-v2 plan's Setback conversion synthesizes before it, on the reversal track — treating a unit about to reverse and carry straight on as if it were parking there. Regressed `6t_custom_example3` and `8t_custom_example2` under `edge`'s schema-v2/Setback work (found 2026-09-12, see below). **Fixed and merged into `edge`** 2026-09-13 (`af6ce88`, generalizing the existing Exit exemption to also cover Setback) — both fixtures get past this rejection now. Not yet in `stable`. |
 | evaluator#18 (fixed on `edge`) | `MoveActionGenerator` recomputes a replayed multi-hop `Move`'s duration as a fixed per-track-type sum instead of trusting the plan's own declared duration; on a long enough route the sum overruns the plan's window, and the next queued action for that unit (typically `EndMove`) fails with a misleading "already active" error. Filed 2026-09-13, was the sole blocker for both `6t_custom_example3` and `8t_custom_example2` under `edge` (see above section). **Fixed and merged into `main`, then `edge`** the same day (`aa499be`) — both fixtures confirmed valid again, see below. Not yet in `stable`. |
+| evaluator#25 | Evaluating `48t_custom_larger-example` (KleineBinckhorst, after gateway `906a`'s widening in PR #17 let this scenario past its old scenario-level length rejection) crashes with `Invalid argument: unordered_map::at` on stderr, exit code 0, no verdict written — before applying a single plan action. Filed 2026-09-17; not yet triaged inside `cTORS`. See `scenario-feasibility.md`'s "Fixed-scenario fixtures" table for the repro. |
 
-None of #17, #18 or #19 blocks the pipeline. #17 needs a combined inStanding
-train that gets split, which no fixture has; #18 needs a non-null
-`standingIndex`, which no fixture has; #19 is a modelling question.
+None of #17, #18, #19 or #25 blocks the pipeline. #17 needs a combined
+inStanding train that gets split, which no fixture has; #18 needs a non-null
+`standingIndex`, which no fixture has; #19 is a modelling question; #25 only
+reproduces on `larger-example`, which was never a pipeline-blocking fixture
+(classified `unknown`, not `infeasible`, even before this).
 
 Both fixtures were named in `RELEASE_NOTES.md`'s 2.0.0 known-limitations
 section as expected to fail under `stable`. As of solver/evaluator `2.1.0`

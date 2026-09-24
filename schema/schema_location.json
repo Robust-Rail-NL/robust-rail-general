@@ -74,12 +74,12 @@
         "Move",
         "Split",
         "Combine",
+        "Reverse",
         "Wait",
         "Arrive",
         "Exit",
         "StandIn",
         "StandOut",
-        "Walking",
         "Break",
         "NonService"
       ],
@@ -278,7 +278,7 @@
   "description": "The fixed part of the problem specification: track layout and\nfacilities. Does not change on a daily basis.",
   "properties": {
     "schemaVersion": {
-      "default": 1,
+      "default": 2,
       "title": "Schemaversion",
       "type": "integer"
     },
