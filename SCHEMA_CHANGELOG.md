@@ -35,7 +35,7 @@ entry instead of requiring it to be rewritten from scratch.
 
 Three related changes, to land together:
 
-- `PredefinedTaskType.Walking` renamed to `Setback`. `Walking` named a
+- `PredefinedTaskType.Walking` renamed to `Reverse`. `Walking` named a
   shunting-unit reversal action after the crew's part in it (walking to the
   other end, which is why it takes time) rather than what the action
   represents. Moved out of the "Staff / facility" grouping into "Movement",
@@ -43,7 +43,7 @@ Three related changes, to land together:
 - A `Move` action whose route embeds an unflagged reversal (the same track
   revisited two hops apart, e.g. `[..,X,Y,X,..]`) is no longer accepted for
   a plan declaring `schemaVersion: 2` or later — it must use an explicit
-  `Setback` action instead. A plan declaring `schemaVersion: 1` (or none)
+  `Reverse` action instead. A plan declaring `schemaVersion: 1` (or none)
   keeps evaluating exactly as before: still tolerated, with a deprecation
   warning.
 - `Plan` gains `feasibility` (`Feasibility` enum: `Feasible`/`Infeasible`/
@@ -60,7 +60,7 @@ Three related changes, to land together:
 Not free for existing producers, unlike most entries below: robust-rail-solver
 and robust-rail-planner currently only ever produce the embedded-reversal
 shape (they fold a reversal into a `Move`'s resource list rather than
-emitting a separate action), so both need to start emitting `Setback` before
+emitting a separate action), so both need to start emitting `Reverse` before
 adopting `schemaVersion: 2`. The version gate exists specifically so this can
 happen on each producer's own timeline: nothing currently emitted anywhere
 regresses, since it all declares `schemaVersion: 1` today, and each producer
