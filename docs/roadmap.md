@@ -54,9 +54,10 @@ this same doc's use of "producer" as a schema-versioning role term):
   (2026-09-24), and `main` merged into `edge` the same day. Unlike the
   2026-09-15 snapshot of this doc, this now includes real `Feasibility`/
   `Cost`/`Origin` wiring off `SolutionCost` (`eaf8d6a`, bundled into the same
-  PR) — solver's plans no longer all declare `Unknown` with no cost.
-  **Fully landed**, `edge` image rebuild is the only remaining step to
-  actually pick it up.
+  PR) — solver's plans no longer all declare `Unknown` with no cost. `edge`
+  image already rebuilt from this (GHCR `edge` tag pushed 2026-09-24T19:45Z).
+  **Landed on `main`/`edge`, but not yet released** — `stable` is still
+  pinned to `v2.1.0`, which predates PR #47; no new tag cut yet.
 - **evaluator**: two independent tracks, no longer stacked:
   - The Reverse-wiring fix, **PR #23** (`fix/issue-13-wire-walking-to-reverse`)
     — **merged into `main`** 2026-09-24, having already been on evaluator's
