@@ -23,13 +23,18 @@ says happened.
 
 ## 2 — planned
 
-**Not yet released.** The three changes below are code-complete on branches
-across every affected repo (this one, `robust-rail-solver`,
-`robust-rail-evaluator`, `robust-rail-planner`) but none of it has merged to
-any repo's `main` yet — every producer and consumer still speaks
-`schemaVersion: 1` today. This entry is deliberately a separate commit on top
-of the "landed" wording (see that commit for the original text) rather than
-an edit to it, so that once schemaVersion 2 actually lands, reverting this
+**Not fully released.** As of 2026-09-24: merged into `main` (and already
+carried into `edge`) in this repo, `robust-rail-solver` (including real
+`Feasibility`/`Cost`/`Origin` wiring off `SolutionCost`, not just `Unknown`),
+and `robust-rail-evaluator` (the `Reverse`-wiring half only — the
+`feasibility`/`origin`/`cost`/`costDetails`-parsing half is still an open,
+review-blocked PR there, though already merged into evaluator's own `edge`
+directly). `robust-rail-planner` hasn't landed either half yet: its branch
+for this still needs reworking onto current `main`, not just rebasing. So
+`schemaVersion: 1` is still in real use (planner), and `2` isn't universal
+yet. This entry is deliberately a separate commit on top of the "landed"
+wording (see that commit for the original text) rather than an edit to it,
+so that once schemaVersion 2 actually lands everywhere, reverting this
 commit and filling in the real date restores the original present-tense
 entry instead of requiring it to be rewritten from scratch.
 

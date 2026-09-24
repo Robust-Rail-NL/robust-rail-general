@@ -23,11 +23,14 @@ evaluator#12 (task-duration global sum bug) and evaluator#13 (saw movement
 flips a train's tracked orientation) triggered a schema v2 change — bundled
 under one shared version bump, but actually **two independent features**:
 
-- **The `Setback` rename** (breaking): a new explicit `Setback` action,
-  replacing a reversal that used to be silently embedded in a `Move`.
-- **`Plan.feasibility`/`producer`/`cost`/`costDetails`** (purely additive): a
-  producer's own declared verdict on whether its plan is feasible, plus
-  free-text provenance/cost metadata.
+- **The `Reverse` rename** (breaking): a new explicit `Reverse` action,
+  replacing a reversal that used to be silently embedded in a `Move`. (Named
+  `Setback` until partway through this rollout; renamed for readability —
+  see `SCHEMA_CHANGELOG.md`.)
+- **`Plan.feasibility`/`origin`/`cost`/`costDetails`** (purely additive): a
+  plan's declared verdict on whether it's feasible, plus free-text
+  provenance/cost metadata. (`origin` was named `producer` until the same
+  point, for the same reason.)
 
 Both originated from the same evaluator#12/#13 investigation and landed
 together in this repo's own two-branch stack, so they move together here —
@@ -36,123 +39,93 @@ one is breaking and the other isn't. `robust-rail-generator` isn't part of
 the rollout at all — it never produces or consumes a `Plan`, only
 `Location`/`Scenario`.
 
-Per-repo state, as of 2026-09-15:
+Per-repo state, as of 2026-09-24 (the rename settled on `Reverse`/`origin`
+rather than `Setback`/`producer` along the way — `producer` collided with
+this same doc's use of "producer" as a schema-versioning role term):
 
-- **evaluator**: two independent branches, both based on current `main`,
-  *not* stacked on each other:
-  - `fix/issue-13-wire-walking-to-setback` — the Setback-wiring fix, plus a
-    companion regression it introduced and fixed in the same branch (a
-    spurious "Parking is not allowed" rejection right before a Setback, see
-    that branch tip's own commit message). Pushed, full suite green,
-    **already merged into evaluator's own `edge`** (`6d5e00b`). **PR #23**
-    open (correct direction this time — `head: fix/issue-13-wire-walking-to-setback`,
-    `base: main`), CI/mergeability set, blocked only on required review.
-    (Superseded PR #21, which had base/head swapped; closed 2026-09-15.)
-  - `feat/plan-feasibility-cost` — parses `feasibility`/`producer`/`cost`/
-    `costDetails` off an incoming plan and logs (never rejects) a warning
-    when a plan's *declared* feasibility disagrees with the evaluator's own
-    verdict, staying silent when the plan declares `Unknown`. This is real
-    behavior on the exact path `run_evaluator.py` always uses
-    (`plan_type == "Solver"` → `RunResult::CreateRunResult(pb_hip_plan, ...)`
-    → `EvaluatePlan`), not a passive parse-and-ignore. **PR #22** is open
-    (opened 2026-09-15) targeting `main`, CI green on both platforms,
-    `mergeStateStatus: BLOCKED` purely on the required-review branch
-    protection — nothing technical. **Not yet merged into evaluator's own
-    `edge` either** — a dry-run merge against `origin/edge` shows no
-    conflicts, so nothing blocks that but someone actually doing it.
-- **solver**: a three-branch stack, `fix/rename-walking-to-setback` →
-  `feat/plan-feasibility-cost` → `feat/emit-setback-actions`, each an
-  ancestor of the next. All three are **already merged into solver's own
-  `edge`** (`fbe9848`, 2026-09-13 00:52 CEST), and `hip:edge` has been
-  rebuilt from that exact commit — confirmed directly from the live image's
-  OCI labels (`2.1.0-edge+20260912.fbe9848`, built `2026-09-12T22:53:53Z`).
-  Note solver doesn't actually populate real `Feasibility`/`Cost` values yet
-  — its own commit says plainly "not wired up... nothing populates these
-  from a real `SolutionCost`" — so every plan it emits today still declares
-  `Unknown` with no cost. **PR #47** is open (lands all three pieces of the
-  stack into `main` together, since `feat/emit-setback-actions` is the tip),
-  blocked only on required review.
-- **planner**: `feat/emit-setback-actions` (the Setback half) is still
-  local, unpushed, unreviewed, based on `convert_to_tors_improvements`
-  rather than `main` — hasn't landed anywhere, including planner's own
-  `edge`. **Blocked on PR #32** ("Convert to tors improvements",
-  `convert_to_tors_improvements` → `main`, currently `CHANGES_REQUESTED`;
-  PR #33 is addressing that) landing first — and once it does,
-  `feat/emit-setback-actions` needs to be **reworked onto `main`, not just
-  rebased**, since it was built against a branch that won't be the current
-  base anymore. **No `feat/plan-feasibility-cost` branch exists in planner
-  at all.** Unconfirmed whether that's deliberate (planner produces plans
-  too, as a producer, so could in principle declare its own
-  feasibility/cost) or just not gotten to yet — worth asking rather than
-  assuming either way.
-- **this repo**: the `fix/rename-walking-to-setback` →
-  `feat/plan-feasibility-cost` stack (general's schema source-of-truth
-  changes backing all of the above) is pushed but **deliberately not yet
-  merged into `main`** — sequenced to land after solver's and planner's
-  Setback work, since that half is a breaking rename. The feasibility/cost
-  half doesn't independently need that sequencing (see below), but it's
-  bundled in the same branch stack here, so it moves together regardless.
+- **this repo**: the `fix/rename-walking-to-reverse` → `feat/plan-feasibility-cost`
+  stack (general's schema source-of-truth changes backing all of the below)
+  **merged into `main`** (PRs #15, #16) and already carried into `edge`
+  (`main` merged into `edge` same day) — no longer sequenced behind
+  anything, since solver and evaluator's own Reverse work landed the same
+  day (see below).
+- **solver**: the three-branch stack (retitled along the way, tip
+  `feat/emit-reverse-actions`) **merged into `main`** via **PR #47**
+  (2026-09-24), and `main` merged into `edge` the same day. Unlike the
+  2026-09-15 snapshot of this doc, this now includes real `Feasibility`/
+  `Cost`/`Origin` wiring off `SolutionCost` (`eaf8d6a`, bundled into the same
+  PR) — solver's plans no longer all declare `Unknown` with no cost.
+  **Fully landed**, `edge` image rebuild is the only remaining step to
+  actually pick it up.
+- **evaluator**: two independent tracks, no longer stacked:
+  - The Reverse-wiring fix, **PR #23** (`fix/issue-13-wire-walking-to-reverse`)
+    — **merged into `main`** 2026-09-24, having already been on evaluator's
+    own `edge` before that.
+  - `feat/plan-feasibility-cost`, **PR #22** (parses `feasibility`/`origin`/
+    `cost`/`costDetails`) — **still open**, blocked only on required review
+    (CI green on both platforms); its content is already merged into
+    evaluator's own `edge` directly (`d285bd1`), so nothing blocks the
+    round-trip coverage this unlocks. **Someone is actively iterating on
+    this branch right now** (a live worktree, most recent commit reworking
+    `producer` mentions in comments/docs to `origin`) — check before
+    touching it.
+- **planner**: still the long pole. Its former blocker — PR #32
+  (`convert_to_tors_improvements` → `main`) needing rework — is resolved:
+  both PR #32 and its follow-up PR #33 merged into `main` back on
+  2026-09-17. But `feat/emit-setback-actions` itself is still local-only,
+  unpushed, and based on a `main` commit that's since fallen well behind —
+  it still needs the rework onto current `main` flagged before, not just a
+  rebase. **No `feat/plan-feasibility-cost` branch exists in planner at
+  all**, still unconfirmed whether deliberate.
 
-### Verified: the forward-compatibility this sequencing relies on is implemented, not just documented
+### Verified (2026-09-15): the forward-compatibility this sequencing relies on is implemented, not just documented
 
-Checked directly in code, since solver's `edge` already ships a
-schemaVersion-2 plan (including the new feasibility/cost fields) that
-evaluator's `edge` doesn't yet expect: `robust-rail-evaluator`'s JSON plan
-reader sets `ignore_unknown_fields = true`
+Checked directly in code, back when solver's `edge` shipped a schemaVersion-2
+plan that evaluator's `edge` didn't yet expect: `robust-rail-evaluator`'s
+JSON plan reader sets `ignore_unknown_fields = true`
 (`cTORS/include/Utils.h:127-128`, exercised by `CompatibilityTest.cpp`, and
 confirmed to be the code path `Plan.cpp:935` actually uses for `plan.json`),
 and a schemaVersion mismatch only ever warns, never hard-rejects
-(`warn_on_schema_version_mismatch`, covered by `SchemaVersionTest.cpp`;
-evaluator's `EXPECTED_SCHEMA_VERSION` is still `1` on both `main` and
-`edge`). This is why solver's producer-side change can safely ship ahead of
+(`warn_on_schema_version_mismatch`, covered by `SchemaVersionTest.cpp`).
+This is why solver's producer-side change could safely ship ahead of
 evaluator's consumer-side change — confirmed against real fixtures in the
 2026-09-13 `edge` rerun in `roadmap-2.0.0.md`, not just inferred from the
 schemaVersion policy table.
 
-**What merging evaluator's `feat/plan-feasibility-cost` into `edge` would
-still add**, given that: it would newly exercise the actual parse/round-trip
-of these fields against solver's real `edge` output — do the optional
-`producer`/`cost`/`costDetails` fields round-trip the way `has_producer()`
-etc. expect, does the `Unknown` enum value map correctly end-to-end — which
-evaluator's *current* `edge` can't provide any signal on, since it just
-drops the fields via `ignore_unknown_fields`. What it would **not** yet
-exercise is the interesting half of `WarnIfFeasibilityMismatch` — a producer
-actually declaring `Feasible`/`Infeasible` and evaluator disagreeing —
-because solver, as of 2026-09-15, does now wire real values through
-(`eaf8d6a`, "Wire Plan.Feasibility/Cost/CostDetails/Producer to real
-SolutionCost", bundled into PR #47 rather than a separate follow-up PR), but
-that commit is still sitting in an unmerged PR, same as evaluator's own side.
+Now that both solver and evaluator have `Reverse`/schemaVersion-2 on `main`
+(see above), the same lean-on-forward-compatibility logic is what lets
+**planner** stay behind without blocking anyone: planner still emits
+`schemaVersion: 1` plans with the old embedded-reversal shape, and nothing
+above rejects that — it's exactly the mismatch path just verified, just with
+the lagging side now being planner instead of evaluator. Worth re-confirming
+against real planner fixtures once its rework starts, rather than assuming
+the solver/evaluator verification generalizes unchecked.
 
 ### Priorities, in order
 
-1. **Get solver PR #47 reviewed and merged into `main`** (lands its whole
-   three-branch stack, including `feat/plan-feasibility-cost`, in one PR —
-   now also including real `SolutionCost` wiring, `eaf8d6a`; blocked only on
-   required review). Evaluator's PR #23 is open too, same state as #47.
-   Planner is the long pole and has a real dependency now: **get PR #32
-   fixed (PR #33) and merged first**, then rework `feat/emit-setback-actions`
-   onto `main` — it can't just be pushed and rebased as-is.
-2. **Get evaluator PR #22 reviewed and merged into `main`**, and separately
-   merge `feat/plan-feasibility-cost` into evaluator's own `edge` — no
-   technical blocker (no conflicts, CI green on both platforms), just needs
-   doing. Worth prioritizing specifically for the round-trip integration
-   coverage this unlocks against solver's real `edge` output (see above),
-   even before solver populates real feasibility values.
-3. **Once solver's and planner's Setback work land**, merge this repo's
-   `fix/rename-walking-to-setback` + `feat/plan-feasibility-cost` stack into
-   `main`, revert `fb45294` in `SCHEMA_CHANGELOG.md` (it deliberately
-   reworded the "## 2" entry to "planned" so this revert could be
-   mechanical) with the real landing date, and cut a new tag so
-   `robust-rail-generator` can move its `robust-rail-general` pin off
-   `v0.1.1` (which predates all of this).
+1. **Get evaluator PR #22 reviewed and merged into `main`.** No technical
+   blocker (CI green on both platforms, no conflicts) — its content is
+   already on evaluator's own `edge`, so this is purely the review-and-merge
+   step. Someone is actively iterating on the branch right now (see above);
+   coordinate rather than duplicating that work.
+2. **Rework planner's `feat/emit-setback-actions` onto current `main`** (a
+   rework, not a rebase — see above) now that its former blocker (PR #32/#33)
+   has been merged for over a week. This is the actual long pole left in the
+   rollout. Also worth asking directly: should planner get its own
+   `feat/plan-feasibility-cost`-equivalent branch (it produces plans too, so
+   could declare its own feasibility/cost), or is that deliberately out of
+   scope for it?
+3. **Cut a new `robust-rail-general` tag** now that this repo's stack has
+   landed, so `robust-rail-generator` can move its pin off `v0.1.1` (which
+   predates all of this).
 4. **Investigate whether a reversal can reach a plan for free**, bypassing
-   `Setback` (and its modelled cost) entirely — now filed as **solver#46**.
+   `Reverse` (and its modelled cost) entirely — now filed as **solver#46**.
    Two suspected mechanisms in the solver, neither confirmed:
    `PlanGraph.ComputeRouting`'s `Access == Side.Both` branch picking a
    cheaper departure side with no check it's consistent with the train's
    actual arrival orientation, and a local-search neighbourhood move that
    could reach the same physical effect via Move+Wait+Move instead of a real
-   Setback substitution. If real, this undermines the point of the whole
+   `Reverse` substitution. If real, this undermines the point of the whole
    rollout — the solver could silently prefer the unrealistic-but-free
    reversal over the correctly-priced one. Scoped to the solver's routing
    graph and local search; suitable for its own session.
