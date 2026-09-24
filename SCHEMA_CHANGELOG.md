@@ -47,7 +47,7 @@ Three related changes, to land together:
   keeps evaluating exactly as before: still tolerated, with a deprecation
   warning.
 - `Plan` gains `feasibility` (`Feasibility` enum: `Feasible`/`Infeasible`/
-  `Unknown`, defaults to `Unknown`), and optional `producer` (free text,
+  `Unknown`, defaults to `Unknown`), and optional `origin` (free text,
   e.g. `"robust-rail-solver 2.0.0-edge+20260826.a1b2c3d"`), `cost` (number),
   and `costDetails` (free-form breakdown string, e.g. the solver's own
   `SolutionCost.ToString()` output) fields. `feasibility` is a producer's own
