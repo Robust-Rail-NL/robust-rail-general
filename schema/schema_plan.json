@@ -220,7 +220,7 @@
       "$ref": "#/$defs/Feasibility",
       "default": "Unknown"
     },
-    "producer": {
+    "origin": {
       "anyOf": [
         {
           "type": "string"
@@ -230,7 +230,7 @@
         }
       ],
       "default": null,
-      "title": "Producer"
+      "title": "Origin"
     },
     "cost": {
       "anyOf": [

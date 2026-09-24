@@ -78,13 +78,13 @@ class Plan(SchemaVersioned):
     # Free text identifying what produced this plan, e.g.
     # "robust-rail-solver 2.0.0-edge+20260826.a1b2c3d" - for a human
     # debugging a failed evaluation, not for programmatic parsing.
-    producer: Optional[str] = None
-    # The producer's own total objective/cost value for this plan, in
-    # whatever units and scale that producer uses - not comparable across
-    # different producers.
+    origin: Optional[str] = None
+    # The origin's own total objective/cost value for this plan, in
+    # whatever units and scale that origin uses - not comparable across
+    # different origins.
     cost: Optional[float] = None
     # Free-form human-readable breakdown of `cost`, e.g. the solver's own
     # SolutionCost.ToString() output ("Cost = 0.0 : 0.06 | cr=0, dd=0, ...").
-    # Not structured: the term breakdown is producer-specific and isn't a
+    # Not structured: the term breakdown is origin-specific and isn't a
     # general interchange concept the way the total itself is.
     cost_details: Optional[str] = Field(None, alias="costDetails")

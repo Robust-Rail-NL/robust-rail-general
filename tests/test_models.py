@@ -86,7 +86,7 @@ class TestPlanFeasibilityAndCost:
     def test_new_fields_omitted_from_wire_when_unset(self):
         wire = Plan(actions=[]).to_dict()
         assert "feasibility" not in wire
-        assert "producer" not in wire
+        assert "origin" not in wire
         assert "cost" not in wire
         assert "costDetails" not in wire
         assert "schemaVersion" in wire
@@ -94,7 +94,7 @@ class TestPlanFeasibilityAndCost:
     def test_old_plan_without_new_fields_still_validates(self):
         plan = Plan.model_validate({"schemaVersion": 2, "actions": []})
         assert plan.feasibility == Feasibility.UNKNOWN
-        assert plan.producer is None
+        assert plan.origin is None
         assert plan.cost is None
         assert plan.cost_details is None
 
@@ -102,19 +102,19 @@ class TestPlanFeasibilityAndCost:
         plan = Plan(
             actions=[],
             feasibility=Feasibility.FEASIBLE,
-            producer="robust-rail-solver 2.0.0",
+            origin="robust-rail-solver 2.0.0",
             cost=12.5,
             cost_details="Cost = 12.5 : cr=0, dd=0",
         )
         wire = plan.to_dict()
         assert wire["feasibility"] == "Feasible"
-        assert wire["producer"] == "robust-rail-solver 2.0.0"
+        assert wire["origin"] == "robust-rail-solver 2.0.0"
         assert wire["cost"] == 12.5
         assert wire["costDetails"] == "Cost = 12.5 : cr=0, dd=0"
 
         reloaded = Plan.model_validate(wire)
         assert reloaded.feasibility == Feasibility.FEASIBLE
-        assert reloaded.producer == plan.producer
+        assert reloaded.origin == plan.origin
         assert reloaded.cost == plan.cost
         assert reloaded.cost_details == plan.cost_details
 
