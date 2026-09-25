@@ -8,10 +8,10 @@ wire format, and all three repos bump their local `EXPECTED_SCHEMA_VERSION`
 together when it does.
 
 Mismatch behaviour is warn-and-continue: a missing or unexpected
-`schemaVersion` produces a logged warning, not a hard reject. That default is
-planned to loosen starting at version 2 (see below), once it lands: one
-specific plan shape will become a hard reject, gated on the plan's own
-declared `schemaVersion` rather than on this mismatch warning.
+`schemaVersion` produces a logged warning, not a hard reject. That default
+loosens starting at version 2 (see below): one specific plan shape becomes a
+hard reject, gated on the plan's own declared `schemaVersion` rather than on
+this mismatch warning.
 
 Moved here from `robust-rail-generator` on 2026-09-10, alongside the rest of
 `src/models/` (see `docs/roadmap-2.0.0.md`, "Where the exported schemas
@@ -21,17 +21,20 @@ below predating the move still say "the generator" where that was
 accurate at the time; only the file's own location was stale, not what it
 says happened.
 
-## 2 — planned
+## 2 — 2026-09-24
 
-**Not yet released.** The three changes below are code-complete on branches
-across every affected repo (this one, `robust-rail-solver`,
-`robust-rail-evaluator`, `robust-rail-planner`) but none of it has merged to
-any repo's `main` yet — every producer and consumer still speaks
-`schemaVersion: 1` today. This entry is deliberately a separate commit on top
-of the "landed" wording (see that commit for the original text) rather than
-an edit to it, so that once schemaVersion 2 actually lands, reverting this
-commit and filling in the real date restores the original present-tense
-entry instead of requiring it to be rewritten from scratch.
+Defined in this repo (the schema source of truth) as of this release.
+Downstream adoption, as of the same date: `robust-rail-solver`'s `main`
+emits `Reverse` and declares `schemaVersion: 2` end-to-end, including real
+`Feasibility`/`Cost`/`Origin` wiring off `SolutionCost` (not just
+`Unknown`); `robust-rail-evaluator`'s `main` has both halves (`Reverse`
+wiring and `feasibility`/`origin`/`cost`/`costDetails` parsing).
+`robust-rail-planner` hasn't adopted either half yet — its own branch for
+this predates the current `main` and needs reworking onto it, not just
+rebasing. None of the above blocks this release: the version gate below
+exists precisely so each producer adopts on its own timeline, and a plan
+declaring `schemaVersion: 1` keeps evaluating exactly as before in the
+meantime.
 
 Three related changes, to land together:
 
@@ -58,13 +61,15 @@ Three related changes, to land together:
   verdict.
 
 Not free for existing producers, unlike most entries below: robust-rail-solver
-and robust-rail-planner currently only ever produce the embedded-reversal
-shape (they fold a reversal into a `Move`'s resource list rather than
-emitting a separate action), so both need to start emitting `Reverse` before
-adopting `schemaVersion: 2`. The version gate exists specifically so this can
-happen on each producer's own timeline: nothing currently emitted anywhere
-regresses, since it all declares `schemaVersion: 1` today, and each producer
-opts into the stricter rule only once it bumps its own output to declare `2`.
+and robust-rail-planner only ever produced the embedded-reversal shape (they
+fold a reversal into a `Move`'s resource list rather than emitting a separate
+action), so both need to start emitting `Reverse` before adopting
+`schemaVersion: 2`. Solver has done so as of its own `main`; planner hasn't
+yet. The version gate exists specifically so this can happen on each
+producer's own timeline: nothing already emitted anywhere regresses, since a
+plan declaring `schemaVersion: 1` keeps evaluating exactly as before, and
+each producer opts into the stricter rule only once it bumps its own output
+to declare `2`.
 
 No real producer has ever emitted `"Walking"` as a value (see
 robust-rail-evaluator's `doc/known-issue-plan-type.md`), so the rename itself

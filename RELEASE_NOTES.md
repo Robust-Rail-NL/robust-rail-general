@@ -1,5 +1,40 @@
 # Release notes
 
+## 0.2.0 — 2026-09-25
+
+Defines interchange `schemaVersion: 2`. Full detail, including the
+not-yet-universal-adoption caveat below, is in
+[`SCHEMA_CHANGELOG.md`](SCHEMA_CHANGELOG.md#2--2026-09-24).
+
+### `PredefinedTaskType.Reverse` (breaking)
+
+A shunting unit reversing direction in place is now its own explicit action,
+replacing a reversal that used to be silently embedded in a `Move`'s route
+(the same track revisited two hops apart). A plan declaring
+`schemaVersion: 2` or later must use `Reverse`; one declaring `1` (or none)
+keeps evaluating exactly as before, with a deprecation warning.
+
+### `Plan.feasibility` / `origin` / `cost` / `costDetails` (additive)
+
+- `feasibility` (`Feasible`/`Infeasible`/`Unknown`, default `Unknown`) — a
+  plan's own declared verdict on whether it satisfies all hard constraints,
+  not a claim about whether some other plan for the scenario exists.
+- `origin` (free text, e.g. `"robust-rail-solver 2.0.0-edge+20260826.a1b2c3d"`)
+  — what produced the plan, for a human debugging a failed evaluation.
+- `cost` (number) and `costDetails` (free-form breakdown string, e.g. the
+  solver's own `SolutionCost.ToString()` output).
+
+All default to absent/`Unknown`, so no existing plan fixture needs
+migrating. The evaluator additionally logs a line (never a reject) when a
+plan's declared `feasibility` disagrees with its own verdict.
+
+### Downstream adoption, as of this release
+
+`robust-rail-solver` and `robust-rail-evaluator` `main` both already
+emit/parse the above. `robust-rail-planner` hasn't adopted either half yet —
+not a blocker, since a `schemaVersion: 1` plan keeps evaluating exactly as
+before in the meantime.
+
 ## 2.0.0 — 2026-08-20
 
 This repo's slice of the shared 2.0.0 release: the same interchange format,
