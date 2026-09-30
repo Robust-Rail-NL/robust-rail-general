@@ -50,6 +50,12 @@ OPTIONAL_DEFAULTS = {
     "num_seeds": None,
     "certify_threshold": None,
     "jobs": 1,
+    # How much a departure may miss its scheduled time and still count, as a
+    # fraction of the scenario's own span — a fixed number of seconds would be
+    # generous for a short scenario and negligible for a long one. Defaults to
+    # 0, the evaluator's own exact match, so relaxing what counts as solved is
+    # always something a run asks for rather than something it inherits.
+    "departure_delay_fraction": 0,
 }
 
 
@@ -74,6 +80,10 @@ def _check_settings(spec: dict, path: Path) -> None:
                         f"got {spec['planner']!r}")
     if spec["jobs"] < 1:
         raise SpecError(f'"jobs" in {path} must be at least 1, got {spec["jobs"]}')
+    fraction = spec["departure_delay_fraction"]
+    if not isinstance(fraction, (int, float)) or isinstance(fraction, bool) or not 0 <= fraction <= 1:
+        raise SpecError(f'"departure_delay_fraction" in {path} must be a number between 0 and 1, '
+                        f"got {fraction!r}")
     if spec["seed"] is not None and spec["num_seeds"] is not None:
         raise SpecError(f'"seed" and "num_seeds" in {path} are mutually exclusive: '
                         f"one fixed seed, or a sweep over several.")
