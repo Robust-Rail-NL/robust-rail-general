@@ -50,11 +50,6 @@ OPTIONAL_DEFAULTS = {
     "num_seeds": None,
     "certify_threshold": None,
     "jobs": 1,
-    # How much a departure may miss its scheduled time and still count, as a
-    # fraction of the scenario's own span — a fixed number of seconds would be
-    # generous for a short scenario and negligible for a long one. Defaults to
-    # 0, the evaluator's own exact match, so relaxing what counts as solved is
-    # always something a run asks for rather than something it inherits.
     "departure_delay_fraction": 0,
 }
 
