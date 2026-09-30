@@ -197,7 +197,10 @@ def _run_generator(location: str, version: str, dry_run: bool, config_dir: Path,
     writes beside each scenario.
     """
     cmd = [
-        sys.executable, str(ROOT / "run_generator.py"),
+        # -u: python block-buffers stdout as soon as it is a pipe rather than a
+        # terminal, so without this the generator's lines arrive in one burst
+        # when it exits and the count below jumps from 0 to the total.
+        sys.executable, "-u", str(ROOT / "run_generator.py"),
         "--location", location, "--version", version, "--no-pull",
         "--config-dir", str(config_dir),
         *(["--dry-run"] if dry_run else []),
@@ -214,8 +217,10 @@ def _run_generator(location: str, version: str, dry_run: bool, config_dir: Path,
     done, problems = 0, []
     for line in proc.stdout:
         line = line.rstrip()
-        # run_generator.py's per-config summary line: one per scenario finished.
-        if line.startswith("    stdout:"):
+        # run_generator.py's per-config summary line, counted only where it
+        # reports success: it prints one per config either way, so counting them
+        # all reported a full sweep even when every single config had failed.
+        if line.startswith("    stdout:") and line.endswith("(exit 0)"):
             done += 1
             if live:
                 print(f"\r  Generated {done}/{total}", end="", flush=True)
@@ -339,13 +344,31 @@ def _run_tool(tool: str, location: str, instance: str, out_dir: Path, version: s
     }
 
 
+def _departure_delay(location: str, instance: str, fraction: float) -> int | None:
+    """The tolerance to allow this instance's evaluation, or None if unreadable.
+
+    None leaves run_evaluator.py to omit the flag entirely, which is the
+    evaluator's own exact-match behaviour — the same thing an unreadable
+    scenario would have got before this existed.
+    """
+    path = ROOT / location / "scenarios" / f"scenario_{instance}.json"
+    try:
+        scenario = json.loads(path.read_text())
+        span = int(scenario["endTime"]) - int(scenario["startTime"])
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+    return int(span * fraction) if span > 0 and fraction > 0 else None
+
+
 def _run_evaluator(location: str, instance: str, plan_path: Path, version: str,
-                   dry_run: bool) -> dict:
+                   dry_run: bool, delay_fraction: float) -> dict:
     eval_result_path = plan_path.parent / "eval_result.json"
+    delay = _departure_delay(location, instance, delay_fraction)
     _run_step([
         sys.executable, str(ROOT / "run_evaluator.py"),
         "--location", location, "--instance", instance, "--plan", str(plan_path),
         "--version", version, "--no-pull",
+        *(["--departure-delay", str(delay)] if delay is not None else []),
         *(["--dry-run"] if dry_run else []),
     ], eval_result_path, f"{instance} [evaluator]", dry_run)
     return json.loads(eval_result_path.read_text()) if eval_result_path.exists() else {
@@ -390,7 +413,7 @@ def _status(run_result: dict, eval_result: dict | None, dry_run: bool) -> str:
 def _run_and_record(tool: str, location: str, instance: str, tool_dir: Path,
                     solver_version: str, planner_version: str, evaluator_version: str,
                     dry_run: bool, max_duration: int | None, seed: int | None,
-                    planner_impl: str, results: dict, key: str) -> bool:
+                    planner_impl: str, delay_fraction: float, results: dict, key: str) -> bool:
     """Run one attempt and record it. Returns whether the evaluator accepted its plan."""
     version = _version_for(tool, solver_version, planner_version)
     run_result = _run_tool(tool, location, instance, tool_dir, version, dry_run,
@@ -403,7 +426,7 @@ def _run_and_record(tool: str, location: str, instance: str, tool_dir: Path,
     # scored by the same evaluator build a solver plan would be.
     if not dry_run and run_result.get("plan_produced"):
         eval_result = _run_evaluator(location, instance, tool_dir / "plan.json",
-                                     evaluator_version, dry_run)
+                                     evaluator_version, dry_run, delay_fraction)
     results[key] = {"run": run_result, "eval": eval_result}
     wall = run_result.get("wall_seconds")
     print(f"  {_describe(instance)}  {key:<16}  "
@@ -416,7 +439,7 @@ def _run_instance(location: str, instance: str, tools: list[str], out_dir: Path,
                   solver_version: str, planner_version: str, evaluator_version: str,
                   dry_run: bool, max_duration: int | None,
                   certify_threshold: int | None, seed: int | None, num_seeds: int | None,
-                  planner_impl: str, all_results: dict) -> None:
+                  planner_impl: str, delay_fraction: float, all_results: dict) -> None:
     results = all_results.setdefault(instance, {})
     for tool in tools:
         if tool == "solver" and num_seeds:
@@ -425,8 +448,8 @@ def _run_instance(location: str, instance: str, tools: list[str], out_dir: Path,
                 tool_dir = out_dir / instance / FOLDER_NAMES[tool] / f"seed{s}"
                 solved = _run_and_record(tool, location, instance, tool_dir,
                                          solver_version, planner_version, evaluator_version,
-                                         dry_run, max_duration, s, planner_impl, results,
-                                         f"solver_seed{s}")
+                                         dry_run, max_duration, s, planner_impl, delay_fraction,
+                                         results, f"solver_seed{s}")
                 if not dry_run:
                     _append_attempt(out_dir, instance, label, tool_dir)
                 # Both things the seeds feed — feasibility.csv and the RQ1
@@ -440,7 +463,8 @@ def _run_instance(location: str, instance: str, tools: list[str], out_dir: Path,
             tool_dir = out_dir / instance / label
             _run_and_record(tool, location, instance, tool_dir,
                             solver_version, planner_version, evaluator_version,
-                            dry_run, max_duration, seed, planner_impl, results, tool)
+                            dry_run, max_duration, seed, planner_impl, delay_fraction,
+                            results, tool)
             if not dry_run:
                 _append_attempt(out_dir, instance, label, tool_dir)
 
@@ -525,7 +549,8 @@ def main() -> None:
         _run_instance(location, instance, tools, out_dir,
                       versions["solver"], versions["planner"], versions["evaluator"],
                       args.dry_run, max_duration, certify_threshold,
-                      spec["seed"], spec["num_seeds"], spec["planner"], all_results)
+                      spec["seed"], spec["num_seeds"], spec["planner"],
+                      spec["departure_delay_fraction"], all_results)
 
     if spec["jobs"] > 1 and not args.dry_run:
         with ThreadPoolExecutor(max_workers=spec["jobs"]) as pool:
