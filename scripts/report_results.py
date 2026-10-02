@@ -76,7 +76,10 @@ DEFAULT_CERTIFY_THRESHOLD = 1800
 RUN_FIELDNAMES = [
     "instance", "tool", "seed", "plan_found", "timed_out", "valid_plan",
     "plan_length", "move_actions", "non_wait_actions", "seconds",
+    "trains_out", "pct_late", "avg_lateness", "pct_early", "avg_earliness",
 ]
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
 FEASIBILITY_FIELDNAMES = ["instance", "classification", "tested"]
 FAILURE_FIELDNAMES = ["instance", "tool", "seed", "reason", "seconds"]
 
@@ -126,6 +129,88 @@ def _plan_stats(tool_dir: Path) -> tuple:
     moves = sum(1 for a in actions if (a.get("taskType") or {}).get("predefined") == "Move")
     non_waits = sum(1 for a in actions if (a.get("taskType") or {}).get("predefined") != "Wait")
     return len(actions), moves, non_waits
+
+
+def _composition(units: list) -> tuple:
+    """A train's make-up as an order-independent key: which types, how many."""
+    return tuple(sorted((u.get("typePrefix"), u.get("carriages")) for u in units))
+
+
+def departure_deltas(actions: list, scenario: dict) -> list:
+    """Signed seconds each departing train left off its scheduled time.
+
+    Positive is late, negative is early. One entry per Exit the plan makes that
+    can be attributed to a departure request in the scenario's out[].
+
+    An out[] request names the units it wants by type, not by id, so an Exit is
+    matched to a request by composition -- the same basis TORS matches on. Where
+    several requests want the same composition, the nearest departure time wins
+    and each request is used once, so two interchangeable trains are not both
+    charged against the earlier deadline. An Exit that matches nothing is left
+    out rather than attributed to a guess, and a StandOut is skipped: a train
+    staying in the yard has no departure time to be late for.
+    """
+    member_type = {}
+    for group in ("in", "inStanding"):
+        for train in scenario.get(group) or []:
+            for member in train.get("members") or []:
+                member_type[member["id"]] = (member.get("typePrefix"), member.get("carriages"))
+
+    requests = []
+    for request in scenario.get("out") or []:
+        requests.append({
+            "composition": _composition(request.get("trainUnits") or []),
+            "departure": int(request.get("departure", 0)),
+            "taken": False,
+        })
+
+    exits = sorted(
+        (a for a in actions if (a.get("taskType") or {}).get("predefined") == "Exit"),
+        key=lambda a: a["startTime"],
+    )
+    deltas = []
+    for action in exits:
+        members = (action.get("shuntingUnit") or {}).get("memberIDs") or []
+        if not all(m in member_type for m in members):
+            continue
+        wanted = tuple(sorted(member_type[m] for m in members))
+        candidates = [r for r in requests if not r["taken"] and r["composition"] == wanted]
+        if not candidates:
+            continue
+        best = min(candidates, key=lambda r: abs(action["startTime"] - r["departure"]))
+        best["taken"] = True
+        deltas.append(int(action["startTime"]) - best["departure"])
+    return deltas
+
+
+def punctuality(deltas: list) -> dict:
+    """Lateness and earliness of a plan's departures, as runs.csv reports them.
+
+    The averages are over the trains actually late or actually early, not over
+    every train, so "12% late, averaging 240s" reads as it sounds instead of
+    being diluted towards zero by the punctual ones. Rounded to whole seconds.
+    """
+    if not deltas:
+        return {"trains_out": 0, "pct_late": "", "avg_lateness": "",
+                "pct_early": "", "avg_earliness": ""}
+    late = [d for d in deltas if d > 0]
+    early = [-d for d in deltas if d < 0]
+    n = len(deltas)
+    return {
+        "trains_out": n,
+        "pct_late": round(100 * len(late) / n, 1),
+        "avg_lateness": round(sum(late) / len(late)) if late else 0,
+        "pct_early": round(100 * len(early) / n, 1),
+        "avg_earliness": round(sum(early) / len(early)) if early else 0,
+    }
+
+
+def _scenario_for(eval_result: dict) -> dict:
+    """The scenario an attempt ran against, found from what eval_result.json records."""
+    location, scenario = eval_result.get("location"), eval_result.get("scenario")
+    if not location or not scenario:
+        return {}
+    return read_json(REPO_ROOT / location / "scenarios" / scenario)
 
 
 def failure_reason(result: dict, eval_result: dict) -> str | None:
@@ -181,6 +266,14 @@ def tool_rows(instance: str, tool: str, tool_dir: Path) -> tuple:
         "non_wait_actions": non_wait_actions if non_wait_actions is not None else "",
         "seconds": result.get("wall_seconds", ""),
     }
+
+    # How close the plan's departures came to the times asked for. Reported for
+    # any plan that exists, accepted or not: a rejected plan's lateness is often
+    # the reason it was rejected, and is worth seeing.
+    plan = read_json(tool_dir / "plan.json")
+    actions = plan.get("actions") or []
+    scenario = _scenario_for(eval_result) if actions else {}
+    run_row.update(punctuality(departure_deltas(actions, scenario) if scenario else []))
 
     reason = failure_reason(result, eval_result)
     failure_row = None if reason is None else {

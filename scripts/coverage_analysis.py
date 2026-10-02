@@ -15,6 +15,15 @@ the experimental-setup doc's Section 4.1 protocol:
     pairs) on the paired per-instance solved/not-solved outcomes, on both
     subsets. Flagged as underpowered/descriptive-only below 10 discordant
     pairs, per the doc's own caveat about McNemar's power.
+  - The same two statistics again per matching strategy, for the sweep
+    instances whose names carry one. The strategies are not equally hard: a
+    random matching usually has to take an arriving composition apart and
+    rebuild it (measured on Location_KleineBinckhorst: ~0.6 Splits and ~1.3
+    Combines per plan, against none at all for FIFO and LIFO), while the
+    generator sizes every scenario's time window without regard to which
+    strategy it used. A pooled figure therefore mixes instances whose window
+    comfortably fits the work with instances where it cannot, and both tools'
+    coverage is dragged down by the latter.
 
 Out of scope here, deliberately: RQ2 (scaling) is marked TODO in the doc
 itself; RQ3 (runtime) asks for a cactus plot, not a hypothesis test; the
@@ -29,6 +38,7 @@ Reads the same result.json/eval_result.json files report_results.py does
 """
 
 import argparse
+import collections
 import sys
 from math import comb
 from pathlib import Path
@@ -84,6 +94,19 @@ def _tool_solved(instance_dir: Path, folder: str) -> bool:
         rr.read_json(seed_dir / "eval_result.json").get("solved")
         for seed_dir in sorted((instance_dir / folder).glob("seed*"))
     )
+
+
+def matching_of(instance: str) -> str | None:
+    """The matching strategy a sweep instance was generated with, or None.
+
+    generate_experiment_configs.py names them custom_<trains>_<matching>_<n>.
+    A hand-written fixture carries no strategy in its name, so it is left out
+    of the per-strategy breakdown rather than guessed at.
+    """
+    parts = instance.split("_")
+    if len(parts) == 4 and parts[0] == "custom" and parts[1].isdigit() and parts[3].isdigit():
+        return parts[2]
+    return None
 
 
 def _format_subset(label: str, solver: list, planner: list) -> str:
@@ -143,11 +166,16 @@ def main() -> None:
 
     solver_all, planner_all = [], []
     solver_feasible, planner_feasible = [], []
+    by_matching = collections.defaultdict(lambda: ([], []))
     for instance_dir in instance_dirs:
         solved_solver = _tool_solved(instance_dir, "local_search")
         solved_planner = _tool_solved(instance_dir, "planning")
         solver_all.append(solved_solver)
         planner_all.append(solved_planner)
+        matching = matching_of(instance_dir.name)
+        if matching is not None:
+            by_matching[matching][0].append(solved_solver)
+            by_matching[matching][1].append(solved_planner)
         # certify_threshold doesn't affect classification, only the "tested"
         # flag this script doesn't use -- any value is fine here.
         classification = rr.instance_feasibility(
@@ -165,6 +193,18 @@ def main() -> None:
         _format_subset(f"Full instance set (secondary, denominator={len(instance_dirs)})",
                         solver_all, planner_all),
     ]
+
+    # Broken out per matching strategy because the strategies are not equally
+    # hard: a random matching usually has to take an arriving composition apart
+    # and rebuild it, which FIFO and LIFO mostly avoid, and the generator sizes
+    # every scenario's time window the same way regardless. Pooling them hides
+    # that, and dilutes both tools' coverage with instances whose window is too
+    # short for the work the matching implies.
+    if by_matching:
+        report += ["", "Per matching strategy (same instances, grouped)"]
+        for matching in sorted(by_matching):
+            solver, planner = by_matching[matching]
+            report += ["", _format_subset(f"matching={matching}", solver, planner)]
     text = "\n".join(report)
     print(text)
     if args.output:
