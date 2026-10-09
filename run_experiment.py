@@ -14,7 +14,10 @@ Drives run_generator.py / run_solver.py / run_planner.py / run_evaluator.py as
 subprocesses. The file's "scenario_config" section is the scenario config for
 the whole sweep: run_generator.py --experiment generates every instance from
 it, first (cheap relative to solving/planning), so every instance has its
-scenario before any tool runs. No per-instance config files are kept. Each
+scenario before any tool runs. No per-instance config files are kept. An
+instance whose scenario is already there from the same generator image and
+config is not regenerated, so a sweep can be generated ahead of time with
+run_generator.py --experiment <file> and this run will reuse it. Each
 (instance, tool) attempt gets its own directory, named after the search approach
 rather than the script that drives it:
 
@@ -25,6 +28,16 @@ rather than the script that drives it:
                                            result.json, eval.out/.err/.txt,
                                            eval_result.json
   results/<name>/<instance>/planning/      same layout
+
+Rerunning an experiment only runs what is missing or stale. Each finished
+solver/planner attempt leaves run_stamp.json in its directory (tool image
+identity, scenario, location files, budget, seed or planner), each evaluation
+eval_stamp.json (evaluator image, plan, scenario, location files, tolerance),
+and a later run reuses whatever still matches. So adding "planner" to an
+experiment that already ran the solver runs only the planner; a rebuilt or
+newly pulled tool image reruns that tool's attempts; a new evaluator image only
+re-evaluates. An attempt killed from outside (an interrupted run) is never
+reused. To force a rerun, delete the attempt's directory.
 
 "num_seeds": N runs the solver up to N times per instance instead of once, each
 seed getting its own local_search/seed<i>/ subdirectory with that same layout
@@ -59,6 +72,7 @@ also appends nothing.
 
 import argparse
 import csv
+import hashlib
 import json
 import shutil
 import subprocess
@@ -72,7 +86,7 @@ sys.path.insert(0, str(ROOT))
 from scripts import experiment_spec  # noqa: E402
 from scripts.generate_experiment_configs import scenario_params, sweep_configs  # noqa: E402
 from scripts.docker_utils import (  # noqa: E402
-    add_engine_args, ensure_pulled, ensure_runtime_ready, load_image_versions,
+    add_engine_args, ensure_pulled, ensure_runtime_ready, image_identity, load_image_versions,
 )
 from scripts.report_results import (  # noqa: E402
     DEFAULT_CERTIFY_THRESHOLD,
@@ -241,7 +255,8 @@ def _run_generator(experiment: Path, version: str, dry_run: bool, run_dir: Path,
         # run_generator.py's per-config summary line, counted only where it
         # reports success: it prints one per config either way, so counting them
         # all reported a full sweep even when every single config had failed.
-        if line.startswith("    stdout:") and line.endswith("(exit 0)"):
+        if (line.startswith("    stdout:") and line.endswith("(exit 0)")) \
+                or line.startswith("    up to date"):
             done += 1
             if live:
                 print(f"\r  Generated {done}/{total}", end="", flush=True)
@@ -402,15 +417,112 @@ def _status(run_result: dict, eval_result: dict | None, dry_run: bool) -> str:
     return reason if len(reason) <= REASON_WIDTH else reason[:REASON_WIDTH - 1] + "…"
 
 
+# Reuse of earlier attempts. Each finished solver/planner attempt leaves a stamp
+# of everything it ran with in its tool directory, and each evaluation one of
+# everything it judged; a later run reuses whatever still matches -- so adding a
+# tool to an experiment's "tools", or rerunning after an interruption, only runs
+# what is missing or stale. A new tool image (rebuilt, or a newer one pulled), a
+# changed scenario, budget, seed or location file each invalidate the stamp.
+RUN_STAMP = "run_stamp.json"
+EVAL_STAMP = "eval_stamp.json"
+
+_identity_cache: dict[tuple, str | None] = {}
+_identity_lock = threading.Lock()
+
+
+def _image_id(engine: str, image: str, cache_dir: Path | None) -> str | None:
+    """image_identity(), looked up once per run: images are pulled before any attempt starts."""
+    key = (engine, image, cache_dir)
+    with _identity_lock:
+        if key not in _identity_cache:
+            _identity_cache[key] = image_identity(engine, image, cache_dir)
+        return _identity_cache[key]
+
+
+def _digest(path: Path) -> str | None:
+    try:
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    except OSError:
+        return None
+
+
+def _run_stamp(tool: str, location: str, scenario: Path, version: str,
+               max_duration: int | None, seed: int | None, planner_impl: str,
+               engine: str, cache_dir: Path | None) -> dict | None:
+    """Everything a solver/planner attempt's outcome depends on, or None if the
+    tool image can't be identified (then nothing is reused)."""
+    image = load_image_versions(ROOT / f"run_{tool}.py")[version]
+    image_id = _image_id(engine, image, cache_dir)
+    if image_id is None:
+        return None
+    loc = ROOT / location
+    stamp = {"tool": tool, "image": image, "image_id": image_id,
+             "scenario": _digest(scenario), "location": _digest(loc / "location.json"),
+             "max_duration": max_duration}
+    if tool == "solver":
+        stamp.update(seed=seed, solver_config=_digest(loc / "config_solver.yaml"))
+    else:
+        stamp.update(planner=planner_impl)
+    return stamp
+
+
+def _eval_stamp(location: str, scenario: Path, plan: Path, version: str,
+                delay_fraction: float, engine: str, cache_dir: Path | None) -> dict | None:
+    """Everything an evaluation's verdict depends on, or None if unknown."""
+    image = load_image_versions(ROOT / "run_evaluator.py")[version]
+    image_id = _image_id(engine, image, cache_dir)
+    if image_id is None:
+        return None
+    loc = ROOT / location
+    return {"image": image, "image_id": image_id, "plan": _digest(plan),
+            "scenario": _digest(scenario), "location": _digest(loc / "location.json"),
+            "config": _digest(loc / "config.json"),
+            "departure_delay": _departure_delay(scenario, delay_fraction)}
+
+
+def _stamp_matches(path: Path, stamp: dict | None) -> bool:
+    if stamp is None:
+        return False
+    try:
+        return json.loads(path.read_text()) == stamp
+    except (OSError, ValueError):
+        return False
+
+
+def _reusable(run_result: dict) -> bool:
+    """Whether a recorded attempt finished on its own terms. One killed from
+    outside (an interrupted run: no exit code, or a signal's 128+N without the
+    tool's own timeout) says nothing about the instance, so it is run again."""
+    exit_code = run_result.get("exit_code")
+    if exit_code is None:
+        return False
+    return exit_code < 128 or bool(run_result.get("timed_out"))
+
+
 def _run_and_record(tool: str, location: str, instance: str, scenario: Path, tool_dir: Path,
                     solver_version: str, planner_version: str, evaluator_version: str,
                     dry_run: bool, max_duration: int | None, seed: int | None,
                     planner_impl: str, delay_fraction: float, results: dict, key: str,
                     engine: str = "docker", cache_dir: Path | None = None) -> bool:
-    """Run one attempt and record it. Returns whether the evaluator accepted its plan."""
+    """Run one attempt and record it, reusing an earlier one whose stamp still
+    matches (see RUN_STAMP). Returns whether the evaluator accepted its plan."""
     version = _version_for(tool, solver_version, planner_version)
-    run_result = _run_tool(tool, location, instance, scenario, tool_dir, version, dry_run,
-                           max_duration, seed, planner_impl, engine, cache_dir)
+    result_path = tool_dir / "result.json"
+    run_stamp = None if dry_run else _run_stamp(tool, location, scenario, version, max_duration,
+                                                seed, planner_impl, engine, cache_dir)
+    previous = json.loads(result_path.read_text()) if result_path.exists() else {}
+    reused = (_stamp_matches(tool_dir / RUN_STAMP, run_stamp) and _reusable(previous))
+    if reused:
+        run_result = previous
+    else:
+        if not dry_run and tool_dir.exists():
+            # Cleared rather than overwritten: a stale plan.json or eval_result.json
+            # from an earlier attempt would otherwise pass for this one's.
+            shutil.rmtree(tool_dir)
+        run_result = _run_tool(tool, location, instance, scenario, tool_dir, version, dry_run,
+                               max_duration, seed, planner_impl, engine, cache_dir)
+        if run_stamp and result_path.exists():
+            (tool_dir / RUN_STAMP).write_text(json.dumps(run_stamp, indent=2) + "\n")
     eval_result = None
     # A dry run never produces a real plan.json, so there is nothing for the
     # evaluator to dry-run against — skip it rather than have it fail a
@@ -418,14 +530,24 @@ def _run_and_record(tool: str, location: str, instance: str, scenario: Path, too
     # independent version, never the plan producer's: a planner plan must be
     # scored by the same evaluator build a solver plan would be.
     if not dry_run and run_result.get("plan_produced"):
-        eval_result = _run_evaluator(location, instance, scenario, tool_dir / "plan.json",
-                                     evaluator_version, dry_run, delay_fraction,
-                                     engine, cache_dir)
+        plan = tool_dir / "plan.json"
+        eval_stamp = _eval_stamp(location, scenario, plan, evaluator_version, delay_fraction,
+                                 engine, cache_dir)
+        eval_path = tool_dir / "eval_result.json"
+        if _stamp_matches(tool_dir / EVAL_STAMP, eval_stamp) and eval_path.exists():
+            eval_result = json.loads(eval_path.read_text())
+        else:
+            (tool_dir / EVAL_STAMP).unlink(missing_ok=True)
+            eval_result = _run_evaluator(location, instance, scenario, plan, evaluator_version,
+                                         dry_run, delay_fraction, engine, cache_dir)
+            if eval_stamp and eval_path.exists():
+                (tool_dir / EVAL_STAMP).write_text(json.dumps(eval_stamp, indent=2) + "\n")
     results[key] = {"run": run_result, "eval": eval_result}
     wall = run_result.get("wall_seconds")
     print(f"  {_describe(instance)}  {key:<16}  "
           f"{f'{wall:.1f}s' if isinstance(wall, (int, float)) else '':>7}  "
-          f"{_status(run_result, eval_result, dry_run)}", flush=True)
+          f"{_status(run_result, eval_result, dry_run)}{' (reused)' if reused else ''}",
+          flush=True)
     return bool(eval_result and eval_result.get("solved"))
 
 

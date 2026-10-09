@@ -11,6 +11,14 @@ generator image takes exactly one train count, matching and seed per run --
 which is deleted afterwards, and each scenario is written to
 <run-dir>/<instance>/scenario_<instance>.json with its .out/.err beside it. The
 location only supplies location.json.
+
+Each scenario generated that way gets a stamp beside it,
+scenario_<instance>.generator.json, recording the generator image's identity
+and the exact config it was generated from. A later --experiment run skips any
+instance whose scenario is still there with a matching stamp -- same image
+(not rebuilt or re-pulled since) and same config -- so a sweep can be generated
+ahead of time and run_experiment.py won't regenerate it. --force regenerates
+regardless.
 """
 
 import argparse
@@ -26,6 +34,7 @@ from scripts.docker_utils import (
     ensure_pulled,
     ensure_runtime_ready,
     finish_capture,
+    image_identity,
     run_container,
 )
 from scripts import experiment_spec
@@ -109,6 +118,28 @@ def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bo
     return ok
 
 
+def _stamp_path(instance_dir: Path, instance: str) -> Path:
+    return instance_dir / f"scenario_{instance}.generator.json"
+
+
+def _generation_stamp(image: str, identity: str | None, config: dict) -> dict:
+    """What a scenario was generated from: the image, its identity, and the config."""
+    return {"generator_image": image, "generator_image_id": identity, "config": config}
+
+
+def _up_to_date(instance_dir: Path, instance: str, stamp: dict) -> bool:
+    """Whether instance_dir already holds this instance's scenario, generated from
+    exactly this stamp. An unknown image identity never counts as up to date."""
+    if not stamp["generator_image_id"]:
+        return False
+    if not (instance_dir / f"scenario_{instance}.json").is_file():
+        return False
+    try:
+        return json.loads(_stamp_path(instance_dir, instance).read_text()) == stamp
+    except (OSError, ValueError):
+        return False
+
+
 def _generate_experiment(args, image: str) -> None:
     """--experiment: generate every instance of the file's "scenario_config" sweep."""
     try:
@@ -121,7 +152,11 @@ def _generate_experiment(args, image: str) -> None:
         sys.exit(f"No such location: {loc}")
     run_dir = args.run_dir or ROOT / "results" / spec["name"]
 
-    total, errors = 0, 0
+    # Looked up once, after main() has pulled: a pull that brought a newer image
+    # changes it, and so invalidates every stamp written with the old one.
+    identity = None if args.dry_run else image_identity(args.engine, image, args.sif_cache_dir)
+
+    total, errors, skipped = 0, 0, 0
     with tempfile.TemporaryDirectory(prefix="scenario_configs_") as tmp:
         paths = []
         for instance, config in configs.items():
@@ -133,13 +168,29 @@ def _generate_experiment(args, image: str) -> None:
             fail_no_match(args.instance, list(configs))
         print(f"\n{loc.name} ({len(selected)} instance(s)) [from {args.experiment} -> {run_dir}]")
         for config in selected:
+            instance = _instance_name(config)
+            instance_dir = run_dir / instance
+            stamp = _generation_stamp(image, identity, configs[instance])
+            if not args.force and _up_to_date(instance_dir, instance, stamp):
+                print(f"  {config.name}  ->  scenario_{instance}.json")
+                print("    up to date (same generator image and config), skipped")
+                skipped += 1
+                continue
             total += 1
-            if not _run_config(image, loc, config, args.dry_run, engine=args.engine,
-                               cache_dir=args.sif_cache_dir,
-                               instance_dir=run_dir / _instance_name(config)):
+            if not args.dry_run:
+                # Cleared first, so a failed generation can't leave an older
+                # scenario behind looking like this run's.
+                (instance_dir / f"scenario_{instance}.json").unlink(missing_ok=True)
+                _stamp_path(instance_dir, instance).unlink(missing_ok=True)
+            if _run_config(image, loc, config, args.dry_run, engine=args.engine,
+                           cache_dir=args.sif_cache_dir, instance_dir=instance_dir):
+                if not args.dry_run and identity:
+                    _stamp_path(instance_dir, instance).write_text(json.dumps(stamp, indent=2) + "\n")
+            else:
                 errors += 1
 
-    print(f"\nDone: {total - errors}/{total} succeeded.")
+    skipped_part = f", {skipped} already up to date" if skipped else ""
+    print(f"\nDone: {total - errors}/{total} succeeded{skipped_part}.")
     if errors:
         sys.exit(1)
 
@@ -172,6 +223,9 @@ def main() -> None:
     parser.add_argument("--run-dir", metavar="DIR", type=Path,
                         help="With --experiment: where the instance directories go (default: "
                              "results/<name>/).")
+    parser.add_argument("--force", action="store_true",
+                        help="With --experiment: regenerate every instance, even one whose "
+                             "scenario is up to date with the current generator image and config.")
     parser.add_argument("--no-pull", action="store_true",
                         help="Skip the up-front 'docker pull'. For a driver like "
                              "run_experiment.py that invokes this script once per attempt and "
@@ -186,6 +240,8 @@ def main() -> None:
     if args.experiment and (args.location or args.config_dir):
         parser.error("--experiment takes its location from the file, and is its own config: "
                      "drop --location/--config-dir.")
+    if args.force and not args.experiment:
+        parser.error("--force requires --experiment.")
     if args.run_dir and not args.experiment:
         parser.error("--run-dir requires --experiment.")
     if args.experiment and not args.experiment.is_file():

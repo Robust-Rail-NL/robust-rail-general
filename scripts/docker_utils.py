@@ -146,6 +146,29 @@ def apptainer_pull(image: str, cache_dir: Path, force: bool = False) -> Path | N
     return dest
 
 
+def image_identity(engine: str, image: str, cache_dir: Path | None = None) -> str | None:
+    """Something that changes whenever the image's content does, or None if unknown.
+
+    docker: the local image ID (a content hash), which a pull or a rebuild changes.
+    apptainer: the cached .sif's size and modification time -- a re-pull or
+    re-stage rewrites the file. None when the image isn't available locally,
+    which callers treat as "can't tell, so don't trust anything built with it".
+    """
+    if engine == "apptainer":
+        if cache_dir is None:
+            return None
+        path = sif_path(image, cache_dir)
+        if not path.is_file():
+            return None
+        stat = path.stat()
+        return f"sif:{stat.st_size}:{stat.st_mtime_ns}"
+    result = subprocess.run(["docker", "image", "inspect", "--format", "{{.Id}}", image],
+                            capture_output=True, text=True)
+    if result.returncode != 0:
+        return None
+    return result.stdout.strip() or None
+
+
 def load_image_versions(script_path: Path) -> dict[str, str]:
     """Load a run_*.py's DOCKER_IMAGE_VERSIONS dict without running its CLI.
 

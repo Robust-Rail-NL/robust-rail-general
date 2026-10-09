@@ -169,3 +169,80 @@ def test_length_fill_is_all_units_over_parking_length(tmp_path):
     (instance_dir / "scenario_custom_2_FIFO_0.json").write_text(json.dumps(scenario))
     row = instance_feasibility("custom_2_FIFO_0", instance_dir, 1800)
     assert 0 < row["length_fill"] < 1
+
+
+def test_generated_scenario_is_reused_only_for_the_same_image_and_config(tmp_path):
+    from run_generator import _generation_stamp, _stamp_path, _up_to_date
+
+    instance = "custom_2_FIFO_0"
+    config = {"number_of_trains": 2, "seed": 42}
+    stamp = _generation_stamp("generator:latest", "sha256:aaa", config)
+    (tmp_path / f"scenario_{instance}.json").write_text("{}")
+
+    assert not _up_to_date(tmp_path, instance, stamp)  # no stamp yet
+    _stamp_path(tmp_path, instance).write_text(json.dumps(stamp))
+    assert _up_to_date(tmp_path, instance, stamp)
+
+    rebuilt = _generation_stamp("generator:latest", "sha256:bbb", config)
+    assert not _up_to_date(tmp_path, instance, rebuilt)
+    other_config = _generation_stamp("generator:latest", "sha256:aaa", {**config, "seed": 43})
+    assert not _up_to_date(tmp_path, instance, other_config)
+    unknown_image = _generation_stamp("generator:latest", None, config)
+    assert not _up_to_date(tmp_path, instance, unknown_image)
+
+    (tmp_path / f"scenario_{instance}.json").unlink()
+    assert not _up_to_date(tmp_path, instance, stamp)  # stamp without its scenario
+
+
+def test_attempts_are_reused_until_an_input_changes(tmp_path, monkeypatch):
+    calls = {"tool": 0, "eval": 0}
+    ids = {"run_solver.py": "sha256:solver-1", "run_evaluator.py": "sha256:eval-1"}
+
+    def fake_tool(tool, location, instance, scenario, tool_dir, *args, **kwargs):
+        calls["tool"] += 1
+        tool_dir.mkdir(parents=True, exist_ok=True)
+        (tool_dir / "plan.json").write_text('{"actions": []}')
+        result = {"plan_produced": True, "exit_code": 0, "timed_out": False, "wall_seconds": 1.0}
+        (tool_dir / "result.json").write_text(json.dumps(result))
+        return result
+
+    def fake_eval(location, instance, scenario, plan, *args, **kwargs):
+        calls["eval"] += 1
+        result = {"solved": True, "verdict": "accepted", "reason": ""}
+        (plan.parent / "eval_result.json").write_text(json.dumps(result))
+        return result
+
+    monkeypatch.setattr(run_experiment, "_run_tool", fake_tool)
+    monkeypatch.setattr(run_experiment, "_run_evaluator", fake_eval)
+    monkeypatch.setattr(run_experiment, "_image_id",
+                        lambda engine, image, cache_dir: ids["run_evaluator.py" if "tors" in image else "run_solver.py"])
+
+    scenario = tmp_path / "scenario_custom_2_FIFO_0.json"
+    scenario.write_text(json.dumps({"startTime": 0, "endTime": 100}))
+    tool_dir = tmp_path / "custom_2_FIFO_0" / "local_search" / "seed1"
+
+    def attempt():
+        return run_experiment._run_and_record(
+            "solver", LOCATION, "custom_2_FIFO_0", scenario, tool_dir, "edge", "edge", "edge",
+            False, 60, 1, "symbolic-rail", 0.0, {}, "solver_seed1")
+
+    assert attempt() and calls == {"tool": 1, "eval": 1}
+    assert attempt() and calls == {"tool": 1, "eval": 1}  # everything reused
+
+    ids["run_evaluator.py"] = "sha256:eval-2"  # new evaluator image: re-evaluate only
+    assert attempt() and calls == {"tool": 1, "eval": 2}
+
+    ids["run_solver.py"] = "sha256:solver-2"  # new solver image: rerun everything
+    assert attempt() and calls == {"tool": 2, "eval": 3}
+
+    scenario.write_text(json.dumps({"startTime": 0, "endTime": 200}))  # regenerated scenario
+    assert attempt() and calls == {"tool": 3, "eval": 4}
+
+
+def test_interrupted_attempts_are_not_reused():
+    assert run_experiment._reusable({"exit_code": 0})
+    assert run_experiment._reusable({"exit_code": 1})  # the tool's own failure is an outcome
+    assert run_experiment._reusable({"exit_code": 137, "timed_out": True})  # its budget ran out
+    assert not run_experiment._reusable({"exit_code": 137, "timed_out": False})  # killed from outside
+    assert not run_experiment._reusable({"exit_code": None})
+    assert not run_experiment._reusable({})
