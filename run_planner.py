@@ -14,16 +14,17 @@ docker-push.sh.
 
 import argparse
 import json
-import os
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 
 from scripts.docker_utils import (
+    add_engine_args,
+    build_run_cmd,
     container_name,
-    ensure_docker_running,
     ensure_pulled,
+    ensure_runtime_ready,
     finish_capture,
     run_container,
 )
@@ -41,28 +42,33 @@ DOCKER_IMAGE_VERSIONS = {
     "edge": "ghcr.io/robust-rail-nl/planner:edge",
     "local": "planner:latest",
 }
+# apptainer-only (see docker_utils.build_run_cmd's workdir param): the
+# planner image's own Dockerfile WORKDIR. Its ENTRYPOINT is an absolute path
+# (/app/docker-entrypoint.sh), so this isn't needed to find the entrypoint
+# itself, but the script it runs may still depend on cwd internally.
+CONTAINER_WORKDIR = "/app"
+# The image's own Julia depot is read-only to the non-root user the container runs as.
+CONTAINER_ENV = {"JULIA_DEPOT_PATH": "/tmp/julia-depot:/opt/julia-depot"}
 
 def _instance_name(path: Path) -> str:
     return instance_of(path, INSTANCE_PREFIX)
 
 def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner: str,
-                  dry_run: bool, timeout: int) -> bool:
+                  dry_run: bool, timeout: int, engine: str = "docker",
+                  cache_dir: Path | None = None) -> bool:
     name = _instance_name(scenario)
     plan_name = f"plan_{name}.json"
     cname = container_name("planner", name)
 
-    cmd = [
-        "docker", "run", "--rm",
-        "--name", cname,
-        *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
-        "--env", "JULIA_DEPOT_PATH=/tmp/julia-depot:/opt/julia-depot",
-        "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
-        docker_image,
+    mounts = [(location_dir.resolve(), CONTAINER_DB)]
+    args = [
         "--location", f"{CONTAINER_DB}/location.json",
         "--scenario", f"{CONTAINER_DB}/scenarios/{scenario.name}",
         "--planner", planner,
         "--output", f"{CONTAINER_DB}/plans/{plan_name}",
     ]
+    cmd = build_run_cmd(engine, docker_image, mounts, args, name=cname, cache_dir=cache_dir,
+                        strict=not dry_run, workdir=CONTAINER_WORKDIR, env=CONTAINER_ENV)
 
     print(f"  {scenario.name}  ->  {plan_name}")
     if dry_run:
@@ -74,7 +80,7 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner
     out_file = plans_dir / f"plan_{name}.out"
     err_file = plans_dir / f"plan_{name}.err"
 
-    returncode, timed_out = run_container(cmd, cname, out_file, err_file, timeout)
+    returncode, timed_out = run_container(cmd, cname, out_file, err_file, timeout, engine)
     ok = returncode == 0
 
     footer = (f"--- timeout: killed after {timeout}s (container {cname})" if timed_out
@@ -93,24 +99,21 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner
 
 def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, planner: str,
                          output_dir: Path, version: str, dry_run: bool,
-                         timeout: int | None = None) -> dict:
+                         timeout: int | None = None, engine: str = "docker",
+                         cache_dir: Path | None = None) -> dict:
     output_dir = output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     cname = container_name("planner", _instance_name(scenario))
 
-    cmd = [
-        "docker", "run", "--rm", "--name", cname,
-        *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
-        # See the matching comment in _run_scenario.
-        "--env", "JULIA_DEPOT_PATH=/tmp/julia-depot:/opt/julia-depot",
-        "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
-        "--mount", f"type=bind,source={output_dir},target=/app/output",
-        docker_image,
+    mounts = [(location_dir.resolve(), CONTAINER_DB), (output_dir, "/app/output")]
+    args = [
         "--location", f"{CONTAINER_DB}/location.json",
         "--scenario", f"{CONTAINER_DB}/scenarios/{scenario.name}",
         "--planner", planner,
         "--output", "/app/output/plan.json",
     ]
+    cmd = build_run_cmd(engine, docker_image, mounts, args, name=cname, cache_dir=cache_dir,
+                        strict=not dry_run, workdir=CONTAINER_WORKDIR, env=CONTAINER_ENV)
 
     plan_path = output_dir / "plan.json"
     print(f"  {scenario.name}  ->  {plan_path}")
@@ -120,7 +123,7 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
 
     out_file, err_file = output_dir / "planner.out", output_dir / "planner.err"
     start, start_iso = time.monotonic(), datetime.now(timezone.utc).isoformat()
-    returncode, timed_out = run_container(cmd, cname, out_file, err_file, timeout)
+    returncode, timed_out = run_container(cmd, cname, out_file, err_file, timeout, engine)
 
     plan_produced = plan_path.exists() and plan_path.stat().st_size > 0
     record = {
@@ -191,6 +194,7 @@ def main() -> None:
                              f"run_solver.py takes the same flag, so both can be held to one "
                              f"wall-clock budget; --max-duration is kept as an alias so "
                              f"run_experiment.py can pass one flag name to both tools.")
+    add_engine_args(parser)
     args = parser.parse_args()
 
     if args.output_dir and not args.instance:
@@ -198,8 +202,8 @@ def main() -> None:
                      "result.json, so it must name a single scenario.")
 
     if not args.dry_run:
-        ensure_docker_running()
-        if not args.no_pull:
+        ensure_runtime_ready(args.engine)
+        if args.engine == "docker" and not args.no_pull:
             ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
@@ -222,7 +226,7 @@ def main() -> None:
             total += 1
             record = _run_scenario_single(DOCKER_IMAGE_VERSIONS[args.version], loc, scenarios[0],
                                           args.planner, args.output_dir, args.version,
-                                          args.dry_run, args.timeout)
+                                          args.dry_run, args.timeout, args.engine, args.sif_cache_dir)
             if record and not record.get("plan_produced"):
                 errors += 1
             continue
@@ -230,7 +234,8 @@ def main() -> None:
         for scenario in scenarios:
             total += 1
             if not _run_scenario(DOCKER_IMAGE_VERSIONS[args.version], loc, scenario,
-                                 args.planner, args.dry_run, args.timeout):
+                                 args.planner, args.dry_run, args.timeout, args.engine,
+                                 args.sif_cache_dir):
                 errors += 1
 
     if args.instance and total == 0:

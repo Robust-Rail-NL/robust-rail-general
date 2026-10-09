@@ -96,17 +96,46 @@ def _tool_solved(instance_dir: Path, folder: str) -> bool:
     )
 
 
-def matching_of(instance: str) -> str | None:
-    """The matching strategy a sweep instance was generated with, or None.
+def _sweep_name(instance: str) -> tuple[int, str] | None:
+    """(train count, matching strategy) of a sweep instance, or None.
 
     generate_experiment_configs.py names them custom_<trains>_<matching>_<n>.
-    A hand-written fixture carries no strategy in its name, so it is left out
-    of the per-strategy breakdown rather than guessed at.
+    A hand-written fixture carries neither in its name, so it is left out of
+    the per-strategy breakdowns rather than guessed at.
     """
     parts = instance.split("_")
     if len(parts) == 4 and parts[0] == "custom" and parts[1].isdigit() and parts[3].isdigit():
-        return parts[2]
+        return int(parts[1]), parts[2]
     return None
+
+
+def matching_of(instance: str) -> str | None:
+    """The matching strategy a sweep instance was generated with, or None."""
+    name = _sweep_name(instance)
+    return name[1] if name else None
+
+
+def _format_size_table(title: str, cells: dict, tool_index: int) -> str:
+    """Percent of instances solved and evaluator-accepted, per train count and matching.
+
+    cells maps (trains, matching) -> ([solver solved...], [planner solved...]);
+    tool_index picks which of the two this table is for. A combination the
+    sweep did not generate is shown as "-".
+    """
+    matchings = sorted({m for _, m in cells})
+    sizes = sorted({n for n, _ in cells})
+    rows = []
+    for n in sizes:
+        row = [str(n)]
+        for m in matchings:
+            hits = cells.get((n, m), ([], []))[tool_index]
+            row.append(f"{100 * sum(hits) / len(hits):.1f}% ({sum(hits)}/{len(hits)})"
+                       if hits else "-")
+        rows.append(row)
+    header = ["trains", *matchings]
+    widths = [max(len(r[i]) for r in [header, *rows]) for i in range(len(header))]
+    fmt = lambda r: "  ".join(c.rjust(w) for c, w in zip(r, widths))
+    return "\n".join([title, "  " + fmt(header), *("  " + fmt(r) for r in rows)])
 
 
 def _format_subset(label: str, solver: list, planner: list) -> str:
@@ -167,15 +196,19 @@ def main() -> None:
     solver_all, planner_all = [], []
     solver_feasible, planner_feasible = [], []
     by_matching = collections.defaultdict(lambda: ([], []))
+    by_size_matching = collections.defaultdict(lambda: ([], []))
     for instance_dir in instance_dirs:
         solved_solver = _tool_solved(instance_dir, "local_search")
         solved_planner = _tool_solved(instance_dir, "planning")
         solver_all.append(solved_solver)
         planner_all.append(solved_planner)
-        matching = matching_of(instance_dir.name)
-        if matching is not None:
+        sweep_name = _sweep_name(instance_dir.name)
+        if sweep_name is not None:
+            matching = sweep_name[1]
             by_matching[matching][0].append(solved_solver)
             by_matching[matching][1].append(solved_planner)
+            by_size_matching[sweep_name][0].append(solved_solver)
+            by_size_matching[sweep_name][1].append(solved_planner)
         # certify_threshold doesn't affect classification, only the "tested"
         # flag this script doesn't use -- any value is fine here.
         classification = rr.instance_feasibility(
@@ -205,6 +238,13 @@ def main() -> None:
         for matching in sorted(by_matching):
             solver, planner = by_matching[matching]
             report += ["", _format_subset(f"matching={matching}", solver, planner)]
+    # The same grouping by train count as well: coverage falling off with size
+    # is the scaling story, and it can differ by matching strategy.
+    if by_size_matching:
+        report += ["", "Percent of instances solved and evaluator-accepted, by number of trains "
+                       "and matching (solved/total in brackets)"]
+        for title, index in (("local_search", 0), ("planning", 1)):
+            report += ["", _format_size_table(f"{title}:", by_size_matching, index)]
     text = "\n".join(report)
     print(text)
     if args.output:

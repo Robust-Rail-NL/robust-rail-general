@@ -64,7 +64,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 from scripts import experiment_spec  # noqa: E402
-from scripts.docker_utils import ensure_docker_running, ensure_pulled, load_image_versions  # noqa: E402
+from scripts.docker_utils import (  # noqa: E402
+    add_engine_args, ensure_pulled, ensure_runtime_ready, load_image_versions,
+)
 from scripts.report_results import (  # noqa: E402
     DEFAULT_CERTIFY_THRESHOLD,
     FAILURE_FIELDNAMES,
@@ -162,6 +164,17 @@ def _pull_once(steps: dict[str, str]) -> None:
             ensure_pulled(image)
 
 
+def _engine_flags(engine: str, cache_dir: Path | None) -> list[str]:
+    """The --engine/--sif-cache-dir passthrough for a run_*.py subprocess call.
+
+    Only emitted for apptainer, like every other optional flag here, so a docker
+    run's printed --dry-run command lines stay exactly as they were.
+    """
+    if engine == "docker":
+        return []
+    return ["--engine", engine, "--sif-cache-dir", str(cache_dir)]
+
+
 def _run_report(out_dir: Path, max_duration: int | None,
                 certify_threshold: int | None) -> None:
     """Recompile all four CSVs from every result.json/eval_result.json on disk.
@@ -188,7 +201,7 @@ def _run_coverage_analysis(out_dir: Path) -> None:
 
 
 def _run_generator(location: str, version: str, dry_run: bool, config_dir: Path,
-                   total: int) -> None:
+                   total: int, engine: str = "docker", cache_dir: Path | None = None) -> None:
     """Run the generator over the sweep, reporting progress as one rewritten line.
 
     run_generator.py prints two lines per config, a few hundred for a sweep of
@@ -204,6 +217,7 @@ def _run_generator(location: str, version: str, dry_run: bool, config_dir: Path,
         "--location", location, "--version", version, "--no-pull",
         "--config-dir", str(config_dir),
         *(["--dry-run"] if dry_run else []),
+        *_engine_flags(engine, cache_dir),
     ]
     if dry_run:
         subprocess.run(cmd, cwd=ROOT)
@@ -321,7 +335,7 @@ def _run_step(cmd: list[str], record_path: Path, what: str, dry_run: bool) -> No
 
 def _run_tool(tool: str, location: str, instance: str, out_dir: Path, version: str,
               dry_run: bool, max_duration: int | None, seed: int | None,
-              planner_impl: str) -> dict:
+              planner_impl: str, engine: str = "docker", cache_dir: Path | None = None) -> dict:
     result_path = out_dir / "result.json"
     script = "run_solver.py" if tool == "solver" else "run_planner.py"
     _run_step([
@@ -338,6 +352,7 @@ def _run_tool(tool: str, location: str, instance: str, out_dir: Path, version: s
         *(["--seed", str(seed)] if seed is not None and tool == "solver" else []),
         # --planner is planner-only; run_solver.py has no such flag at all.
         *(["--planner", planner_impl] if tool == "planner" else []),
+        *_engine_flags(engine, cache_dir),
     ], result_path, f"{instance} [{tool}]", dry_run)
     return json.loads(result_path.read_text()) if result_path.exists() else {
         "instance": instance, "tool": tool, "plan_produced": False,
@@ -361,7 +376,8 @@ def _departure_delay(location: str, instance: str, fraction: float) -> int | Non
 
 
 def _run_evaluator(location: str, instance: str, plan_path: Path, version: str,
-                   dry_run: bool, delay_fraction: float) -> dict:
+                   dry_run: bool, delay_fraction: float, engine: str = "docker",
+                   cache_dir: Path | None = None) -> dict:
     eval_result_path = plan_path.parent / "eval_result.json"
     delay = _departure_delay(location, instance, delay_fraction)
     _run_step([
@@ -370,6 +386,7 @@ def _run_evaluator(location: str, instance: str, plan_path: Path, version: str,
         "--version", version, "--no-pull",
         *(["--departure-delay", str(delay)] if delay is not None else []),
         *(["--dry-run"] if dry_run else []),
+        *_engine_flags(engine, cache_dir),
     ], eval_result_path, f"{instance} [evaluator]", dry_run)
     return json.loads(eval_result_path.read_text()) if eval_result_path.exists() else {
         "solved": False, "verdict": "error", "reason": "evaluator produced no eval_result.json",
@@ -413,11 +430,12 @@ def _status(run_result: dict, eval_result: dict | None, dry_run: bool) -> str:
 def _run_and_record(tool: str, location: str, instance: str, tool_dir: Path,
                     solver_version: str, planner_version: str, evaluator_version: str,
                     dry_run: bool, max_duration: int | None, seed: int | None,
-                    planner_impl: str, delay_fraction: float, results: dict, key: str) -> bool:
+                    planner_impl: str, delay_fraction: float, results: dict, key: str,
+                    engine: str = "docker", cache_dir: Path | None = None) -> bool:
     """Run one attempt and record it. Returns whether the evaluator accepted its plan."""
     version = _version_for(tool, solver_version, planner_version)
     run_result = _run_tool(tool, location, instance, tool_dir, version, dry_run,
-                           max_duration, seed, planner_impl)
+                           max_duration, seed, planner_impl, engine, cache_dir)
     eval_result = None
     # A dry run never produces a real plan.json, so there is nothing for the
     # evaluator to dry-run against — skip it rather than have it fail a
@@ -426,7 +444,8 @@ def _run_and_record(tool: str, location: str, instance: str, tool_dir: Path,
     # scored by the same evaluator build a solver plan would be.
     if not dry_run and run_result.get("plan_produced"):
         eval_result = _run_evaluator(location, instance, tool_dir / "plan.json",
-                                     evaluator_version, dry_run, delay_fraction)
+                                     evaluator_version, dry_run, delay_fraction,
+                                     engine, cache_dir)
     results[key] = {"run": run_result, "eval": eval_result}
     wall = run_result.get("wall_seconds")
     print(f"  {_describe(instance)}  {key:<16}  "
@@ -439,7 +458,8 @@ def _run_instance(location: str, instance: str, tools: list[str], out_dir: Path,
                   solver_version: str, planner_version: str, evaluator_version: str,
                   dry_run: bool, max_duration: int | None,
                   certify_threshold: int | None, seed: int | None, num_seeds: int | None,
-                  planner_impl: str, delay_fraction: float, all_results: dict) -> None:
+                  planner_impl: str, delay_fraction: float, all_results: dict,
+                  engine: str = "docker", cache_dir: Path | None = None) -> None:
     results = all_results.setdefault(instance, {})
     for tool in tools:
         if tool == "solver" and num_seeds:
@@ -449,7 +469,7 @@ def _run_instance(location: str, instance: str, tools: list[str], out_dir: Path,
                 solved = _run_and_record(tool, location, instance, tool_dir,
                                          solver_version, planner_version, evaluator_version,
                                          dry_run, max_duration, s, planner_impl, delay_fraction,
-                                         results, f"solver_seed{s}")
+                                         results, f"solver_seed{s}", engine, cache_dir)
                 if not dry_run:
                     _append_attempt(out_dir, instance, label, tool_dir)
                 # Both things the seeds feed — feasibility.csv and the RQ1
@@ -464,7 +484,7 @@ def _run_instance(location: str, instance: str, tools: list[str], out_dir: Path,
             _run_and_record(tool, location, instance, tool_dir,
                             solver_version, planner_version, evaluator_version,
                             dry_run, max_duration, seed, planner_impl, delay_fraction,
-                            results, tool)
+                            results, tool, engine, cache_dir)
             if not dry_run:
                 _append_attempt(out_dir, instance, label, tool_dir)
 
@@ -491,6 +511,7 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true",
                         help="Print docker commands without executing them (evaluator steps are "
                              "skipped, since a dry run never produces a plan to evaluate).")
+    add_engine_args(parser)
     args = parser.parse_args()
 
     if not args.experiment.is_file():
@@ -512,13 +533,32 @@ def main() -> None:
     out_dir = ROOT / "results" / name
     config_dir = _generate_configs_from_json(loc, args.experiment, name)
 
+    steps = {"run_generator.py": versions["generator"],
+             "run_evaluator.py": versions["evaluator"]}
+    for tool in tools:
+        steps[f"run_{tool}.py"] = versions[tool]
+
+    if args.engine == "apptainer":
+        # A bare local-build tag (e.g. the planner's "local" version, "planner:latest")
+        # has no apptainer equivalent -- there is nothing to stage for it. Left
+        # unchecked it surfaces several subprocess calls deep as an opaque "not
+        # staged" error pointing at the staging script, which can never fix it.
+        for script, version in steps.items():
+            image = load_image_versions(ROOT / script)[version]
+            if "/" not in image:
+                sys.exit(f"ERROR: {script} version {version!r} resolves to {image!r}, a "
+                         f"local-build tag with no apptainer equivalent. --engine apptainer "
+                         f"only supports registry images -- pick a different version in "
+                         f"{args.experiment} (e.g. 'stable').")
+
     if not args.dry_run:
-        ensure_docker_running()
-        steps = {"run_generator.py": versions["generator"],
-                 "run_evaluator.py": versions["evaluator"]}
-        for tool in tools:
-            steps[f"run_{tool}.py"] = versions[tool]
-        _pull_once(steps)
+        ensure_runtime_ready(args.engine)
+        # Apptainer images are staged once, up front, by
+        # scripts/stage_apptainer_images.py, typically on a different host (a
+        # cluster login node) -- there is nothing to pull here, and a compute
+        # node has no internet to pull with anyway.
+        if args.engine == "docker":
+            _pull_once(steps)
 
     # Resolved before generating, not after: it is the denominator of the
     # progress count, and an empty sweep is worth catching before the run.
@@ -527,7 +567,8 @@ def main() -> None:
         sys.exit(f"No scenario_config_*.json files under {config_dir}.")
 
     print(f"Generating scenarios for {loc.name} from {config_dir}...", flush=True)
-    _run_generator(location, versions["generator"], args.dry_run, config_dir, len(instances))
+    _run_generator(location, versions["generator"], args.dry_run, config_dir, len(instances),
+                   args.engine, args.sif_cache_dir)
     print()
 
     if not args.dry_run:
@@ -550,7 +591,8 @@ def main() -> None:
                       versions["solver"], versions["planner"], versions["evaluator"],
                       args.dry_run, max_duration, certify_threshold,
                       spec["seed"], spec["num_seeds"], spec["planner"],
-                      spec["departure_delay_fraction"], all_results)
+                      spec["departure_delay_fraction"], all_results,
+                      args.engine, args.sif_cache_dir)
 
     if spec["jobs"] > 1 and not args.dry_run:
         with ThreadPoolExecutor(max_workers=spec["jobs"]) as pool:

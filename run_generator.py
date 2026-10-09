@@ -2,14 +2,15 @@
 """Run the generator docker image on all scenario_config_*.json files."""
 
 import argparse
-import os
 import sys
 from pathlib import Path
 
 from scripts.docker_utils import (
+    add_engine_args,
+    build_run_cmd,
     container_name,
-    ensure_docker_running,
     ensure_pulled,
+    ensure_runtime_ready,
     finish_capture,
     run_container,
 )
@@ -24,26 +25,31 @@ DOCKER_IMAGE_VERSIONS = {
     "local": "generator:latest",
 }
 CONTAINER_DB = "/app/database"
+# apptainer-only (see docker_utils.build_run_cmd's workdir param): the
+# generator image's own Dockerfile WORKDIR, which its ENTRYPOINT ("python
+# src/main.py") is relative to.
+CONTAINER_WORKDIR = "/app"
 
 def _instance_name(path: Path) -> str:
     return instance_of(path, INSTANCE_PREFIX)
 
 def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bool,
-                config_dir: Path | None = None) -> bool:
+                config_dir: Path | None = None, engine: str = "docker",
+                cache_dir: Path | None = None) -> bool:
     name = _instance_name(config)
     cname = container_name("generator", name)
-    cmd = [
-        "docker", "run", "--rm",
-        "--name", cname,
-        *(["--user", f"{os.getuid()}:{os.getgid()}"] if sys.platform != "win32" else []),
-        "--mount", f"type=bind,source={location_dir.resolve()},target={CONTAINER_DB}",
-        *(["--mount", f"type=bind,source={config_dir.resolve()},target={CONTAINER_DB}/configurations"]
-          if config_dir else []),
-        docker_image,
+    mounts = [(location_dir.resolve(), CONTAINER_DB)]
+    # An overlay on just the configurations/ subpath, not a merge: only
+    # config_dir's contents are visible there.
+    if config_dir:
+        mounts.append((config_dir.resolve(), f"{CONTAINER_DB}/configurations"))
+    args = [
         "--config", config.name,
         "--path", CONTAINER_DB,
         "--scenario-file", f"scenario_{name}.json",
     ]
+    cmd = build_run_cmd(engine, docker_image, mounts, args, name=cname, cache_dir=cache_dir,
+                        strict=not dry_run, workdir=CONTAINER_WORKDIR)
 
     print(f"  {config.name}  ->  scenario_{name}.json")
     if dry_run:
@@ -55,7 +61,7 @@ def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bo
     out_file = scenarios_dir / f"scenario_{name}.out"
     err_file = scenarios_dir / f"scenario_{name}.err"
 
-    returncode, _ = run_container(cmd, cname, out_file, err_file, None)
+    returncode, _ = run_container(cmd, cname, out_file, err_file, None, engine)
     ok = returncode == 0
 
     footer = f"--- exit: {returncode if returncode is not None else 'error'}"
@@ -95,6 +101,7 @@ def main() -> None:
     parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default="stable",
                         help="Pick a docker image version ('local' is reserved for locally built "
                              "images).")
+    add_engine_args(parser)
     args = parser.parse_args()
 
     if args.config_dir and not args.location:
@@ -103,8 +110,12 @@ def main() -> None:
         parser.error(f"No such directory: {args.config_dir}")
 
     if not args.dry_run:
-        ensure_docker_running()
-        if not args.no_pull:
+        ensure_runtime_ready(args.engine)
+        # Apptainer images are staged once, up front, by
+        # scripts/stage_apptainer_images.py -- there is nothing to pull here
+        # (and compute nodes running under --engine apptainer have no
+        # internet to pull with anyway).
+        if args.engine == "docker" and not args.no_pull:
             ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
@@ -131,7 +142,7 @@ def main() -> None:
         for config in configs:
             total += 1
             if not _run_config(DOCKER_IMAGE_VERSIONS[args.version], loc, config, args.dry_run,
-                               args.config_dir):
+                               args.config_dir, args.engine, args.sif_cache_dir):
                 errors += 1
 
     if args.instance and total == 0:
