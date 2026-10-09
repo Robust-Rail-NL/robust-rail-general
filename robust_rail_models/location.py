@@ -26,9 +26,6 @@ class PredefinedTaskType(str, Enum):
     MOVE = "Move"
     SPLIT = "Split"
     COMBINE = "Combine"
-    # A shunting unit reversing direction in place (no track change). Named
-    # for the physical action, not "Walking" (the crew walking to the other
-    # end is why it takes time, but it's not what the action represents).
     REVERSE = "Reverse"
     # Waiting / lifecycle
     WAIT = "Wait"
