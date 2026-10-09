@@ -44,9 +44,8 @@ everything downstream treats a 5-seed local_search the same as a solitary one.
                       and seconds (the tool's own wall_seconds, i.e. how long
                       it ran before this outcome -- not the evaluator's,
                       which is typically much shorter and less telling).
-                      reason is the evaluator's own "reason" (the same text
-                      tally_failures.py classifies) when a plan was produced
-                      and rejected, or one synthesized from result.json
+                      reason is the evaluator's own "reason" when a plan was
+                      produced and rejected, or one synthesized from result.json
                       (timed_out / exit_code) when no plan was ever produced
                       to evaluate. A tool split its own file rather than one
                       shared failures.csv, matching --runs-csv already
@@ -226,8 +225,7 @@ def _scenario_for(eval_result: dict, tool_dir: Path) -> dict:
 def failure_reason(result: dict, eval_result: dict) -> str | None:
     """None if this attempt was not a failure (a plan was produced and the
     evaluator accepted it). Otherwise a short one-line reason: the evaluator's
-    own "reason" (the same text tally_failures.py classifies) when a plan was
-    produced and rejected, or one synthesized from the tool's own result.json
+    own "reason" when a plan was produced and rejected, or one synthesized from the tool's own result.json
     (timed_out / exit_code) when no plan was ever produced to evaluate.
     """
     if not result.get("plan_produced"):
