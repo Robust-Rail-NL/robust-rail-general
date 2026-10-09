@@ -190,10 +190,11 @@ started.
 2. **Build the manifest**: `python3 scripts/slurm_manifest.py <EXPERIMENT.json>
    --output-dir <SCRATCH_DIR>`. Takes the same experiment JSON
    `run_experiment.py` does, so tools, seeds and instances come from the one
-   file that records the run. It expands the file's `scenarios` block into
-   `<location>/configurations/<name>/` and enumerates the sweep's
-   (instance, tool[, seed]) work units — reusing `run_experiment.py`'s own
-   instance resolution and mirroring `_run_instance`'s per-tool/per-seed loop,
+   file that records the run. It copies the file to
+   `<output-dir>/experiment.json` and enumerates the sweep its
+   `scenario_config` section describes as (instance, tool[, seed]) work
+   units — reusing `run_experiment.py`'s own sweep expansion and mirroring
+   `_run_instance`'s per-tool/per-seed loop,
    so an array-job sweep and a local sweep of the same file produce identical
    layouts (`<output-dir>/<instance>/local_search[/seed<i>]/`,
    `<output-dir>/<instance>/planning/`). One difference: a local sweep stops at
@@ -203,8 +204,11 @@ started.
    generator and `sbatch` commands to run next.
 3. **Generate scenarios**, directly on the login node, with the command the
    manifest step printed:
-   `python3 run_generator.py --location <NAME> --config-dir <CONFIG_DIR>
-   --engine apptainer`.
+   `python3 run_generator.py --experiment <EXPERIMENT.json> --run-dir
+   <OUTPUT_DIR> --engine apptainer`. It generates every instance straight from
+   the `scenario_config` section (no config files are kept) into
+   `<output-dir>/<instance>/scenario_<instance>.json`, where the array tasks
+   read it.
 4. **Submit the array job**: the printed
    `sbatch --array=0-N scripts/slurm/run_experiment_array.sbatch <manifest>
    <experiment.json> <output-dir>` command. Each task runs

@@ -29,6 +29,8 @@ DOCKER_IMAGE_VERSIONS = {
 }
 CONTAINER_DB = "/app/database"
 CONTAINER_OUT = "/app/output"
+# --scenario only: the directory of a scenario that lives outside the location.
+CONTAINER_SCENARIO = "/app/scenario"
 # apptainer-only (see docker_utils.build_run_cmd's workdir param): the
 # solver image's own Dockerfile WORKDIR, which its ENTRYPOINT ("dotnet
 # ServiceSiteScheduling.dll") is relative to.
@@ -79,7 +81,7 @@ def _fmt_section(d: dict, indent: int = 2) -> str:
     return "\n".join(f"{pad}{k}: {v}" for k, v in d.items())
 
 
-def _write_config(config_path: Path, scenario_name: str, plan_container_path: str,
+def _write_config(config_path: Path, scenario_container_path: str, plan_container_path: str,
                   params: dict) -> None:
     tabu = params.get("TabuSearch", {
         "Iterations": 40, "IterationsUntilReset": 100, "TabuListLength": 16, "Bias": 0.5,
@@ -91,7 +93,7 @@ def _write_config(config_path: Path, scenario_name: str, plan_container_path: st
     })
     content = (
         f'LocationPath: "{CONTAINER_DB}/location.json"\n'
-        f'ScenarioPath: "{CONTAINER_DB}/scenarios/{scenario_name}"\n'
+        f'ScenarioPath: "{scenario_container_path}"\n'
         f'PlanPath: "{plan_container_path}"\n'
         f'Seed: {params.get("Seed", 1)}\n'
         f'DebugLevel: {params.get("DebugLevel", 0)}\n'
@@ -156,7 +158,8 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run
     out_file = plans_dir / f"{plan_stem}.out"
     err_file = plans_dir / f"{plan_stem}.err"
 
-    _write_config(config_path, scenario.name, f"{CONTAINER_DB}/plans/{plan_name}", params)
+    _write_config(config_path, f"{CONTAINER_DB}/scenarios/{scenario.name}",
+                  f"{CONTAINER_DB}/plans/{plan_name}", params)
     try:
         returncode, timed_out = run_container(cmd, cname, out_file, err_file, timeout, engine)
     finally:
@@ -180,7 +183,13 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run
 def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, output_dir: Path,
                          version: str, dry_run: bool, max_duration: int | None = None,
                          seed: int | None = None, timeout: int | None = None,
-                         engine: str = "docker", cache_dir: Path | None = None) -> dict:
+                         engine: str = "docker", cache_dir: Path | None = None,
+                         outside_location: bool = False) -> dict:
+    """Run one scenario into output_dir.
+
+    outside_location (--scenario): the scenario file is mounted from wherever it
+    lives rather than read from <location>/scenarios/.
+    """
     output_dir = output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     config_path = output_dir / TEMP_CONFIG
@@ -190,6 +199,11 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
     cname = container_name("solver", _instance_name(scenario))
 
     mounts = [(location_dir.resolve(), CONTAINER_DB), (output_dir, CONTAINER_OUT)]
+    if outside_location:
+        mounts.append((scenario.parent.resolve(), CONTAINER_SCENARIO))
+        scenario_container_path = f"{CONTAINER_SCENARIO}/{scenario.name}"
+    else:
+        scenario_container_path = f"{CONTAINER_DB}/scenarios/{scenario.name}"
     args = [f"--config={CONTAINER_OUT}/{config_path.name}"]
     cmd = build_run_cmd(engine, docker_image, mounts, args, name=cname, cache_dir=cache_dir,
                         strict=not dry_run, workdir=CONTAINER_WORKDIR)
@@ -200,7 +214,7 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
         print(f"    [dry-run] {' '.join(cmd)}")
         return {}
 
-    _write_config(config_path, scenario.name, f"{CONTAINER_OUT}/plan.json", params)
+    _write_config(config_path, scenario_container_path, f"{CONTAINER_OUT}/plan.json", params)
     out_file, err_file = output_dir / "solver.out", output_dir / "solver.err"
     start, start_iso = time.monotonic(), datetime.now(timezone.utc).isoformat()
     returncode, timed_out = run_container(cmd, cname, out_file, err_file,
@@ -253,6 +267,12 @@ def main() -> None:
                              "scenario). This is the per-attempt layout run_experiment.py drives, "
                              "keeping each (instance, tool) run in its own directory rather than "
                              "the shared, filename-keyed plans/ folder.")
+    parser.add_argument("--scenario", metavar="FILE", type=Path,
+                        help="Solve this one scenario_<NAME>.json wherever it lives, instead of "
+                             "looking it up in <location>/scenarios/ (requires --location, for "
+                             "location.json and config_solver.yaml, and --output-dir). This is "
+                             "how run_experiment.py solves the scenarios it keeps under "
+                             "results/<name>/<instance>/.")
     parser.add_argument("--max-duration", type=int, metavar="SECONDS",
                         help="Override SimulatedAnnealing.MaxDuration for this run — the solver's "
                              "own budget, which it stops at cleanly and still writes its best plan "
@@ -282,7 +302,14 @@ def main() -> None:
     add_engine_args(parser)
     args = parser.parse_args()
 
-    if args.output_dir and not args.instance:
+    if args.scenario:
+        if args.instance:
+            parser.error("--scenario and --instance are mutually exclusive.")
+        if not args.location or not args.output_dir:
+            parser.error("--scenario requires --location and --output-dir.")
+        if not args.dry_run and not args.scenario.is_file():
+            parser.error(f"No such scenario file: {args.scenario}")
+    elif args.output_dir and not args.instance:
         parser.error("--output-dir requires --instance: it holds one attempt's plan.json and "
                      "result.json, so it must name a single scenario.")
 
@@ -290,6 +317,13 @@ def main() -> None:
         ensure_runtime_ready(args.engine)
         if args.engine == "docker" and not args.no_pull:
             ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
+
+    if args.scenario:
+        record = _run_scenario_single(DOCKER_IMAGE_VERSIONS[args.version], ROOT / args.location,
+                                      args.scenario, args.output_dir, args.version, args.dry_run,
+                                      args.max_duration, args.seed, args.timeout,
+                                      args.engine, args.sif_cache_dir, outside_location=True)
+        sys.exit(1 if record and not record.get("plan_produced") else 0)
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 

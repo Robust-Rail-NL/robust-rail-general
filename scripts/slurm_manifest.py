@@ -4,13 +4,14 @@ line per SLURM array task index -- for scripts/slurm_run_task.py to read.
 
 Takes the same experiment JSON run_experiment.py does (see
 scripts/experiment_spec.py), so the sweep's tools, seeds and instances come
-from the one file that records the run. Expands its "scenarios" block into
-<location>/configurations/<name>/ -- run_generator.py needs those configs, and
-the instances are named by them -- and prints the generator command to run
-next. Runs no container itself; this only enumerates work.
+from the one file that records the run. Copies the experiment JSON to
+<output-dir>/experiment.json and prints the generator command to run next:
+run_generator.py --experiment, which generates every instance straight from
+the file's "scenario_config" section into <output-dir>/<instance>/ -- the
+same self-contained layout run_experiment.py uses. Runs no container itself;
+this only enumerates work.
 
-Reuses run_experiment.py's own instance resolution (_instances_from_configs)
-and mirrors _run_instance's per-tool/per-seed loop, rather than
+Reuses run_experiment.py's own sweep expansion (_sweep) and mirrors _run_instance's per-tool/per-seed loop, rather than
 reimplementing either, so an array-job sweep and a local sweep of the same
 file produce the same folder layout. One difference: a local sweep stops at the
 first seed that solves an instance, which independent array tasks cannot do,
@@ -20,6 +21,7 @@ the results are the same.
 
 import argparse
 import csv
+import shutil
 import sys
 from pathlib import Path
 
@@ -51,10 +53,9 @@ def main() -> None:
     parser.add_argument("experiment", metavar="FILE", type=Path,
                         help="The experiment JSON, as for run_experiment.py.")
     parser.add_argument("--output-dir", required=True, type=Path, metavar="DIR",
-                        help="Where the sweep's results go (e.g. on /scratch). Not written into "
-                             "by this script (that's each array task's job), only used to "
-                             "default --manifest's location and to print the ready-to-run "
-                             "commands below.")
+                        help="Where the sweep's results go (e.g. on /scratch). This script "
+                             "copies the experiment JSON there; the scenarios and every "
+                             "attempt's results follow from the commands it prints.")
     parser.add_argument("--manifest", type=Path, metavar="FILE",
                         help="Where to write the manifest (default: <output-dir>/tasks.tsv).")
     args = parser.parse_args()
@@ -66,15 +67,16 @@ def main() -> None:
     except (OSError, ValueError) as exc:
         sys.exit(f"ERROR: {exc}")
 
-    name, location = spec["name"], spec["location"]
+    location = spec["location"]
     loc = ROOT / location
     if not loc.is_dir():
         sys.exit(f"No such location: {loc}")
 
-    config_dir = run_experiment._generate_configs_from_json(loc, args.experiment, name)
-    instances = run_experiment._instances_from_configs(config_dir)
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(args.experiment, args.output_dir / "experiment.json")
+    instances = list(run_experiment._sweep(spec))
     if not instances:
-        sys.exit(f"No scenario_config_*.json files under {config_dir}.")
+        sys.exit(f"The \"scenario_config\" section of {args.experiment} expands to no instances.")
 
     manifest_path = args.manifest or (args.output_dir / "tasks.tsv")
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
@@ -100,7 +102,7 @@ def main() -> None:
     print(f"Wrote {len(rows)} task(s) ({len(instances)} instance(s) x {spec['tools']}{seeds_note}) "
           f"to {manifest_path}")
     print(f"\nGenerate the scenarios first (login node):\n"
-          f"  python3 run_generator.py --location {location} --config-dir {config_dir} "
+          f"  python3 run_generator.py --experiment {args.experiment} --run-dir {args.output_dir} "
           f"--version {spec[experiment_spec.VERSIONS_KEY]['generator']} --engine apptainer")
     if rows:
         print(f"\nThen submit with:\n"

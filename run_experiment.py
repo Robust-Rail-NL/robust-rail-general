@@ -6,26 +6,25 @@
 The file is the whole interface (see scripts/experiment_spec.py): it names the
 run, the location, the tools, the image versions, the budgets, and the scenario
 sweep to generate. Nothing here overrides it, so the file stays an exact record
-of what was run. "name" is the only name a run needs — configs land in
-<location>/configurations/<name>/ and results in results/<name>/.
+of what was run. "name" is the only name a run needs: everything the run makes
+lands in results/<name>/ and nowhere else — the location directory is only
+read (location.json, config.json, config_solver.yaml).
 
 Drives run_generator.py / run_solver.py / run_planner.py / run_evaluator.py as
-subprocesses. Generation goes first (cheap relative to solving/planning) so
-every config has a matching scenario before instances are resolved, and the
-generated directory then scopes the instance list for the rest of the run. Each
+subprocesses. The file's "scenario_config" section is the scenario config for
+the whole sweep: run_generator.py --experiment generates every instance from
+it, first (cheap relative to solving/planning), so every instance has its
+scenario before any tool runs. No per-instance config files are kept. Each
 (instance, tool) attempt gets its own directory, named after the search approach
 rather than the script that drives it:
 
+  results/<name>/experiment.json           copy of the experiment JSON
+  results/<name>/<instance>/               scenario_<instance>.json and its
+                                           generator .out/.err
   results/<name>/<instance>/local_search/  plan.json, solver.out/.err,
                                            result.json, eval.out/.err/.txt,
                                            eval_result.json
   results/<name>/<instance>/planning/      same layout
-
-Each run also leaves its inputs next to its results, so a results directory can
-be reviewed on its own: results/<name>/experiment.json is a copy of the
-experiment JSON the run was started with, and
-results/<name>/<instance>/scenario_config_<instance>.json is the generator
-config that instance's scenario was produced from (including its derived seed).
 
 "num_seeds": N runs the solver up to N times per instance instead of once, each
 seed getting its own local_search/seed<i>/ subdirectory with that same layout
@@ -71,6 +70,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 from scripts import experiment_spec  # noqa: E402
+from scripts.generate_experiment_configs import scenario_params, sweep_configs  # noqa: E402
 from scripts.docker_utils import (  # noqa: E402
     add_engine_args, ensure_pulled, ensure_runtime_ready, load_image_versions,
 )
@@ -207,22 +207,22 @@ def _run_coverage_analysis(out_dir: Path) -> None:
     ], cwd=ROOT)
 
 
-def _run_generator(location: str, version: str, dry_run: bool, config_dir: Path,
+def _run_generator(experiment: Path, version: str, dry_run: bool, run_dir: Path,
                    total: int, engine: str = "docker", cache_dir: Path | None = None) -> None:
     """Run the generator over the sweep, reporting progress as one rewritten line.
 
     run_generator.py prints two lines per config, a few hundred for a sweep of
     any size, and only the count is interesting here. What it complains about
     is still shown, and the per-scenario detail stays in the .out/.err files it
-    writes beside each scenario.
+    writes beside each scenario, in that instance's own directory.
     """
     cmd = [
         # -u: python block-buffers stdout as soon as it is a pipe rather than a
         # terminal, so without this the generator's lines arrive in one burst
         # when it exits and the count below jumps from 0 to the total.
         sys.executable, "-u", str(ROOT / "run_generator.py"),
-        "--location", location, "--version", version, "--no-pull",
-        "--config-dir", str(config_dir),
+        "--experiment", str(experiment), "--run-dir", str(run_dir),
+        "--version", version, "--no-pull",
         *(["--dry-run"] if dry_run else []),
         *_engine_flags(engine, cache_dir),
     ]
@@ -254,71 +254,25 @@ def _run_generator(location: str, version: str, dry_run: bool, config_dir: Path,
         print(f"    {problem}", file=sys.stderr, flush=True)
 
 
-def _instances_from_configs(config_dir: Path) -> list[str]:
-    """The instances a directory of configs will produce, straight from their names.
+def _scenario_path(out_dir: Path, instance: str) -> Path:
+    """Where an instance's scenario lives: in its own results directory."""
+    return out_dir / instance / f"scenario_{instance}.json"
 
-    run_generator.py passes --scenario-file explicitly, so a config named
-    scenario_config_<X>.json always yields scenario_<X>.json — which is what
-    makes this a filename computation rather than a scan of scenarios/.
+
+def _sweep(spec: dict) -> dict[str, dict]:
+    """The generator config of every instance the "scenario_config" section
+    describes, keyed by instance name — the same expansion run_generator.py
+    --experiment generates from. Held in memory only; never written out.
     """
-    return [c.stem.removeprefix("scenario_config_")
-            for c in sorted(config_dir.glob("scenario_config_*.json"))]
+    try:
+        return sweep_configs(scenario_params(spec), spec["location"])
+    except ValueError as exc:
+        sys.exit(f"ERROR: {exc}")
 
 
-def _generate_configs_from_json(loc: Path, experiment: Path, name: str) -> Path:
-    """Expand the spec's "scenarios" block into <loc>/configurations/<name>/.
-
-    Hands that directory back: it scopes both generation and the instance list
-    for the rest of the run. The generator script reads the same experiment
-    file, so the sweep parameters are never passed second-hand.
-    """
-    config_dir = loc / "configurations" / name
-    print(f"Generating scenario configs for {loc.name} from {experiment} -> {config_dir}...",
-          flush=True)
-    result = subprocess.run([
-        sys.executable, str(ROOT / "scripts" / "generate_experiment_configs.py"),
-        "--from-json", str(experiment.resolve()),
-    ], cwd=ROOT)
-    if result.returncode != 0:
-        # It has already said why, in the same terms this script would have —
-        # both read the spec through experiment_spec. A traceback on top of
-        # that message would only bury it.
-        sys.exit(result.returncode)
-    print()
-    return config_dir
-
-
-def _record_inputs(out_dir: Path, experiment: Path, config_dir: Path,
-                   instances: list[str]) -> None:
-    """Copy the experiment JSON and each instance's generator config into the results.
-
-    Overwritten on a re-run under the same name, which is what the rest of
-    results/<name>/ is too: the copy always describes the run that last wrote there.
-    """
-    shutil.copy2(experiment, out_dir / "experiment.json")
-    for instance in instances:
-        config = config_dir / f"scenario_config_{instance}.json"
-        if config.is_file():
-            (out_dir / instance).mkdir(parents=True, exist_ok=True)
-            shutil.copy2(config, out_dir / instance / config.name)
-
-
-def _by_size(loc: Path, instances: list[str], config_dir: Path) -> list[str]:
-    def trains(instance: str) -> float:
-        configs = [config_dir / f"scenario_config_{instance}.json",
-                   loc / "configurations" / f"scenario_config_{instance}.json"]
-        for path in configs:
-            try:
-                return float(json.loads(path.read_text())["number_of_trains"])
-            except (OSError, ValueError, KeyError, TypeError):
-                pass
-        try:
-            scenario = json.loads((loc / "scenarios" / f"scenario_{instance}.json").read_text())
-            return float(len(scenario.get("in") or []) + len(scenario.get("inStanding") or []))
-        except (OSError, ValueError):
-            return float("inf")
-
-    return sorted(instances, key=trains)
+def _by_size(configs: dict[str, dict]) -> list[str]:
+    """Instance names, fewest trains first."""
+    return sorted(configs, key=lambda instance: configs[instance]["number_of_trains"])
 
 
 def _version_for(tool: str, solver_version: str, planner_version: str) -> str:
@@ -355,14 +309,14 @@ def _run_step(cmd: list[str], record_path: Path, what: str, dry_run: bool) -> No
           file=sys.stderr, flush=True)
 
 
-def _run_tool(tool: str, location: str, instance: str, out_dir: Path, version: str,
-              dry_run: bool, max_duration: int | None, seed: int | None,
+def _run_tool(tool: str, location: str, instance: str, scenario: Path, out_dir: Path,
+              version: str, dry_run: bool, max_duration: int | None, seed: int | None,
               planner_impl: str, engine: str = "docker", cache_dir: Path | None = None) -> dict:
     result_path = out_dir / "result.json"
     script = "run_solver.py" if tool == "solver" else "run_planner.py"
     _run_step([
         sys.executable, str(ROOT / script),
-        "--location", location, "--instance", instance,
+        "--location", location, "--scenario", str(scenario),
         "--output-dir", str(out_dir), "--version", version, "--no-pull",
         *(["--dry-run"] if dry_run else []),
         # Both tools take --max-duration, but it means different things: the
@@ -381,30 +335,29 @@ def _run_tool(tool: str, location: str, instance: str, out_dir: Path, version: s
     }
 
 
-def _departure_delay(location: str, instance: str, fraction: float) -> int | None:
+def _departure_delay(scenario_path: Path, fraction: float) -> int | None:
     """The tolerance to allow this instance's evaluation, or None if unreadable.
 
     None leaves run_evaluator.py to omit the flag entirely, which is the
     evaluator's own exact-match behaviour — the same thing an unreadable
     scenario would have got before this existed.
     """
-    path = ROOT / location / "scenarios" / f"scenario_{instance}.json"
     try:
-        scenario = json.loads(path.read_text())
+        scenario = json.loads(scenario_path.read_text())
         span = int(scenario["endTime"]) - int(scenario["startTime"])
     except (OSError, ValueError, KeyError, TypeError):
         return None
     return int(span * fraction) if span > 0 and fraction > 0 else None
 
 
-def _run_evaluator(location: str, instance: str, plan_path: Path, version: str,
-                   dry_run: bool, delay_fraction: float, engine: str = "docker",
+def _run_evaluator(location: str, instance: str, scenario: Path, plan_path: Path,
+                   version: str, dry_run: bool, delay_fraction: float, engine: str = "docker",
                    cache_dir: Path | None = None) -> dict:
     eval_result_path = plan_path.parent / "eval_result.json"
-    delay = _departure_delay(location, instance, delay_fraction)
+    delay = _departure_delay(scenario, delay_fraction)
     _run_step([
         sys.executable, str(ROOT / "run_evaluator.py"),
-        "--location", location, "--instance", instance, "--plan", str(plan_path),
+        "--location", location, "--scenario", str(scenario), "--plan", str(plan_path),
         "--version", version, "--no-pull",
         *(["--departure-delay", str(delay)] if delay is not None else []),
         *(["--dry-run"] if dry_run else []),
@@ -449,14 +402,14 @@ def _status(run_result: dict, eval_result: dict | None, dry_run: bool) -> str:
     return reason if len(reason) <= REASON_WIDTH else reason[:REASON_WIDTH - 1] + "…"
 
 
-def _run_and_record(tool: str, location: str, instance: str, tool_dir: Path,
+def _run_and_record(tool: str, location: str, instance: str, scenario: Path, tool_dir: Path,
                     solver_version: str, planner_version: str, evaluator_version: str,
                     dry_run: bool, max_duration: int | None, seed: int | None,
                     planner_impl: str, delay_fraction: float, results: dict, key: str,
                     engine: str = "docker", cache_dir: Path | None = None) -> bool:
     """Run one attempt and record it. Returns whether the evaluator accepted its plan."""
     version = _version_for(tool, solver_version, planner_version)
-    run_result = _run_tool(tool, location, instance, tool_dir, version, dry_run,
+    run_result = _run_tool(tool, location, instance, scenario, tool_dir, version, dry_run,
                            max_duration, seed, planner_impl, engine, cache_dir)
     eval_result = None
     # A dry run never produces a real plan.json, so there is nothing for the
@@ -465,7 +418,7 @@ def _run_and_record(tool: str, location: str, instance: str, tool_dir: Path,
     # independent version, never the plan producer's: a planner plan must be
     # scored by the same evaluator build a solver plan would be.
     if not dry_run and run_result.get("plan_produced"):
-        eval_result = _run_evaluator(location, instance, tool_dir / "plan.json",
+        eval_result = _run_evaluator(location, instance, scenario, tool_dir / "plan.json",
                                      evaluator_version, dry_run, delay_fraction,
                                      engine, cache_dir)
     results[key] = {"run": run_result, "eval": eval_result}
@@ -483,12 +436,13 @@ def _run_instance(location: str, instance: str, tools: list[str], out_dir: Path,
                   planner_impl: str, delay_fraction: float, all_results: dict,
                   engine: str = "docker", cache_dir: Path | None = None) -> None:
     results = all_results.setdefault(instance, {})
+    scenario = _scenario_path(out_dir, instance)
     for tool in tools:
         if tool == "solver" and num_seeds:
             for s in range(1, num_seeds + 1):
                 label = f"{FOLDER_NAMES[tool]}_seed{s}"
                 tool_dir = out_dir / instance / FOLDER_NAMES[tool] / f"seed{s}"
-                solved = _run_and_record(tool, location, instance, tool_dir,
+                solved = _run_and_record(tool, location, instance, scenario, tool_dir,
                                          solver_version, planner_version, evaluator_version,
                                          dry_run, max_duration, s, planner_impl, delay_fraction,
                                          results, f"solver_seed{s}", engine, cache_dir)
@@ -503,7 +457,7 @@ def _run_instance(location: str, instance: str, tools: list[str], out_dir: Path,
         else:
             label = FOLDER_NAMES[tool]
             tool_dir = out_dir / instance / label
-            _run_and_record(tool, location, instance, tool_dir,
+            _run_and_record(tool, location, instance, scenario, tool_dir,
                             solver_version, planner_version, evaluator_version,
                             dry_run, max_duration, seed, planner_impl, delay_fraction,
                             results, tool, engine, cache_dir)
@@ -551,9 +505,9 @@ def main() -> None:
     versions = spec[experiment_spec.VERSIONS_KEY]
     max_duration, certify_threshold = spec["max_duration"], spec["certify_threshold"]
 
-    # One name for the whole run: its configs, and its results.
+    # One name for the whole run, and one directory holding all of it: the
+    # experiment JSON, each instance's config and scenario, and the results.
     out_dir = ROOT / "results" / name
-    config_dir = _generate_configs_from_json(loc, args.experiment, name)
 
     steps = {"run_generator.py": versions["generator"],
              "run_evaluator.py": versions["evaluator"]}
@@ -582,22 +536,25 @@ def main() -> None:
         if args.engine == "docker":
             _pull_once(steps)
 
-    # Resolved before generating, not after: it is the denominator of the
-    # progress count, and an empty sweep is worth catching before the run.
-    instances = _instances_from_configs(config_dir)
-    if not instances:
-        sys.exit(f"No scenario_config_*.json files under {config_dir}.")
+    configs = _sweep(spec)
+    if not configs:
+        sys.exit(f"The \"scenario_config\" section of {args.experiment} expands to no instances.")
 
-    print(f"Generating scenarios for {loc.name} from {config_dir}...", flush=True)
-    _run_generator(location, versions["generator"], args.dry_run, config_dir, len(instances),
+    if not args.dry_run:
+        out_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(args.experiment, out_dir / "experiment.json")
+
+    print(f"Generating {len(configs)} scenario(s) for {loc.name} into {out_dir}...", flush=True)
+    _run_generator(args.experiment, versions["generator"], args.dry_run, out_dir, len(configs),
                    args.engine, args.sif_cache_dir)
     print()
 
     if not args.dry_run:
-        missing = [i for i in instances if not (loc / "scenarios" / f"scenario_{i}.json").exists()]
+        missing = [i for i in configs if not _scenario_path(out_dir, i).exists()]
         if missing:
-            sys.exit(f"Generator produced no scenario for: {', '.join(missing)}")
-    instances = _by_size(loc, instances, config_dir)
+            sys.exit(f"Generator produced no scenario for: {', '.join(missing)} "
+                     f"(see scenario_<instance>.err in each instance's directory)")
+    instances = _by_size(configs)
 
     print(f"Running {name}: {len(instances)} instance(s) x {tools} against {loc.name}, "
           f"smallest first -> {out_dir}\n", flush=True)
@@ -605,8 +562,6 @@ def main() -> None:
 
     all_results = {}
     if not args.dry_run:
-        out_dir.mkdir(parents=True, exist_ok=True)
-        _record_inputs(out_dir, args.experiment, config_dir, instances)
         _init_live_csvs(out_dir)
 
     def run_one(instance: str) -> None:

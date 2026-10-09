@@ -32,6 +32,8 @@ from scripts.instance_filter import fail_no_match, instance_of, select
 
 ROOT = Path(__file__).parent
 CONTAINER_DB = "/app/database"
+# --scenario only: the directory of a scenario that lives outside the location.
+CONTAINER_SCENARIO = "/app/scenario"
 INSTANCE_PREFIX = "scenario_"
 
 DEFAULT_PLANNER_TIMEOUT = 600
@@ -100,15 +102,25 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner
 def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, planner: str,
                          output_dir: Path, version: str, dry_run: bool,
                          timeout: int | None = None, engine: str = "docker",
-                         cache_dir: Path | None = None) -> dict:
+                         cache_dir: Path | None = None, outside_location: bool = False) -> dict:
+    """Plan one scenario into output_dir.
+
+    outside_location (--scenario): the scenario file is mounted from wherever it
+    lives rather than read from <location>/scenarios/.
+    """
     output_dir = output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     cname = container_name("planner", _instance_name(scenario))
 
     mounts = [(location_dir.resolve(), CONTAINER_DB), (output_dir, "/app/output")]
+    if outside_location:
+        mounts.append((scenario.parent.resolve(), CONTAINER_SCENARIO))
+        scenario_container_path = f"{CONTAINER_SCENARIO}/{scenario.name}"
+    else:
+        scenario_container_path = f"{CONTAINER_DB}/scenarios/{scenario.name}"
     args = [
         "--location", f"{CONTAINER_DB}/location.json",
-        "--scenario", f"{CONTAINER_DB}/scenarios/{scenario.name}",
+        "--scenario", scenario_container_path,
         "--planner", planner,
         "--output", "/app/output/plan.json",
     ]
@@ -185,6 +197,11 @@ def main() -> None:
                              "into <location>/plans/ (requires --instance to name a single "
                              "scenario). Same per-attempt layout run_solver.py --output-dir "
                              "produces, which is what run_experiment.py drives.")
+    parser.add_argument("--scenario", metavar="FILE", type=Path,
+                        help="Plan this one scenario_<NAME>.json wherever it lives, instead of "
+                             "looking it up in <location>/scenarios/ (requires --location, for "
+                             "location.json, and --output-dir). This is how run_experiment.py "
+                             "plans the scenarios it keeps under results/<name>/<instance>/.")
     parser.add_argument("--timeout", "--max-duration", type=int, dest="timeout",
                         default=DEFAULT_PLANNER_TIMEOUT, metavar="SECONDS",
                         help=f"Kill a single scenario's planner container after this many "
@@ -197,7 +214,14 @@ def main() -> None:
     add_engine_args(parser)
     args = parser.parse_args()
 
-    if args.output_dir and not args.instance:
+    if args.scenario:
+        if args.instance:
+            parser.error("--scenario and --instance are mutually exclusive.")
+        if not args.location or not args.output_dir:
+            parser.error("--scenario requires --location and --output-dir.")
+        if not args.dry_run and not args.scenario.is_file():
+            parser.error(f"No such scenario file: {args.scenario}")
+    elif args.output_dir and not args.instance:
         parser.error("--output-dir requires --instance: it holds one attempt's plan.json and "
                      "result.json, so it must name a single scenario.")
 
@@ -205,6 +229,13 @@ def main() -> None:
         ensure_runtime_ready(args.engine)
         if args.engine == "docker" and not args.no_pull:
             ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
+
+    if args.scenario:
+        record = _run_scenario_single(DOCKER_IMAGE_VERSIONS[args.version], ROOT / args.location,
+                                      args.scenario, args.planner, args.output_dir, args.version,
+                                      args.dry_run, args.timeout, args.engine, args.sif_cache_dir,
+                                      outside_location=True)
+        sys.exit(1 if record and not record.get("plan_produced") else 0)
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 

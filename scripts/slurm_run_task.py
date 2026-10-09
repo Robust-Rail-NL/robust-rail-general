@@ -79,7 +79,8 @@ def main() -> None:
 
     results = {}
     run_experiment._run_and_record(
-        tool, spec["location"], instance, tool_dir,
+        tool, spec["location"], instance,
+        run_experiment._scenario_path(args.output_dir, instance), tool_dir,
         versions["solver"], versions["planner"], versions["evaluator"],
         False, spec["max_duration"], seed, spec["planner"],
         spec["departure_delay_fraction"], results, key,

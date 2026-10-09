@@ -205,10 +205,20 @@ def punctuality(deltas: list) -> dict:
     }
 
 
-def _scenario_for(eval_result: dict) -> dict:
-    """The scenario an attempt ran against, found from what eval_result.json records."""
+def _scenario_for(eval_result: dict, tool_dir: Path) -> dict:
+    """The scenario an attempt ran against, found from what eval_result.json records.
+
+    run_experiment.py keeps each scenario in its instance's own results
+    directory, an ancestor of the attempt's tool_dir (<instance>/local_search[/seed<i>]);
+    anything else ran against <location>/scenarios/.
+    """
     location, scenario = eval_result.get("location"), eval_result.get("scenario")
-    if not location or not scenario:
+    if not scenario:
+        return {}
+    for directory in list(tool_dir.parents)[:2]:
+        if (directory / scenario).is_file():
+            return read_json(directory / scenario)
+    if not location:
         return {}
     return read_json(REPO_ROOT / location / "scenarios" / scenario)
 
@@ -272,7 +282,7 @@ def tool_rows(instance: str, tool: str, tool_dir: Path) -> tuple:
     # the reason it was rejected, and is worth seeing.
     plan = read_json(tool_dir / "plan.json")
     actions = plan.get("actions") or []
-    scenario = _scenario_for(eval_result) if actions else {}
+    scenario = _scenario_for(eval_result, tool_dir) if actions else {}
     run_row.update(punctuality(departure_deltas(actions, scenario) if scenario else []))
 
     reason = failure_reason(result, eval_result)

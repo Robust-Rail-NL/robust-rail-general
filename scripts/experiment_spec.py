@@ -2,25 +2,27 @@
 """The experiment JSON: the one file that describes a run.
 
 Top level holds the experiment's own settings — what it is called, which
-location, which tools, what budget. "scenarios" holds the generation sweep that
-generate_experiment_configs.py expands into scenario_config_*.json files:
+location, which tools, what budget. "scenario_config" is the scenario
+generator's config for the whole sweep -- the generator settings, plus the
+lists to sweep over (number_of_trains, matchings, number_of_instances):
 
     {
       "name": "baseline_sweep",
       "location": "Location_KleineBinckhorst",
       "tools": ["solver", "planner"],
       "max_duration": 600,
-      "scenarios": {"number_of_trains": [5, 10, 15], ...}
+      "scenario_config": {"number_of_trains": [5, 10, 15], ...}
     }
 
-"name" is what the run is called, and it is the only name a run needs: configs
-land in <location>/configurations/<name>/ and results in results/<name>/.
+"name" is what the run is called, and it is the only name a run needs: the
+whole run -- a copy of this file, each instance's scenario, and the results --
+lands in results/<name>/.
 
 run_experiment.py takes no settings of its own — it runs what the file says, so
 the file is an exact record of the run. load() therefore fills in every default
 and does every check here, leaving its caller nothing to resolve.
 
-The "scenarios" block is returned unvalidated: its keys belong to
+The "scenario_config" section is returned unvalidated: its keys belong to
 generate_experiment_configs.py's own DEFAULTS, and that script checks them when
 it reads the same file. Validating them here would mean importing it, and it
 already imports this.
@@ -29,7 +31,9 @@ already imports this.
 import json
 from pathlib import Path
 
-SCENARIOS_KEY = "scenarios"
+SCENARIO_CONFIG_KEY = "scenario_config"
+# The section's name before it was renamed to "scenario_config".
+OLD_SCENARIO_CONFIG_KEY = "scenarios"
 VERSIONS_KEY = "versions"
 
 TOOLS = ("solver", "planner")
@@ -94,14 +98,17 @@ def load(path: Path) -> dict:
 
     Raises SpecError (a ValueError) with a message meant to be shown as-is.
     Every optional setting is present in the result, as is "versions" (one
-    entry per tool) and "scenarios" (empty if the file omitted it).
+    entry per tool) and "scenario_config" (empty if the file omitted it).
     """
     with open(path) as f:
         spec = json.load(f)
     if not isinstance(spec, dict):
         raise SpecError(f"{path} must contain a JSON object, not a {type(spec).__name__}.")
 
-    allowed = REQUIRED_KEYS + tuple(OPTIONAL_DEFAULTS) + (VERSIONS_KEY, SCENARIOS_KEY)
+    if OLD_SCENARIO_CONFIG_KEY in spec:
+        raise SpecError(f'{path}: the "{OLD_SCENARIO_CONFIG_KEY}" section has been renamed to '
+                        f'"{SCENARIO_CONFIG_KEY}" -- rename it in the file.')
+    allowed = REQUIRED_KEYS + tuple(OPTIONAL_DEFAULTS) + (VERSIONS_KEY, SCENARIO_CONFIG_KEY)
     _check_keys(set(spec), allowed, "top-level", path)
     missing = [k for k in REQUIRED_KEYS if not spec.get(k)]
     if missing:
@@ -114,7 +121,7 @@ def load(path: Path) -> dict:
     versions = spec.get(VERSIONS_KEY) or {}
     _check_keys(set(versions), VERSION_KEYS, f'"{VERSIONS_KEY}"', path)
     spec[VERSIONS_KEY] = {k: versions.get(k, DEFAULT_VERSION) for k in VERSION_KEYS}
-    spec[SCENARIOS_KEY] = spec.get(SCENARIOS_KEY) or {}
+    spec[SCENARIO_CONFIG_KEY] = spec.get(SCENARIO_CONFIG_KEY) or {}
 
     _check_settings(spec, path)
     return spec

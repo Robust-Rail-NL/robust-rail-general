@@ -30,6 +30,8 @@ DOCKER_IMAGE_VERSIONS = {
     "delay": "tors:delay",
 }
 CONTAINER_DB = "/app/database"
+# --scenario only: the directory of a scenario that lives outside the location.
+CONTAINER_SCENARIO = "/app/scenario"
 # apptainer-only (see docker_utils.build_run_cmd's workdir param): the
 # evaluator image's own Dockerfile WORKDIR, which its ENTRYPOINT
 # ("build/TORS") is relative to. Note this differs from the other three
@@ -125,16 +127,27 @@ def _classify_verdict(out_text: str, err_text: str, txt_text: str) -> tuple[str,
 
 def _run_plan_single(docker_image: str, location_dir: Path, plan: Path, scenario: Path,
                      version: str, dry_run: bool, departure_delay: int | None = None,
-                     engine: str = "docker", cache_dir: Path | None = None) -> dict:
+                     engine: str = "docker", cache_dir: Path | None = None,
+                     outside_location: bool = False) -> dict:
+    """Evaluate one plan, writing eval.* and eval_result.json beside it.
+
+    outside_location (--scenario): the scenario file is mounted from wherever it
+    lives rather than read from <location>/scenarios/.
+    """
     plan = plan.resolve()
     plan_dir = plan.parent
     cname = container_name("evaluator", instance_of(scenario, "scenario_"))
 
     mounts = [(location_dir.resolve(), CONTAINER_DB), (plan_dir, "/app/planio")]
+    if outside_location:
+        mounts.append((scenario.parent.resolve(), CONTAINER_SCENARIO))
+        scenario_container_path = f"{CONTAINER_SCENARIO}/{scenario.name}"
+    else:
+        scenario_container_path = f"{CONTAINER_DB}/scenarios/{scenario.name}"
     args = [
         "--mode", "EVAL_AND_STORE",
         "--path_location", CONTAINER_DB,
-        "--path_scenario", f"{CONTAINER_DB}/scenarios/{scenario.name}",
+        "--path_scenario", scenario_container_path,
         "--path_plan", f"/app/planio/{plan.name}",
         "--path_eval_result", "/app/planio/eval.txt",
         "--plan_type", "Solver",
@@ -202,6 +215,11 @@ def main() -> None:
                              "eval.out/.err/.txt and eval_result.json are written beside it "
                              "instead of into <location>/evaluations/. Requires --location and "
                              "--instance (to find the matching scenario).")
+    parser.add_argument("--scenario", metavar="FILE", type=Path,
+                        help="With --plan: evaluate against this scenario_<NAME>.json wherever it "
+                             "lives, instead of looking it up in <location>/scenarios/ by "
+                             "--instance. This is how run_experiment.py evaluates against the "
+                             "scenarios it keeps under results/<name>/<instance>/.")
     parser.add_argument("--departure-delay", type=int, metavar="SECONDS",
                         help="Allow a departure to be this many seconds off its scheduled time "
                              "and still count as valid. The evaluator applies it symmetrically — "
@@ -220,11 +238,17 @@ def main() -> None:
     add_engine_args(parser)
     args = parser.parse_args()
 
+    if args.scenario and not args.plan:
+        parser.error("--scenario requires --plan.")
+    if args.scenario and args.instance:
+        parser.error("--scenario and --instance are mutually exclusive.")
     if args.plan:
-        if not args.location or not args.instance:
-            parser.error("--plan requires --location and --instance: the plan lives outside the "
-                         "location, so neither the scenario nor the location can be inferred "
-                         "from its path.")
+        if not args.location or not (args.instance or args.scenario):
+            parser.error("--plan requires --location and --instance (or --scenario): the plan "
+                         "lives outside the location, so neither the scenario nor the location "
+                         "can be inferred from its path.")
+        if not args.dry_run and args.scenario and not args.scenario.is_file():
+            parser.error(f"No such scenario file: {args.scenario}")
         if not args.dry_run and not args.plan.exists():
             parser.error(f"No such plan file: {args.plan}")
 
@@ -232,6 +256,13 @@ def main() -> None:
         ensure_runtime_ready(args.engine)
         if args.engine == "docker" and not args.no_pull:
             ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
+
+    if args.plan and args.scenario:
+        record = _run_plan_single(DOCKER_IMAGE_VERSIONS[args.version], ROOT / args.location,
+                                  args.plan, args.scenario, args.version, args.dry_run,
+                                  args.departure_delay, args.engine, args.sif_cache_dir,
+                                  outside_location=True)
+        sys.exit(0 if (not record or record.get("verdict") != "error") else 1)
 
     if args.plan:
         loc = ROOT / args.location

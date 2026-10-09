@@ -7,12 +7,12 @@ any one Location_* directory. Iterates over every combination of (number of
 trains) x (instances) x (matching strategy) and writes one config per
 combination into <location>/configurations/, or
 <location>/configurations/<--subfolder>/ if given. Use run_generator.py to
-actually run the generator on them, or hand the same JSON to
-run_experiment.py's --from-json to scope a whole generate+solve+plan+evaluate
-run to just this sweep.
+actually run the generator on them. run_experiment.py does not go through
+this CLI: run_generator.py --experiment calls sweep_configs() on the experiment
+JSON's "scenario_config" section directly, keeping no config files at all.
 
 --from-json takes an experiment JSON (see scripts/example.json and
-scripts/experiment_spec.py): this script reads its "scenarios" block for the
+scripts/experiment_spec.py): this script reads its "scenario_config" section for the
 sweep parameters below, and its "name"/"location" for where to write. Every
 value it supplies is a default the matching flag still overrides.
 """
@@ -60,6 +60,64 @@ DEFAULTS = {
 }
 
 
+def sweep_configs(params: dict, location: str) -> dict[str, dict]:
+    """Expand one sweep into its generator configs, keyed by instance name.
+
+    params holds a value for every DEFAULTS key (an experiment JSON's
+    "scenario_config" section, with DEFAULTS filling the gaps); location is the
+    Location_* directory name. Instances are named custom_<trains>_<matching>_<i>
+    and come back in trains x matchings x instances order.
+    """
+    location_name = location.removeprefix("Location_")
+    configs = {}
+    for j, n in enumerate(params["number_of_trains"]):
+        end_time = n * params["time_window_per_train"]
+        for matching in params["matchings"]:
+            for i in range(params["number_of_instances"]):
+                configs[f"custom_{n}_{matching}_{i}"] = {
+                    "location": location_name,
+                    "number_of_trains": n,
+                    "start_time": 0,
+                    "end_time": end_time,
+                    "seed": params["seed"] * (j + i + 1),
+                    "use_default_material": True,
+                    "trains_given": False,
+                    "perform_servicing": params["perform_servicing"],
+                    "mixed_traffic": params["mixed_traffic"],
+                    "matching": MATCHING_NAME_TO_ID[matching],
+                    "min_gap_on_gateway": params["min_gap_on_gateway"],
+                    "gateway": {
+                        "arrival": [15],
+                        "departure": [15],
+                    },
+                    "train_unit_distribution": {
+                        "train_unit_types": params["train_unit_types"],
+                        "super_type_ratio": params["super_type_ratio"],
+                        "units_per_composition": params["units_per_composition"],
+                        "matching_complexity": params["matching_complexity"],
+                        "instanding_ratio": params["instanding_ratio"],
+                        "outstanding_ratio": params["outstanding_ratio"],
+                    },
+                }
+    return configs
+
+
+def scenario_params(spec: dict) -> dict:
+    """An experiment spec's "scenario_config" section with DEFAULTS filling any gaps.
+
+    Rejects keys DEFAULTS does not know, the same check main() applies to --from-json.
+    """
+    file_values = spec[experiment_spec.SCENARIO_CONFIG_KEY]
+    unknown_keys = file_values.keys() - DEFAULTS.keys()
+    if unknown_keys:
+        raise ValueError(f"Unknown \"{experiment_spec.SCENARIO_CONFIG_KEY}\" key(s): "
+                         f"{sorted(unknown_keys)}")
+    invalid_matchings = set(file_values.get("matchings", [])) - MATCHING_NAME_TO_ID.keys()
+    if invalid_matchings:
+        raise ValueError(f"invalid matching(s): {sorted(invalid_matchings)}")
+    return {key: file_values.get(key, default) for key, default in DEFAULTS.items()}
+
+
 def main() -> None:
     # First pass: only look for --from-json, so its values can seed the
     # defaults of every other flag before those flags are defined below.
@@ -73,10 +131,10 @@ def main() -> None:
             spec = experiment_spec.load(pre_args.from_json)
         except (OSError, ValueError, json.JSONDecodeError) as exc:
             sys.exit(f"ERROR: {exc}")
-        file_values = spec[experiment_spec.SCENARIOS_KEY]
+        file_values = spec[experiment_spec.SCENARIO_CONFIG_KEY]
         unknown_keys = file_values.keys() - DEFAULTS.keys()
         if unknown_keys:
-            sys.exit(f"ERROR: Unknown \"{experiment_spec.SCENARIOS_KEY}\" key(s) in "
+            sys.exit(f"ERROR: Unknown \"{experiment_spec.SCENARIO_CONFIG_KEY}\" key(s) in "
                      f"{pre_args.from_json}: {sorted(unknown_keys)}")
 
     def default(key):
@@ -140,7 +198,6 @@ def main() -> None:
     loc = REPO_ROOT / args.location
     if not loc.is_dir():
         parser.error(f"No such location: {loc}")
-    location_name = args.location.removeprefix("Location_")
 
     total_runs = len(args.number_of_trains) * args.number_of_instances * len(args.matchings)
     print(
@@ -153,43 +210,13 @@ def main() -> None:
     configurations_dir = loc / "configurations"
     config_dir = (configurations_dir / args.subfolder) if args.subfolder else configurations_dir
     config_dir.mkdir(parents=True, exist_ok=True)
+    params = {key: getattr(args, key) for key in DEFAULTS}
     written = 0
-    for j, n in enumerate(args.number_of_trains):
-        end_time = n * args.time_window_per_train
-        for matching in args.matchings:
-            for i in range(args.number_of_instances):
-                seed = args.seed * (j + i + 1)
-                config = {
-                    "location": location_name,
-                    "number_of_trains": n,
-                    "start_time": 0,
-                    "end_time": end_time,
-                    "seed": seed,
-                    "use_default_material": True,
-                    "trains_given": False,
-                    "perform_servicing": args.perform_servicing,
-                    "mixed_traffic": args.mixed_traffic,
-                    "matching": MATCHING_NAME_TO_ID[matching],
-                    "min_gap_on_gateway": args.min_gap_on_gateway,
-                    "gateway": {
-                        "arrival": [15],
-                        "departure": [15],
-                    },
-                    "train_unit_distribution": {
-                        "train_unit_types": args.train_unit_types,
-                        "super_type_ratio": args.super_type_ratio,
-                        "units_per_composition": args.units_per_composition,
-                        "matching_complexity": args.matching_complexity,
-                        "instanding_ratio": args.instanding_ratio,
-                        "outstanding_ratio": args.outstanding_ratio,
-                    },
-                }
-
-                out_name = f"scenario_config_custom_{n}_{matching}_{i}.json"
-                out_path = config_dir / out_name
-                with open(out_path, "w") as f:
-                    json.dump(config, f, indent=4)
-                written += 1
+    for instance, config in sweep_configs(params, args.location).items():
+        out_path = config_dir / f"scenario_config_{instance}.json"
+        with open(out_path, "w") as f:
+            json.dump(config, f, indent=4)
+        written += 1
 
     print(f"Wrote {written} config(s) to {config_dir.relative_to(REPO_ROOT)}/")
 

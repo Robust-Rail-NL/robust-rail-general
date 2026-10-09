@@ -1,8 +1,22 @@
 #!/usr/bin/env python3
-"""Run the generator docker image on all scenario_config_*.json files."""
+"""Run the generator docker image on all scenario_config_*.json files.
+
+By default each config comes from <location>/configurations/ (or --config-dir)
+and its scenario lands in <location>/scenarios/.
+
+--experiment is the self-contained layout run_experiment.py uses instead: the
+experiment JSON's "scenario_config" section is the only config. It is expanded
+into one generator config per instance in a temporary directory -- the
+generator image takes exactly one train count, matching and seed per run --
+which is deleted afterwards, and each scenario is written to
+<run-dir>/<instance>/scenario_<instance>.json with its .out/.err beside it. The
+location only supplies location.json.
+"""
 
 import argparse
+import json
 import sys
+import tempfile
 from pathlib import Path
 
 from scripts.docker_utils import (
@@ -14,6 +28,8 @@ from scripts.docker_utils import (
     finish_capture,
     run_container,
 )
+from scripts import experiment_spec
+from scripts.generate_experiment_configs import scenario_params, sweep_configs
 from scripts.instance_filter import fail_no_match, instance_of, select
 
 ROOT = Path(__file__).parent
@@ -25,6 +41,10 @@ DOCKER_IMAGE_VERSIONS = {
     "local": "generator:latest",
 }
 CONTAINER_DB = "/app/database"
+# --experiment only: the temporary directory holding the expanded configs, and
+# the instance's own directory the scenario is written into.
+CONTAINER_CONFIG = "/app/config"
+CONTAINER_RUN = "/app/run"
 # apptainer-only (see docker_utils.build_run_cmd's workdir param): the
 # generator image's own Dockerfile WORKDIR, which its ENTRYPOINT ("python
 # src/main.py") is relative to.
@@ -35,18 +55,33 @@ def _instance_name(path: Path) -> str:
 
 def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bool,
                 config_dir: Path | None = None, engine: str = "docker",
-                cache_dir: Path | None = None) -> bool:
+                cache_dir: Path | None = None, instance_dir: Path | None = None) -> bool:
+    """Generate one config's scenario.
+
+    instance_dir (--experiment): write the scenario and its .out/.err there,
+    instead of into <location>/scenarios/.
+    """
     name = _instance_name(config)
     cname = container_name("generator", name)
     mounts = [(location_dir.resolve(), CONTAINER_DB)]
-    # An overlay on just the configurations/ subpath, not a merge: only
-    # config_dir's contents are visible there.
-    if config_dir:
-        mounts.append((config_dir.resolve(), f"{CONTAINER_DB}/configurations"))
+    if instance_dir:
+        # The generator takes a full path for both --config and --scenario-file,
+        # so the location stays mounted for location.json alone.
+        mounts += [(config.parent.resolve(), CONTAINER_CONFIG),
+                   (instance_dir.resolve(), CONTAINER_RUN)]
+        config_arg = f"{CONTAINER_CONFIG}/{config.name}"
+        scenario_arg = f"{CONTAINER_RUN}/scenario_{name}.json"
+    else:
+        # An overlay on just the configurations/ subpath, not a merge: only
+        # config_dir's contents are visible there.
+        if config_dir:
+            mounts.append((config_dir.resolve(), f"{CONTAINER_DB}/configurations"))
+        config_arg = config.name
+        scenario_arg = f"scenario_{name}.json"
     args = [
-        "--config", config.name,
+        "--config", config_arg,
         "--path", CONTAINER_DB,
-        "--scenario-file", f"scenario_{name}.json",
+        "--scenario-file", scenario_arg,
     ]
     cmd = build_run_cmd(engine, docker_image, mounts, args, name=cname, cache_dir=cache_dir,
                         strict=not dry_run, workdir=CONTAINER_WORKDIR)
@@ -56,8 +91,8 @@ def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bo
         print(f"    [dry-run] {' '.join(cmd)}")
         return True
 
-    scenarios_dir = location_dir / "scenarios"
-    scenarios_dir.mkdir(exist_ok=True)
+    scenarios_dir = instance_dir or location_dir / "scenarios"
+    scenarios_dir.mkdir(parents=True, exist_ok=True)
     out_file = scenarios_dir / f"scenario_{name}.out"
     err_file = scenarios_dir / f"scenario_{name}.err"
 
@@ -72,6 +107,41 @@ def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bo
     if not ok and returncode is not None:
         print(f"    FAILED (exit {returncode})", file=sys.stderr)
     return ok
+
+
+def _generate_experiment(args, image: str) -> None:
+    """--experiment: generate every instance of the file's "scenario_config" sweep."""
+    try:
+        spec = experiment_spec.load(args.experiment)
+        configs = sweep_configs(scenario_params(spec), spec["location"])
+    except (OSError, ValueError) as exc:
+        sys.exit(f"ERROR: {exc}")
+    loc = ROOT / spec["location"]
+    if not loc.is_dir():
+        sys.exit(f"No such location: {loc}")
+    run_dir = args.run_dir or ROOT / "results" / spec["name"]
+
+    total, errors = 0, 0
+    with tempfile.TemporaryDirectory(prefix="scenario_configs_") as tmp:
+        paths = []
+        for instance, config in configs.items():
+            path = Path(tmp) / f"{INSTANCE_PREFIX}{instance}.json"
+            path.write_text(json.dumps(config, indent=4) + "\n")
+            paths.append(path)
+        selected = select(paths, args.instance, INSTANCE_PREFIX)
+        if args.instance and not selected:
+            fail_no_match(args.instance, list(configs))
+        print(f"\n{loc.name} ({len(selected)} instance(s)) [from {args.experiment} -> {run_dir}]")
+        for config in selected:
+            total += 1
+            if not _run_config(image, loc, config, args.dry_run, engine=args.engine,
+                               cache_dir=args.sif_cache_dir,
+                               instance_dir=run_dir / _instance_name(config)):
+                errors += 1
+
+    print(f"\nDone: {total - errors}/{total} succeeded.")
+    if errors:
+        sys.exit(1)
 
 
 def main() -> None:
@@ -93,6 +163,15 @@ def main() -> None:
                              "hand-written configs and the location supplies everything else. "
                              "It overlays the location's own configurations/ rather than merging "
                              "with it, so only this directory's configs are visible.")
+    parser.add_argument("--experiment", metavar="FILE", type=Path,
+                        help="Generate the sweep an experiment JSON's \"scenario_config\" section "
+                             "describes, writing each scenario to "
+                             "<run-dir>/<instance>/scenario_<instance>.json. The location comes "
+                             "from the file. No config files are kept: the section itself is the "
+                             "config. This is the self-contained layout run_experiment.py uses.")
+    parser.add_argument("--run-dir", metavar="DIR", type=Path,
+                        help="With --experiment: where the instance directories go (default: "
+                             "results/<name>/).")
     parser.add_argument("--no-pull", action="store_true",
                         help="Skip the up-front 'docker pull'. For a driver like "
                              "run_experiment.py that invokes this script once per attempt and "
@@ -104,6 +183,13 @@ def main() -> None:
     add_engine_args(parser)
     args = parser.parse_args()
 
+    if args.experiment and (args.location or args.config_dir):
+        parser.error("--experiment takes its location from the file, and is its own config: "
+                     "drop --location/--config-dir.")
+    if args.run_dir and not args.experiment:
+        parser.error("--run-dir requires --experiment.")
+    if args.experiment and not args.experiment.is_file():
+        parser.error(f"No such experiment file: {args.experiment}")
     if args.config_dir and not args.location:
         parser.error("--config-dir requires --location.")
     if args.config_dir and not args.config_dir.is_dir():
@@ -117,6 +203,10 @@ def main() -> None:
         # internet to pull with anyway).
         if args.engine == "docker" and not args.no_pull:
             ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
+
+    if args.experiment:
+        _generate_experiment(args, DOCKER_IMAGE_VERSIONS[args.version])
+        return
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 
