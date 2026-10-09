@@ -126,3 +126,46 @@ def test_evaluator_mounts_a_scenario_outside_the_location(tmp_path):
                    "--plan", str(tmp_path / "local_search" / "plan.json"))
 
     assert "--path_scenario /app/scenario/scenario_custom_2_FIFO_0.json" in out
+
+
+def test_max_duration_lifts_the_solver_iteration_cap():
+    from run_solver import UNCAPPED_ITERATIONS, _apply_overrides
+
+    old_schema = {"SimulatedAnnealing": {"IterationsUntilReset": 15000, "Reset": 2000}}
+    sa = _apply_overrides(old_schema, 300, None)["SimulatedAnnealing"]
+    assert sa == {"IterationsUntilReset": UNCAPPED_ITERATIONS, "Reset": 2000, "MaxDuration": 300}
+
+    new_schema = {"SimulatedAnnealing": {"MaxIterations": 15000, "IterationsUntilReset": 2000}}
+    sa = _apply_overrides(new_schema, 300, None)["SimulatedAnnealing"]
+    assert sa["MaxIterations"] == UNCAPPED_ITERATIONS and sa["IterationsUntilReset"] == 2000
+
+    untouched = {"SimulatedAnnealing": {"IterationsUntilReset": 15000, "Reset": 2000}}
+    assert _apply_overrides(untouched, None, None)["SimulatedAnnealing"]["IterationsUntilReset"] == 15000
+
+
+def test_length_fill_is_all_units_over_parking_length(tmp_path):
+    from scripts.report_results import instance_feasibility, length_fill
+
+    scenario = {
+        "trainUnitTypes": [{"typePrefix": "A", "carriages": 4, "length": 100.0},
+                           {"typePrefix": "B", "carriages": 3, "length": 50.0}],
+        "in": [{"members": [{"typePrefix": "A", "carriages": 4},
+                            {"typePrefix": "B", "carriages": 3}]}],
+        "inStanding": [{"members": [{"typePrefix": "B", "carriages": 3}]}],
+    }
+    location = {"trackParts": [
+        {"type": "RailRoad", "parkingAllowed": True, "length": 300.0},
+        {"type": "RailRoad", "parkingAllowed": True, "length": 100.0},
+        {"type": "RailRoad", "parkingAllowed": False, "length": 999.0},
+        {"type": "Switch", "parkingAllowed": True, "length": 999.0},
+    ]}
+    assert length_fill(scenario, location) == 0.5  # (100 + 50 + 50) / (300 + 100)
+    assert length_fill({**scenario, "trainUnitTypes": []}, location) is None
+
+    # In run_experiment's layout the location comes from the run's experiment.json.
+    instance_dir = tmp_path / "custom_2_FIFO_0"
+    instance_dir.mkdir()
+    (tmp_path / "experiment.json").write_text(json.dumps({"location": LOCATION}))
+    (instance_dir / "scenario_custom_2_FIFO_0.json").write_text(json.dumps(scenario))
+    row = instance_feasibility("custom_2_FIFO_0", instance_dir, 1800)
+    assert 0 < row["length_fill"] < 1

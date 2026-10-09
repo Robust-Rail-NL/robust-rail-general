@@ -80,7 +80,7 @@ RUN_FIELDNAMES = [
 ]
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-FEASIBILITY_FIELDNAMES = ["instance", "classification", "tested"]
+FEASIBILITY_FIELDNAMES = ["instance", "classification", "tested", "length_fill"]
 FAILURE_FIELDNAMES = ["instance", "tool", "seed", "reason", "seconds"]
 
 
@@ -296,6 +296,51 @@ def tool_rows(instance: str, tool: str, tool_dir: Path) -> tuple:
     return run_row, failure_row
 
 
+def _instance_location(instance_dir: Path) -> str | None:
+    """The Location_* directory an instance ran against: from the run's own
+    experiment.json (run_experiment.py's layout), else from any attempt's result.json."""
+    location = read_json(instance_dir.parent / "experiment.json").get("location")
+    if location:
+        return location
+    for _, tool_dir in _tool_dirs(instance_dir):
+        location = read_json(tool_dir / "result.json").get("location")
+        if location:
+            return location
+    return None
+
+
+def length_fill(scenario: dict, location: dict) -> float | None:
+    """Total train-unit length over total parking-track length, both in metres.
+
+    Without mixed traffic every arrival precedes every departure, so at the
+    peak the yard holds every unit in the scenario at once: in-standing trains
+    plus all arrivals. That makes this the yard's peak fill, independent of the
+    schedule or the plan. Above 1 the instance cannot be solved; well below 1
+    it still may not be, since compositions must each fit on one track and
+    moves need free space. None if either length is unknown.
+    """
+    type_lengths = {(t.get("typePrefix"), t.get("carriages")): t.get("length")
+                    for t in scenario.get("trainUnitTypes") or []}
+    units = [m for train in (scenario.get("in") or []) + (scenario.get("inStanding") or [])
+             for m in train.get("members") or []]
+    unit_lengths = [type_lengths.get((m.get("typePrefix"), m.get("carriages"))) for m in units]
+    parking = [part.get("length") for part in location.get("trackParts") or []
+               if part.get("type") == "RailRoad" and part.get("parkingAllowed")]
+    if not units or None in unit_lengths or not parking or None in parking:
+        return None
+    return round(sum(unit_lengths) / sum(parking), 3)
+
+
+def _instance_length_fill(instance: str, instance_dir: Path) -> float | None:
+    """length_fill for an instance in run_experiment.py's layout, whose scenario
+    sits in its own results directory."""
+    location = _instance_location(instance_dir)
+    scenario = read_json(instance_dir / f"scenario_{instance}.json")
+    if not location or not scenario:
+        return None
+    return length_fill(scenario, read_json(REPO_ROOT / location / "location.json"))
+
+
 def instance_feasibility(instance: str, instance_dir: Path, certify_threshold: int) -> dict:
     any_solved = False
     any_infeasible = False
@@ -321,6 +366,7 @@ def instance_feasibility(instance: str, instance_dir: Path, certify_threshold: i
         "instance": instance,
         "classification": classification,
         "tested": "yes" if (classification == "unresolved" and any_certified) else "",
+        "length_fill": _instance_length_fill(instance, instance_dir) or "",
     }
 
 

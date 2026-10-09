@@ -87,8 +87,8 @@ def _write_config(config_path: Path, scenario_container_path: str, plan_containe
         "Iterations": 40, "IterationsUntilReset": 100, "TabuListLength": 16, "Bias": 0.5,
     })
     sa = params.get("SimulatedAnnealing", {
-        "MaxDuration": 3600, "StopWhenFeasible": "true", "IterationsUntilReset": 15000,
-        "T": 15, "A": 0.97, "Q": 2000, "Reset": 2000, "Bias": 0.2,
+        "MaxDuration": 3600, "StopWhenFeasible": "true", "MaxIterations": 15000,
+        "IterationsUntilReset": 2000, "T": 15, "A": 0.97, "Q": 2000, "Bias": 0.2,
         "IntensifyOnImprovement": "false",
     })
     content = (
@@ -110,16 +110,32 @@ def _backstop(max_duration: int | None) -> int | None:
     return None if max_duration is None else max_duration + BACKSTOP_GRACE
 
 
+# Simulated annealing stops at whichever comes first: MaxDuration, a feasible
+# plan (StopWhenFeasible), or its total iteration cap. The locations' configs
+# cap it at MaxIterations: 15000 -- a few seconds -- which made --max-duration
+# a no-op, so a given --max-duration lifts the cap to this (C# int.MaxValue).
+UNCAPPED_ITERATIONS = 2_147_483_647
+
+
 def _apply_overrides(params: dict, max_duration: int | None, seed: int | None) -> dict:
     """Fold --max-duration/--seed into the parsed config_solver.yaml params.
 
     Applied on both the batch and the single-instance path, so neither flag is
     a silent no-op depending on which one you happen to be on.
+
+    --max-duration also lifts the iteration cap, so the time budget is what
+    actually ends the search. The cap is "MaxIterations" in the solver's
+    current config schema (v2.1.0+), and "IterationsUntilReset" in the
+    deprecated one, recognisable by its "Reset" key -- there
+    "IterationsUntilReset" holds the cap and "Reset" the real reset threshold
+    (solver#30).
     """
     if seed is not None:
         params["Seed"] = seed
     if max_duration is not None:
-        params.setdefault("SimulatedAnnealing", {})["MaxDuration"] = max_duration
+        sa = params.setdefault("SimulatedAnnealing", {})
+        sa["MaxDuration"] = max_duration
+        sa["IterationsUntilReset" if "Reset" in sa else "MaxIterations"] = UNCAPPED_ITERATIONS
     return params
 
 
