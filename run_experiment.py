@@ -21,6 +21,12 @@ rather than the script that drives it:
                                            eval_result.json
   results/<name>/<instance>/planning/      same layout
 
+Each run also leaves its inputs next to its results, so a results directory can
+be reviewed on its own: results/<name>/experiment.json is a copy of the
+experiment JSON the run was started with, and
+results/<name>/<instance>/scenario_config_<instance>.json is the generator
+config that instance's scenario was produced from (including its derived seed).
+
 "num_seeds": N runs the solver up to N times per instance instead of once, each
 seed getting its own local_search/seed<i>/ subdirectory with that same layout
 (planning is unaffected — run_planner.py has no seed concept). It stops at the
@@ -55,6 +61,7 @@ also appends nothing.
 import argparse
 import csv
 import json
+import shutil
 import subprocess
 import sys
 import threading
@@ -279,6 +286,21 @@ def _generate_configs_from_json(loc: Path, experiment: Path, name: str) -> Path:
         sys.exit(result.returncode)
     print()
     return config_dir
+
+
+def _record_inputs(out_dir: Path, experiment: Path, config_dir: Path,
+                   instances: list[str]) -> None:
+    """Copy the experiment JSON and each instance's generator config into the results.
+
+    Overwritten on a re-run under the same name, which is what the rest of
+    results/<name>/ is too: the copy always describes the run that last wrote there.
+    """
+    shutil.copy2(experiment, out_dir / "experiment.json")
+    for instance in instances:
+        config = config_dir / f"scenario_config_{instance}.json"
+        if config.is_file():
+            (out_dir / instance).mkdir(parents=True, exist_ok=True)
+            shutil.copy2(config, out_dir / instance / config.name)
 
 
 def _by_size(loc: Path, instances: list[str], config_dir: Path) -> list[str]:
@@ -584,6 +606,7 @@ def main() -> None:
     all_results = {}
     if not args.dry_run:
         out_dir.mkdir(parents=True, exist_ok=True)
+        _record_inputs(out_dir, args.experiment, config_dir, instances)
         _init_live_csvs(out_dir)
 
     def run_one(instance: str) -> None:
