@@ -11,6 +11,7 @@ default to "docker" so every existing call site keeps working unchanged.
 import argparse
 import importlib.util
 import os
+import re
 import shutil
 import signal
 import subprocess
@@ -303,12 +304,19 @@ def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args:
 #   stat()/listdir() on it   FAIL      bind-mounting it         ok
 #
 # Mounting the ancestor refreshes it, and its children then mount normally.
-# Hence _warm_bind below, run only after a failure has already happened.
+# Hence warm_bind below: run after a failure has happened, and up front by
+# run_generator.py --experiment, which mounts many freshly created directories.
+#
+# Docker Desktop words the same failure two ways, depending on the version and
+# file-sharing backend: "bind source path does not exist: <path>", or
+# 'invalid mount config for type "bind": stat <path>: operation not permitted'.
 MOUNT_RACE_MESSAGE = "bind source path does not exist"
+MOUNT_RACE_STAT_PATTERN = re.compile(
+    r'invalid mount config for type "bind": stat (.+?): operation not permitted')
 MOUNT_RACE_EXIT = 125
 
 
-def _warm_bind(source: Path, image: str) -> None:
+def warm_bind(source: Path, image: str) -> None:
     """Bind-mount `source` and each ancestor under the working directory once.
 
     The exit codes are ignored on purpose: the container is expected to fail
@@ -342,6 +350,9 @@ def _failed_bind_source(stderr: str) -> Path | None:
         if MOUNT_RACE_MESSAGE in line:
             path = line.split(MOUNT_RACE_MESSAGE, 1)[1].strip(": ")
             return Path(path.removeprefix("/host_mnt") or "/")
+        match = MOUNT_RACE_STAT_PATTERN.search(line)
+        if match:
+            return Path(match.group(1).removeprefix("/host_mnt") or "/")
     return None
 
 
@@ -375,7 +386,7 @@ def run_container(cmd: list[str], name: str, out_file: Path, err_file: Path,
         if source is not None:
             print(f"    docker cannot see {source}, which exists on disk — refreshing its "
                   f"parent directories and retrying", file=sys.stderr)
-            _warm_bind(source, _image_of(cmd))
+            warm_bind(source, _image_of(cmd))
             returncode, timed_out = _run_once(cmd, name, out_file, err_file, timeout, engine)
             if returncode == MOUNT_RACE_EXIT:
                 print("    still unusable. A directory on that path was most likely deleted "

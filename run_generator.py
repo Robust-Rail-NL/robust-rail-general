@@ -36,6 +36,7 @@ from scripts.docker_utils import (
     finish_capture,
     image_identity,
     run_container,
+    warm_bind,
 )
 from scripts import experiment_spec
 from scripts.generate_experiment_configs import scenario_params, sweep_configs
@@ -167,6 +168,14 @@ def _generate_experiment(args, image: str) -> None:
         if args.instance and not selected:
             fail_no_match(args.instance, list(configs))
         print(f"\n{loc.name} ({len(selected)} instance(s)) [from {args.experiment} -> {run_dir}]")
+        if args.engine == "docker" and not args.dry_run and selected:
+            # Every instance directory is mounted into a container moments after
+            # being created. Creating them all first and mounting their parent
+            # once makes Docker Desktop see them (see docker_utils.warm_bind),
+            # instead of the first few failing with exit 125.
+            for config in selected:
+                (run_dir / _instance_name(config)).mkdir(parents=True, exist_ok=True)
+            warm_bind(run_dir, image)
         for config in selected:
             instance = _instance_name(config)
             instance_dir = run_dir / instance

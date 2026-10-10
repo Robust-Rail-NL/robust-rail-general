@@ -246,3 +246,14 @@ def test_interrupted_attempts_are_not_reused():
     assert not run_experiment._reusable({"exit_code": 137, "timed_out": False})  # killed from outside
     assert not run_experiment._reusable({"exit_code": None})
     assert not run_experiment._reusable({})
+
+
+def test_both_docker_desktop_mount_race_messages_are_recognised():
+    from scripts.docker_utils import _failed_bind_source
+
+    old = "docker: Error response from daemon: bind source path does not exist: /host_mnt/Users/x/results/a"
+    new = ('docker: Error response from daemon: invalid mount config for type "bind": '
+           "stat /host_mnt/Users/x/results/b: operation not permitted")
+    assert _failed_bind_source(old) == Path("/Users/x/results/a")
+    assert _failed_bind_source(new) == Path("/Users/x/results/b")
+    assert _failed_bind_source("docker: some other error") is None
