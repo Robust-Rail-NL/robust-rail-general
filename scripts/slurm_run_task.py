@@ -9,6 +9,9 @@ future fix to that sequence covers both paths at once, and this script stays
 a thin adapter (manifest row -> _run_and_record call) rather than a second
 copy of the pipeline logic.
 
+Takes the same experiment JSON as run_experiment.py, so versions, budget,
+planner and departure-delay tolerance are exactly what the file says.
+
 --index defaults to $SLURM_ARRAY_TASK_ID so scripts/slurm/
 run_experiment_array.sbatch doesn't have to pass it explicitly; passing
 --index directly also lets this be run/tested off an actual array job.
@@ -26,6 +29,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 import run_experiment  # noqa: E402
+from scripts import experiment_spec  # noqa: E402
 from scripts.docker_utils import DEFAULT_SIF_CACHE_DIR  # noqa: E402
 
 
@@ -45,16 +49,9 @@ def main() -> None:
     parser.add_argument("--manifest", required=True, type=Path, metavar="FILE")
     parser.add_argument("--index", type=int, metavar="N",
                         help="Manifest row to run (default: $SLURM_ARRAY_TASK_ID).")
-    parser.add_argument("--location", required=True, metavar="NAME")
+    parser.add_argument("--experiment", required=True, type=Path, metavar="FILE",
+                        help="The experiment JSON, as for run_experiment.py.")
     parser.add_argument("--output-dir", required=True, type=Path, metavar="DIR")
-    parser.add_argument("--solver-version", default="stable")
-    parser.add_argument("--planner-version", default="stable")
-    parser.add_argument("--evaluator-version", default="stable")
-    parser.add_argument("--max-duration", type=int, metavar="SECONDS")
-    parser.add_argument("--force", dest="force", action="store_true", default=True,
-                        help="Re-run even if a result.json/eval_result.json exists (default: on, "
-                             "same as run_experiment.py).")
-    parser.add_argument("--skip-existing", dest="force", action="store_false")
     parser.add_argument("--sif-cache-dir", type=Path, default=DEFAULT_SIF_CACHE_DIR, metavar="DIR")
     args = parser.parse_args()
 
@@ -66,19 +63,27 @@ def main() -> None:
                      "explicitly when running this off an actual array job.")
         index = int(env_index)
 
+    try:
+        spec = experiment_spec.load(args.experiment)
+    except (OSError, ValueError) as exc:
+        sys.exit(f"ERROR: {exc}")
+    versions = spec[experiment_spec.VERSIONS_KEY]
+
     row = _read_row(args.manifest, index)
     instance, tool = row["instance"], row["tool"]
-    seed = int(row["seed"]) if row["seed"] else None
+    seed = int(row["seed"]) if row["seed"] else spec["seed"]
     tool_dir = args.output_dir / row["tool_dir"]
 
-    key = f"solver_seed{seed}" if (tool == "solver" and seed) else tool
+    key = f"solver_seed{seed}" if (tool == "solver" and row["seed"]) else tool
     print(f"[task {index}] {instance} [{key}] -> {tool_dir}", flush=True)
 
     results = {}
     run_experiment._run_and_record(
-        tool, args.location, instance, tool_dir,
-        args.solver_version, args.planner_version, args.evaluator_version,
-        args.force, False, args.max_duration, seed, results, key,
+        tool, spec["location"], instance,
+        run_experiment._scenario_path(args.output_dir, instance), tool_dir,
+        versions["solver"], versions["planner"], versions["evaluator"],
+        False, spec["max_duration"], seed, spec["planner"],
+        spec["departure_delay_fraction"], results, key,
         "apptainer", args.sif_cache_dir,
     )
 

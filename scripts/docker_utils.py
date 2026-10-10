@@ -11,6 +11,7 @@ default to "docker" so every existing call site keeps working unchanged.
 import argparse
 import importlib.util
 import os
+import re
 import shutil
 import signal
 import subprocess
@@ -146,6 +147,29 @@ def apptainer_pull(image: str, cache_dir: Path, force: bool = False) -> Path | N
     return dest
 
 
+def image_identity(engine: str, image: str, cache_dir: Path | None = None) -> str | None:
+    """Something that changes whenever the image's content does, or None if unknown.
+
+    docker: the local image ID (a content hash), which a pull or a rebuild changes.
+    apptainer: the cached .sif's size and modification time -- a re-pull or
+    re-stage rewrites the file. None when the image isn't available locally,
+    which callers treat as "can't tell, so don't trust anything built with it".
+    """
+    if engine == "apptainer":
+        if cache_dir is None:
+            return None
+        path = sif_path(image, cache_dir)
+        if not path.is_file():
+            return None
+        stat = path.stat()
+        return f"sif:{stat.st_size}:{stat.st_mtime_ns}"
+    result = subprocess.run(["docker", "image", "inspect", "--format", "{{.Id}}", image],
+                            capture_output=True, text=True)
+    if result.returncode != 0:
+        return None
+    return result.stdout.strip() or None
+
+
 def load_image_versions(script_path: Path) -> dict[str, str]:
     """Load a run_*.py's DOCKER_IMAGE_VERSIONS dict without running its CLI.
 
@@ -182,7 +206,8 @@ def container_name(prefix: str, instance: str) -> str:
 
 def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args: list[str], *,
                   name: str | None = None, cache_dir: Path | None = None,
-                  strict: bool = True, workdir: str | None = None) -> list[str]:
+                  strict: bool = True, workdir: str | None = None,
+                  env: dict[str, str] | None = None) -> list[str]:
     """Build one container invocation's argv, docker or apptainer, from engine-
     neutral pieces: mounts as (host source, in-container target) pairs, plus
     the image's own argv.
@@ -231,6 +256,9 @@ def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args:
     and fails with a "no such file" naming a path that was never meant to
     exist. Caught 2026-09-23 running a bare `apptainer run <sif>` sanity
     check by hand -- see docs/slurm-apptainer.md.
+
+    env is passed through to the container as `--env KEY=VALUE`, which both
+    engines spell the same way.
     """
     if engine == "docker":
         cmd = ["docker", "run", "--rm"]
@@ -238,6 +266,8 @@ def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args:
             cmd += ["--name", name]
         if sys.platform != "win32":
             cmd += ["--user", f"{os.getuid()}:{os.getgid()}"]
+        for key, value in (env or {}).items():
+            cmd += ["--env", f"{key}={value}"]
         for source, target in mounts:
             cmd += ["--mount", f"type=bind,source={source},target={target}"]
         cmd += [image, *args]
@@ -249,6 +279,8 @@ def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args:
         cmd = ["apptainer", "run", "--writable-tmpfs"]
         if workdir is not None:
             cmd += ["--pwd", workdir]
+        for key, value in (env or {}).items():
+            cmd += ["--env", f"{key}={value}"]
         for source, target in mounts:
             cmd += ["--bind", f"{source}:{target}"]
         cmd += [str(sif), *args]
@@ -272,12 +304,19 @@ def build_run_cmd(engine: str, image: str, mounts: list[tuple[Path, str]], args:
 #   stat()/listdir() on it   FAIL      bind-mounting it         ok
 #
 # Mounting the ancestor refreshes it, and its children then mount normally.
-# Hence _warm_bind below, run only after a failure has already happened.
+# Hence warm_bind below: run after a failure has happened, and up front by
+# run_generator.py --experiment, which mounts many freshly created directories.
+#
+# Docker Desktop words the same failure two ways, depending on the version and
+# file-sharing backend: "bind source path does not exist: <path>", or
+# 'invalid mount config for type "bind": stat <path>: operation not permitted'.
 MOUNT_RACE_MESSAGE = "bind source path does not exist"
+MOUNT_RACE_STAT_PATTERN = re.compile(
+    r'invalid mount config for type "bind": stat (.+?): operation not permitted')
 MOUNT_RACE_EXIT = 125
 
 
-def _warm_bind(source: Path, image: str) -> None:
+def warm_bind(source: Path, image: str) -> None:
     """Bind-mount `source` and each ancestor under the working directory once.
 
     The exit codes are ignored on purpose: the container is expected to fail
@@ -311,6 +350,9 @@ def _failed_bind_source(stderr: str) -> Path | None:
         if MOUNT_RACE_MESSAGE in line:
             path = line.split(MOUNT_RACE_MESSAGE, 1)[1].strip(": ")
             return Path(path.removeprefix("/host_mnt") or "/")
+        match = MOUNT_RACE_STAT_PATTERN.search(line)
+        if match:
+            return Path(match.group(1).removeprefix("/host_mnt") or "/")
     return None
 
 
@@ -344,7 +386,7 @@ def run_container(cmd: list[str], name: str, out_file: Path, err_file: Path,
         if source is not None:
             print(f"    docker cannot see {source}, which exists on disk — refreshing its "
                   f"parent directories and retrying", file=sys.stderr)
-            _warm_bind(source, _image_of(cmd))
+            warm_bind(source, _image_of(cmd))
             returncode, timed_out = _run_once(cmd, name, out_file, err_file, timeout, engine)
             if returncode == MOUNT_RACE_EXIT:
                 print("    still unusable. A directory on that path was most likely deleted "
@@ -405,6 +447,43 @@ def _run_once(cmd: list[str], name: str, out_file: Path, err_file: Path,
     except Exception as exc:
         print(f"    ERROR: {exc}", file=sys.stderr)
     return returncode, timed_out
+
+
+def _count_lines(path: Path) -> int:
+    """Lines in a file, counting a final unterminated one; 0 if it cannot be read."""
+    try:
+        with open(path, "rb") as f:
+            count = sum(chunk.count(b"\n") for chunk in iter(lambda: f.read(1 << 20), b""))
+    except OSError:
+        return 0
+    return count if _ends_with_newline(path) else count + 1
+
+
+def _ends_with_newline(path: Path) -> bool:
+    try:
+        with open(path, "rb") as f:
+            f.seek(-1, os.SEEK_END)
+            return f.read(1) == b"\n"
+    except OSError:
+        return True
+
+
+def finish_capture(out_file: Path, err_file: Path, footer: str, ok: bool) -> tuple[int, int]:
+    """Close out a container's captured output; return (stdout lines, stderr lines).
+
+    A clean run with nothing on stderr leaves no .err file at all. Anything else
+    gets `footer` (the exit/timeout line) appended to it, on a line of its own.
+    """
+    had_stderr = err_file.exists() and err_file.stat().st_size > 0
+    if ok and not had_stderr:
+        err_file.unlink(missing_ok=True)
+        return _count_lines(out_file), 0
+
+    with open(err_file, "a") as f:
+        if had_stderr and not _ends_with_newline(err_file):
+            f.write("\n")
+        f.write(footer if footer.endswith("\n") else footer + "\n")
+    return _count_lines(out_file), _count_lines(err_file)
 
 
 def ensure_runtime_ready(engine: str) -> None:

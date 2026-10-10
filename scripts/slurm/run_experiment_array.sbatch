@@ -4,17 +4,16 @@
 # submit with the exact command it prints, e.g.:
 #
 #   sbatch --array=0-41 scripts/slurm/run_experiment_array.sbatch \
-#       /scratch/<you>/sweep1/tasks.tsv KleineBinckhorst /scratch/<you>/sweep1
+#       /scratch/<you>/sweep1/tasks.tsv experiments/sweep1.json /scratch/<you>/sweep1
 #
-# Positional args: $1 manifest, $2 location, $3 output-dir. Assumes it's
+# Positional args: $1 manifest, $2 experiment JSON, $3 output-dir. Assumes it's
 # submitted from the repo root (the `cd` below is relative to this script's
 # own location, so it doesn't actually matter where `sbatch` is invoked
 # from, but the #SBATCH --output/--error paths below are still resolved
 # against the submission directory by SLURM itself).
 #
-# Version/max-duration are read from env vars if set -- export them before
-# `sbatch`, or pass `--export=SOLVER_VERSION=...,...` -- rather than being
-# separate positional args, so this file doesn't need editing per sweep.
+# Versions, max-duration and the rest come from the experiment JSON itself
+# (see scripts/experiment_spec.py), the same file run_experiment.py reads.
 #
 # --sif-cache-dir is not overridable here: scripts/stage_apptainer_images.py
 # and scripts/slurm_run_task.py share the same default
@@ -54,7 +53,7 @@ module load python/3.13.12
 set -euo pipefail
 
 MANIFEST="$1"
-LOCATION="$2"
+EXPERIMENT="$2"
 OUTPUT_DIR="$3"
 
 cd "$(dirname "$0")/../.."  # repo root
@@ -62,10 +61,6 @@ mkdir -p slurm-logs
 
 python3 scripts/slurm_run_task.py \
     --manifest "$MANIFEST" \
-    --location "$LOCATION" \
+    --experiment "$EXPERIMENT" \
     --output-dir "$OUTPUT_DIR" \
-    --solver-version "${SOLVER_VERSION:-stable}" \
-    --planner-version "${PLANNER_VERSION:-stable}" \
-    --evaluator-version "${EVALUATOR_VERSION:-stable}" \
-    ${MAX_DURATION:+--max-duration "$MAX_DURATION"} \
     ${SIF_CACHE_DIR:+--sif-cache-dir "$SIF_CACHE_DIR"}

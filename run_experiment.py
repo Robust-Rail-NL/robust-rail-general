@@ -1,47 +1,80 @@
 #!/usr/bin/env python3
-"""Run solver and/or planner against one or all instances in a location and
-record which were solved, for local solver-vs-planner comparison.
+"""Run the experiment described by an experiment JSON, and record what solved.
+
+    run_experiment.py scripts/example.json
+
+The file is the whole interface (see scripts/experiment_spec.py): it names the
+run, the location, the tools, the image versions, the budgets, and the scenario
+sweep to generate. Nothing here overrides it, so the file stays an exact record
+of what was run. "name" is the only name a run needs: everything the run makes
+lands in results/<name>/ and nowhere else — the location directory is only
+read (location.json, config.json, config_solver.yaml).
 
 Drives run_generator.py / run_solver.py / run_planner.py / run_evaluator.py as
-subprocesses via their --instance and --output-dir flags. Each (instance, tool)
-attempt gets its own directory, named after the search approach rather than the
-script that drives it:
+subprocesses. The file's "scenario_config" section is the scenario config for
+the whole sweep: run_generator.py --experiment generates every instance from
+it, first (cheap relative to solving/planning), so every instance has its
+scenario before any tool runs. No per-instance config files are kept. An
+instance whose scenario is already there from the same generator image and
+config is not regenerated, so a sweep can be generated ahead of time with
+run_generator.py --experiment <file> and this run will reuse it. Each
+(instance, tool) attempt gets its own directory, named after the search approach
+rather than the script that drives it:
 
-  <output-dir>/<instance>/local_search/  plan.json, solver.out/.err, result.json,
-                                         eval.out/.err/.txt, eval_result.json
-  <output-dir>/<instance>/planning/      same layout
+  results/<name>/experiment.json           copy of the experiment JSON
+  results/<name>/<instance>/               scenario_<instance>.json and its
+                                           generator .out/.err
+  results/<name>/<instance>/local_search/  plan.json, solver.out/.err,
+                                           result.json, eval.out/.err/.txt,
+                                           eval_result.json
+  results/<name>/<instance>/planning/      same layout
 
---num-seeds N runs the solver N times per instance instead of once, each seed
-getting its own local_search/seed<i>/ subdirectory with that same layout
-(planning is unaffected -- run_planner.py has no seed concept).
+Rerunning an experiment only runs what is missing or stale. Each finished
+solver/planner attempt leaves run_stamp.json in its directory (tool image
+identity, scenario, location files, budget, seed or planner), each evaluation
+eval_stamp.json (evaluator image, plan, scenario, location files, tolerance),
+and a later run reuses whatever still matches. So adding "planner" to an
+experiment that already ran the solver runs only the planner; a rebuilt or
+newly pulled tool image reruns that tool's attempts; a new evaluator image only
+re-evaluates. An attempt killed from outside (an interrupted run) is never
+reused. To force a rerun, delete the attempt's directory.
+
+"num_seeds": N runs the solver up to N times per instance instead of once, each
+seed getting its own local_search/seed<i>/ subdirectory with that same layout
+(planning is unaffected — run_planner.py has no seed concept). It stops at the
+first seed that solves: feasibility and coverage both ask only whether any seed
+solved, so the rest would cost wall-clock without changing either answer. An
+instance therefore has as many seed directories as it took, not always N.
 scripts/report_results.py and scripts/coverage_analysis.py detect and handle
 both layouts.
 
 result.json (written by run_solver.py/run_planner.py) records whether the tool
 produced a plan; eval_result.json (written by run_evaluator.py, only when a
-plan was produced) carries the "solved" verdict -- solved is decided by the
+plan was produced) carries the "solved" verdict — solved is decided by the
 evaluator alone, never by the solver/planner's own exit code.
 
-Runs run_generator.py first (cheap relative to solving/planning) so every
-config has a matching scenario before instances are resolved. --config-dir
-restricts both generation and the instances that follow it to one external
-directory of configs, instead of the location's own configurations/ -- this is
-how a custom instance set is run end to end.
+scripts/report_results.py's four reports — runs.csv, feasibility.csv,
+solver_failures.csv and planner_failures.csv — fill in live under results/<name>/
+over a long run. Each finished attempt appends its own row (one open, one
+write), so the cost per attempt is constant no matter how far into a sweep it
+lands. runs.csv and the two failures CSVs are already one row per
+(instance, tool[, seed]), so an attempt's row depends on nothing but its own
+directory; feasibility.csv is the one aggregate, and its row is appended once
+an instance's every tool and seed has finished.
 
-Finishes by running scripts/report_results.py over --output-dir, writing
-runs.csv and feasibility.csv there, then scripts/coverage_analysis.py, writing
-coverage_analysis.txt (RQ1 coverage + Wilson intervals + exact McNemar test)
--- both skipped on --dry-run, since a dry run's results are never fresh.
-
-progress.csv (instance, local_search, planning -- "done"/blank) is rewritten in
---output-dir after every (instance, tool) attempt finishes, whether that finish
-came from a real evaluator call or from the tool failing/timing out before ever
-reaching one -- a live view of how far a long run has gotten.
+Those live rows are a progress view, not the record: re-running an attempt
+appends a second row for it. Finishing the sweep runs report_results.py over
+the whole tree once, overwriting all four files with a canonical full scan,
+then scripts/coverage_analysis.py writes coverage_analysis.txt (RQ1 coverage +
+Wilson intervals + exact McNemar test). Both are skipped on --dry-run, which
+also appends nothing.
 """
 
 import argparse
 import csv
+import hashlib
 import json
+import shutil
 import subprocess
 import sys
 import threading
@@ -50,8 +83,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
+from scripts import experiment_spec  # noqa: E402
+from scripts.generate_experiment_configs import scenario_params, sweep_configs  # noqa: E402
 from scripts.docker_utils import (  # noqa: E402
-    add_engine_args, ensure_pulled, ensure_runtime_ready, load_image_versions,
+    add_engine_args, ensure_pulled, ensure_runtime_ready, image_identity, load_image_versions,
+)
+from scripts.report_results import (  # noqa: E402
+    DEFAULT_CERTIFY_THRESHOLD,
+    FAILURE_FIELDNAMES,
+    FEASIBILITY_FIELDNAMES,
+    RUN_FIELDNAMES,
+    failure_reason,
+    instance_feasibility,
+    tool_rows,
 )
 
 # --tools/result.json still say "solver"/"planner" (they name the script, and
@@ -59,29 +103,77 @@ from scripts.docker_utils import (  # noqa: E402
 # per-instance output directory is named after the search approach instead.
 FOLDER_NAMES = {"solver": "local_search", "planner": "planning"}
 
-# Guards progress.csv: with --jobs > 1, several instances' worker threads call
-# _write_progress concurrently, and each rewrites the whole file from scratch
-# -- without this, two threads opening it "w" at the same time could interleave
-# writes into a half-truncated file. all_results itself needs no such guard:
-# each instance owns a disjoint sub-dict (all_results.setdefault(instance, {})),
-# so concurrent reads/writes never touch the same key.
-_progress_lock = threading.Lock()
+# Guards the live CSV appends: with --jobs > 1, worker threads finish attempts
+# around the same time and would otherwise interleave each other's rows.
+# all_results needs no such guard — each instance owns a disjoint sub-dict, so
+# concurrent writes never touch the same key.
+_report_lock = threading.Lock()
 
 # A certification pass is conventionally run at a multiple of the main budget,
-# not the same T -- so the default threshold isn't just --max-duration itself.
+# not the same T — so the default threshold isn't just --max-duration itself.
 CERTIFY_MULTIPLIER = 6
 
+# The four CSVs, appended a row at a time as the sweep runs and then recompiled
+# in full by report_results.py at the end. The live rows are a progress view:
+# a re-run appends a second row for the same attempt, and the final pass is
+# what resolves that into one canonical set of files.
+LIVE_CSVS = {
+    "runs.csv": RUN_FIELDNAMES,
+    "feasibility.csv": FEASIBILITY_FIELDNAMES,
+    "solver_failures.csv": FAILURE_FIELDNAMES,
+    "planner_failures.csv": FAILURE_FIELDNAMES,
+}
 
-def _pull_once(steps: dict) -> None:
+
+def _certify_threshold(max_duration: int | None, certify_threshold: int | None) -> int:
+    """--certify-threshold if given, else a multiple of --max-duration, else the
+    same default report_results.py would have applied on its own.
+    """
+    if certify_threshold is not None:
+        return certify_threshold
+    if max_duration is not None:
+        return CERTIFY_MULTIPLIER * max_duration
+    return DEFAULT_CERTIFY_THRESHOLD
+
+
+def _init_live_csvs(out_dir: Path) -> None:
+    """Start each live CSV as a bare header, before any attempt runs."""
+    for name, fieldnames in LIVE_CSVS.items():
+        with open(out_dir / name, "w", newline="") as f:
+            csv.DictWriter(f, fieldnames=fieldnames).writeheader()
+
+
+def _append_row(out_dir: Path, name: str, row: dict) -> None:
+    """Append one row to a live CSV — one open, one write, no rescan."""
+    with _report_lock:
+        with open(out_dir / name, "a", newline="") as f:
+            csv.DictWriter(f, fieldnames=LIVE_CSVS[name]).writerow(row)
+
+
+def _append_attempt(out_dir: Path, instance: str, label: str, tool_dir: Path) -> None:
+    """Append one finished attempt's runs.csv row, and its failure row if any.
+
+    Reads only that attempt's own result.json/eval_result.json/plan.json, via
+    the same tool_rows() report_results.py uses for its full scan, so the live
+    rows and the final ones are built by one piece of code.
+    """
+    run_row, failure_row = tool_rows(instance, label, tool_dir)
+    if run_row:
+        _append_row(out_dir, "runs.csv", run_row)
+    if failure_row:
+        name = ("solver_failures.csv" if label.startswith(FOLDER_NAMES["solver"])
+                else "planner_failures.csv")
+        _append_row(out_dir, name, failure_row)
+
+
+def _pull_once(steps: dict[str, str]) -> None:
     """Pull each image this run needs, once, before any attempt starts.
 
-    Every run_*.py pulls up front so a floating tag is never served stale, which
-    is right when you invoke it yourself. But this driver invokes them once per
-    (instance, tool, seed): a 180-instance sweep at 5 seeds is 900 invocations,
-    so that same guarantee became 900 registry round-trips for images that
-    cannot change mid-run — minutes of waiting, and 900 chances for a flaky
-    registry to kill the sweep. Pulling here once and passing --no-pull down
-    keeps the guarantee and drops the repetition.
+    Every run_*.py pulls up front so a floating tag is never served stale, but
+    this driver invokes them once per (instance, tool, seed) — a 180-instance
+    sweep at 5 seeds would be 900 registry round-trips for images that cannot
+    change mid-run. Pulling here once and passing --no-pull down keeps the
+    guarantee without the repetition.
 
     steps maps script name -> version key, e.g. {"run_solver.py": "stable"}.
     """
@@ -93,32 +185,32 @@ def _pull_once(steps: dict) -> None:
             ensure_pulled(image)
 
 
-def _engine_flags(engine: str, cache_dir: Path) -> list:
+def _engine_flags(engine: str, cache_dir: Path | None) -> list[str]:
     """The --engine/--sif-cache-dir passthrough for a run_*.py subprocess call.
 
-    Only emitted for apptainer, like every other optional flag in this file
-    (--config-dir, --seed, ...), so a docker run's printed --dry-run command
-    line stays exactly as it always has -- and so a driver invoked with no
-    --engine at all (the common case) doesn't grow two extra tokens on every
-    subprocess call for nothing.
+    Only emitted for apptainer, like every other optional flag here, so a docker
+    run's printed --dry-run command lines stay exactly as they were.
     """
     if engine == "docker":
         return []
     return ["--engine", engine, "--sif-cache-dir", str(cache_dir)]
 
 
-def _run_report(out_dir: Path, max_duration, certify_threshold) -> None:
-    # --certify-threshold, if given directly, wins outright. Otherwise derive it
-    # from --max-duration (this invocation's own budget input) rather than an
-    # independently-guessed number; report_results.py's own default applies only
-    # when neither --max-duration nor --certify-threshold was given.
-    if certify_threshold is None and max_duration is not None:
-        certify_threshold = CERTIFY_MULTIPLIER * max_duration
+def _run_report(out_dir: Path, max_duration: int | None,
+                certify_threshold: int | None) -> None:
+    """Recompile all four CSVs from every result.json/eval_result.json on disk.
+
+    Run once, at the end. It overwrites the rows appended live during the
+    sweep, which is what resolves a re-run's duplicate rows into one canonical
+    set of files.
+    """
     subprocess.run([
         sys.executable, str(ROOT / "scripts" / "report_results.py"), str(out_dir),
         "--runs-csv", str(out_dir / "runs.csv"),
         "--feasibility-csv", str(out_dir / "feasibility.csv"),
-        *(["--certify-threshold", str(certify_threshold)] if certify_threshold is not None else []),
+        "--solver-failures-csv", str(out_dir / "solver_failures.csv"),
+        "--planner-failures-csv", str(out_dir / "planner_failures.csv"),
+        "--certify-threshold", str(_certify_threshold(max_duration, certify_threshold)),
     ], cwd=ROOT)
 
 
@@ -129,61 +221,78 @@ def _run_coverage_analysis(out_dir: Path) -> None:
     ], cwd=ROOT)
 
 
-def _run_generator(location: str, version: str, dry_run: bool, config_dir: Path = None,
-                   instance: str = None, engine: str = "docker", cache_dir: Path = None) -> None:
-    subprocess.run([
-        sys.executable, str(ROOT / "run_generator.py"),
-        "--location", location, "--version", version, "--no-pull",
+def _run_generator(experiment: Path, version: str, dry_run: bool, run_dir: Path,
+                   total: int, engine: str = "docker", cache_dir: Path | None = None) -> None:
+    """Run the generator over the sweep, reporting progress as one rewritten line.
+
+    run_generator.py prints two lines per config, a few hundred for a sweep of
+    any size, and only the count is interesting here. What it complains about
+    is still shown, and the per-scenario detail stays in the .out/.err files it
+    writes beside each scenario, in that instance's own directory.
+    """
+    cmd = [
+        # -u: python block-buffers stdout as soon as it is a pipe rather than a
+        # terminal, so without this the generator's lines arrive in one burst
+        # when it exits and the count below jumps from 0 to the total.
+        sys.executable, "-u", str(ROOT / "run_generator.py"),
+        "--experiment", str(experiment), "--run-dir", str(run_dir),
+        "--version", version, "--no-pull",
         *(["--dry-run"] if dry_run else []),
-        *(["--config-dir", str(config_dir)] if config_dir else []),
-        *(["--instance", instance] if instance else []),
         *_engine_flags(engine, cache_dir),
-    ], cwd=ROOT)
+    ]
+    if dry_run:
+        subprocess.run(cmd, cwd=ROOT)
+        return
+
+    # stderr is merged into stdout so this one loop drains both; left on its own
+    # pipe, a long one could fill its buffer and wedge the sweep half way.
+    proc = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT, text=True)
+    live = sys.stdout.isatty()
+    done, problems = 0, []
+    for line in proc.stdout:
+        line = line.rstrip()
+        # run_generator.py's per-config summary line, counted only where it
+        # reports success: it prints one per config either way, so counting them
+        # all reported a full sweep even when every single config had failed.
+        if (line.startswith("    stdout:") and line.endswith("(exit 0)")) \
+                or line.startswith("    up to date"):
+            done += 1
+            if live:
+                print(f"\r  Generated {done}/{total}", end="", flush=True)
+        elif line.startswith(("WARNING", "ERROR", "    FAILED")):
+            problems.append(line.strip())
+    proc.wait()
+
+    print(f"\r  Generated {done}/{total}", flush=True)
+    for problem in problems:
+        print(f"    {problem}", file=sys.stderr, flush=True)
 
 
-def _instances_from_configs(config_dir: Path) -> list:
-    """The instances a directory of configs will produce, straight from their names.
+def _scenario_path(out_dir: Path, instance: str) -> Path:
+    """Where an instance's scenario lives: in its own results directory."""
+    return out_dir / instance / f"scenario_{instance}.json"
 
-    run_generator.py passes --scenario-file explicitly, so a config named
-    scenario_config_<X>.json always yields scenario_<X>.json. That is what
-    makes this a filename computation rather than the mtime diff this used to
-    need: the generator once derived scenario names from a config's *content*
-    (location, train count, seed), so the only way to learn what a run had
-    written was to compare scenarios/ before and after.
+
+def _sweep(spec: dict) -> dict[str, dict]:
+    """The generator config of every instance the "scenario_config" section
+    describes, keyed by instance name — the same expansion run_generator.py
+    --experiment generates from. Held in memory only; never written out.
     """
-    return [c.stem.removeprefix("scenario_config_")
-            for c in sorted(config_dir.glob("scenario_config_*.json"))]
+    try:
+        return sweep_configs(scenario_params(spec), spec["location"])
+    except ValueError as exc:
+        sys.exit(f"ERROR: {exc}")
 
 
-def _write_progress(out_dir: Path, instances: list, all_results: dict, num_seeds=None) -> None:
-    """Rewrite progress.csv from the current in-memory results -- called after
-    every (instance, tool[, seed]) attempt finishes, so it always reflects
-    exactly how far the run has gotten, including instances not yet started
-    (blank cells) and tools outside --tools for this run (also blank, since they
-    were never in scope here, not because they're pending). With --num-seeds,
-    local_search shows "k/N" until all N seeds for that instance are done, then
-    "done" -- planning never has seeds, so it's unaffected.
-    """
-    with _progress_lock, open(out_dir / "progress.csv", "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["instance", "local_search", "planning"])
-        writer.writeheader()
-        for instance in instances:
-            done = all_results.get(instance, {})
-            if num_seeds:
-                n_done = sum(1 for s in range(1, num_seeds + 1) if f"solver_seed{s}" in done)
-                local_search = "done" if n_done == num_seeds else (f"{n_done}/{num_seeds}" if n_done else "")
-            else:
-                local_search = "done" if "solver" in done else ""
-            writer.writerow({
-                "instance": instance,
-                "local_search": local_search,
-                "planning": "done" if "planner" in done else "",
-            })
+def _by_size(configs: dict[str, dict]) -> list[str]:
+    """Instance names, fewest trains first."""
+    return sorted(configs, key=lambda instance: configs[instance]["number_of_trains"])
 
 
 def _version_for(tool: str, solver_version: str, planner_version: str) -> str:
     """The planner has its own independent version line (see run_planner.py's own
-    DOCKER_IMAGE_VERSIONS comment) -- generator and solver share the 2.0.0-family
+    DOCKER_IMAGE_VERSIONS comment) — generator and solver share the 2.0.0-family
     version instead. Only for picking the solver-or-planner image itself: the
     evaluator always uses its own version regardless of which tool produced the
     plan (see the comment at its call site).
@@ -191,18 +300,38 @@ def _version_for(tool: str, solver_version: str, planner_version: str) -> str:
     return planner_version if tool == "planner" else solver_version
 
 
-def _run_tool(tool: str, location: str, instance: str, out_dir: Path, version: str,
-              force: bool, dry_run: bool, max_duration, seed, engine: str = "docker",
-              cache_dir: Path = None) -> dict:
-    result_path = out_dir / "result.json"
-    if result_path.exists() and not force:
-        print(f"  SKIP {tool} (result.json exists): {out_dir}")
-        return json.loads(result_path.read_text())
+def _run_step(cmd: list[str], record_path: Path, what: str, dry_run: bool) -> None:
+    """Run one attempt, swallowing its output unless it failed to leave a record.
 
+    Everything a healthy attempt says is already on disk — solver.out/.err and
+    result.json — so the child's own progress lines only repeat the summary
+    line below, and under --jobs they interleave across threads. A missing
+    record means it never got that far (docker down, a bad --instance, a
+    crash), and then what it said is the only clue there is.
+
+    A dry run is exempt: printing the docker commands is the whole point of it.
+    """
+    if dry_run:
+        subprocess.run(cmd, cwd=ROOT)
+        return
+
+    result = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    if record_path.exists():
+        return
+    # One string, one write: under --jobs two failures would otherwise interleave.
+    said = "\n".join(f"    {line}" for line in (result.stdout + result.stderr).splitlines())
+    print(f"  {what}: wrote no {record_path.name} (exit {result.returncode}) —\n{said}",
+          file=sys.stderr, flush=True)
+
+
+def _run_tool(tool: str, location: str, instance: str, scenario: Path, out_dir: Path,
+              version: str, dry_run: bool, max_duration: int | None, seed: int | None,
+              planner_impl: str, engine: str = "docker", cache_dir: Path | None = None) -> dict:
+    result_path = out_dir / "result.json"
     script = "run_solver.py" if tool == "solver" else "run_planner.py"
-    subprocess.run([
+    _run_step([
         sys.executable, str(ROOT / script),
-        "--location", location, "--instance", instance,
+        "--location", location, "--scenario", str(scenario),
         "--output-dir", str(out_dir), "--version", version, "--no-pull",
         *(["--dry-run"] if dry_run else []),
         # Both tools take --max-duration, but it means different things: the
@@ -212,252 +341,361 @@ def _run_tool(tool: str, location: str, instance: str, out_dir: Path, version: s
         *(["--max-duration", str(max_duration)] if max_duration is not None else []),
         # --seed is solver-only; run_planner.py has no seed concept at all.
         *(["--seed", str(seed)] if seed is not None and tool == "solver" else []),
+        # --planner is planner-only; run_solver.py has no such flag at all.
+        *(["--planner", planner_impl] if tool == "planner" else []),
         *_engine_flags(engine, cache_dir),
-    ], cwd=ROOT)
+    ], result_path, f"{instance} [{tool}]", dry_run)
     return json.loads(result_path.read_text()) if result_path.exists() else {
         "instance": instance, "tool": tool, "plan_produced": False,
     }
 
 
-def _run_evaluator(location: str, instance: str, plan_path: Path, version: str,
-                   force: bool, dry_run: bool, engine: str = "docker",
-                   cache_dir: Path = None) -> dict:
-    eval_result_path = plan_path.parent / "eval_result.json"
-    if eval_result_path.exists() and not force:
-        print(f"  SKIP evaluator (eval_result.json exists): {plan_path.parent}")
-        return json.loads(eval_result_path.read_text())
+def _departure_delay(scenario_path: Path, fraction: float) -> int | None:
+    """The tolerance to allow this instance's evaluation, or None if unreadable.
 
-    subprocess.run([
+    None leaves run_evaluator.py to omit the flag entirely, which is the
+    evaluator's own exact-match behaviour — the same thing an unreadable
+    scenario would have got before this existed.
+    """
+    try:
+        scenario = json.loads(scenario_path.read_text())
+        span = int(scenario["endTime"]) - int(scenario["startTime"])
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+    return int(span * fraction) if span > 0 and fraction > 0 else None
+
+
+def _run_evaluator(location: str, instance: str, scenario: Path, plan_path: Path,
+                   version: str, dry_run: bool, delay_fraction: float, engine: str = "docker",
+                   cache_dir: Path | None = None) -> dict:
+    eval_result_path = plan_path.parent / "eval_result.json"
+    delay = _departure_delay(scenario, delay_fraction)
+    _run_step([
         sys.executable, str(ROOT / "run_evaluator.py"),
-        "--location", location, "--instance", instance, "--plan", str(plan_path),
+        "--location", location, "--scenario", str(scenario), "--plan", str(plan_path),
         "--version", version, "--no-pull",
+        *(["--departure-delay", str(delay)] if delay is not None else []),
         *(["--dry-run"] if dry_run else []),
         *_engine_flags(engine, cache_dir),
-    ], cwd=ROOT)
+    ], eval_result_path, f"{instance} [evaluator]", dry_run)
     return json.loads(eval_result_path.read_text()) if eval_result_path.exists() else {
         "solved": False, "verdict": "error", "reason": "evaluator produced no eval_result.json",
     }
 
 
-def _run_and_record(tool: str, location: str, instance: str, tool_dir: Path,
+# The instance column, wide enough for the sweep's own names; a longer one from
+# somewhere else just pushes the rest of the row right.
+INSTANCE_WIDTH = 24
+REASON_WIDTH = 46
+
+
+def _describe(instance: str) -> str:
+    """A sweep instance name as readable columns: " 10 trains  FIFO    #3".
+
+    generate_experiment_configs.py names them custom_<trains>_<matching>_<n>.
+    Anything else — a hand-written fixture — is shown as it is.
+    """
+    parts = instance.split("_")
+    if len(parts) == 4 and parts[0] == "custom" and parts[1].isdigit() and parts[3].isdigit():
+        _, trains, matching, number = parts
+        return f"{trains:>3} trains  {matching:<6}  #{number:<3}"
+    return f"{instance:<{INSTANCE_WIDTH}}"
+
+
+def _status(run_result: dict, eval_result: dict | None, dry_run: bool) -> str:
+    """How one attempt ended, in the same words the failures CSV will use.
+
+    "solved" means a plan was produced and the evaluator accepted it — the only
+    outcome that counts. Everything else is why not: a timeout, a tool that
+    exited without a plan, or the evaluator's own reason for rejecting one.
+    """
+    if dry_run:
+        return "dry run"
+    reason = failure_reason(run_result, eval_result or {})
+    if reason is None:
+        return "solved"
+    return reason if len(reason) <= REASON_WIDTH else reason[:REASON_WIDTH - 1] + "…"
+
+
+# Reuse of earlier attempts. Each finished solver/planner attempt leaves a stamp
+# of everything it ran with in its tool directory, and each evaluation one of
+# everything it judged; a later run reuses whatever still matches -- so adding a
+# tool to an experiment's "tools", or rerunning after an interruption, only runs
+# what is missing or stale. A new tool image (rebuilt, or a newer one pulled), a
+# changed scenario, budget, seed or location file each invalidate the stamp.
+RUN_STAMP = "run_stamp.json"
+EVAL_STAMP = "eval_stamp.json"
+
+_identity_cache: dict[tuple, str | None] = {}
+_identity_lock = threading.Lock()
+
+
+def _image_id(engine: str, image: str, cache_dir: Path | None) -> str | None:
+    """image_identity(), looked up once per run: images are pulled before any attempt starts."""
+    key = (engine, image, cache_dir)
+    with _identity_lock:
+        if key not in _identity_cache:
+            _identity_cache[key] = image_identity(engine, image, cache_dir)
+        return _identity_cache[key]
+
+
+def _digest(path: Path) -> str | None:
+    try:
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    except OSError:
+        return None
+
+
+def _run_stamp(tool: str, location: str, scenario: Path, version: str,
+               max_duration: int | None, seed: int | None, planner_impl: str,
+               engine: str, cache_dir: Path | None) -> dict | None:
+    """Everything a solver/planner attempt's outcome depends on, or None if the
+    tool image can't be identified (then nothing is reused)."""
+    image = load_image_versions(ROOT / f"run_{tool}.py")[version]
+    image_id = _image_id(engine, image, cache_dir)
+    if image_id is None:
+        return None
+    loc = ROOT / location
+    stamp = {"tool": tool, "image": image, "image_id": image_id,
+             "scenario": _digest(scenario), "location": _digest(loc / "location.json"),
+             "max_duration": max_duration}
+    if tool == "solver":
+        stamp.update(seed=seed, solver_config=_digest(loc / "config_solver.yaml"))
+    else:
+        stamp.update(planner=planner_impl)
+    return stamp
+
+
+def _eval_stamp(location: str, scenario: Path, plan: Path, version: str,
+                delay_fraction: float, engine: str, cache_dir: Path | None) -> dict | None:
+    """Everything an evaluation's verdict depends on, or None if unknown."""
+    image = load_image_versions(ROOT / "run_evaluator.py")[version]
+    image_id = _image_id(engine, image, cache_dir)
+    if image_id is None:
+        return None
+    loc = ROOT / location
+    return {"image": image, "image_id": image_id, "plan": _digest(plan),
+            "scenario": _digest(scenario), "location": _digest(loc / "location.json"),
+            "config": _digest(loc / "config.json"),
+            "departure_delay": _departure_delay(scenario, delay_fraction)}
+
+
+def _stamp_matches(path: Path, stamp: dict | None) -> bool:
+    if stamp is None:
+        return False
+    try:
+        return json.loads(path.read_text()) == stamp
+    except (OSError, ValueError):
+        return False
+
+
+def _reusable(run_result: dict) -> bool:
+    """Whether a recorded attempt finished on its own terms. One killed from
+    outside (an interrupted run: no exit code, or a signal's 128+N without the
+    tool's own timeout) says nothing about the instance, so it is run again."""
+    exit_code = run_result.get("exit_code")
+    if exit_code is None:
+        return False
+    return exit_code < 128 or bool(run_result.get("timed_out"))
+
+
+def _run_and_record(tool: str, location: str, instance: str, scenario: Path, tool_dir: Path,
                     solver_version: str, planner_version: str, evaluator_version: str,
-                    force: bool, dry_run: bool, max_duration, seed, results: dict,
-                    key: str, engine: str = "docker", cache_dir: Path = None) -> None:
+                    dry_run: bool, max_duration: int | None, seed: int | None,
+                    planner_impl: str, delay_fraction: float, results: dict, key: str,
+                    engine: str = "docker", cache_dir: Path | None = None) -> bool:
+    """Run one attempt and record it, reusing an earlier one whose stamp still
+    matches (see RUN_STAMP). Returns whether the evaluator accepted its plan."""
     version = _version_for(tool, solver_version, planner_version)
-    run_result = _run_tool(tool, location, instance, tool_dir, version, force, dry_run,
-                           max_duration, seed, engine, cache_dir)
+    result_path = tool_dir / "result.json"
+    run_stamp = None if dry_run else _run_stamp(tool, location, scenario, version, max_duration,
+                                                seed, planner_impl, engine, cache_dir)
+    previous = json.loads(result_path.read_text()) if result_path.exists() else {}
+    reused = (_stamp_matches(tool_dir / RUN_STAMP, run_stamp) and _reusable(previous))
+    if reused:
+        run_result = previous
+    else:
+        if not dry_run and tool_dir.exists():
+            # Cleared rather than overwritten: a stale plan.json or eval_result.json
+            # from an earlier attempt would otherwise pass for this one's.
+            shutil.rmtree(tool_dir)
+        run_result = _run_tool(tool, location, instance, scenario, tool_dir, version, dry_run,
+                               max_duration, seed, planner_impl, engine, cache_dir)
+        if run_stamp and result_path.exists():
+            (tool_dir / RUN_STAMP).write_text(json.dumps(run_stamp, indent=2) + "\n")
     eval_result = None
     # A dry run never produces a real plan.json, so there is nothing for the
-    # evaluator to dry-run against either -- skip it rather than have it fail a
-    # "no such plan file" check that would be misleading here. The evaluator has
-    # its own independent version, never the plan's producer version: a planner
-    # plan is still scored by the same evaluator build a solver plan would be,
-    # otherwise "local" here would mean the planner's own dev image tag, which
-    # the evaluator has no relation to. It also isn't tied to solver_version,
-    # even though both default into the same family -- that "stable" alias is
-    # deliberately float-forward and has bitten the solver once already (see
-    # run_solver.py's own "stable" comment).
+    # evaluator to dry-run against — skip it rather than have it fail a
+    # misleading "no such plan file" check. The evaluator always uses its own
+    # independent version, never the plan producer's: a planner plan must be
+    # scored by the same evaluator build a solver plan would be.
     if not dry_run and run_result.get("plan_produced"):
-        eval_result = _run_evaluator(location, instance, tool_dir / "plan.json",
-                                     evaluator_version, force, dry_run, engine, cache_dir)
+        plan = tool_dir / "plan.json"
+        eval_stamp = _eval_stamp(location, scenario, plan, evaluator_version, delay_fraction,
+                                 engine, cache_dir)
+        eval_path = tool_dir / "eval_result.json"
+        if _stamp_matches(tool_dir / EVAL_STAMP, eval_stamp) and eval_path.exists():
+            eval_result = json.loads(eval_path.read_text())
+        else:
+            (tool_dir / EVAL_STAMP).unlink(missing_ok=True)
+            eval_result = _run_evaluator(location, instance, scenario, plan, evaluator_version,
+                                         dry_run, delay_fraction, engine, cache_dir)
+            if eval_stamp and eval_path.exists():
+                (tool_dir / EVAL_STAMP).write_text(json.dumps(eval_stamp, indent=2) + "\n")
     results[key] = {"run": run_result, "eval": eval_result}
-    solved = bool(eval_result and eval_result.get("solved"))
-    print(f"  {instance} [{key}]  plan_produced={run_result.get('plan_produced')}  solved={solved}")
+    wall = run_result.get("wall_seconds")
+    print(f"  {_describe(instance)}  {key:<16}  "
+          f"{f'{wall:.1f}s' if isinstance(wall, (int, float)) else '':>7}  "
+          f"{_status(run_result, eval_result, dry_run)}{' (reused)' if reused else ''}",
+          flush=True)
+    return bool(eval_result and eval_result.get("solved"))
 
 
-def _run_instance(location: str, instance: str, tools: list, out_dir: Path,
+def _run_instance(location: str, instance: str, tools: list[str], out_dir: Path,
                   solver_version: str, planner_version: str, evaluator_version: str,
-                  force: bool, dry_run: bool, max_duration, seed, num_seeds,
-                  all_results: dict, all_instances: list, engine: str = "docker",
-                  cache_dir: Path = None) -> None:
+                  dry_run: bool, max_duration: int | None,
+                  certify_threshold: int | None, seed: int | None, num_seeds: int | None,
+                  planner_impl: str, delay_fraction: float, all_results: dict,
+                  engine: str = "docker", cache_dir: Path | None = None) -> None:
     results = all_results.setdefault(instance, {})
+    scenario = _scenario_path(out_dir, instance)
     for tool in tools:
         if tool == "solver" and num_seeds:
             for s in range(1, num_seeds + 1):
+                label = f"{FOLDER_NAMES[tool]}_seed{s}"
                 tool_dir = out_dir / instance / FOLDER_NAMES[tool] / f"seed{s}"
-                _run_and_record(tool, location, instance, tool_dir,
-                                solver_version, planner_version, evaluator_version,
-                                force, dry_run, max_duration, s, results, f"solver_seed{s}",
-                                engine, cache_dir)
+                solved = _run_and_record(tool, location, instance, scenario, tool_dir,
+                                         solver_version, planner_version, evaluator_version,
+                                         dry_run, max_duration, s, planner_impl, delay_fraction,
+                                         results, f"solver_seed{s}", engine, cache_dir)
                 if not dry_run:
-                    _write_progress(out_dir, all_instances, all_results, num_seeds)
+                    _append_attempt(out_dir, instance, label, tool_dir)
+                # Both things the seeds feed — feasibility.csv and the RQ1
+                # coverage count — ask only whether ANY seed solved, so the
+                # remaining seeds cannot change either answer. Retrying is only
+                # worth the wall-clock while the instance is still unsolved.
+                if solved:
+                    break
         else:
-            tool_dir = out_dir / instance / FOLDER_NAMES[tool]
-            _run_and_record(tool, location, instance, tool_dir,
+            label = FOLDER_NAMES[tool]
+            tool_dir = out_dir / instance / label
+            _run_and_record(tool, location, instance, scenario, tool_dir,
                             solver_version, planner_version, evaluator_version,
-                            force, dry_run, max_duration, seed, results, tool,
-                            engine, cache_dir)
+                            dry_run, max_duration, seed, planner_impl, delay_fraction,
+                            results, tool, engine, cache_dir)
             if not dry_run:
-                _write_progress(out_dir, all_instances, all_results, num_seeds)
+                _append_attempt(out_dir, instance, label, tool_dir)
+
+    # Every tool and seed for this instance has finished, so its feasibility
+    # row — the one aggregate of the four, over this instance's attempts only —
+    # can be settled now rather than recomputed after each attempt.
+    if not dry_run:
+        _append_row(out_dir, "feasibility.csv",
+                    instance_feasibility(instance, out_dir / instance,
+                                         _certify_threshold(max_duration, certify_threshold)))
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Run solver and/or planner (each followed by the evaluator) against one or "
-                    "every instance in a location, and record solved/not-solved.",
+        description="Run the experiment described by an experiment JSON: generate its "
+                    "scenarios, run each tool against them, evaluate every plan, and report.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("--location", required=True, metavar="NAME")
-    parser.add_argument("--instance", metavar="NAME",
-                        help="Run a single instance instead of every scenario under the location. "
-                             "Same name every step uses: scenario_<NAME>.json -> plan.json -> "
-                             "eval_result.json. Mutually exclusive with --config-dir.")
-    parser.add_argument("--tools", metavar="solver,planner", default="solver,planner",
-                        help="Comma-separated subset of {solver,planner} to run (default: both).")
-    parser.add_argument("--config-dir", metavar="DIR", type=Path,
-                        help="Use scenario_config_*.json files from this directory instead of "
-                             "<location>/configurations/. Restricts both generation and which "
-                             "instances run afterward to this subset -- the way a custom instance "
-                             "set is run. Mutually exclusive with --instance.")
-    parser.add_argument("--output-dir", required=True, metavar="DIR")
-    parser.add_argument("--generator-version", default="stable",
-                        help="Docker image version for the generator -- kept separate from "
-                             "--solver-version so scenario generation can be pinned or bumped "
-                             "independently of the solve step. See run_generator.py --help.")
-    parser.add_argument("--solver-version", default="stable",
-                        help="Docker image version for the solver. See run_solver.py --help.")
-    parser.add_argument("--planner-version", default="local",
-                        help="Docker image version for the planner -- robust-rail-planner has its "
-                             "own independent version line (default: local, i.e. whatever "
-                             "'docker build -t planner:latest .' produced). See run_planner.py.")
-    parser.add_argument("--evaluator-version", default="stable",
-                        help="Docker image version for the evaluator -- kept separately settable "
-                             "rather than inheriting the solver's. See run_evaluator.py --help.")
-    parser.add_argument("--max-duration", type=int, metavar="SECONDS",
-                        help="Wall-clock budget passed to each solver/planner run. Note it is not "
-                             "enforced identically: the solver stops its own search there and "
-                             "still writes its best plan, while the planner's container is killed "
-                             "and writes nothing (ENHSP's own -timeout is dead code upstream). "
-                             "Worth keeping in mind when reading a comparison.")
-    parser.add_argument("--seed", type=int, metavar="N",
-                        help="Passed through to run_solver.py's --seed (solver only). Without it "
-                             "every run uses the same implicit seed, so this is for deliberately "
-                             "varying it. Mutually exclusive with --num-seeds.")
-    parser.add_argument("--num-seeds", type=int, metavar="N",
-                        help="Run the solver N times per instance with seeds 1..N, each into its "
-                             "own <instance>/local_search/seed<i>/. Solver only: --tools planner "
-                             "still runs once. Mutually exclusive with --seed.")
-    parser.add_argument("--certify-threshold", type=int, metavar="SECONDS",
-                        help=f"Passed to report_results.py. Default: {CERTIFY_MULTIPLIER} x "
-                             "--max-duration; report_results.py's own default applies if neither "
-                             "this nor --max-duration is given.")
-    parser.add_argument("--force", dest="force", action="store_true", default=True,
-                        help="Re-run even if a result.json/eval_result.json exists (default: on).")
-    parser.add_argument("--skip-existing", dest="force", action="store_false",
-                        help="Skip (instance, tool) pairs that already have a result.json/"
-                             "eval_result.json, instead of re-running them.")
+    parser.add_argument("experiment", metavar="FILE", type=Path,
+                        help="The experiment JSON (see scripts/example.json). It supplies the "
+                             "name, location, tools, versions, budgets and scenario sweep for "
+                             "the whole run — there is nothing to override here, so the file is "
+                             "an exact record of what was run.")
     parser.add_argument("--dry-run", action="store_true",
                         help="Print docker commands without executing them (evaluator steps are "
                              "skipped, since a dry run never produces a plan to evaluate).")
-    parser.add_argument("--jobs", type=int, default=1, metavar="N",
-                        help="Run N instances concurrently (default: 1, sequential). Each "
-                             "instance writes into its own <output-dir>/<instance>/ subtree and "
-                             "gets its own uniquely-named containers (see "
-                             "scripts/docker_utils.container_name), so instances never collide "
-                             "with each other. Each attempt still blocks on its own docker "
-                             "container, so this only helps when the host has spare CPU/IO to "
-                             "run several at once. Ignored under --dry-run, which stays "
-                             "sequential so its printed commands are easy to read in order.")
     add_engine_args(parser)
     args = parser.parse_args()
-    if args.jobs < 1:
-        sys.exit("--jobs must be at least 1.")
 
-    loc = ROOT / args.location
+    if not args.experiment.is_file():
+        sys.exit(f"No such experiment file: {args.experiment}")
+    try:
+        spec = experiment_spec.load(args.experiment)
+    except (OSError, ValueError) as exc:
+        sys.exit(f"ERROR: {exc}")
+
+    name, location = spec["name"], spec["location"]
+    loc = ROOT / location
     if not loc.is_dir():
         sys.exit(f"No such location: {loc}")
-    if args.instance and args.config_dir:
-        sys.exit("--instance and --config-dir are mutually exclusive.")
-    if args.config_dir and not args.config_dir.is_dir():
-        sys.exit(f"No such directory: {args.config_dir}")
-    if args.seed is not None and args.num_seeds is not None:
-        sys.exit("--seed and --num-seeds are mutually exclusive.")
-    if args.num_seeds is not None and args.num_seeds < 1:
-        sys.exit("--num-seeds must be at least 1.")
+    tools = spec["tools"]
+    versions = spec[experiment_spec.VERSIONS_KEY]
+    max_duration, certify_threshold = spec["max_duration"], spec["certify_threshold"]
 
-    tools = args.tools.split(",")
+    # One name for the whole run, and one directory holding all of it: the
+    # experiment JSON, each instance's config and scenario, and the results.
+    out_dir = ROOT / "results" / name
+
+    steps = {"run_generator.py": versions["generator"],
+             "run_evaluator.py": versions["evaluator"]}
     for tool in tools:
-        if tool not in ("solver", "planner"):
-            sys.exit(f"Unknown tool {tool!r}; --tools takes a subset of solver,planner.")
-    if args.num_seeds is not None and "solver" not in tools:
-        sys.exit("--num-seeds only applies to the solver; include it in --tools.")
+        steps[f"run_{tool}.py"] = versions[tool]
 
     if args.engine == "apptainer":
-        # A bare local-build tag (e.g. the planner's own --version local
-        # default, "planner:latest") has no apptainer equivalent -- nothing
-        # to stage, since apptainer_pull skips it too (see docker_utils.py).
-        # Left unchecked, this surfaces four subprocess calls deep as an
-        # opaque "not staged" error pointing at the staging script, which is
-        # misleading here: it can never be staged, whatever you run first.
-        # Caught here, once, before anything runs, with which flag to change.
-        to_check = {"run_generator.py": ("--generator-version", args.generator_version),
-                    "run_evaluator.py": ("--evaluator-version", args.evaluator_version)}
-        if "solver" in tools:
-            to_check["run_solver.py"] = ("--solver-version", args.solver_version)
-        if "planner" in tools:
-            to_check["run_planner.py"] = ("--planner-version", args.planner_version)
-        for script, (flag, version) in to_check.items():
+        # A bare local-build tag (e.g. the planner's "local" version, "planner:latest")
+        # has no apptainer equivalent -- there is nothing to stage for it. Left
+        # unchecked it surfaces several subprocess calls deep as an opaque "not
+        # staged" error pointing at the staging script, which can never fix it.
+        for script, version in steps.items():
             image = load_image_versions(ROOT / script)[version]
             if "/" not in image:
-                sys.exit(f"ERROR: {flag} {version!r} resolves to {image!r}, a local-build tag "
-                         f"with no apptainer equivalent. --engine apptainer only supports "
-                         f"registry images -- pick a different {flag} (e.g. 'stable').")
+                sys.exit(f"ERROR: {script} version {version!r} resolves to {image!r}, a "
+                         f"local-build tag with no apptainer equivalent. --engine apptainer "
+                         f"only supports registry images -- pick a different version in "
+                         f"{args.experiment} (e.g. 'stable').")
 
     if not args.dry_run:
         ensure_runtime_ready(args.engine)
         # Apptainer images are staged once, up front, by
-        # scripts/stage_apptainer_images.py, typically on a different host
-        # (a cluster login node) than the one this run itself executes on --
-        # there is nothing to pull here, and a compute node running under
-        # --engine apptainer has no internet to pull with anyway.
+        # scripts/stage_apptainer_images.py, typically on a different host (a
+        # cluster login node) -- there is nothing to pull here, and a compute
+        # node has no internet to pull with anyway.
         if args.engine == "docker":
-            steps = {"run_generator.py": args.generator_version,
-                     "run_evaluator.py": args.evaluator_version}
-            if "solver" in tools:
-                steps["run_solver.py"] = args.solver_version
-            if "planner" in tools:
-                steps["run_planner.py"] = args.planner_version
             _pull_once(steps)
 
-    source = f" from {args.config_dir}" if args.config_dir else ""
-    print(f"Generating scenarios for {loc.name}{source}...", flush=True)
-    _run_generator(args.location, args.generator_version, args.dry_run,
-                   args.config_dir, args.instance, args.engine, args.sif_cache_dir)
-    print()
-
-    if args.config_dir:
-        instances = _instances_from_configs(args.config_dir)
-        if not instances:
-            sys.exit(f"No scenario_config_*.json files under {args.config_dir}.")
-    elif args.instance:
-        instances = [args.instance]
-    else:
-        instances = [p.stem.removeprefix("scenario_")
-                     for p in sorted(loc.glob("scenarios/scenario_*.json"))]
-        if not instances and not args.dry_run:
-            sys.exit(f"No scenario_*.json files under {loc}/scenarios/ "
-                     f"(and none generated from configurations/ either).")
+    configs = _sweep(spec)
+    if not configs:
+        sys.exit(f"The \"scenario_config\" section of {args.experiment} expands to no instances.")
 
     if not args.dry_run:
-        missing = [i for i in instances if not (loc / "scenarios" / f"scenario_{i}.json").exists()]
-        if missing:
-            sys.exit(f"Generator produced no scenario for: {', '.join(missing)}")
+        out_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(args.experiment, out_dir / "experiment.json")
 
-    out_dir = Path(args.output_dir)
-    print(f"Running {len(instances)} instance(s) x {tools} against {loc.name}...\n", flush=True)
+    print(f"Generating {len(configs)} scenario(s) for {loc.name} into {out_dir}...", flush=True)
+    _run_generator(args.experiment, versions["generator"], args.dry_run, out_dir, len(configs),
+                   args.engine, args.sif_cache_dir)
+    print()
+
+    if not args.dry_run:
+        missing = [i for i in configs if not _scenario_path(out_dir, i).exists()]
+        if missing:
+            sys.exit(f"Generator produced no scenario for: {', '.join(missing)} "
+                     f"(see scenario_<instance>.err in each instance's directory)")
+    instances = _by_size(configs)
+
+    print(f"Running {name}: {len(instances)} instance(s) x {tools} against {loc.name}, "
+          f"smallest first -> {out_dir}\n", flush=True)
+    print(f"  {'instance':<{INSTANCE_WIDTH}}  {'tool':<16}  {'time':>7}  status", flush=True)
 
     all_results = {}
     if not args.dry_run:
-        out_dir.mkdir(parents=True, exist_ok=True)
-        _write_progress(out_dir, instances, all_results, args.num_seeds)
-    def run_one(instance: str) -> None:
-        _run_instance(args.location, instance, tools, out_dir,
-                      args.solver_version, args.planner_version, args.evaluator_version,
-                      args.force, args.dry_run, args.max_duration, args.seed, args.num_seeds,
-                      all_results, instances, args.engine, args.sif_cache_dir)
+        _init_live_csvs(out_dir)
 
-    if args.jobs > 1 and not args.dry_run:
-        with ThreadPoolExecutor(max_workers=args.jobs) as pool:
+    def run_one(instance: str) -> None:
+        _run_instance(location, instance, tools, out_dir,
+                      versions["solver"], versions["planner"], versions["evaluator"],
+                      args.dry_run, max_duration, certify_threshold,
+                      spec["seed"], spec["num_seeds"], spec["planner"],
+                      spec["departure_delay_fraction"], all_results,
+                      args.engine, args.sif_cache_dir)
+
+    if spec["jobs"] > 1 and not args.dry_run:
+        with ThreadPoolExecutor(max_workers=spec["jobs"]) as pool:
             # list(), not just submit(): forces every future's result (or
             # exception) before moving on to the summary below, the same as the
             # sequential loop would.
@@ -472,13 +710,14 @@ def main() -> None:
             f"{tool}={'solved' if (r['eval'] and r['eval'].get('solved')) else 'unsolved'}"
             for tool, r in per_tool.items()
         )
-        print(f"  {instance}: {line}", flush=True)
+        print(f"  {_describe(instance)}  {line}", flush=True)
 
     if not args.dry_run:
         print(flush=True)
-        _run_report(out_dir, args.max_duration, args.certify_threshold)
+        _run_report(out_dir, max_duration, certify_threshold)
         print(flush=True)
         _run_coverage_analysis(out_dir)
+
 
 
 if __name__ == "__main__":

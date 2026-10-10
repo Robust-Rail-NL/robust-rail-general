@@ -15,6 +15,15 @@ the experimental-setup doc's Section 4.1 protocol:
     pairs) on the paired per-instance solved/not-solved outcomes, on both
     subsets. Flagged as underpowered/descriptive-only below 10 discordant
     pairs, per the doc's own caveat about McNemar's power.
+  - The same two statistics again per matching strategy, for the sweep
+    instances whose names carry one. The strategies are not equally hard: a
+    random matching usually has to take an arriving composition apart and
+    rebuild it (measured on Location_KleineBinckhorst: ~0.6 Splits and ~1.3
+    Combines per plan, against none at all for FIFO and LIFO), while the
+    generator sizes every scenario's time window without regard to which
+    strategy it used. A pooled figure therefore mixes instances whose window
+    comfortably fits the work with instances where it cannot, and both tools'
+    coverage is dragged down by the latter.
 
 Out of scope here, deliberately: RQ2 (scaling) is marked TODO in the doc
 itself; RQ3 (runtime) asks for a cactus plot, not a hypothesis test; the
@@ -29,6 +38,7 @@ Reads the same result.json/eval_result.json files report_results.py does
 """
 
 import argparse
+import collections
 import sys
 from math import comb
 from pathlib import Path
@@ -77,13 +87,55 @@ def _tool_solved(instance_dir: Path, folder: str) -> bool:
     instance per solver, and a solver that finds a plan on any one of its
     seeds has covered that instance.
     """
-    direct = rr._read_json(instance_dir / folder / "eval_result.json")
+    direct = rr.read_json(instance_dir / folder / "eval_result.json")
     if direct:
         return bool(direct.get("solved"))
     return any(
-        rr._read_json(seed_dir / "eval_result.json").get("solved")
+        rr.read_json(seed_dir / "eval_result.json").get("solved")
         for seed_dir in sorted((instance_dir / folder).glob("seed*"))
     )
+
+
+def _sweep_name(instance: str) -> tuple[int, str] | None:
+    """(train count, matching strategy) of a sweep instance, or None.
+
+    generate_experiment_configs.py names them custom_<trains>_<matching>_<n>.
+    A hand-written fixture carries neither in its name, so it is left out of
+    the per-strategy breakdowns rather than guessed at.
+    """
+    parts = instance.split("_")
+    if len(parts) == 4 and parts[0] == "custom" and parts[1].isdigit() and parts[3].isdigit():
+        return int(parts[1]), parts[2]
+    return None
+
+
+def matching_of(instance: str) -> str | None:
+    """The matching strategy a sweep instance was generated with, or None."""
+    name = _sweep_name(instance)
+    return name[1] if name else None
+
+
+def _format_size_table(title: str, cells: dict, tool_index: int) -> str:
+    """Percent of instances solved and evaluator-accepted, per train count and matching.
+
+    cells maps (trains, matching) -> ([solver solved...], [planner solved...]);
+    tool_index picks which of the two this table is for. A combination the
+    sweep did not generate is shown as "-".
+    """
+    matchings = sorted({m for _, m in cells})
+    sizes = sorted({n for n, _ in cells})
+    rows = []
+    for n in sizes:
+        row = [str(n)]
+        for m in matchings:
+            hits = cells.get((n, m), ([], []))[tool_index]
+            row.append(f"{100 * sum(hits) / len(hits):.1f}% ({sum(hits)}/{len(hits)})"
+                       if hits else "-")
+        rows.append(row)
+    header = ["trains", *matchings]
+    widths = [max(len(r[i]) for r in [header, *rows]) for i in range(len(header))]
+    fmt = lambda r: "  ".join(c.rjust(w) for c, w in zip(r, widths))
+    return "\n".join([title, "  " + fmt(header), *("  " + fmt(r) for r in rows)])
 
 
 def _format_subset(label: str, solver: list, planner: list) -> str:
@@ -143,14 +195,23 @@ def main() -> None:
 
     solver_all, planner_all = [], []
     solver_feasible, planner_feasible = [], []
+    by_matching = collections.defaultdict(lambda: ([], []))
+    by_size_matching = collections.defaultdict(lambda: ([], []))
     for instance_dir in instance_dirs:
         solved_solver = _tool_solved(instance_dir, "local_search")
         solved_planner = _tool_solved(instance_dir, "planning")
         solver_all.append(solved_solver)
         planner_all.append(solved_planner)
+        sweep_name = _sweep_name(instance_dir.name)
+        if sweep_name is not None:
+            matching = sweep_name[1]
+            by_matching[matching][0].append(solved_solver)
+            by_matching[matching][1].append(solved_planner)
+            by_size_matching[sweep_name][0].append(solved_solver)
+            by_size_matching[sweep_name][1].append(solved_planner)
         # certify_threshold doesn't affect classification, only the "tested"
         # flag this script doesn't use -- any value is fine here.
-        classification = rr._instance_feasibility(
+        classification = rr.instance_feasibility(
             instance_dir.name, instance_dir, certify_threshold=0
         )["classification"]
         if classification == "feasible":
@@ -165,6 +226,25 @@ def main() -> None:
         _format_subset(f"Full instance set (secondary, denominator={len(instance_dirs)})",
                         solver_all, planner_all),
     ]
+
+    # Broken out per matching strategy because the strategies are not equally
+    # hard: a random matching usually has to take an arriving composition apart
+    # and rebuild it, which FIFO and LIFO mostly avoid, and the generator sizes
+    # every scenario's time window the same way regardless. Pooling them hides
+    # that, and dilutes both tools' coverage with instances whose window is too
+    # short for the work the matching implies.
+    if by_matching:
+        report += ["", "Per matching strategy (same instances, grouped)"]
+        for matching in sorted(by_matching):
+            solver, planner = by_matching[matching]
+            report += ["", _format_subset(f"matching={matching}", solver, planner)]
+    # The same grouping by train count as well: coverage falling off with size
+    # is the scaling story, and it can differ by matching strategy.
+    if by_size_matching:
+        report += ["", "Percent of instances solved and evaluator-accepted, by number of trains "
+                       "and matching (solved/total in brackets)"]
+        for title, index in (("local_search", 0), ("planning", 1)):
+            report += ["", _format_size_table(f"{title}:", by_size_matching, index)]
     text = "\n".join(report)
     print(text)
     if args.output:

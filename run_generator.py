@@ -1,104 +1,207 @@
 #!/usr/bin/env python3
-"""Run the generator docker image on all scenario_config_*.json files."""
+"""Run the generator docker image on all scenario_config_*.json files.
+
+By default each config comes from <location>/configurations/ (or --config-dir)
+and its scenario lands in <location>/scenarios/.
+
+--experiment is the self-contained layout run_experiment.py uses instead: the
+experiment JSON's "scenario_config" section is the only config. It is expanded
+into one generator config per instance in a temporary directory -- the
+generator image takes exactly one train count, matching and seed per run --
+which is deleted afterwards, and each scenario is written to
+<run-dir>/<instance>/scenario_<instance>.json with its .out/.err beside it. The
+location only supplies location.json.
+
+Each scenario generated that way gets a stamp beside it,
+scenario_<instance>.generator.json, recording the generator image's identity
+and the exact config it was generated from. A later --experiment run skips any
+instance whose scenario is still there with a matching stamp -- same image
+(not rebuilt or re-pulled since) and same config -- so a sweep can be generated
+ahead of time and run_experiment.py won't regenerate it. --force regenerates
+regardless.
+"""
 
 import argparse
-import subprocess
+import json
 import sys
+import tempfile
 from pathlib import Path
 
-from scripts.docker_utils import add_engine_args, build_run_cmd, ensure_pulled, ensure_runtime_ready
+from scripts.docker_utils import (
+    add_engine_args,
+    build_run_cmd,
+    container_name,
+    ensure_pulled,
+    ensure_runtime_ready,
+    finish_capture,
+    image_identity,
+    run_container,
+    warm_bind,
+)
+from scripts import experiment_spec
+from scripts.generate_experiment_configs import scenario_params, sweep_configs
 from scripts.instance_filter import fail_no_match, instance_of, select
 
 ROOT = Path(__file__).parent
 INSTANCE_PREFIX = "scenario_config_"
 DOCKER_IMAGE_VERSIONS = {
     "stable": "ghcr.io/robust-rail-nl/generator:latest",
-    # Same image: the generator has no assertions build. "stable-assert" names
-    # a pipeline configuration — assert the evaluator, leave everything else
-    # alone — rather than a per-tool build flag. See run_evaluator.py.
     "stable-assert": "ghcr.io/robust-rail-nl/generator:latest",
-    # Same image again: the generator has no edge channel — the solver,
-    # planner and evaluator all do. "edge" names a pipeline configuration —
-    # run those from their edge channels, leave the generator on stable —
-    # rather than a per-tool build flag. See run_solver.py.
     "edge": "ghcr.io/robust-rail-nl/generator:latest",
     "local": "generator:latest",
 }
 CONTAINER_DB = "/app/database"
+# --experiment only: the temporary directory holding the expanded configs, and
+# the instance's own directory the scenario is written into.
+CONTAINER_CONFIG = "/app/config"
+CONTAINER_RUN = "/app/run"
 # apptainer-only (see docker_utils.build_run_cmd's workdir param): the
 # generator image's own Dockerfile WORKDIR, which its ENTRYPOINT ("python
 # src/main.py") is relative to.
 CONTAINER_WORKDIR = "/app"
 
-
-def _config_name(config: Path) -> str:
-    return instance_of(config, INSTANCE_PREFIX)
-
+def _instance_name(path: Path) -> str:
+    return instance_of(path, INSTANCE_PREFIX)
 
 def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bool,
                 config_dir: Path | None = None, engine: str = "docker",
-                cache_dir: Path | None = None) -> bool:
-    name = _config_name(config)
+                cache_dir: Path | None = None, instance_dir: Path | None = None) -> bool:
+    """Generate one config's scenario.
+
+    instance_dir (--experiment): write the scenario and its .out/.err there,
+    instead of into <location>/scenarios/.
+    """
+    name = _instance_name(config)
+    cname = container_name("generator", name)
     mounts = [(location_dir.resolve(), CONTAINER_DB)]
-    # A second, more specific mount overlays just the configurations/
-    # subpath, so the container sees config_dir's contents there instead of
-    # the location's own configurations/ — everything else (location.json,
-    # the scenarios/ output dir) still resolves against the real location.
-    # An overlay, not a merge: only this directory's configs are visible.
-    if config_dir:
-        mounts.append((config_dir.resolve(), f"{CONTAINER_DB}/configurations"))
+    if instance_dir:
+        # The generator takes a full path for both --config and --scenario-file,
+        # so the location stays mounted for location.json alone.
+        mounts += [(config.parent.resolve(), CONTAINER_CONFIG),
+                   (instance_dir.resolve(), CONTAINER_RUN)]
+        config_arg = f"{CONTAINER_CONFIG}/{config.name}"
+        scenario_arg = f"{CONTAINER_RUN}/scenario_{name}.json"
+    else:
+        # An overlay on just the configurations/ subpath, not a merge: only
+        # config_dir's contents are visible there.
+        if config_dir:
+            mounts.append((config_dir.resolve(), f"{CONTAINER_DB}/configurations"))
+        config_arg = config.name
+        scenario_arg = f"scenario_{name}.json"
     args = [
-        "--config", config.name,
+        "--config", config_arg,
         "--path", CONTAINER_DB,
-        # Name the output explicitly rather than letting the generator derive
-        # one. Left to itself, create_scenario_from_config() in
-        # robust-rail-generator's src/main.py builds the name out of the
-        # location, the train count and either "custom" or the seed, so
-        # scenario_config_marginal_congestion.json became
-        # scenario_KleineBinckhorst_14t_random_1s_marginal_congestion.json —
-        # a rule this repo could only mirror by reimplementing it (seed
-        # default included) and re-mirroring it on every generator change.
-        # Naming it here instead keeps one suffix across all four steps:
-        # scenario_<suffix> -> plan_<suffix> -> eval_<suffix>, so a single
-        # --instance value selects the same instance at every step.
-        "--scenario-file", f"scenario_{name}.json",
+        "--scenario-file", scenario_arg,
     ]
-    cmd = build_run_cmd(engine, docker_image, mounts, args, cache_dir=cache_dir, strict=not dry_run,
-                        workdir=CONTAINER_WORKDIR)
+    cmd = build_run_cmd(engine, docker_image, mounts, args, name=cname, cache_dir=cache_dir,
+                        strict=not dry_run, workdir=CONTAINER_WORKDIR)
 
     print(f"  {config.name}  ->  scenario_{name}.json")
     if dry_run:
         print(f"    [dry-run] {' '.join(cmd)}")
         return True
 
-    scenarios_dir = location_dir / "scenarios"
-    scenarios_dir.mkdir(exist_ok=True)
+    scenarios_dir = instance_dir or location_dir / "scenarios"
+    scenarios_dir.mkdir(parents=True, exist_ok=True)
     out_file = scenarios_dir / f"scenario_{name}.out"
     err_file = scenarios_dir / f"scenario_{name}.err"
 
-    returncode = None
-    ok = False
-    try:
-        with open(out_file, "w") as fout, open(err_file, "w") as ferr:
-            result = subprocess.run(cmd, stdout=fout, stderr=ferr)
-        returncode = result.returncode
-        ok = returncode == 0
-    except Exception as exc:
-        print(f"    ERROR: {exc}", file=sys.stderr)
+    returncode, _ = run_container(cmd, cname, out_file, err_file, None, engine)
+    ok = returncode == 0
 
-    with open(err_file, "a") as f:
-        f.write(f"--- exit: {returncode if returncode is not None else 'error'}\n")
-    out_lines = len(out_file.read_text().splitlines()) if out_file.exists() else 0
-    err_lines = len(err_file.read_text().splitlines()) if err_file.exists() else 0
-    if ok and err_lines <= 1:
-        err_file.unlink(missing_ok=True)
-        err_lines = 0
+    footer = f"--- exit: {returncode if returncode is not None else 'error'}"
+    out_lines, err_lines = finish_capture(out_file, err_file, footer, ok)
     err_part = f"  stderr: {err_lines}L" if err_lines else ""
     print(f"    stdout: {out_lines}L{err_part}  (exit {returncode})")
 
     if not ok and returncode is not None:
         print(f"    FAILED (exit {returncode})", file=sys.stderr)
     return ok
+
+
+def _stamp_path(instance_dir: Path, instance: str) -> Path:
+    return instance_dir / f"scenario_{instance}.generator.json"
+
+
+def _generation_stamp(image: str, identity: str | None, config: dict) -> dict:
+    """What a scenario was generated from: the image, its identity, and the config."""
+    return {"generator_image": image, "generator_image_id": identity, "config": config}
+
+
+def _up_to_date(instance_dir: Path, instance: str, stamp: dict) -> bool:
+    """Whether instance_dir already holds this instance's scenario, generated from
+    exactly this stamp. An unknown image identity never counts as up to date."""
+    if not stamp["generator_image_id"]:
+        return False
+    if not (instance_dir / f"scenario_{instance}.json").is_file():
+        return False
+    try:
+        return json.loads(_stamp_path(instance_dir, instance).read_text()) == stamp
+    except (OSError, ValueError):
+        return False
+
+
+def _generate_experiment(args, image: str) -> None:
+    """--experiment: generate every instance of the file's "scenario_config" sweep."""
+    try:
+        spec = experiment_spec.load(args.experiment)
+        configs = sweep_configs(scenario_params(spec), spec["location"])
+    except (OSError, ValueError) as exc:
+        sys.exit(f"ERROR: {exc}")
+    loc = ROOT / spec["location"]
+    if not loc.is_dir():
+        sys.exit(f"No such location: {loc}")
+    run_dir = args.run_dir or ROOT / "results" / spec["name"]
+
+    # Looked up once, after main() has pulled: a pull that brought a newer image
+    # changes it, and so invalidates every stamp written with the old one.
+    identity = None if args.dry_run else image_identity(args.engine, image, args.sif_cache_dir)
+
+    total, errors, skipped = 0, 0, 0
+    with tempfile.TemporaryDirectory(prefix="scenario_configs_") as tmp:
+        paths = []
+        for instance, config in configs.items():
+            path = Path(tmp) / f"{INSTANCE_PREFIX}{instance}.json"
+            path.write_text(json.dumps(config, indent=4) + "\n")
+            paths.append(path)
+        selected = select(paths, args.instance, INSTANCE_PREFIX)
+        if args.instance and not selected:
+            fail_no_match(args.instance, list(configs))
+        print(f"\n{loc.name} ({len(selected)} instance(s)) [from {args.experiment} -> {run_dir}]")
+        if args.engine == "docker" and not args.dry_run and selected:
+            # Every instance directory is mounted into a container moments after
+            # being created. Creating them all first and mounting their parent
+            # once makes Docker Desktop see them (see docker_utils.warm_bind),
+            # instead of the first few failing with exit 125.
+            for config in selected:
+                (run_dir / _instance_name(config)).mkdir(parents=True, exist_ok=True)
+            warm_bind(run_dir, image)
+        for config in selected:
+            instance = _instance_name(config)
+            instance_dir = run_dir / instance
+            stamp = _generation_stamp(image, identity, configs[instance])
+            if not args.force and _up_to_date(instance_dir, instance, stamp):
+                print(f"  {config.name}  ->  scenario_{instance}.json")
+                print("    up to date (same generator image and config), skipped")
+                skipped += 1
+                continue
+            total += 1
+            if not args.dry_run:
+                # Cleared first, so a failed generation can't leave an older
+                # scenario behind looking like this run's.
+                (instance_dir / f"scenario_{instance}.json").unlink(missing_ok=True)
+                _stamp_path(instance_dir, instance).unlink(missing_ok=True)
+            if _run_config(image, loc, config, args.dry_run, engine=args.engine,
+                           cache_dir=args.sif_cache_dir, instance_dir=instance_dir):
+                if not args.dry_run and identity:
+                    _stamp_path(instance_dir, instance).write_text(json.dumps(stamp, indent=2) + "\n")
+            else:
+                errors += 1
+
+    skipped_part = f", {skipped} already up to date" if skipped else ""
+    print(f"\nDone: {total - errors}/{total} succeeded{skipped_part}.")
+    if errors:
+        sys.exit(1)
 
 
 def main() -> None:
@@ -117,23 +220,41 @@ def main() -> None:
                         help="Use scenario_config_*.json files from this directory instead of "
                              "<location>/configurations/ (requires --location). This is how "
                              "custom instance sets are generated: point it at a directory of "
-                             "hand-written configs and the location supplies everything else "
-                             "(location.json, the scenarios/ output dir). It overlays the "
-                             "location's own configurations/ inside the container rather than "
-                             "merging with it, so only this directory's configs are visible.")
+                             "hand-written configs and the location supplies everything else. "
+                             "It overlays the location's own configurations/ rather than merging "
+                             "with it, so only this directory's configs are visible.")
+    parser.add_argument("--experiment", metavar="FILE", type=Path,
+                        help="Generate the sweep an experiment JSON's \"scenario_config\" section "
+                             "describes, writing each scenario to "
+                             "<run-dir>/<instance>/scenario_<instance>.json. The location comes "
+                             "from the file. No config files are kept: the section itself is the "
+                             "config. This is the self-contained layout run_experiment.py uses.")
+    parser.add_argument("--run-dir", metavar="DIR", type=Path,
+                        help="With --experiment: where the instance directories go (default: "
+                             "results/<name>/).")
+    parser.add_argument("--force", action="store_true",
+                        help="With --experiment: regenerate every instance, even one whose "
+                             "scenario is up to date with the current generator image and config.")
     parser.add_argument("--no-pull", action="store_true",
                         help="Skip the up-front 'docker pull'. For a driver like "
-                             "run_experiment.py that invokes this script once per attempt: it "
-                             "pulls each image once itself, and without this every invocation "
-                             "would re-check the registry -- hundreds of round-trips for an "
-                             "image that cannot change mid-run, and hundreds of chances for a "
-                             "flaky registry to abort the sweep.")
-    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='stable',
+                             "run_experiment.py that invokes this script once per attempt and "
+                             "pulls each image once itself — without it, every invocation would "
+                             "re-check the registry for an image that cannot change mid-run.")
+    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default="stable",
                         help="Pick a docker image version ('local' is reserved for locally built "
                              "images).")
     add_engine_args(parser)
     args = parser.parse_args()
 
+    if args.experiment and (args.location or args.config_dir):
+        parser.error("--experiment takes its location from the file, and is its own config: "
+                     "drop --location/--config-dir.")
+    if args.force and not args.experiment:
+        parser.error("--force requires --experiment.")
+    if args.run_dir and not args.experiment:
+        parser.error("--run-dir requires --experiment.")
+    if args.experiment and not args.experiment.is_file():
+        parser.error(f"No such experiment file: {args.experiment}")
     if args.config_dir and not args.location:
         parser.error("--config-dir requires --location.")
     if args.config_dir and not args.config_dir.is_dir():
@@ -147,6 +268,10 @@ def main() -> None:
         # internet to pull with anyway).
         if args.engine == "docker" and not args.no_pull:
             ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
+
+    if args.experiment:
+        _generate_experiment(args, DOCKER_IMAGE_VERSIONS[args.version])
+        return
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 
@@ -163,7 +288,7 @@ def main() -> None:
                       file=sys.stderr)
         else:
             configs = sorted(loc.glob("configurations/scenario_config_*.json"))
-        available += [_config_name(c) for c in configs]
+        available += [_instance_name(c) for c in configs]
         configs = select(configs, args.instance, INSTANCE_PREFIX)
         if not configs:
             continue

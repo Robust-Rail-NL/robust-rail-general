@@ -24,29 +24,23 @@ SCRIPTS = {
     "evaluator": ROOT / "run_evaluator.py",
 }
 
-# run_solver.py and run_planner.py both write plans/plan_<suffix>.json. Running
-# both over one location does not produce two sets of plans to compare, it
-# produces one set from whichever ran last — and run_evaluator.py globs
-# plans/plan_*.json, so nothing downstream can tell which tool made what.
-# Rejected outright rather than documented: the failure is silent otherwise.
+# Mutually exclusive, both write to the same location.
 EXCLUSIVE_STEPS = {"solver", "planner"}
 
-# Only the two plan-producing steps take --timeout. The generator and evaluator
-# are short, bounded conversions with nothing to cut short, and passing them a
-# flag they do not define would abort the pipeline on an argparse error.
+# Steps that can be given a wall-clock timeout (seconds) via --timeout.
 TIMEOUT_STEPS = {"solver", "planner"}
 
 
 def _load_versions(step: str, version_key: str) -> str:
     return load_image_versions(SCRIPTS[step]).get(version_key, "?")
 
-
 def _run_step(step: str, extra_args: list[str]) -> bool:
     script = SCRIPTS[step]
     cmd = [sys.executable, str(script)] + extra_args
-    print(f"\n{'='*60}")
+    rule = "=" * 60
+    print(f"\n{rule}")
     print(f"  Step: {step}")
-    print(f"{'='*60}")
+    print(rule)
     result = subprocess.run(cmd)
     return result.returncode == 0
 
@@ -65,31 +59,30 @@ def main() -> None:
                              "eval_<NAME>), so one value selects the same instance throughout. "
                              "Accepts shell-style wildcards; a step that matches nothing fails "
                              "and aborts the pipeline.")
-    parser.add_argument("--version", choices=['stable', 'stable-assert', 'edge', 'local'],
-                        default='stable',
+    parser.add_argument("--version", choices=["stable", "stable-assert", "edge", "local"],
+                        default="stable",
                         help="Pick a docker image version ('local' is reserved for locally built "
                              "images; 'stable-assert' runs the evaluator with assertions enabled "
                              "for integration testing, and is not for baseline comparison; 'edge' "
                              "runs the solver/planner and evaluator from their not-yet-vetted edge "
                              "branch builds while generator stays on stable).")
     parser.add_argument("--timeout", type=int, default=None, metavar="SECONDS",
-                        help="Wall-clock budget for whichever of solver/planner runs, enforced "
-                             "the same way for both: the container is killed once it expires. "
-                             "Passed only to those two steps. For the solver this is a SIGKILL "
-                             "that forfeits its best-so-far plan, so also raise "
-                             "SimulatedAnnealing.MaxDuration in config_solver.yaml above this "
-                             "value if you want the kill, rather than the solver's own budget, "
-                             "to be what binds.")
+                        help="Wall-clock budget for whichever of solver/planner runs: the "
+                             "container is killed once it expires. Passed only to those two "
+                             "steps. For the solver this is a SIGKILL that forfeits its "
+                             "best-so-far plan, so raise SimulatedAnnealing.MaxDuration in "
+                             "config_solver.yaml above this value if you want the kill to be "
+                             "what binds.")
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--steps", metavar="STEPS", default=None,
-                        help=f"Comma-separated list of steps to run (default: "
-                             f"{','.join(DEFAULT_STEPS)}). Valid: {', '.join(ALL_STEPS)}. "
-                             f"'planner' is an alternative to 'solver' and cannot be "
-                             f"combined with it.")
+                       help=f"Comma-separated list of steps to run (default: "
+                            f"{','.join(DEFAULT_STEPS)}). Valid: {', '.join(ALL_STEPS)}. "
+                            f"'planner' is an alternative to 'solver' and cannot be "
+                            f"combined with it.")
     group.add_argument("--use-solver", action="store_true",
-                        help=f"Shorthand for --steps {','.join(DEFAULT_STEPS)} (the default).")
+                       help=f"Shorthand for --steps {','.join(DEFAULT_STEPS)} (the default).")
     group.add_argument("--use-planner", action="store_true",
-                        help="Shorthand for --steps generator,planner,evaluator.")
+                       help="Shorthand for --steps generator,planner,evaluator.")
     args = parser.parse_args()
 
     if args.use_planner:
@@ -102,16 +95,15 @@ def main() -> None:
     steps = [s.strip() for s in steps_arg.split(",")]
     unknown = [s for s in steps if s not in ALL_STEPS]
     if unknown:
-        print(f"ERROR: unknown step(s): {', '.join(unknown)}. Valid: {', '.join(ALL_STEPS)}", file=sys.stderr)
-        sys.exit(1)
+        sys.exit(f"ERROR: unknown step(s): {', '.join(unknown)}. "
+                 f"Valid: {', '.join(ALL_STEPS)}")
 
     both = EXCLUSIVE_STEPS.intersection(steps)
     if len(both) > 1:
-        print(f"ERROR: {' and '.join(sorted(both))} cannot run in one pipeline — they "
-              f"both write plans/plan_<suffix>.json, so the second would overwrite the "
-              f"first and the evaluator could not tell them apart. Run them separately, "
-              f"keeping the plans/ output of each.", file=sys.stderr)
-        sys.exit(1)
+        sys.exit(f"ERROR: {' and '.join(sorted(both))} cannot run in one pipeline — they "
+                 f"both write plans/plan_<suffix>.json, so the second would overwrite the "
+                 f"first and the evaluator could not tell them apart. Run them separately, "
+                 f"keeping the plans/ output of each.")
 
     extra: list[str] = []
     if args.dry_run:
