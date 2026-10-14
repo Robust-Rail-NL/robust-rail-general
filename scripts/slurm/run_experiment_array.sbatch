@@ -20,37 +20,48 @@
 # (docker_utils.DEFAULT_SIF_CACHE_DIR, ~/apptainer-images) -- override
 # SIF_CACHE_DIR below only if you staged somewhere else.
 #
-# TODO before this is actually runnable: partition/QOS and walltime/mem/cpu
-# below are placeholders -- still pending input from the collaborator who
-# runs this (see docs/slurm-apptainer.md). --account is filled in (Léon's
-# own value). --ntasks=1 and --mem-per-cpu (not --mem) are DelftBlue sbatch
-# requirements, not placeholders -- a bare --mem or an omitted --ntasks are
-# refused outright at submission time ("doesn't specify the number of
-# tasks"/"doesn't specify the amount of memory per-cpu"), found 2026-10-14.
+# --account/--partition/--ntasks are filled in (Léon's own value; compute-p1
+# proven repeatedly; --ntasks=1 and --mem-per-cpu, not --mem, are DelftBlue
+# sbatch requirements -- a bare --mem or an omitted --ntasks are refused
+# outright at submission, found 2026-10-14).
+#
+# --cpus-per-task/--mem-per-cpu/--time below come from a single real
+# measurement (2026-10-14, /usr/bin/time -v over scripts/slurm_run_task.py,
+# one planner attempt, 5 trains, max_duration 300, via __scratch/
+# cluster-smoke-test-planner.json): 72.37s elapsed, 83% of one core, 452568
+# KB peak RSS. That run didn't time out (evaluator rejected the plan at
+# 68.9s, well under budget), so it bounds typical-case cost, not the
+# worst case -- a full 300s timeout's own memory/cpu footprint hasn't been
+# measured, nor has the solver's (only separately confirmed to run
+# successfully, not profiled the same way). Treat these as a reasoned
+# starting point to actually get the array submitted, not a final answer --
+# revisit if OOM-kills or walltime-kills show up for real in the sweep.
 
 #SBATCH --job-name=robust-rail-experiment
 #SBATCH --account=research-eemcs-st
-#SBATCH --partition=TODO
-# Comfortably above --max-duration (the solver's own graceful-stop budget,
-# plus its BACKSTOP_GRACE) and run_planner.py's DEFAULT_PLANNER_TIMEOUT
-# (600s) for the slowest instance in the sweep -- a real number from the
-# collaborator, not a measured one.
-#SBATCH --time=TODO
+#SBATCH --partition=compute-p1
+# 300s max_duration + ~180s margin (evaluator + Julia/dotnet startup +
+# teardown + scheduler slack) -- comfortably above both the solver's own
+# worst case (max_duration + BACKSTOP_GRACE = 420s) and the one measured
+# planner attempt (72s, nowhere near this limit).
+#SBATCH --time=00:08:00
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=TODO
-#SBATCH --mem-per-cpu=TODO
+# The one measured planner attempt stayed under 100% of a single core (83%);
+# no evidence either tool needs more than one.
+#SBATCH --cpus-per-task=1
+# ~4.5x the one measured peak RSS (442MB) for GC/evaluator/OS headroom --
+# still far below the untested 3900M guess used for tonight's sizing run.
+#SBATCH --mem-per-cpu=2G
 #SBATCH --output=slurm-logs/%A_%a.out
 #SBATCH --error=slurm-logs/%A_%a.err
 
 # Before `set -euo pipefail`, deliberately: Lmod's `module` shell function
 # can itself trip `set -u` (references variables that may be unset), and a
 # compute node's default python3 doesn't meet pyproject.toml's >=3.12 (see
-# docs/slurm-apptainer.md's "Prerequisites" -- same module names confirmed
-# on the login node; not yet separately confirmed these two commands are
-# also correct/sufficient on a compute node, since nothing here has run on
-# one yet). apptainer itself needed no module load on the login node, so
-# nothing is loaded for it here -- if a compute node turns out to differ,
-# add it here too.
+# docs/slurm-apptainer.md's "Prerequisites"). Confirmed correct on a real
+# compute node via sbatch, not just the login node, 2026-10-14. apptainer
+# itself needed no module load on the login node, so nothing is loaded for
+# it here -- if a compute node turns out to differ, add it here too.
 module load 2026 cpu
 module load python/3.13.12
 

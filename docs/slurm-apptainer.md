@@ -230,12 +230,12 @@ started.
 
    `scripts/slurm_run_task.py` itself — the exact code each array task
    runs — was confirmed working end to end on a real DelftBlue compute node
-   (`compute-p1`, interactive `srun`, 2026-09-23), before `run_experiment.py`
-   moved to experiment JSONs: it produced a plan (solver) and scored it
-   (evaluator), both exiting cleanly. The experiment-JSON interface
-   (`--experiment` in place of `--location` and the version flags) has not been
-   re-run on a compute node. What's still untried is `sbatch --array` itself
-   doing the scheduling/indexing — see "Known gaps".
+   twice: via `compute-p1`, interactive `srun`, 2026-09-23 (solver, before
+   `run_experiment.py` moved to experiment JSONs), and again 2026-10-14 via
+   `sbatch` (planner, the `--experiment`-based interface, see "Known gaps"
+   for the real resource numbers that run produced). What's still untried is
+   `sbatch --array` itself doing the scheduling/indexing across more than one
+   task — see "Known gaps".
 5. **Submit the aggregation job**, depending on the array job:
    `sbatch --dependency=afterok:<array_job_id> scripts/slurm/aggregate.sbatch
    <output-dir> <home-dest>`. Runs `report_results.py` +
@@ -244,20 +244,40 @@ started.
 
 ## Known gaps
 
-- `scripts/slurm/run_experiment_array.sbatch` and `aggregate.sbatch` have
-  placeholder `#SBATCH` values (`--partition`, `--time`, `--cpus-per-task`,
-  `--mem-per-cpu`) — `sbatch` will refuse to submit until these are filled
-  in, deliberately, rather than running with a guessed number.
-  `--account=research-eemcs-st` is filled in, as are `--ntasks=1` and the use
-  of `--mem-per-cpu` rather than a bare `--mem` — both are DelftBlue `sbatch`
-  requirements, not open placeholders: an omitted `--ntasks` or a bare
-  `--mem` are refused outright at submission ("doesn't specify the number of
-  tasks" / "doesn't specify the amount of memory per-cpu (or per-gpu)"),
-  found 2026-10-14 trying to submit a one-off sizing job. Not documented in
-  anything read beforehand; worth keeping in mind for any new `sbatch` script
-  added later, not just these two.
-- Still genuinely untried: an actual `sbatch --array` submission and the
-  aggregation job. Blocked on the partition/walltime/mem/cpu placeholders
-  above.
+- ~~`scripts/slurm/run_experiment_array.sbatch` and `aggregate.sbatch` have
+  placeholder `#SBATCH` values~~ **Filled in, 2026-10-14**:
+  `--account=research-eemcs-st`, `--partition=compute-p1`, `--ntasks=1`
+  (required — see below), `--cpus-per-task=1`, `--mem-per-cpu=2G` for the
+  array job and `aggregate.sbatch`'s own lighter, unmeasured-but-reasoned
+  `--time=00:20:00`/`--mem-per-cpu=2G`. The array job's own values come from
+  one real measurement: `/usr/bin/time -v` over `scripts/slurm_run_task.py`
+  running one planner attempt (5 trains, `max_duration: 300`, via
+  `__scratch/cluster-smoke-test-planner.json`) on a real DelftBlue compute
+  node — 72.37s elapsed (well under the 300s budget; this attempt didn't time
+  out, the evaluator rejected the plan at 68.9s), 83% of one core, 452568 KB
+  peak RSS. `--time=00:08:00` is reasoned margin above that and above the
+  solver's own worst case (`max_duration + BACKSTOP_GRACE` = 420s), not a
+  measured worst case itself — a full 300s timeout's own resource footprint
+  hasn't been observed yet, for either tool. `--ntasks=1` and `--mem-per-cpu`
+  (not a bare `--mem`) are DelftBlue `sbatch` requirements, not open
+  placeholders: an omitted `--ntasks` or a bare `--mem` are refused outright
+  at submission ("doesn't specify the number of tasks" / "doesn't specify the
+  amount of memory per-cpu (or per-gpu)"), found trying to submit a one-off
+  sizing job. Not documented in anything read beforehand; worth keeping in
+  mind for any new `sbatch` script added later, not just these two.
+- Confirmed, 2026-10-14: `module load 2026 cpu` / `module load
+  python/3.13.12` work correctly on a real compute node via `sbatch`, not
+  just the login node (`run_experiment_array.sbatch`'s own comment on this
+  previously flagged it as unconfirmed).
+- The planner specifically was run under apptainer on a real compute node for
+  the first time 2026-10-14 (via the sizing measurement above) — completed
+  cleanly (exit 0), including its `JULIA_DEPOT_PATH=/tmp/julia-depot:
+  /opt/julia-depot` env var under `--writable-tmpfs`. Previously only the
+  solver had been proven this way (2026-09-23).
+- Still genuinely untried: an actual `sbatch --array` submission (more than
+  one task) and the aggregation job. The resource values above are a reasoned
+  starting point to get there, not a guarantee against an OOM-kill or
+  walltime-kill on a harder instance — watch for either in the sweep's own
+  `.err` files and revisit if they show up.
 - Recommended next step: a small manually submitted array (one or two
-  instances) once those values are known.
+  instances) with these values, before committing to the full sweep.
