@@ -25,6 +25,7 @@ import argparse
 import json
 import sys
 import tempfile
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from scripts.docker_utils import (
@@ -141,6 +142,31 @@ def _up_to_date(instance_dir: Path, instance: str, stamp: dict) -> bool:
         return False
 
 
+def _generate_one(image: str, loc: Path, config: Path, args, run_dir: Path,
+                  identity: str | None, stamp: dict) -> str:
+    """Generate one instance's scenario. Returns "skipped", "ok" or "error" --
+    collected by the caller rather than mutated from multiple threads, so
+    --jobs > 1 needs no locking around the tally.
+    """
+    instance = _instance_name(config)
+    instance_dir = run_dir / instance
+    if not args.force and _up_to_date(instance_dir, instance, stamp):
+        print(f"  {config.name}  ->  scenario_{instance}.json")
+        print("    up to date (same generator image and config), skipped")
+        return "skipped"
+    if not args.dry_run:
+        # Cleared first, so a failed generation can't leave an older
+        # scenario behind looking like this run's.
+        (instance_dir / f"scenario_{instance}.json").unlink(missing_ok=True)
+        _stamp_path(instance_dir, instance).unlink(missing_ok=True)
+    if _run_config(image, loc, config, args.dry_run, engine=args.engine,
+                   cache_dir=args.sif_cache_dir, instance_dir=instance_dir):
+        if not args.dry_run and identity:
+            _stamp_path(instance_dir, instance).write_text(json.dumps(stamp, indent=2) + "\n")
+        return "ok"
+    return "error"
+
+
 def _generate_experiment(args, image: str) -> None:
     """--experiment: generate every instance of the file's "scenario_config" sweep."""
     try:
@@ -157,7 +183,6 @@ def _generate_experiment(args, image: str) -> None:
     # changes it, and so invalidates every stamp written with the old one.
     identity = None if args.dry_run else image_identity(args.engine, image, args.sif_cache_dir)
 
-    total, errors, skipped = 0, 0, 0
     with tempfile.TemporaryDirectory(prefix="scenario_configs_") as tmp:
         paths = []
         for instance, config in configs.items():
@@ -176,27 +201,20 @@ def _generate_experiment(args, image: str) -> None:
             for config in selected:
                 (run_dir / _instance_name(config)).mkdir(parents=True, exist_ok=True)
             warm_bind(run_dir, image)
-        for config in selected:
-            instance = _instance_name(config)
-            instance_dir = run_dir / instance
-            stamp = _generation_stamp(image, identity, configs[instance])
-            if not args.force and _up_to_date(instance_dir, instance, stamp):
-                print(f"  {config.name}  ->  scenario_{instance}.json")
-                print("    up to date (same generator image and config), skipped")
-                skipped += 1
-                continue
-            total += 1
-            if not args.dry_run:
-                # Cleared first, so a failed generation can't leave an older
-                # scenario behind looking like this run's.
-                (instance_dir / f"scenario_{instance}.json").unlink(missing_ok=True)
-                _stamp_path(instance_dir, instance).unlink(missing_ok=True)
-            if _run_config(image, loc, config, args.dry_run, engine=args.engine,
-                           cache_dir=args.sif_cache_dir, instance_dir=instance_dir):
-                if not args.dry_run and identity:
-                    _stamp_path(instance_dir, instance).write_text(json.dumps(stamp, indent=2) + "\n")
-            else:
-                errors += 1
+
+        def generate_one(config: Path) -> str:
+            stamp = _generation_stamp(image, identity, configs[_instance_name(config)])
+            return _generate_one(image, loc, config, args, run_dir, identity, stamp)
+
+        if args.jobs > 1 and not args.dry_run:
+            with ThreadPoolExecutor(max_workers=args.jobs) as pool:
+                outcomes = list(pool.map(generate_one, selected))
+        else:
+            outcomes = [generate_one(config) for config in selected]
+
+    skipped = outcomes.count("skipped")
+    errors = outcomes.count("error")
+    total = len(outcomes) - skipped
 
     skipped_part = f", {skipped} already up to date" if skipped else ""
     print(f"\nDone: {total - errors}/{total} succeeded{skipped_part}.")
@@ -235,6 +253,12 @@ def main() -> None:
     parser.add_argument("--force", action="store_true",
                         help="With --experiment: regenerate every instance, even one whose "
                              "scenario is up to date with the current generator image and config.")
+    parser.add_argument("--jobs", "-j", type=int, default=1, metavar="N",
+                        help="With --experiment: generate up to N instances concurrently (default: "
+                             "1, sequential). Each instance's generation is independent, so this is "
+                             "safe to raise -- but on a shared login node (no SLURM accounting), "
+                             "keep it modest rather than maxing out cores; run generation as its "
+                             "own sbatch/srun job on a compute node instead for heavier parallelism.")
     parser.add_argument("--no-pull", action="store_true",
                         help="Skip the up-front 'docker pull'. For a driver like "
                              "run_experiment.py that invokes this script once per attempt and "
@@ -253,6 +277,10 @@ def main() -> None:
         parser.error("--force requires --experiment.")
     if args.run_dir and not args.experiment:
         parser.error("--run-dir requires --experiment.")
+    if args.jobs > 1 and not args.experiment:
+        parser.error("--jobs requires --experiment.")
+    if args.jobs < 1:
+        parser.error(f"--jobs must be at least 1, got {args.jobs}.")
     if args.experiment and not args.experiment.is_file():
         parser.error(f"No such experiment file: {args.experiment}")
     if args.config_dir and not args.location:

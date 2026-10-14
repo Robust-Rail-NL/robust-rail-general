@@ -219,7 +219,13 @@ started.
    <OUTPUT_DIR> --engine apptainer`. It generates every instance straight from
    the `scenario_config` section (no config files are kept) into
    `<output-dir>/<instance>/scenario_<instance>.json`, where the array tasks
-   read it.
+   read it. Each instance's generation is independent, so `--jobs N` runs up
+   to `N` concurrently (default 1, sequential) — a real speedup for a sweep
+   of any size (2.9x with `--jobs 4` on 8 instances, measured 2026-10-15,
+   docker locally). This runs on the shared login node, not through SLURM, so
+   keep `N` modest (e.g. 4-8) rather than maxing out cores — run generation as
+   its own `sbatch`/`srun` job on a compute node instead for heavier
+   parallelism.
 4. **Submit the array job**: the printed
    `sbatch --array=0-N scripts/slurm/run_experiment_array.sbatch <manifest>
    <experiment.json> <output-dir>` command. Each task runs
