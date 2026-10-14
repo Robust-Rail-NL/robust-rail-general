@@ -26,17 +26,20 @@
 # array that ran the actual attempts), so report_results.py's own default
 # applies unless you set this explicitly.
 #
-# TODO: same as run_experiment_array.sbatch -- partition/QOS/walltime/mem
-# are placeholders pending the collaborator (see docs/slurm-apptainer.md).
-# This job is far lighter than an array task (just report generation + an
-# rsync), so its resource needs are smaller, but still unmeasured.
+# --account/--partition/--ntasks filled in, same reasoning as
+# run_experiment_array.sbatch. --time/--mem-per-cpu below are an unmeasured
+# but reasoned guess, not placeholders: this job is pure Python (CSV/JSON
+# scanning + an rsync), far lighter than an array task and not something
+# 2026-10-14's sizing run covered (that only measured one array task, not
+# this job) -- revisit if it runs long or OOMs for a large sweep.
 
 #SBATCH --job-name=robust-rail-experiment-aggregate
 #SBATCH --account=research-eemcs-st
-#SBATCH --partition=TODO
-#SBATCH --time=TODO
+#SBATCH --partition=compute-p1
+#SBATCH --time=00:20:00
+#SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=TODO
+#SBATCH --mem-per-cpu=2G
 #SBATCH --output=slurm-logs/aggregate_%j.out
 #SBATCH --error=slurm-logs/aggregate_%j.err
 
