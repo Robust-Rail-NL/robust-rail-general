@@ -1128,6 +1128,10 @@
                 }
             ],
             "simultaneousUsageCount": 1,
+            "timeWindow": {
+                "start": 0,
+                "end": 100000
+            },
             "relatedTrackPartIDs": [
                 12
             ]
@@ -1141,6 +1145,10 @@
                 }
             ],
             "simultaneousUsageCount": 3,
+            "timeWindow": {
+                "start": 0,
+                "end": 100000
+            },
             "relatedTrackPartIDs": [
                 1,
                 2,
