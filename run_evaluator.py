@@ -3,60 +3,65 @@
 
 import argparse
 import json
-import subprocess
 import sys
 import time
 from datetime import datetime, timezone
+from itertools import chain
 from pathlib import Path
 
-from scripts.docker_utils import add_engine_args, build_run_cmd, ensure_pulled, ensure_runtime_ready
+from scripts.docker_utils import (
+    add_engine_args,
+    build_run_cmd,
+    container_name,
+    ensure_pulled,
+    ensure_runtime_ready,
+    finish_capture,
+    run_container,
+)
 from scripts.instance_filter import fail_no_match, instance_of, select
 
 ROOT = Path(__file__).parent
 INSTANCE_PREFIX = "plan_"
 DOCKER_IMAGE_VERSIONS = {
     "stable": "ghcr.io/robust-rail-nl/tors:latest",
-    # The evaluator is the oracle the pipeline trusts, and its assertions build
-    # produces the same verdicts and .err content as the plain one (verified
-    # across all KleineBinckhorst scenarios — .txt trace files can differ in
-    # line order between separately-built binaries, see docs/roadmap-2.0.0.md,
-    # but never in content) while turning an internal invariant violation into
-    # an abort rather than a verdict computed from corrupt state. A run that
-    # trips one exits 134/139 with the assertion text in the .err file, which
-    # reads very differently from an ordinary "plan is not valid".
     "stable-assert": "ghcr.io/robust-rail-nl/tors:assert",
-    # The solver and evaluator both have an edge channel; only the generator
-    # stays pinned to stable. "edge" names a pipeline configuration — run the
-    # solver and evaluator from their edge channels, leave the generator on
-    # stable — rather than a per-tool build flag. See run_solver.py.
     "edge": "ghcr.io/robust-rail-nl/tors:edge",
     "local": "tors:latest",
+    "delay": "tors:delay",
 }
 CONTAINER_DB = "/app/database"
+# --scenario only: the directory of a scenario that lives outside the location.
+CONTAINER_SCENARIO = "/app/scenario"
 # apptainer-only (see docker_utils.build_run_cmd's workdir param): the
 # evaluator image's own Dockerfile WORKDIR, which its ENTRYPOINT
 # ("build/TORS") is relative to. Note this differs from the other three
 # images (/app) -- the evaluator's Dockerfile uses /workspace.
 CONTAINER_WORKDIR = "/workspace"
 
+def _instance_name(path: Path) -> str:
+    return instance_of(path, INSTANCE_PREFIX)
 
-def _scenario_name(plan: Path) -> str:
-    return instance_of(plan, INSTANCE_PREFIX)
+def _delay_arg(departure_delay: int | None) -> list[str]:
+    """The evaluator's --departure_delay, or nothing to leave it at its own default of 0.
+
+    It widens the window an Exit may fall in to match its scheduled departure,
+    symmetrically: 'delay' N accepts a departure N seconds late or N early.
+    Omitted rather than passed as 0 so a run that does not ask for a tolerance
+    invokes the evaluator exactly as before.
+    """
+    return ["--departure_delay", str(departure_delay)] if departure_delay is not None else []
 
 
 def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool,
-             engine: str = "docker", cache_dir: Path | None = None) -> bool:
-    name = _scenario_name(plan)
+              departure_delay: int | None = None, engine: str = "docker",
+              cache_dir: Path | None = None) -> bool:
+    name = _instance_name(plan)
     scenario = location_dir / "scenarios" / f"scenario_{name}.json"
 
     if not scenario.exists():
         print(f"  SKIP {plan.name}: no matching scenario_{name}.json", file=sys.stderr)
-        return True  # not a failure — plan may predate the scenario file
+        return True
 
-    # The evaluator needs this alongside location.json, not just
-    # location.json + scenario — without it the container fails deep inside
-    # TORS with a misleading "specified file '/app/database' does not
-    # exist" (it means config.json, not the mount itself).
     if not (location_dir / "config.json").exists():
         print(f"  SKIP {plan.name}: {location_dir}/config.json missing — "
               f"required by the evaluator alongside location.json", file=sys.stderr)
@@ -67,6 +72,7 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool,
     out_file = eval_dir / f"eval_{name}.out"
     err_file = eval_dir / f"eval_{name}.err"
 
+    cname = container_name("evaluator", name)
     mounts = [(location_dir.resolve(), CONTAINER_DB)]
     args = [
         "--mode", "EVAL_AND_STORE",
@@ -75,32 +81,21 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool,
         "--path_plan", f"{CONTAINER_DB}/plans/{plan.name}",
         "--path_eval_result", f"{CONTAINER_DB}/evaluations/eval_{name}.txt",
         "--plan_type", "Solver",
+        *_delay_arg(departure_delay),
     ]
-    cmd = build_run_cmd(engine, docker_image, mounts, args, cache_dir=cache_dir, strict=not dry_run,
-                        workdir=CONTAINER_WORKDIR)
+    cmd = build_run_cmd(engine, docker_image, mounts, args, name=cname, cache_dir=cache_dir,
+                        strict=not dry_run, workdir=CONTAINER_WORKDIR)
 
     print(f"  {plan.name}  ->  evaluations/eval_{name}.txt")
     if dry_run:
         print(f"    [dry-run] {' '.join(cmd)}")
         return True
 
-    returncode = None
-    ok = False
-    try:
-        with open(out_file, "w") as fout, open(err_file, "w") as ferr:
-            result = subprocess.run(cmd, stdout=fout, stderr=ferr)
-        returncode = result.returncode
-        ok = returncode == 0
-    except Exception as exc:
-        print(f"    ERROR: {exc}", file=sys.stderr)
+    returncode, _ = run_container(cmd, cname, out_file, err_file, None, engine)
+    ok = returncode == 0
 
-    with open(err_file, "a") as f:
-        f.write(f"--- exit: {returncode if returncode is not None else 'error'}\n")
-    out_lines = len(out_file.read_text().splitlines()) if out_file.exists() else 0
-    err_lines = len(err_file.read_text().splitlines()) if err_file.exists() else 0
-    if ok and err_lines <= 1:
-        err_file.unlink(missing_ok=True)
-        err_lines = 0
+    footer = f"--- exit: {returncode if returncode is not None else 'error'}"
+    out_lines, err_lines = finish_capture(out_file, err_file, footer, ok)
     err_part = f"  stderr: {err_lines}L" if err_lines else ""
     print(f"    stdout: {out_lines}L{err_part}  (exit {returncode})")
 
@@ -110,13 +105,7 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool,
 
 
 def _classify_verdict(out_text: str, err_text: str, txt_text: str) -> tuple[str, str]:
-    """Read the evaluator's own verdict out of its output.
-
-    The same string checks scripts/sweep_seeds.py's _classify uses, kept in
-    step with it deliberately: in EVAL_AND_STORE mode the rejection reason goes
-    to the result file rather than stdout, so txt_text has to be read too.
-    """
-    for line in (err_text + out_text).splitlines():
+    for line in chain(err_text.splitlines(), out_text.splitlines()):
         if "Issue detected with the Scenario" in line:
             return "rejected", line.split("Scenario:", 1)[-1].strip()
     if "The plan is valid" in out_text:
@@ -124,7 +113,7 @@ def _classify_verdict(out_text: str, err_text: str, txt_text: str) -> tuple[str,
     reason = next(
         (
             ln.split("The action is invalid.", 1)[-1].strip().rstrip(".")
-            for ln in (out_text + txt_text).splitlines()
+            for ln in chain(out_text.splitlines(), txt_text.splitlines())
             if "Scenario failed" in ln
         ),
         None,
@@ -137,33 +126,35 @@ def _classify_verdict(out_text: str, err_text: str, txt_text: str) -> tuple[str,
 
 
 def _run_plan_single(docker_image: str, location_dir: Path, plan: Path, scenario: Path,
-                     version: str, dry_run: bool, engine: str = "docker",
-                     cache_dir: Path | None = None) -> dict:
-    """Evaluate one plan wherever it lives, writing its verdict beside it.
+                     version: str, dry_run: bool, departure_delay: int | None = None,
+                     engine: str = "docker", cache_dir: Path | None = None,
+                     outside_location: bool = False) -> dict:
+    """Evaluate one plan, writing eval.* and eval_result.json beside it.
 
-    For plans under a run_solver.py/run_planner.py --output-dir: eval.out,
-    eval.err, eval.txt and eval_result.json land next to that attempt's own
-    plan.json and result.json, rather than in location_dir/evaluations/ where a
-    solver run and a planner run of the same instance would collide.
-
-    eval_result.json carries the "solved" verdict, and it is the only thing
-    that does — a solver or planner exit code of 0 means the tool finished, not
-    that its plan holds up.
+    outside_location (--scenario): the scenario file is mounted from wherever it
+    lives rather than read from <location>/scenarios/.
     """
     plan = plan.resolve()
     plan_dir = plan.parent
+    cname = container_name("evaluator", instance_of(scenario, "scenario_"))
 
     mounts = [(location_dir.resolve(), CONTAINER_DB), (plan_dir, "/app/planio")]
+    if outside_location:
+        mounts.append((scenario.parent.resolve(), CONTAINER_SCENARIO))
+        scenario_container_path = f"{CONTAINER_SCENARIO}/{scenario.name}"
+    else:
+        scenario_container_path = f"{CONTAINER_DB}/scenarios/{scenario.name}"
     args = [
         "--mode", "EVAL_AND_STORE",
         "--path_location", CONTAINER_DB,
-        "--path_scenario", f"{CONTAINER_DB}/scenarios/{scenario.name}",
+        "--path_scenario", scenario_container_path,
         "--path_plan", f"/app/planio/{plan.name}",
         "--path_eval_result", "/app/planio/eval.txt",
         "--plan_type", "Solver",
+        *_delay_arg(departure_delay),
     ]
-    cmd = build_run_cmd(engine, docker_image, mounts, args, cache_dir=cache_dir, strict=not dry_run,
-                        workdir=CONTAINER_WORKDIR)
+    cmd = build_run_cmd(engine, docker_image, mounts, args, name=cname, cache_dir=cache_dir,
+                        strict=not dry_run, workdir=CONTAINER_WORKDIR)
 
     print(f"  {plan}  ->  {plan_dir}/eval_result.json")
     if dry_run:
@@ -173,13 +164,7 @@ def _run_plan_single(docker_image: str, location_dir: Path, plan: Path, scenario
     out_file, err_file = plan_dir / "eval.out", plan_dir / "eval.err"
     txt_file = plan_dir / "eval.txt"
     start, start_iso = time.monotonic(), datetime.now(timezone.utc).isoformat()
-    returncode = None
-    try:
-        with open(out_file, "w") as fout, open(err_file, "w") as ferr:
-            result = subprocess.run(cmd, stdout=fout, stderr=ferr)
-        returncode = result.returncode
-    except Exception as exc:
-        print(f"    ERROR: {exc}", file=sys.stderr)
+    returncode, _ = run_container(cmd, cname, out_file, err_file, None, engine)
 
     def _read(path: Path) -> str:
         return path.read_text(errors="replace") if path.exists() else ""
@@ -193,6 +178,8 @@ def _run_plan_single(docker_image: str, location_dir: Path, plan: Path, scenario
         "version": version,
         "image": docker_image,
         "command": cmd,
+        # What "solved" was allowed to mean here, so a run stays self-describing.
+        "departure_delay": departure_delay,
         "start_time": start_iso,
         "end_time": datetime.now(timezone.utc).isoformat(),
         "wall_seconds": round(time.monotonic() - start, 3),
@@ -228,24 +215,40 @@ def main() -> None:
                              "eval.out/.err/.txt and eval_result.json are written beside it "
                              "instead of into <location>/evaluations/. Requires --location and "
                              "--instance (to find the matching scenario).")
+    parser.add_argument("--scenario", metavar="FILE", type=Path,
+                        help="With --plan: evaluate against this scenario_<NAME>.json wherever it "
+                             "lives, instead of looking it up in <location>/scenarios/ by "
+                             "--instance. This is how run_experiment.py evaluates against the "
+                             "scenarios it keeps under results/<name>/<instance>/.")
+    parser.add_argument("--departure-delay", type=int, metavar="SECONDS",
+                        help="Allow a departure to be this many seconds off its scheduled time "
+                             "and still count as valid. The evaluator applies it symmetrically — "
+                             "N seconds late or N early — and defaults to 0, an exact match, "
+                             "which is why a plan one second over its deadline is rejected "
+                             "outright. Meant for rounding, not for excusing a scenario whose "
+                             "window is too short to be met at all.")
     parser.add_argument("--no-pull", action="store_true",
                         help="Skip the up-front 'docker pull'. For a driver like "
-                             "run_experiment.py that invokes this script once per attempt: it "
-                             "pulls each image once itself, and without this every invocation "
-                             "would re-check the registry -- hundreds of round-trips for an "
-                             "image that cannot change mid-run, and hundreds of chances for a "
-                             "flaky registry to abort the sweep.")
-    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='stable',
+                             "run_experiment.py that invokes this script once per attempt and "
+                             "pulls each image once itself — without it, every invocation would "
+                             "re-check the registry for an image that cannot change mid-run.")
+    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default="stable",
                         help="Pick a docker image version ('local' is reserved for locally built "
                              "images).")
     add_engine_args(parser)
     args = parser.parse_args()
 
+    if args.scenario and not args.plan:
+        parser.error("--scenario requires --plan.")
+    if args.scenario and args.instance:
+        parser.error("--scenario and --instance are mutually exclusive.")
     if args.plan:
-        if not args.location or not args.instance:
-            parser.error("--plan requires --location and --instance: the plan lives outside the "
-                         "location, so neither the scenario nor the location can be inferred "
-                         "from its path.")
+        if not args.location or not (args.instance or args.scenario):
+            parser.error("--plan requires --location and --instance (or --scenario): the plan "
+                         "lives outside the location, so neither the scenario nor the location "
+                         "can be inferred from its path.")
+        if not args.dry_run and args.scenario and not args.scenario.is_file():
+            parser.error(f"No such scenario file: {args.scenario}")
         if not args.dry_run and not args.plan.exists():
             parser.error(f"No such plan file: {args.plan}")
 
@@ -254,15 +257,15 @@ def main() -> None:
         if args.engine == "docker" and not args.no_pull:
             ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
 
+    if args.plan and args.scenario:
+        record = _run_plan_single(DOCKER_IMAGE_VERSIONS[args.version], ROOT / args.location,
+                                  args.plan, args.scenario, args.version, args.dry_run,
+                                  args.departure_delay, args.engine, args.sif_cache_dir,
+                                  outside_location=True)
+        sys.exit(0 if (not record or record.get("verdict") != "error") else 1)
+
     if args.plan:
         loc = ROOT / args.location
-        # Resolve --instance the same way the batch path below does (select()
-        # against scripts/instance_filter.py, wildcards and pasted filenames
-        # included) rather than pasting it straight into a path — a raw paste
-        # broke both of those for this one flag combination. Strip either a
-        # scenario_ or plan_ prefix before matching: the natural filename to
-        # paste here is --plan's own (plan_<name>.json), which sits right in
-        # the same command, not the scenario's.
         name = args.instance.removesuffix(".json")
         for stray_prefix in ("scenario_", "plan_"):
             name = name.removeprefix(stray_prefix)
@@ -274,16 +277,14 @@ def main() -> None:
             sys.exit(f"ERROR: --instance {args.instance!r} matched {len(scenarios)} scenarios; "
                      f"--plan evaluates one. Narrow it to exactly one.")
         elif args.dry_run:
-            # Nothing to glob against yet (e.g. a dry run against a location with
-            # no scenarios/ generated) -- fall back to the same normalization
-            # select() applies, so the printed command still reflects --instance.
             scenario = loc / "scenarios" / f"scenario_{name}.json"
         else:
             fail_no_match(args.instance, [instance_of(p, "scenario_") for p in candidates])
         if not args.dry_run and not scenario.exists():
             sys.exit(f"ERROR: no matching scenario for --instance {args.instance!r}: {scenario}")
         record = _run_plan_single(DOCKER_IMAGE_VERSIONS[args.version], loc, args.plan, scenario,
-                                  args.version, args.dry_run, args.engine, args.sif_cache_dir)
+                                  args.version, args.dry_run, args.departure_delay,
+                                  args.engine, args.sif_cache_dir)
         sys.exit(0 if (not record or record.get("verdict") != "error") else 1)
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
@@ -295,7 +296,7 @@ def main() -> None:
             print(f"WARNING: {loc} not found, skipping.", file=sys.stderr)
             continue
         plans = sorted(loc.glob("plans/plan_*.json"))
-        available += [_scenario_name(p) for p in plans]
+        available += [_instance_name(p) for p in plans]
         plans = select(plans, args.instance, INSTANCE_PREFIX)
         if not plans:
             continue
@@ -303,7 +304,7 @@ def main() -> None:
         for plan in plans:
             total += 1
             if not _run_plan(DOCKER_IMAGE_VERSIONS[args.version], loc, plan, args.dry_run,
-                             args.engine, args.sif_cache_dir):
+                             args.departure_delay, args.engine, args.sif_cache_dir):
                 errors += 1
 
     if args.instance and total == 0:

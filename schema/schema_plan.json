@@ -73,17 +73,27 @@
       "title": "Action",
       "type": "object"
     },
+    "Feasibility": {
+      "description": "A producer's own verdict on whether its submitted Plan satisfies all\nhard constraints - not a claim about whether some other plan for the\nsame Scenario might exist. UNKNOWN is the default for a producer that\ndoesn't compute this (or a plan predating this field), not a third kind\nof \"maybe\".",
+      "enum": [
+        "Feasible",
+        "Infeasible",
+        "Unknown"
+      ],
+      "title": "Feasibility",
+      "type": "string"
+    },
     "PredefinedTaskType": {
       "enum": [
         "Move",
         "Split",
         "Combine",
+        "Reverse",
         "Wait",
         "Arrive",
         "Exit",
         "StandIn",
         "StandOut",
-        "Walking",
         "Break",
         "NonService"
       ],
@@ -195,7 +205,7 @@
   "description": "The output of a shunting algorithm: an ordered list of actions.\n\nThere was a trackParts field here, carrying a copy of the Location's track\ngraph because the evaluator supposedly could not reach the original. That\ncondition no longer holds \u2014 run_evaluator.py passes --path_location\nalongside --path_plan \u2014 and in practice nothing ever wrote or read it.",
   "properties": {
     "schemaVersion": {
-      "default": 1,
+      "default": 2,
       "title": "Schemaversion",
       "type": "integer"
     },
@@ -205,6 +215,46 @@
       },
       "title": "Actions",
       "type": "array"
+    },
+    "feasibility": {
+      "$ref": "#/$defs/Feasibility",
+      "default": "Unknown"
+    },
+    "origin": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Origin"
+    },
+    "cost": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Cost"
+    },
+    "costDetails": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Costdetails"
     }
   },
   "required": [

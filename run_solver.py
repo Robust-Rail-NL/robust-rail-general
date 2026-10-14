@@ -9,39 +9,35 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from scripts.docker_utils import (
-    add_engine_args, build_run_cmd, container_name, ensure_pulled, ensure_runtime_ready, run_container,
+    add_engine_args,
+    build_run_cmd,
+    container_name,
+    ensure_pulled,
+    ensure_runtime_ready,
+    finish_capture,
+    run_container,
 )
 from scripts.instance_filter import fail_no_match, instance_of, select
 
 ROOT = Path(__file__).parent
 INSTANCE_PREFIX = "scenario_"
 DOCKER_IMAGE_VERSIONS = {
-    # Floats forward across ordinary releases rather than pinning one:
-    # docker-push.sh only tags :latest on a real X.Y.Z build, so this needs no
-    # update here when a new stable version ships. The --version key names a
-    # pipeline configuration rather than a literal version number.
     "stable": "ghcr.io/robust-rail-nl/hip:latest",
-    # Deliberately the plain image, not an -assert one. The solver is a
-    # wall-clock-bounded local search, so an assertions-enabled build explores
-    # less of the neighbourhood in the same budget and returns different plans
-    # on any scenario that does not converge first — which would break the
-    # comparison against the stable baseline. Run the -assert solver image
-    # separately as a soak test (seed sweeps looking for a violation) instead.
     "stable-assert": "ghcr.io/robust-rail-nl/hip:latest",
-    # Newest push to the edge branch: fixes worth running before they've gone
-    # through PR review into main, not yet vetted enough to call stable.
-    # Floating tag, always overwritten — see docker-push.sh in
-    # robust-rail-solver.
     "edge": "ghcr.io/robust-rail-nl/hip:edge",
     "local": "hip:latest",
 }
 CONTAINER_DB = "/app/database"
 CONTAINER_OUT = "/app/output"
+# --scenario only: the directory of a scenario that lives outside the location.
+CONTAINER_SCENARIO = "/app/scenario"
 # apptainer-only (see docker_utils.build_run_cmd's workdir param): the
 # solver image's own Dockerfile WORKDIR, which its ENTRYPOINT ("dotnet
 # ServiceSiteScheduling.dll") is relative to.
 CONTAINER_WORKDIR = "/app"
 TEMP_CONFIG = "config_solver_run.yaml"
+
+BACKSTOP_GRACE = 120
 
 
 def _parse_config(config_path: Path) -> dict:
@@ -85,24 +81,19 @@ def _fmt_section(d: dict, indent: int = 2) -> str:
     return "\n".join(f"{pad}{k}: {v}" for k, v in d.items())
 
 
-def _write_config(config_path: Path, scenario_name: str, plan_container_path: str,
+def _write_config(config_path: Path, scenario_container_path: str, plan_container_path: str,
                   params: dict) -> None:
-    """Write the solver's run config. plan_container_path is a full path *inside
-    the container*, not a bare filename: the batch path points it into the
-    location's own plans/, while --output-dir points it at the separate
-    /app/output mount, and neither prefix can be assumed from here.
-    """
     tabu = params.get("TabuSearch", {
         "Iterations": 40, "IterationsUntilReset": 100, "TabuListLength": 16, "Bias": 0.5,
     })
     sa = params.get("SimulatedAnnealing", {
-        "MaxDuration": 3600, "StopWhenFeasible": "true", "IterationsUntilReset": 15000,
-        "T": 15, "A": 0.97, "Q": 2000, "Reset": 2000, "Bias": 0.2,
+        "MaxDuration": 3600, "StopWhenFeasible": "true", "MaxIterations": 15000,
+        "IterationsUntilReset": 2000, "T": 15, "A": 0.97, "Q": 2000, "Bias": 0.2,
         "IntensifyOnImprovement": "false",
     })
     content = (
         f'LocationPath: "{CONTAINER_DB}/location.json"\n'
-        f'ScenarioPath: "{CONTAINER_DB}/scenarios/{scenario_name}"\n'
+        f'ScenarioPath: "{scenario_container_path}"\n'
         f'PlanPath: "{plan_container_path}"\n'
         f'Seed: {params.get("Seed", 1)}\n'
         f'DebugLevel: {params.get("DebugLevel", 0)}\n'
@@ -114,18 +105,16 @@ def _write_config(config_path: Path, scenario_name: str, plan_container_path: st
     config_path.write_text(content)
 
 
-# How far past its own MaxDuration a container may run before the external kill
-# fires. The internal budget is the one meant to bind — the solver stops the
-# annealing there cleanly and still writes its best plan — so this only catches
-# a container that has stopped respecting it. Generous, because MaxDuration
-# bounds the annealing loop alone, not container startup, scenario loading or
-# writing the plan back out.
-BACKSTOP_GRACE = 120
-
-
 def _backstop(max_duration: int | None) -> int | None:
     """The external-kill deadline implied by an internal budget, if any."""
     return None if max_duration is None else max_duration + BACKSTOP_GRACE
+
+
+# Simulated annealing stops at whichever comes first: MaxDuration, a feasible
+# plan (StopWhenFeasible), or its total iteration cap. The locations' configs
+# cap it at MaxIterations: 15000 -- a few seconds -- which made --max-duration
+# a no-op, so a given --max-duration lifts the cap to this (C# int.MaxValue).
+UNCAPPED_ITERATIONS = 2_147_483_647
 
 
 def _apply_overrides(params: dict, max_duration: int | None, seed: int | None) -> dict:
@@ -133,20 +122,29 @@ def _apply_overrides(params: dict, max_duration: int | None, seed: int | None) -
 
     Applied on both the batch and the single-instance path, so neither flag is
     a silent no-op depending on which one you happen to be on.
+
+    --max-duration also lifts the iteration cap, so the time budget is what
+    actually ends the search. The cap is "MaxIterations" in the solver's
+    current config schema (v2.1.0+), and "IterationsUntilReset" in the
+    deprecated one, recognisable by its "Reset" key -- there
+    "IterationsUntilReset" holds the cap and "Reset" the real reset threshold
+    (solver#30).
     """
     if seed is not None:
         params["Seed"] = seed
     if max_duration is not None:
-        params.setdefault("SimulatedAnnealing", {})["MaxDuration"] = max_duration
+        sa = params.setdefault("SimulatedAnnealing", {})
+        sa["MaxDuration"] = max_duration
+        sa["IterationsUntilReset" if "Reset" in sa else "MaxIterations"] = UNCAPPED_ITERATIONS
     return params
 
 
-def _scenario_name(scenario: Path) -> str:
-    return instance_of(scenario, INSTANCE_PREFIX)
+def _instance_name(path: Path) -> str:
+    return instance_of(path, INSTANCE_PREFIX)
 
 
 def _plan_name(scenario: Path) -> str:
-    return f"plan_{_scenario_name(scenario)}.json"
+    return f"plan_{_instance_name(scenario)}.json"
 
 
 def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run: bool,
@@ -157,7 +155,7 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run
     config_path = location_dir / TEMP_CONFIG
     params = _apply_overrides(_parse_config(location_dir / "config_solver.yaml"),
                               max_duration, seed)
-    cname = container_name("solver", _scenario_name(scenario))
+    cname = container_name("solver", _instance_name(scenario))
 
     mounts = [(location_dir.resolve(), CONTAINER_DB)]
     args = [f"--config={CONTAINER_DB}/{TEMP_CONFIG}"]
@@ -176,32 +174,22 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run
     out_file = plans_dir / f"{plan_stem}.out"
     err_file = plans_dir / f"{plan_stem}.err"
 
-    _write_config(config_path, scenario.name, f"{CONTAINER_DB}/plans/{plan_name}", params)
+    _write_config(config_path, f"{CONTAINER_DB}/scenarios/{scenario.name}",
+                  f"{CONTAINER_DB}/plans/{plan_name}", params)
     try:
         returncode, timed_out = run_container(cmd, cname, out_file, err_file, timeout, engine)
     finally:
         config_path.unlink(missing_ok=True)
     ok = returncode == 0
 
-    with open(err_file, "a") as f:
-        if timed_out:
-            f.write(f"--- timeout: killed after {timeout}s (container {cname})\n")
-        else:
-            f.write(f"--- exit: {returncode if returncode is not None else 'error'}\n")
-    out_lines = len(out_file.read_text().splitlines()) if out_file.exists() else 0
-    err_lines = len(err_file.read_text().splitlines()) if err_file.exists() else 0
-    if ok and err_lines <= 1:
-        err_file.unlink(missing_ok=True)
-        err_lines = 0
+    footer = (f"--- timeout: killed after {timeout}s (container {cname})" if timed_out
+              else f"--- exit: {returncode if returncode is not None else 'error'}")
+    out_lines, err_lines = finish_capture(out_file, err_file, footer, ok)
     err_part = f"  stderr: {err_lines}L" if err_lines else ""
     status = f"TIMEOUT after {timeout}s" if timed_out else f"exit {returncode}"
     print(f"    stdout: {out_lines}L{err_part}  ({status})")
 
     if timed_out:
-        # SIGKILL, so whatever the search had found is lost: HIP writes its plan
-        # at the end of the run, not incrementally. A timed-out solver therefore
-        # leaves no new plan — and any plan_<suffix>.json from an earlier run
-        # stays on disk for run_evaluator.py to pick up. See --timeout's help.
         print(f"    TIMEOUT after {timeout}s, container killed", file=sys.stderr)
     elif not ok and returncode is not None:
         print(f"    FAILED (exit {returncode})", file=sys.stderr)
@@ -211,19 +199,12 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, dry_run
 def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, output_dir: Path,
                          version: str, dry_run: bool, max_duration: int | None = None,
                          seed: int | None = None, timeout: int | None = None,
-                         engine: str = "docker", cache_dir: Path | None = None) -> dict:
-    """Run one scenario into output_dir, and return/record what happened.
+                         engine: str = "docker", cache_dir: Path | None = None,
+                         outside_location: bool = False) -> dict:
+    """Run one scenario into output_dir.
 
-    For experiment runs (run_experiment.py), which need each (instance, tool)
-    attempt kept in its own directory rather than in the shared, filename-keyed
-    plans/ folder every other scenario also writes into. Writes plan.json,
-    solver.out, solver.err and result.json there.
-
-    result.json is the logging contract the harness reads back: it records
-    whether a plan was produced, never whether the instance was *solved* —
-    that verdict belongs to the evaluator alone and lands in eval_result.json
-    beside it. A solver exit code of 0 says the search finished, not that the
-    plan it wrote is valid.
+    outside_location (--scenario): the scenario file is mounted from wherever it
+    lives rather than read from <location>/scenarios/.
     """
     output_dir = output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -231,9 +212,14 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
     params = _apply_overrides(_parse_config(location_dir / "config_solver.yaml"),
                               max_duration, seed)
     seed_used = params.get("Seed", 1)
-    cname = container_name("solver", _scenario_name(scenario))
+    cname = container_name("solver", _instance_name(scenario))
 
     mounts = [(location_dir.resolve(), CONTAINER_DB), (output_dir, CONTAINER_OUT)]
+    if outside_location:
+        mounts.append((scenario.parent.resolve(), CONTAINER_SCENARIO))
+        scenario_container_path = f"{CONTAINER_SCENARIO}/{scenario.name}"
+    else:
+        scenario_container_path = f"{CONTAINER_DB}/scenarios/{scenario.name}"
     args = [f"--config={CONTAINER_OUT}/{config_path.name}"]
     cmd = build_run_cmd(engine, docker_image, mounts, args, name=cname, cache_dir=cache_dir,
                         strict=not dry_run, workdir=CONTAINER_WORKDIR)
@@ -244,7 +230,7 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
         print(f"    [dry-run] {' '.join(cmd)}")
         return {}
 
-    _write_config(config_path, scenario.name, f"{CONTAINER_OUT}/plan.json", params)
+    _write_config(config_path, scenario_container_path, f"{CONTAINER_OUT}/plan.json", params)
     out_file, err_file = output_dir / "solver.out", output_dir / "solver.err"
     start, start_iso = time.monotonic(), datetime.now(timezone.utc).isoformat()
     returncode, timed_out = run_container(cmd, cname, out_file, err_file,
@@ -252,7 +238,7 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
 
     plan_produced = plan_path.exists() and plan_path.stat().st_size > 0
     record = {
-        "instance": _scenario_name(scenario),
+        "instance": _instance_name(scenario),
         "tool": "solver",
         "location": location_dir.name,
         "scenario": scenario.name,
@@ -286,7 +272,7 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true",
                         help="Print docker commands without executing them.")
     parser.add_argument("--location", metavar="NAME",
-                        help="Restrict to a single Location_* directory (e.g. Location_SimpleService).")
+                        help="Restrict to a single Location_* directory.")
     parser.add_argument("--instance", metavar="NAME",
                         help="Restrict to a single scenarios/scenario_<NAME>.json (a pasted "
                              "filename works too). Accepts shell-style wildcards; exits non-zero "
@@ -297,11 +283,17 @@ def main() -> None:
                              "scenario). This is the per-attempt layout run_experiment.py drives, "
                              "keeping each (instance, tool) run in its own directory rather than "
                              "the shared, filename-keyed plans/ folder.")
+    parser.add_argument("--scenario", metavar="FILE", type=Path,
+                        help="Solve this one scenario_<NAME>.json wherever it lives, instead of "
+                             "looking it up in <location>/scenarios/ (requires --location, for "
+                             "location.json and config_solver.yaml, and --output-dir). This is "
+                             "how run_experiment.py solves the scenarios it keeps under "
+                             "results/<name>/<instance>/.")
     parser.add_argument("--max-duration", type=int, metavar="SECONDS",
                         help="Override SimulatedAnnealing.MaxDuration for this run — the solver's "
                              "own budget, which it stops at cleanly and still writes its best plan "
-                             f"from. An external kill is armed {BACKSTOP_GRACE}s above it purely as "
-                             "a backstop for a wedged container. Prefer this over --timeout for "
+                             f"from. An external kill is armed {BACKSTOP_GRACE}s above it as a "
+                             "backstop for a wedged container. Prefer this over --timeout for "
                              "solver-vs-planner comparison: a SIGKILL at the budget would forfeit "
                              "the plan an anytime search had already found.")
     parser.add_argument("--seed", type=int, metavar="N",
@@ -310,26 +302,30 @@ def main() -> None:
     parser.add_argument("--timeout", type=int, default=None, metavar="SECONDS",
                         help="Kill a single scenario's solver container after this many seconds. "
                              "Off by default, because the solver already bounds itself with "
-                             "SimulatedAnnealing.MaxDuration in config_solver.yaml and exits "
-                             "cleanly there, writing its best plan; this kill is a SIGKILL and "
-                             "forfeits that plan. Set it equal to run_planner.py's --timeout, and "
-                             "MaxDuration above it, to hold both tools to one externally-enforced "
-                             "wall-clock budget for a like-for-like comparison.")
+                             "SimulatedAnnealing.MaxDuration and exits cleanly there, writing its "
+                             "best plan; this kill is a SIGKILL and forfeits that plan. Set it "
+                             "equal to run_planner.py's --timeout, and MaxDuration above it, to "
+                             "hold both tools to one externally-enforced budget.")
     parser.add_argument("--no-pull", action="store_true",
                         help="Skip the up-front 'docker pull'. For a driver like "
-                             "run_experiment.py that invokes this script once per attempt: it "
-                             "pulls each image once itself, and without this every invocation "
-                             "would re-check the registry -- hundreds of round-trips for an "
-                             "image that cannot change mid-run, and hundreds of chances for a "
-                             "flaky registry to abort the sweep.")
-    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default='stable',
+                             "run_experiment.py that invokes this script once per attempt and "
+                             "pulls each image once itself — without it, every invocation would "
+                             "re-check the registry for an image that cannot change mid-run.")
+    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default="stable",
                         help="Pick a docker image version ('local' is reserved for locally built "
-                             "images; " "'edge' tracks the newest not-yet-vetted push to the edge "
+                             "images; 'edge' tracks the newest not-yet-vetted push to the edge "
                              "branch).")
     add_engine_args(parser)
     args = parser.parse_args()
 
-    if args.output_dir and not args.instance:
+    if args.scenario:
+        if args.instance:
+            parser.error("--scenario and --instance are mutually exclusive.")
+        if not args.location or not args.output_dir:
+            parser.error("--scenario requires --location and --output-dir.")
+        if not args.dry_run and not args.scenario.is_file():
+            parser.error(f"No such scenario file: {args.scenario}")
+    elif args.output_dir and not args.instance:
         parser.error("--output-dir requires --instance: it holds one attempt's plan.json and "
                      "result.json, so it must name a single scenario.")
 
@@ -337,6 +333,13 @@ def main() -> None:
         ensure_runtime_ready(args.engine)
         if args.engine == "docker" and not args.no_pull:
             ensure_pulled(DOCKER_IMAGE_VERSIONS[args.version])
+
+    if args.scenario:
+        record = _run_scenario_single(DOCKER_IMAGE_VERSIONS[args.version], ROOT / args.location,
+                                      args.scenario, args.output_dir, args.version, args.dry_run,
+                                      args.max_duration, args.seed, args.timeout,
+                                      args.engine, args.sif_cache_dir, outside_location=True)
+        sys.exit(1 if record and not record.get("plan_produced") else 0)
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
 
@@ -347,7 +350,7 @@ def main() -> None:
             print(f"WARNING: {loc} not found, skipping.", file=sys.stderr)
             continue
         scenarios = sorted(loc.glob("scenarios/scenario_*.json"))
-        available += [_scenario_name(s) for s in scenarios]
+        available += [_instance_name(s) for s in scenarios]
         scenarios = select(scenarios, args.instance, INSTANCE_PREFIX)
         if not scenarios:
             continue

@@ -26,6 +26,7 @@ class PredefinedTaskType(str, Enum):
     MOVE = "Move"
     SPLIT = "Split"
     COMBINE = "Combine"
+    REVERSE = "Reverse"
     # Waiting / lifecycle
     WAIT = "Wait"
     ARRIVE = "Arrive"
@@ -34,7 +35,6 @@ class PredefinedTaskType(str, Enum):
     STAND_IN = "StandIn"
     STAND_OUT = "StandOut"
     # Staff / facility
-    WALKING = "Walking"
     BREAK = "Break"
     # Infrastructure
     NON_SERVICE = "NonService"

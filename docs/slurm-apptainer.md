@@ -184,21 +184,34 @@ started.
 ## Running a sweep as a SLURM job array
 
 1. **Stage images** (once, or whenever `DOCKER_IMAGE_VERSIONS` changes):
-   `python3 scripts/stage_apptainer_images.py`.
-2. **Generate scenarios**, directly on the login node:
-   `python3 run_generator.py --location <NAME> --engine apptainer`.
-3. **Build the manifest**: `python3 scripts/slurm_manifest.py --location
-   <NAME> --tools solver,planner [--num-seeds N] --output-dir <SCRATCH_DIR>`.
-   Enumerates the sweep's (instance, tool[, seed]) work units — reusing
-   `run_experiment.py`'s own instance resolution and mirroring
-   `_run_instance`'s per-tool/per-seed loop exactly, so an array-job sweep
-   and a local `--jobs N` sweep of the same flags produce identical layouts
-   (`<output-dir>/<instance>/local_search[/seed<i>]/`,
-   `<output-dir>/<instance>/planning/`). Writes `tasks.tsv` and prints the
-   `sbatch` command to run next.
+   `python3 scripts/stage_apptainer_images.py`. An experiment JSON's
+   `versions` default to `edge` (see `scripts/experiment_spec.py`), so add
+   `--edge` unless the file pins every version to `stable`.
+2. **Build the manifest**: `python3 scripts/slurm_manifest.py <EXPERIMENT.json>
+   --output-dir <SCRATCH_DIR>`. Takes the same experiment JSON
+   `run_experiment.py` does, so tools, seeds and instances come from the one
+   file that records the run. It copies the file to
+   `<output-dir>/experiment.json` and enumerates the sweep its
+   `scenario_config` section describes as (instance, tool[, seed]) work
+   units — reusing `run_experiment.py`'s own sweep expansion and mirroring
+   `_run_instance`'s per-tool/per-seed loop,
+   so an array-job sweep and a local sweep of the same file produce identical
+   layouts (`<output-dir>/<instance>/local_search[/seed<i>]/`,
+   `<output-dir>/<instance>/planning/`). One difference: a local sweep stops at
+   the first seed that solves an instance, which independent array tasks
+   cannot, so the array runs every seed (the reports only ask whether any seed
+   solved, so the results are the same). Writes `tasks.tsv` and prints the
+   generator and `sbatch` commands to run next.
+3. **Generate scenarios**, directly on the login node, with the command the
+   manifest step printed:
+   `python3 run_generator.py --experiment <EXPERIMENT.json> --run-dir
+   <OUTPUT_DIR> --engine apptainer`. It generates every instance straight from
+   the `scenario_config` section (no config files are kept) into
+   `<output-dir>/<instance>/scenario_<instance>.json`, where the array tasks
+   read it.
 4. **Submit the array job**: the printed
    `sbatch --array=0-N scripts/slurm/run_experiment_array.sbatch <manifest>
-   <location> <output-dir>` command. Each task runs
+   <experiment.json> <output-dir>` command. Each task runs
    `scripts/slurm_run_task.py`, which reads its row (by `--index`, defaulting
    to `$SLURM_ARRAY_TASK_ID`) and calls `run_experiment.py`'s own
    `_run_and_record` directly — the same solver/planner-then-evaluator
@@ -206,11 +219,12 @@ started.
 
    `scripts/slurm_run_task.py` itself — the exact code each array task
    runs — was confirmed working end to end on a real DelftBlue compute node
-   (`compute-p1`, interactive `srun`, 2026-09-23): `python3
-   scripts/slurm_run_task.py --index 0 --manifest <tasks.tsv> --location
-   <NAME> --output-dir <dir>` produced a plan (solver) and scored it
-   (evaluator), both exiting cleanly. What's still untried is `sbatch
-   --array` itself doing the scheduling/indexing — see "Known gaps".
+   (`compute-p1`, interactive `srun`, 2026-09-23), before `run_experiment.py`
+   moved to experiment JSONs: it produced a plan (solver) and scored it
+   (evaluator), both exiting cleanly. The experiment-JSON interface
+   (`--experiment` in place of `--location` and the version flags) has not been
+   re-run on a compute node. What's still untried is `sbatch --array` itself
+   doing the scheduling/indexing — see "Known gaps".
 5. **Submit the aggregation job**, depending on the array job:
    `sbatch --dependency=afterok:<array_job_id> scripts/slurm/aggregate.sbatch
    <output-dir> <home-dest>`. Runs `report_results.py` +

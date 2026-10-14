@@ -58,6 +58,8 @@ mkdir -p slurm-logs
 python3 scripts/report_results.py "$OUTPUT_DIR" \
     --runs-csv "$OUTPUT_DIR/runs.csv" \
     --feasibility-csv "$OUTPUT_DIR/feasibility.csv" \
+    --solver-failures-csv "$OUTPUT_DIR/solver_failures.csv" \
+    --planner-failures-csv "$OUTPUT_DIR/planner_failures.csv" \
     ${CERTIFY_THRESHOLD:+--certify-threshold "$CERTIFY_THRESHOLD"}
 
 python3 scripts/coverage_analysis.py "$OUTPUT_DIR" \

@@ -189,6 +189,16 @@
       "title": "Facility",
       "type": "object"
     },
+    "Feasibility": {
+      "description": "A producer's own verdict on whether its submitted Plan satisfies all\nhard constraints - not a claim about whether some other plan for the\nsame Scenario might exist. UNKNOWN is the default for a producer that\ndoesn't compute this (or a plan predating this field), not a third kind\nof \"maybe\".",
+      "enum": [
+        "Feasible",
+        "Infeasible",
+        "Unknown"
+      ],
+      "title": "Feasibility",
+      "type": "string"
+    },
     "IncomingTrain": {
       "additionalProperties": false,
       "description": "A train arriving at or already present in the shunting yard.\n\nUsed for both in (arriving) and inStanding (already present) trains.",
@@ -302,7 +312,7 @@
       "description": "The fixed part of the problem specification: track layout and\nfacilities. Does not change on a daily basis.",
       "properties": {
         "schemaVersion": {
-          "default": 1,
+          "default": 2,
           "title": "Schemaversion",
           "type": "integer"
         },
@@ -558,7 +568,7 @@
       "description": "The output of a shunting algorithm: an ordered list of actions.\n\nThere was a trackParts field here, carrying a copy of the Location's track\ngraph because the evaluator supposedly could not reach the original. That\ncondition no longer holds \u2014 run_evaluator.py passes --path_location\nalongside --path_plan \u2014 and in practice nothing ever wrote or read it.",
       "properties": {
         "schemaVersion": {
-          "default": 1,
+          "default": 2,
           "title": "Schemaversion",
           "type": "integer"
         },
@@ -568,6 +578,46 @@
           },
           "title": "Actions",
           "type": "array"
+        },
+        "feasibility": {
+          "$ref": "#/$defs/Feasibility",
+          "default": "Unknown"
+        },
+        "origin": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Origin"
+        },
+        "cost": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cost"
+        },
+        "costDetails": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Costdetails"
         }
       },
       "required": [
@@ -581,12 +631,12 @@
         "Move",
         "Split",
         "Combine",
+        "Reverse",
         "Wait",
         "Arrive",
         "Exit",
         "StandIn",
         "StandOut",
-        "Walking",
         "Break",
         "NonService"
       ],
@@ -626,7 +676,7 @@
       "description": "The daily-varying part of the problem specification: which trains\narrive, depart, or remain in the shunting yard.\n\nTODO: decide whether train_unit_types belongs here (normalized, referenced\nby name from TrainUnit) or embedded in each TrainUnit. Current decision:\nhere.",
       "properties": {
         "schemaVersion": {
-          "default": 1,
+          "default": 2,
           "title": "Schemaversion",
           "type": "integer"
         },
