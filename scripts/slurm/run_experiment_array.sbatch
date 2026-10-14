@@ -6,11 +6,17 @@
 #   sbatch --array=0-41 scripts/slurm/run_experiment_array.sbatch \
 #       /scratch/<you>/sweep1/tasks.tsv experiments/sweep1.json /scratch/<you>/sweep1
 #
-# Positional args: $1 manifest, $2 experiment JSON, $3 output-dir. Assumes it's
-# submitted from the repo root (the `cd` below is relative to this script's
-# own location, so it doesn't actually matter where `sbatch` is invoked
-# from, but the #SBATCH --output/--error paths below are still resolved
-# against the submission directory by SLURM itself).
+# Positional args: $1 manifest, $2 experiment JSON, $3 output-dir. Must be
+# submitted from the repo root -- $SLURM_SUBMIT_DIR (what the `cd` below
+# uses) is exactly that directory. An earlier version of this script instead
+# derived it from this script's own path (`dirname "$0"`), which is NOT
+# reliable under sbatch: SLURM may run a submitted script from a spooled
+# copy, so $0 doesn't necessarily point back at scripts/slurm/ in the repo
+# at all -- found 2026-10-14 when every task in a real array failed
+# immediately on `mkdir -p slurm-logs: Permission denied`, because that `cd`
+# had landed somewhere unexpected and unwritable. $SBATCH --output/--error
+# paths are unaffected either way -- SLURM itself resolves those against
+# $SLURM_SUBMIT_DIR before the script body ever runs.
 #
 # Versions, max-duration and the rest come from the experiment JSON itself
 # (see scripts/experiment_spec.py), the same file run_experiment.py reads.
@@ -71,7 +77,7 @@ MANIFEST="$1"
 EXPERIMENT="$2"
 OUTPUT_DIR="$3"
 
-cd "$(dirname "$0")/../.."  # repo root
+cd "$SLURM_SUBMIT_DIR"
 mkdir -p slurm-logs
 
 python3 scripts/slurm_run_task.py \

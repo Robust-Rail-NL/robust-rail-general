@@ -274,10 +274,28 @@ started.
   cleanly (exit 0), including its `JULIA_DEPOT_PATH=/tmp/julia-depot:
   /opt/julia-depot` env var under `--writable-tmpfs`. Previously only the
   solver had been proven this way (2026-09-23).
-- Still genuinely untried: an actual `sbatch --array` submission (more than
-  one task) and the aggregation job. The resource values above are a reasoned
-  starting point to get there, not a guarantee against an OOM-kill or
-  walltime-kill on a harder instance — watch for either in the sweep's own
-  `.err` files and revisit if they show up.
+- Found and fixed, 2026-10-14: `run_experiment_array.sbatch` and
+  `aggregate.sbatch` both `cd`'d to `"$(dirname "$0")/../.."`, assuming that
+  resolved to the repo root regardless of where `sbatch` was invoked from.
+  Under a real `sbatch --array` submission this landed somewhere unexpected
+  and unwritable instead — every one of a 600-task array's tasks failed
+  immediately on `mkdir -p slurm-logs: Permission denied`, before ever
+  reaching `scripts/slurm_run_task.py` (caught cheaply thanks to
+  `set -euo pipefail`, but zero results came out of that submission). `$0`
+  isn't a reliable way to locate the submitted script under `sbatch` — SLURM
+  may run it from a spooled copy rather than its original path. Fixed by
+  using `$SLURM_SUBMIT_DIR` instead (the directory `sbatch` was actually
+  invoked from, which SLURM sets reliably) — both scripts must now be
+  submitted from the repo root, which every instruction here already assumed
+  anyway. Not caught by the 2026-10-14 sizing measurement above, since that
+  used a separate one-off script (`__scratch/sizing-planner.sbatch`) with no
+  such `cd` at all, relying on `sbatch`'s own default working directory
+  instead.
+- Still genuinely untried: an actual `sbatch --array` submission that
+  actually reaches `scripts/slurm_run_task.py` for real work, and the
+  aggregation job. The resource values above are a reasoned starting point
+  to get there, not a guarantee against an OOM-kill or walltime-kill on a
+  harder instance — watch for either in the sweep's own `.err` files and
+  revisit if they show up.
 - Recommended next step: a small manually submitted array (one or two
   instances) with these values, before committing to the full sweep.
