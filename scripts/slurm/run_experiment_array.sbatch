@@ -23,7 +23,10 @@
 # TODO before this is actually runnable: partition/QOS and walltime/mem/cpu
 # below are placeholders -- still pending input from the collaborator who
 # runs this (see docs/slurm-apptainer.md). --account is filled in (Léon's
-# own value).
+# own value). --ntasks=1 and --mem-per-cpu (not --mem) are DelftBlue sbatch
+# requirements, not placeholders -- a bare --mem or an omitted --ntasks are
+# refused outright at submission time ("doesn't specify the number of
+# tasks"/"doesn't specify the amount of memory per-cpu"), found 2026-10-14.
 
 #SBATCH --job-name=robust-rail-experiment
 #SBATCH --account=research-eemcs-st
@@ -33,8 +36,9 @@
 # (600s) for the slowest instance in the sweep -- a real number from the
 # collaborator, not a measured one.
 #SBATCH --time=TODO
+#SBATCH --ntasks=1
 #SBATCH --cpus-per-task=TODO
-#SBATCH --mem=TODO
+#SBATCH --mem-per-cpu=TODO
 #SBATCH --output=slurm-logs/%A_%a.out
 #SBATCH --error=slurm-logs/%A_%a.err
 

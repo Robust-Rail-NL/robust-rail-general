@@ -246,9 +246,16 @@ started.
 
 - `scripts/slurm/run_experiment_array.sbatch` and `aggregate.sbatch` have
   placeholder `#SBATCH` values (`--partition`, `--time`, `--cpus-per-task`,
-  `--mem`) — `sbatch` will refuse to submit until these are filled in,
-  deliberately, rather than running with a guessed number.
-  `--account=research-eemcs-st` is filled in.
+  `--mem-per-cpu`) — `sbatch` will refuse to submit until these are filled
+  in, deliberately, rather than running with a guessed number.
+  `--account=research-eemcs-st` is filled in, as are `--ntasks=1` and the use
+  of `--mem-per-cpu` rather than a bare `--mem` — both are DelftBlue `sbatch`
+  requirements, not open placeholders: an omitted `--ntasks` or a bare
+  `--mem` are refused outright at submission ("doesn't specify the number of
+  tasks" / "doesn't specify the amount of memory per-cpu (or per-gpu)"),
+  found 2026-10-14 trying to submit a one-off sizing job. Not documented in
+  anything read beforehand; worth keeping in mind for any new `sbatch` script
+  added later, not just these two.
 - Still genuinely untried: an actual `sbatch --array` submission and the
   aggregation job. Blocked on the partition/walltime/mem/cpu placeholders
   above.

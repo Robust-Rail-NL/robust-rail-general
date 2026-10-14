@@ -30,13 +30,16 @@
 # are placeholders pending the collaborator (see docs/slurm-apptainer.md).
 # This job is far lighter than an array task (just report generation + an
 # rsync), so its resource needs are smaller, but still unmeasured.
+# --ntasks=1 / --mem-per-cpu (not --mem) are DelftBlue sbatch requirements,
+# not placeholders -- see run_experiment_array.sbatch's own note.
 
 #SBATCH --job-name=robust-rail-experiment-aggregate
 #SBATCH --account=research-eemcs-st
 #SBATCH --partition=TODO
 #SBATCH --time=TODO
+#SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=TODO
+#SBATCH --mem-per-cpu=TODO
 #SBATCH --output=slurm-logs/aggregate_%j.out
 #SBATCH --error=slurm-logs/aggregate_%j.err
 
