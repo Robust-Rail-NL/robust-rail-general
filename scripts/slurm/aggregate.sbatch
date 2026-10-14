@@ -55,7 +55,9 @@ set -euo pipefail
 OUTPUT_DIR="$1"
 HOME_DEST="$2"
 
-cd "$(dirname "$0")/../.."  # repo root
+# Must be submitted from the repo root -- see run_experiment_array.sbatch's
+# own comment on why this is $SLURM_SUBMIT_DIR, not `dirname "$0"`.
+cd "$SLURM_SUBMIT_DIR"
 mkdir -p slurm-logs
 
 python3 scripts/report_results.py "$OUTPUT_DIR" \
