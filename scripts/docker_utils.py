@@ -10,12 +10,15 @@ default to "docker" so every existing call site keeps working unchanged.
 
 import argparse
 import importlib.util
+import json
 import os
 import re
 import shutil
 import signal
 import subprocess
 import sys
+import urllib.error
+import urllib.request
 import uuid
 from pathlib import Path
 
@@ -105,23 +108,72 @@ def ensure_sif_present(image: str, cache_dir: Path, *, strict: bool = True) -> P
     return path
 
 
+# Accept header covering both a multi-arch manifest list/index and a single
+# manifest: ghcr.io returns whichever the tag actually is, and either way the
+# Docker-Content-Digest response header is what we want, not the body.
+_MANIFEST_ACCEPT = ",".join([
+    "application/vnd.oci.image.index.v1+json",
+    "application/vnd.docker.distribution.manifest.list.v2+json",
+    "application/vnd.oci.image.manifest.v1+json",
+    "application/vnd.docker.distribution.manifest.v2+json",
+])
+
+
+def registry_digest(image: str, timeout: float = 10.0) -> str | None:
+    """The manifest digest "ghcr.io/<repo>:<tag>" currently points at, or None
+    if it can't be determined -- a network error, a non-ghcr.io image, a
+    response with no digest header, anything short of a clean answer.
+    Callers treat None as "unknown", same convention as image_identity's own
+    None, never as "unchanged": an unreachable registry should re-pull, not
+    silently trust a cache it couldn't actually check.
+
+    ghcr.io only: every image staged here is ghcr.io/robust-rail-nl/... (see
+    each run_*.py's own DOCKER_IMAGE_VERSIONS), so this hardcodes ghcr.io's
+    own anonymous token endpoint rather than implementing the generic
+    WWW-Authenticate realm/service/scope discovery dance a registry-agnostic
+    client would need. These are public images -- no credential is sent or
+    needed, same as apptainer_pull's own plain `docker://` pull.
+    """
+    if not image.startswith("ghcr.io/"):
+        return None
+    repo, sep, tag = image.removeprefix("ghcr.io/").rpartition(":")
+    if not sep:
+        return None
+    try:
+        with urllib.request.urlopen(
+            f"https://ghcr.io/token?scope=repository:{repo}:pull", timeout=timeout,
+        ) as resp:
+            token = json.load(resp)["token"]
+        request = urllib.request.Request(
+            f"https://ghcr.io/v2/{repo}/manifests/{tag}",
+            headers={"Authorization": f"Bearer {token}", "Accept": _MANIFEST_ACCEPT},
+        )
+        with urllib.request.urlopen(request, timeout=timeout) as resp:
+            return resp.headers.get("Docker-Content-Digest")
+    except (OSError, urllib.error.URLError, ValueError, KeyError):
+        return None
+
+
 def apptainer_pull(image: str, cache_dir: Path, skip_existing: bool = False) -> Path | None:
-    """Pull image into cache_dir as a .sif, overwriting it if already cached.
+    """Pull image into cache_dir as a .sif, re-pulling if the registry's
+    manifest digest has moved since the cached one was staged.
 
     Used only by scripts/stage_apptainer_images.py (an interactive, once-off
     tool run by hand on a login node) -- unlike ensure_pulled, output is left
     to stream straight to the terminal rather than being captured, so a slow
     pull (the planner's Julia-heavy image especially) shows live progress.
 
-    Every image this staged (stable/stable-assert/edge) is a floating docker
+    Every image this stages (stable/stable-assert/edge) is a floating docker
     tag -- there is no immutable, content-addressed version string in play,
     so the .sif's filename (derived from the image ref, not its content; see
     sif_filename) never proves the cached file still matches what the tag
-    points at now. Re-pulling by default is the only way to not silently keep
-    serving a stale image after a tag gets rebuilt and repushed (e.g. "edge"
-    after a hotfix) -- apptainer pull itself has no digest check to lean on
-    either. skip_existing opts back into the old skip-if-cached behaviour,
-    for when you know nothing has changed and want to save the bandwidth.
+    points at now. A "<sif>.digest" sidecar records the manifest digest the
+    .sif was last pulled from (the same stamp-and-compare idea run_generator.py
+    and run_experiment.py already use for scenario/attempt reuse); a changed,
+    missing or unreadable digest means re-pull, never a guess that nothing
+    changed. skip_existing instead skips any existing .sif outright, with no
+    registry round-trip at all, for when you already know the tag hasn't
+    moved and don't even want the digest check's one HTTP request.
 
     Skipped, like ensure_pulled, for bare local-build tags (no "/"): there is
     no registry to pull from, and this repo's apptainer path has no
@@ -136,9 +188,19 @@ def apptainer_pull(image: str, cache_dir: Path, skip_existing: bool = False) -> 
 
     cache_dir.mkdir(parents=True, exist_ok=True)
     dest = sif_path(image, cache_dir)
-    if dest.exists() and skip_existing:
-        print(f"  Already staged: {dest.name}  ({image})")
-        return dest
+    digest_file = dest.with_name(dest.name + ".digest")
+
+    if dest.exists():
+        if skip_existing:
+            print(f"  Already staged: {dest.name}  ({image})")
+            return dest
+        digest = registry_digest(image)
+        if digest is not None and digest_file.exists() \
+                and digest_file.read_text().strip() == digest:
+            print(f"  Up to date: {dest.name}  ({image}, digest unchanged)")
+            return dest
+    else:
+        digest = registry_digest(image)
 
     tmp = dest.with_name(dest.name + ".part")
     tmp.unlink(missing_ok=True)
@@ -150,6 +212,13 @@ def apptainer_pull(image: str, cache_dir: Path, skip_existing: bool = False) -> 
               file=sys.stderr)
         sys.exit(1)
     tmp.replace(dest)
+    if digest is not None:
+        digest_file.write_text(digest + "\n")
+    else:
+        # Unknown digest (registry unreachable, or a fresh pull never checked
+        # one): no stamp to compare against next time either, so the next run
+        # re-pulls again rather than trusting a digest we never actually saw.
+        digest_file.unlink(missing_ok=True)
     return dest
 
 

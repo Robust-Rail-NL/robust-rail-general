@@ -75,12 +75,13 @@ def main() -> None:
     parser.add_argument("--edge", action="store_true",
                         help="Also stage each tool's 'edge' channel alongside the version(s) above.")
     parser.add_argument("--skip-existing", action="store_true",
-                        help="Skip an image whose .sif is already in --cache-dir, instead of "
-                             "re-pulling it. Every staged tag (stable/stable-assert/edge) is "
-                             "floating, so the default is to always re-pull -- a cached .sif's "
-                             "presence says nothing about whether the tag has moved since. Only "
-                             "pass this when you know the tag hasn't changed and want to save "
-                             "the bandwidth.")
+                        help="Skip an image whose .sif is already in --cache-dir outright, with "
+                             "no registry check at all. By default, an already-cached image is "
+                             "instead re-pulled only if ghcr.io's current manifest digest for "
+                             "that tag has moved since the .sif was last staged (every tag here "
+                             "-- stable/stable-assert/edge -- is floating, so its presence alone "
+                             "never proves it's still current). Pass this when you already know "
+                             "the tag hasn't moved and don't want even that one HTTP check.")
     args = parser.parse_args()
 
     ensure_runtime_ready("apptainer")
