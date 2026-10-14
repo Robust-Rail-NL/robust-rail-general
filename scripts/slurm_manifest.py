@@ -101,9 +101,8 @@ def main() -> None:
     seeds_note = f" x up to {spec['num_seeds']} seed(s)" if spec["num_seeds"] else ""
     print(f"Wrote {len(rows)} task(s) ({len(instances)} instance(s) x {spec['tools']}{seeds_note}) "
           f"to {manifest_path}")
-    print(f"\nGenerate the scenarios first (login node):\n"
-          f"  python3 run_generator.py --experiment {args.experiment} --run-dir {args.output_dir} "
-          f"--version {spec[experiment_spec.VERSIONS_KEY]['generator']} --engine apptainer")
+    print(f"\nGenerate the scenarios first:\n"
+          f"  sbatch scripts/slurm/generate_scenarios.sbatch {args.experiment} {args.output_dir}")
     if rows:
         print(f"\nThen submit with:\n"
               f"  sbatch --array=0-{len(rows) - 1} scripts/slurm/run_experiment_array.sbatch \\\n"
