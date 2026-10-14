@@ -141,7 +141,18 @@ own `DOCKER_IMAGE_VERSIONS`, de-duplicates by resolved image before pulling
 needs: generator/solver/planner `stable`, evaluator `stable` *and*
 `stable-assert` (a full solver-vs-planner comparison needs both eventually,
 just never in the same `run_evaluator.py` invocation). `--edge` adds each
-tool's edge channel; `--force` re-pulls.
+tool's edge channel. Every staged tag is a floating docker tag (`stable`/
+`stable-assert`/`edge` all point at tags that get overwritten in place, never
+a content-addressed version), so a cached `.sif`'s mere presence never proved
+it still matched what the tag points at now. `docker_utils.apptainer_pull`
+checks `ghcr.io`'s current manifest digest for the tag (one anonymous HTTP
+request; these are public images) against a `<sif>.digest` sidecar recorded
+at the last pull, and re-pulls whenever they differ, the sidecar is missing,
+or the registry can't be reached — the same stamp-and-compare idea
+`run_generator.py`/`run_experiment.py` already use for scenario/attempt
+reuse, applied to staging. `--skip-existing` skips a `.sif` that's already
+there outright, no registry round-trip at all, for when the tag is known not
+to have moved.
 
 Measured 2026-09-22 on DelftBlue: that default 5-image set is 607MiB total —
 about 2% of `/home`'s 30GiB quota, lighter than expected even with the

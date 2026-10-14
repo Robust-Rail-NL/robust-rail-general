@@ -74,8 +74,14 @@ def main() -> None:
                              "since a full comparison run needs both eventually).")
     parser.add_argument("--edge", action="store_true",
                         help="Also stage each tool's 'edge' channel alongside the version(s) above.")
-    parser.add_argument("--force", action="store_true",
-                        help="Re-pull even if a .sif already exists in --cache-dir.")
+    parser.add_argument("--skip-existing", action="store_true",
+                        help="Skip an image whose .sif is already in --cache-dir outright, with "
+                             "no registry check at all. By default, an already-cached image is "
+                             "instead re-pulled only if ghcr.io's current manifest digest for "
+                             "that tag has moved since the .sif was last staged (every tag here "
+                             "-- stable/stable-assert/edge -- is floating, so its presence alone "
+                             "never proves it's still current). Pass this when you already know "
+                             "the tag hasn't moved and don't want even that one HTTP check.")
     args = parser.parse_args()
 
     ensure_runtime_ready("apptainer")
@@ -104,7 +110,7 @@ def main() -> None:
                 continue
             seen_images[image] = f"{script} --version {version}"
             print(f"{script} --version {version} -> {image}")
-            apptainer_pull(image, args.cache_dir, args.force)
+            apptainer_pull(image, args.cache_dir, args.skip_existing)
 
     print(f"\nDone: {len(seen_images)} distinct image(s) staged in {args.cache_dir}.")
 
