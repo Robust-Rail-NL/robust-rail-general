@@ -141,7 +141,14 @@ own `DOCKER_IMAGE_VERSIONS`, de-duplicates by resolved image before pulling
 needs: generator/solver/planner `stable`, evaluator `stable` *and*
 `stable-assert` (a full solver-vs-planner comparison needs both eventually,
 just never in the same `run_evaluator.py` invocation). `--edge` adds each
-tool's edge channel; `--force` re-pulls.
+tool's edge channel. Every staged tag is a floating docker tag (`stable`/
+`stable-assert`/`edge` all point at tags that get overwritten in place, never
+a content-addressed version), so a cached `.sif`'s mere presence says nothing
+about whether it still matches what the tag points at now -- the script
+always re-pulls by default, rather than silently keep serving a stale image
+after a rebuild. `--skip-existing` opts back into skipping a `.sif` that's
+already there, for when you know the tag hasn't moved and want to save the
+bandwidth.
 
 Measured 2026-09-22 on DelftBlue: that default 5-image set is 607MiB total —
 about 2% of `/home`'s 30GiB quota, lighter than expected even with the

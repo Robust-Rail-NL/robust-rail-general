@@ -74,8 +74,13 @@ def main() -> None:
                              "since a full comparison run needs both eventually).")
     parser.add_argument("--edge", action="store_true",
                         help="Also stage each tool's 'edge' channel alongside the version(s) above.")
-    parser.add_argument("--force", action="store_true",
-                        help="Re-pull even if a .sif already exists in --cache-dir.")
+    parser.add_argument("--skip-existing", action="store_true",
+                        help="Skip an image whose .sif is already in --cache-dir, instead of "
+                             "re-pulling it. Every staged tag (stable/stable-assert/edge) is "
+                             "floating, so the default is to always re-pull -- a cached .sif's "
+                             "presence says nothing about whether the tag has moved since. Only "
+                             "pass this when you know the tag hasn't changed and want to save "
+                             "the bandwidth.")
     args = parser.parse_args()
 
     ensure_runtime_ready("apptainer")
@@ -104,7 +109,7 @@ def main() -> None:
                 continue
             seen_images[image] = f"{script} --version {version}"
             print(f"{script} --version {version} -> {image}")
-            apptainer_pull(image, args.cache_dir, args.force)
+            apptainer_pull(image, args.cache_dir, args.skip_existing)
 
     print(f"\nDone: {len(seen_images)} distinct image(s) staged in {args.cache_dir}.")
 

@@ -105,17 +105,23 @@ def ensure_sif_present(image: str, cache_dir: Path, *, strict: bool = True) -> P
     return path
 
 
-def apptainer_pull(image: str, cache_dir: Path, force: bool = False) -> Path | None:
-    """Pull image into cache_dir as a .sif, skipping it if already cached.
+def apptainer_pull(image: str, cache_dir: Path, skip_existing: bool = False) -> Path | None:
+    """Pull image into cache_dir as a .sif, overwriting it if already cached.
 
     Used only by scripts/stage_apptainer_images.py (an interactive, once-off
     tool run by hand on a login node) -- unlike ensure_pulled, output is left
     to stream straight to the terminal rather than being captured, so a slow
     pull (the planner's Julia-heavy image especially) shows live progress.
 
-    Pulled into a ".part" sibling first and only renamed into place once the
-    pull succeeds, so a failed or interrupted pull never leaves a file at the
-    real cache path for ensure_sif_present to mistake for a valid image.
+    Every image this staged (stable/stable-assert/edge) is a floating docker
+    tag -- there is no immutable, content-addressed version string in play,
+    so the .sif's filename (derived from the image ref, not its content; see
+    sif_filename) never proves the cached file still matches what the tag
+    points at now. Re-pulling by default is the only way to not silently keep
+    serving a stale image after a tag gets rebuilt and repushed (e.g. "edge"
+    after a hotfix) -- apptainer pull itself has no digest check to lean on
+    either. skip_existing opts back into the old skip-if-cached behaviour,
+    for when you know nothing has changed and want to save the bandwidth.
 
     Skipped, like ensure_pulled, for bare local-build tags (no "/"): there is
     no registry to pull from, and this repo's apptainer path has no
@@ -130,7 +136,7 @@ def apptainer_pull(image: str, cache_dir: Path, force: bool = False) -> Path | N
 
     cache_dir.mkdir(parents=True, exist_ok=True)
     dest = sif_path(image, cache_dir)
-    if dest.exists() and not force:
+    if dest.exists() and skip_existing:
         print(f"  Already staged: {dest.name}  ({image})")
         return dest
 
