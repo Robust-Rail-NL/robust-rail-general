@@ -213,13 +213,21 @@ started.
    cannot, so the array runs every seed (the reports only ask whether any seed
    solved, so the results are the same). Writes `tasks.tsv` and prints the
    generator and `sbatch` commands to run next.
-3. **Generate scenarios**, directly on the login node, with the command the
-   manifest step printed:
-   `python3 run_generator.py --experiment <EXPERIMENT.json> --run-dir
-   <OUTPUT_DIR> --engine apptainer`. It generates every instance straight from
-   the `scenario_config` section (no config files are kept) into
+3. **Generate scenarios**, with the command the manifest step printed:
+   `sbatch scripts/slurm/generate_scenarios.sbatch <EXPERIMENT.json>
+   <OUTPUT_DIR>`. Runs `run_generator.py --experiment ... --jobs 8` on a
+   compute node (`--cpus-per-task=8` to match) rather than the login node —
+   each instance's generation is independent, so this is a real speedup for
+   a sweep of any size (2.9x with `--jobs 4` on 8 instances, measured
+   2026-10-15, docker locally) without grabbing 8 cores on a shared,
+   unaccounted login node to get it. It generates every instance straight
+   from the `scenario_config` section (no config files are kept) into
    `<output-dir>/<instance>/scenario_<instance>.json`, where the array tasks
-   read it.
+   read it. `run_generator.py --experiment` itself needs no internet either
+   way (images are already staged) — running it directly on the login node
+   with `python3 run_generator.py --experiment ... --jobs N --engine
+   apptainer` still works too (e.g. for a quick one-off), just keep `N`
+   modest there (4-8) rather than maxing out cores.
 4. **Submit the array job**: the printed
    `sbatch --array=0-N scripts/slurm/run_experiment_array.sbatch <manifest>
    <experiment.json> <output-dir>` command. Each task runs
@@ -274,10 +282,28 @@ started.
   cleanly (exit 0), including its `JULIA_DEPOT_PATH=/tmp/julia-depot:
   /opt/julia-depot` env var under `--writable-tmpfs`. Previously only the
   solver had been proven this way (2026-09-23).
-- Still genuinely untried: an actual `sbatch --array` submission (more than
-  one task) and the aggregation job. The resource values above are a reasoned
-  starting point to get there, not a guarantee against an OOM-kill or
-  walltime-kill on a harder instance — watch for either in the sweep's own
-  `.err` files and revisit if they show up.
+- Found and fixed, 2026-10-14: `run_experiment_array.sbatch` and
+  `aggregate.sbatch` both `cd`'d to `"$(dirname "$0")/../.."`, assuming that
+  resolved to the repo root regardless of where `sbatch` was invoked from.
+  Under a real `sbatch --array` submission this landed somewhere unexpected
+  and unwritable instead — every one of a 600-task array's tasks failed
+  immediately on `mkdir -p slurm-logs: Permission denied`, before ever
+  reaching `scripts/slurm_run_task.py` (caught cheaply thanks to
+  `set -euo pipefail`, but zero results came out of that submission). `$0`
+  isn't a reliable way to locate the submitted script under `sbatch` — SLURM
+  may run it from a spooled copy rather than its original path. Fixed by
+  using `$SLURM_SUBMIT_DIR` instead (the directory `sbatch` was actually
+  invoked from, which SLURM sets reliably) — both scripts must now be
+  submitted from the repo root, which every instruction here already assumed
+  anyway. Not caught by the 2026-10-14 sizing measurement above, since that
+  used a separate one-off script (`__scratch/sizing-planner.sbatch`) with no
+  such `cd` at all, relying on `sbatch`'s own default working directory
+  instead.
+- Still genuinely untried: an actual `sbatch --array` submission that
+  actually reaches `scripts/slurm_run_task.py` for real work, and the
+  aggregation job. The resource values above are a reasoned starting point
+  to get there, not a guarantee against an OOM-kill or walltime-kill on a
+  harder instance — watch for either in the sweep's own `.err` files and
+  revisit if they show up.
 - Recommended next step: a small manually submitted array (one or two
   instances) with these values, before committing to the full sweep.
