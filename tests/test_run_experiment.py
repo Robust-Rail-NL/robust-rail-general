@@ -47,6 +47,25 @@ def test_scenario_params_fills_defaults_and_rejects_unknown_keys():
         scenario_params(_spec(matchings=["sideways"]))
 
 
+def test_servicing_keys_reach_the_generator_config_when_set():
+    params = scenario_params(_spec(number_of_trains=[2], matchings=["FIFO"], number_of_instances=1,
+                                   perform_servicing=True, servicing_ratio=1.0,
+                                   tasks_per_train_unit=2))
+    distribution = sweep_configs(params, LOCATION)["custom_2_FIFO_0"]["train_unit_distribution"]
+
+    assert distribution["servicing_ratio"] == 1.0
+    assert distribution["tasks_per_train_unit"] == 2
+
+
+def test_servicing_keys_are_left_out_when_unset():
+    # So the generator's own defaults apply and existing sweeps' configs do not change.
+    params = scenario_params(_spec(number_of_trains=[2], matchings=["FIFO"], number_of_instances=1))
+    distribution = sweep_configs(params, LOCATION)["custom_2_FIFO_0"]["train_unit_distribution"]
+
+    assert "servicing_ratio" not in distribution
+    assert "tasks_per_train_unit" not in distribution
+
+
 def test_old_scenarios_key_is_rejected_with_a_rename_hint(tmp_path):
     path = tmp_path / "exp.json"
     path.write_text(json.dumps({"name": "demo", "location": LOCATION, "scenarios": {}}))
