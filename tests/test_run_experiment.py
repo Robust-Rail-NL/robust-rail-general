@@ -428,3 +428,83 @@ def test_a_manifest_without_a_planner_column_runs_the_single_planner(tmp_path, m
                                       "--index", "0"])
     slurm_run_task.main()
     assert calls == [("planner", "planning", "enhsp", "planner")]
+
+
+def test_an_old_manifest_with_several_planners_in_the_spec_must_be_regenerated(tmp_path, monkeypatch):
+    from scripts import slurm_run_task
+    experiment = tmp_path / "exp.json"
+    experiment.write_text(json.dumps({"name": "demo", "location": LOCATION,
+                                      "planner": ["enhsp", "symbolic-rail"]}))
+    manifest = tmp_path / "tasks.tsv"
+    manifest.write_text("index\tinstance\ttool\tseed\ttool_dir\n0\ti1\tplanner\t\ti1/planning\n")
+    calls = []
+    monkeypatch.setattr(run_experiment, "_run_and_record", lambda *a, **k: calls.append(a))
+    monkeypatch.setattr(sys, "argv", ["slurm_run_task.py", "--manifest", str(manifest),
+                                      "--experiment", str(experiment), "--output-dir", str(tmp_path),
+                                      "--index", "0"])
+    with pytest.raises(SystemExit, match="regenerate the manifest"):
+        slurm_run_task.main()
+    assert calls == []
+
+
+def _coverage_tree(root: Path, outcomes: dict) -> list:
+    """Results tree: outcomes maps instance -> {folder: solved}."""
+    for instance, folders in outcomes.items():
+        for folder, solved in folders.items():
+            tool_dir = root / instance / folder
+            tool_dir.mkdir(parents=True)
+            (tool_dir / "result.json").write_text("{}")
+            (tool_dir / "eval_result.json").write_text(json.dumps(
+                {"solved": solved, "verdict": "accepted" if solved else "rejected"}))
+    return sorted(root.iterdir())
+
+
+def test_coverage_compares_solver_to_each_planner_and_the_planners_to_each_other(tmp_path):
+    outcomes = {f"custom_1_FIFO_{i}": {"local_search": i < 4, "planning-a": i < 3,
+                                       "planning-b": 1 < i < 5}
+                for i in range(6)}
+    _coverage_tree(tmp_path, outcomes)
+    out = tmp_path / "coverage.txt"
+    import subprocess
+    subprocess.run([sys.executable, str(ROOT / "scripts" / "coverage_analysis.py"), str(tmp_path),
+                    "--output", str(out)], check=True, capture_output=True)
+    text = out.read_text()
+    assert [l for l in text.splitlines() if l.startswith("RQ1:")] == [
+        "RQ1: Coverage (local_search vs. planning-a)",
+        "RQ1: Coverage (local_search vs. planning-b)",
+        "RQ1: Coverage (planning-a vs. planning-b)"]
+    # planning-a solves 0,1,2 and planning-b 2,3,4: one shared, two and two apart, one neither.
+    section = text.split("RQ1: Coverage (planning-a vs. planning-b)")[1]
+    assert "paired: both=1  planning-a only=2  planning-b only=2  neither=1" in section
+    assert "McNemar exact test (discordant pairs=4): p=1.0000" in section
+    assert "planning-a" in section and "95% CI" in section
+
+
+def test_coverage_without_a_solver_skips_the_solver_comparisons(tmp_path):
+    from scripts import coverage_analysis
+    two = {f"custom_1_FIFO_{i}": {"planning-a": i < 3, "planning-b": i < 2} for i in range(4)}
+    _coverage_tree(tmp_path / "two", two)
+    text = "\n".join(coverage_analysis._report(sorted((tmp_path / "two").iterdir()),
+                                               "planning-b", "planning-a"))
+    assert "local_search" not in text
+
+    import subprocess
+    run = lambda d: subprocess.run([sys.executable, str(ROOT / "scripts" / "coverage_analysis.py"),
+                                    str(d)], check=True, capture_output=True, text=True).stdout
+    assert [l for l in run(tmp_path / "two").splitlines() if l.startswith("RQ1:")] == [
+        "RQ1: Coverage (planning-a vs. planning-b)"]
+    _coverage_tree(tmp_path / "one", {"custom_1_FIFO_0": {"planning": True}})
+    assert "nothing to compare" in run(tmp_path / "one")
+
+
+def test_single_planner_coverage_report_is_unchanged(tmp_path):
+    import subprocess
+    outcomes = {f"custom_1_FIFO_{i}": {"local_search": i < 4, "planning": i < 3} for i in range(6)}
+    _coverage_tree(tmp_path, outcomes)
+    text = subprocess.run([sys.executable, str(ROOT / "scripts" / "coverage_analysis.py"),
+                           str(tmp_path)], check=True, capture_output=True, text=True).stdout
+    assert text.startswith("RQ1: Coverage (local_search vs. planning)\n")
+    assert text.count("RQ1:") == 1
+    assert "  local_search coverage: 4/6 = 0.667  95% CI [0.300, 0.903]" in text
+    assert "  planning     coverage: 3/6 = 0.500  95% CI [0.188, 0.812]" in text
+    assert "paired: both=3  local_search only=1  planning only=0  neither=2" in text

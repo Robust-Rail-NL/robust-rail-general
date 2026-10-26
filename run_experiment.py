@@ -104,7 +104,6 @@ from scripts.report_results import (  # noqa: E402
 FOLDER_NAMES = {"solver": "local_search", "planner": "planning"}
 
 
-
 def _tool_units(tools: list[str], planner_folders: dict[str, str]):
     """Yield (tool, planner_impl, folder, key) for each kind of attempt per instance.
 
@@ -697,8 +696,9 @@ def main() -> None:
                      f"(see scenario_<instance>.err in each instance's directory)")
     instances = _by_size(configs)
 
-    print(f"Running {name}: {len(instances)} instance(s) x {[k for _, _, _, k in _tool_units(tools, planner_folders)]} against {loc.name}, "
-          f"smallest first -> {out_dir}\n", flush=True)
+    attempt_keys = [key for _, _, _, key in _tool_units(tools, planner_folders)]
+    print(f"Running {name}: {len(instances)} instance(s) x {attempt_keys} against "
+          f"{loc.name}, smallest first -> {out_dir}\n", flush=True)
     print(f"  {'instance':<{INSTANCE_WIDTH}}  {'tool':<22}  {'time':>7}  status", flush=True)
 
     all_results = {}
