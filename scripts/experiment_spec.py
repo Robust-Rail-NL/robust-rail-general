@@ -10,9 +10,13 @@ lists to sweep over (number_of_trains, matchings, number_of_instances):
       "name": "baseline_sweep",
       "location": "Location_KleineBinckhorst",
       "tools": ["solver", "planner"],
+      "planner": "symbolic-rail",
       "max_duration": 600,
       "scenario_config": {"number_of_trains": [5, 10, 15], ...}
     }
+
+"planner" is one implementation, or a list of them to compare ("enhsp",
+"symbolic-rail"); see planner_folder() for where each one's results go.
 
 "name" is what the run is called, and it is the only name a run needs: the
 whole run -- a copy of this file, each instance's scenario, and the results --
@@ -58,6 +62,23 @@ OPTIONAL_DEFAULTS = {
 }
 
 
+def planners(spec: dict) -> list[str]:
+    """The planner implementations to run, in file order: one for a string, several for a list."""
+    planner = spec["planner"]
+    return list(planner) if isinstance(planner, list) else [planner]
+
+
+def planner_folder(spec: dict, impl: str) -> str:
+    """The per-instance directory a planner's attempts go in.
+
+    A string "planner" keeps the original "planning", so results written before
+    lists existed (and everything that reads that layout) stay valid. A list
+    gives each planner its own "planning-<impl>", even a list of one: the
+    folder then depends only on the file's form, not on how many entries it has.
+    """
+    return f"planning-{impl}" if isinstance(spec["planner"], list) else "planning"
+
+
 class SpecError(ValueError):
     """An experiment JSON that cannot be run, with a message meant to be shown as-is."""
 
@@ -74,9 +95,15 @@ def _check_settings(spec: dict, path: Path) -> None:
     if bad_tools or not spec["tools"]:
         raise SpecError(f'"tools" in {path} must be a non-empty subset of {list(TOOLS)}, '
                         f"got {spec['tools']}")
-    if spec["planner"] not in PLANNERS:
-        raise SpecError(f'"planner" in {path} must be one of {list(PLANNERS)}, '
-                        f"got {spec['planner']!r}")
+    planner = spec["planner"]
+    if isinstance(planner, list):
+        if not planner or len(set(planner)) != len(planner) \
+                or any(p not in PLANNERS for p in planner):
+            raise SpecError(f'"planner" in {path}, given as a list, must be a non-empty list of '
+                            f"distinct values from {list(PLANNERS)}, got {planner!r}")
+    elif planner not in PLANNERS:
+        raise SpecError(f'"planner" in {path} must be one of {list(PLANNERS)} or a list of them, '
+                        f"got {planner!r}")
     if spec["jobs"] < 1:
         raise SpecError(f'"jobs" in {path} must be at least 1, got {spec["jobs"]}')
     fraction = spec["departure_delay_fraction"]
