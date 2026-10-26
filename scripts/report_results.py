@@ -65,8 +65,24 @@ import sys
 from pathlib import Path
 
 # Matches run_experiment.py's FOLDER_NAMES: the folder name is the search
-# approach, not the script/--tools name.
+# approach, not the script/--tools name. A planner given as a list in the
+# experiment JSON gets "planning-<impl>" folders instead of "planning"
+# (experiment_spec.planner_folder), so those are recognised by prefix.
 TOOL_FOLDERS = ("local_search", "planning")
+PLANNER_FOLDER_PREFIX = "planning-"
+
+
+def is_planner_label(label: str) -> bool:
+    """Whether a tool label (a folder name, perhaps with a seed suffix) is a planner's."""
+    return label == "planning" or label.startswith(PLANNER_FOLDER_PREFIX)
+
+
+def tool_folders(instance_dir: Path) -> list[str]:
+    """The tool folders present under an instance: local_search, planning and
+    any planning-<impl>, in that order."""
+    found = [f for f in TOOL_FOLDERS if (instance_dir / f).is_dir()]
+    found += sorted(d.name for d in instance_dir.glob(f"{PLANNER_FOLDER_PREFIX}*") if d.is_dir())
+    return found
 
 DEFAULT_CERTIFY_THRESHOLD = 1800
 
@@ -89,12 +105,12 @@ def read_json(path: Path) -> dict:
 
 def _tool_dirs(instance_dir: Path) -> list:
     """(label, dir) for every actual run under this instance: "local_search"/
-    "planning" directly if that folder has a result.json of its own, or
+    "planning"/"planning-<impl>" directly if that folder has a result.json of its own, or
     "local_search_seed<N>" per seed*/ subdirectory when --num-seeds was used
     (planning never has seeds -- run_planner.py has no seed concept).
     """
     pairs = []
-    for folder in TOOL_FOLDERS:
+    for folder in tool_folders(instance_dir):
         tool_dir = instance_dir / folder
         if (tool_dir / "result.json").exists():
             pairs.append((folder, tool_dir))
@@ -411,9 +427,9 @@ def main() -> None:
                 run_rows.append(run_row)
             if failure_row:
                 # tool_label carries the seed suffix for solver (local_search,
-                # local_search_seed3, ...) but is exactly "planning" for the
-                # planner -- matches TOOL_FOLDERS/_tool_dirs above.
-                failures = solver_failure_rows if tool_label.startswith("local_search") else planner_failure_rows
+                # local_search_seed3, ...) but is exactly the folder name for a
+                # planner (planning, or planning-<impl>) -- see _tool_dirs above.
+                failures = planner_failure_rows if is_planner_label(tool_label) else solver_failure_rows
                 failures.append(failure_row)
         feasibility_rows.append(
             instance_feasibility(instance, instance_dir, args.certify_threshold)

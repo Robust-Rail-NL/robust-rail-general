@@ -138,7 +138,7 @@ def _format_size_table(title: str, cells: dict, tool_index: int) -> str:
     return "\n".join([title, "  " + fmt(header), *("  " + fmt(r) for r in rows)])
 
 
-def _format_subset(label: str, solver: list, planner: list) -> str:
+def _format_subset(label: str, solver: list, planner: list, planner_name: str = "planning") -> str:
     n = len(solver)
     if n == 0:
         return f"--- {label} (n=0) ---\n  no instances in this subset."
@@ -159,10 +159,10 @@ def _format_subset(label: str, solver: list, planner: list) -> str:
         f"--- {label} (n={n}) ---",
         f"  local_search coverage: {solver_hits}/{n} = {p_solver:.3f}  "
         f"95% CI [{solver_lo:.3f}, {solver_hi:.3f}]",
-        f"  planning     coverage: {planner_hits}/{n} = {p_planner:.3f}  "
+        f"  {planner_name:<12} coverage: {planner_hits}/{n} = {p_planner:.3f}  "
         f"95% CI [{planner_lo:.3f}, {planner_hi:.3f}]",
         f"  paired: both={n_both}  local_search only={n_solver_only}  "
-        f"planning only={n_planner_only}  neither={n_neither}",
+        f"{planner_name} only={n_planner_only}  neither={n_neither}",
         f"  McNemar exact test (discordant pairs={discordant}): p={p_value:.4f}"
         if discordant > 0 else
         "  McNemar exact test: no discordant pairs -- untestable (solvers agree on everything).",
@@ -172,6 +172,63 @@ def _format_subset(label: str, solver: list, planner: list) -> str:
                       "instance count; treat this as descriptive, not a significance claim "
                       "(per the experimental-setup doc's RQ1 caveat).")
     return "\n".join(lines)
+
+
+def _report(instance_dirs: list, planner_folder: str) -> list[str]:
+    """The RQ1 report lines for local_search against one planner folder."""
+    solver_all, planner_all = [], []
+    solver_feasible, planner_feasible = [], []
+    by_matching = collections.defaultdict(lambda: ([], []))
+    by_size_matching = collections.defaultdict(lambda: ([], []))
+    for instance_dir in instance_dirs:
+        solved_solver = _tool_solved(instance_dir, "local_search")
+        solved_planner = _tool_solved(instance_dir, planner_folder)
+        solver_all.append(solved_solver)
+        planner_all.append(solved_planner)
+        sweep_name = _sweep_name(instance_dir.name)
+        if sweep_name is not None:
+            matching = sweep_name[1]
+            by_matching[matching][0].append(solved_solver)
+            by_matching[matching][1].append(solved_planner)
+            by_size_matching[sweep_name][0].append(solved_solver)
+            by_size_matching[sweep_name][1].append(solved_planner)
+        # certify_threshold doesn't affect classification, only the "tested"
+        # flag this script doesn't use -- any value is fine here.
+        classification = rr.instance_feasibility(
+            instance_dir.name, instance_dir, certify_threshold=0
+        )["classification"]
+        if classification == "feasible":
+            solver_feasible.append(solved_solver)
+            planner_feasible.append(solved_planner)
+
+    report = [
+        f"RQ1: Coverage (local_search vs. {planner_folder})",
+        "",
+        _format_subset("Known-feasible subset (primary)", solver_feasible, planner_feasible, planner_folder),
+        "",
+        _format_subset(f"Full instance set (secondary, denominator={len(instance_dirs)})",
+                        solver_all, planner_all, planner_folder),
+    ]
+
+    # Broken out per matching strategy because the strategies are not equally
+    # hard: a random matching usually has to take an arriving composition apart
+    # and rebuild it, which FIFO and LIFO mostly avoid, and the generator sizes
+    # every scenario's time window the same way regardless. Pooling them hides
+    # that, and dilutes both tools' coverage with instances whose window is too
+    # short for the work the matching implies.
+    if by_matching:
+        report += ["", "Per matching strategy (same instances, grouped)"]
+        for matching in sorted(by_matching):
+            solver, planner = by_matching[matching]
+            report += ["", _format_subset(f"matching={matching}", solver, planner, planner_folder)]
+    # The same grouping by train count as well: coverage falling off with size
+    # is the scaling story, and it can differ by matching strategy.
+    if by_size_matching:
+        report += ["", "Percent of instances solved and evaluator-accepted, by number of trains "
+                       "and matching (solved/total in brackets)"]
+        for title, index in (("local_search", 0), (planner_folder, 1)):
+            report += ["", _format_size_table(f"{title}:", by_size_matching, index)]
+    return report
 
 
 def main() -> None:
@@ -193,58 +250,15 @@ def main() -> None:
     if not instance_dirs:
         sys.exit(f"No instance directories found under {args.results_dir}")
 
-    solver_all, planner_all = [], []
-    solver_feasible, planner_feasible = [], []
-    by_matching = collections.defaultdict(lambda: ([], []))
-    by_size_matching = collections.defaultdict(lambda: ([], []))
-    for instance_dir in instance_dirs:
-        solved_solver = _tool_solved(instance_dir, "local_search")
-        solved_planner = _tool_solved(instance_dir, "planning")
-        solver_all.append(solved_solver)
-        planner_all.append(solved_planner)
-        sweep_name = _sweep_name(instance_dir.name)
-        if sweep_name is not None:
-            matching = sweep_name[1]
-            by_matching[matching][0].append(solved_solver)
-            by_matching[matching][1].append(solved_planner)
-            by_size_matching[sweep_name][0].append(solved_solver)
-            by_size_matching[sweep_name][1].append(solved_planner)
-        # certify_threshold doesn't affect classification, only the "tested"
-        # flag this script doesn't use -- any value is fine here.
-        classification = rr.instance_feasibility(
-            instance_dir.name, instance_dir, certify_threshold=0
-        )["classification"]
-        if classification == "feasible":
-            solver_feasible.append(solved_solver)
-            planner_feasible.append(solved_planner)
-
-    report = [
-        "RQ1: Coverage (local_search vs. planning)",
-        "",
-        _format_subset("Known-feasible subset (primary)", solver_feasible, planner_feasible),
-        "",
-        _format_subset(f"Full instance set (secondary, denominator={len(instance_dirs)})",
-                        solver_all, planner_all),
-    ]
-
-    # Broken out per matching strategy because the strategies are not equally
-    # hard: a random matching usually has to take an arriving composition apart
-    # and rebuild it, which FIFO and LIFO mostly avoid, and the generator sizes
-    # every scenario's time window the same way regardless. Pooling them hides
-    # that, and dilutes both tools' coverage with instances whose window is too
-    # short for the work the matching implies.
-    if by_matching:
-        report += ["", "Per matching strategy (same instances, grouped)"]
-        for matching in sorted(by_matching):
-            solver, planner = by_matching[matching]
-            report += ["", _format_subset(f"matching={matching}", solver, planner)]
-    # The same grouping by train count as well: coverage falling off with size
-    # is the scaling story, and it can differ by matching strategy.
-    if by_size_matching:
-        report += ["", "Percent of instances solved and evaluator-accepted, by number of trains "
-                       "and matching (solved/total in brackets)"]
-        for title, index in (("local_search", 0), ("planning", 1)):
-            report += ["", _format_size_table(f"{title}:", by_size_matching, index)]
+    # One report per planner folder: "planning", or one "planning-<impl>" for
+    # each implementation of a "planner" list. Each is a paired comparison of
+    # local_search against that planner alone. With no planner results at all,
+    # the single-planner report is still written, as before.
+    folders = sorted({f for d in instance_dirs for f in rr.tool_folders(d)
+                      if rr.is_planner_label(f)}) or ["planning"]
+    report = []
+    for folder in folders:
+        report += ([""] if report else []) + _report(instance_dirs, folder)
     text = "\n".join(report)
     print(text)
     if args.output:

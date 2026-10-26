@@ -11,6 +11,9 @@ the file's "scenario_config" section into <output-dir>/<instance>/ -- the
 same self-contained layout run_experiment.py uses. Runs no container itself;
 this only enumerates work.
 
+A "planner" list gives one task per planner implementation (the manifest's
+"planner" column, empty for solver tasks), in that planner's own folder.
+
 Reuses run_experiment.py's own sweep expansion (_sweep) and mirrors _run_instance's per-tool/per-seed loop, rather than
 reimplementing either, so an array-job sweep and a local sweep of the same
 file produce the same folder layout. One difference: a local sweep stops at the
@@ -31,17 +34,20 @@ import run_experiment  # noqa: E402
 from scripts import experiment_spec  # noqa: E402
 
 
-def _tool_dirs(instance: str, tools: list[str], num_seeds: int | None):
-    """Yield (tool, seed, tool_dir) for one instance, matching
-    run_experiment._run_instance's own loop exactly (same FOLDER_NAMES,
-    same seed<i> subdirectory convention).
+def _tool_dirs(instance: str, spec: dict):
+    """Yield (tool, planner, seed, tool_dir) for one instance, matching
+    run_experiment._run_instance's own loop exactly (same folder names via
+    _tool_units, same seed<i> subdirectory convention). planner is the
+    implementation for a planner task, else None.
     """
-    for tool in tools:
-        if tool == "solver" and num_seeds:
-            for s in range(1, num_seeds + 1):
-                yield tool, s, f"{instance}/{run_experiment.FOLDER_NAMES[tool]}/seed{s}"
+    planner_folders = {impl: experiment_spec.planner_folder(spec, impl)
+                       for impl in experiment_spec.planners(spec)}
+    for tool, impl, folder, _ in run_experiment._tool_units(spec["tools"], planner_folders):
+        if tool == "solver" and spec["num_seeds"]:
+            for s in range(1, spec["num_seeds"] + 1):
+                yield tool, impl, s, f"{instance}/{folder}/seed{s}"
         else:
-            yield tool, None, f"{instance}/{run_experiment.FOLDER_NAMES[tool]}"
+            yield tool, impl, None, f"{instance}/{folder}"
 
 
 def main() -> None:
@@ -83,23 +89,26 @@ def main() -> None:
 
     rows = []
     for instance in instances:
-        for tool, seed, tool_dir in _tool_dirs(instance, spec["tools"], spec["num_seeds"]):
+        for tool, planner, seed, tool_dir in _tool_dirs(instance, spec):
             rows.append({
                 "index": len(rows),
                 "instance": instance,
                 "tool": tool,
+                "planner": planner or "",
                 "seed": seed if seed is not None else "",
                 "tool_dir": tool_dir,
             })
 
     with open(manifest_path, "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["index", "instance", "tool", "seed", "tool_dir"],
+        writer = csv.DictWriter(f, fieldnames=["index", "instance", "tool", "planner", "seed", "tool_dir"],
                                 delimiter="\t")
         writer.writeheader()
         writer.writerows(rows)
 
+    planners = experiment_spec.planners(spec)
+    planners_note = f" (planner: {', '.join(planners)})" if "planner" in spec["tools"] else ""
     seeds_note = f" x up to {spec['num_seeds']} seed(s)" if spec["num_seeds"] else ""
-    print(f"Wrote {len(rows)} task(s) ({len(instances)} instance(s) x {spec['tools']}{seeds_note}) "
+    print(f"Wrote {len(rows)} task(s) ({len(instances)} instance(s) x {spec['tools']}{planners_note}{seeds_note}) "
           f"to {manifest_path}")
     print(f"\nGenerate the scenarios first:\n"
           f"  sbatch scripts/slurm/generate_scenarios.sbatch {args.experiment} {args.output_dir}")
