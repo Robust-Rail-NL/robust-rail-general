@@ -6,6 +6,7 @@ import logging
 import pytest
 from pydantic import TypeAdapter, ValidationError
 
+from robust_rail_models.location import Facility, Location
 from robust_rail_models.plan import Feasibility, Plan
 from robust_rail_models.scenario import (
     IncomingTrain,
@@ -274,3 +275,20 @@ class TestScenarioConfig:
         )
         assert config.intent.designed_for == "domain"
         assert config.intent.notes == ["a", "b"]
+
+
+class TestFacilityTimeWindowDocs:
+    def test_absent_time_window_is_null(self):
+        facility = TypeAdapter(Facility).validate_python({"id": 1})
+        assert facility.time_window is None
+
+    def test_checked_in_schema_documents_missing_time_window(self):
+        import json
+        from pathlib import Path
+
+        schema = json.loads(
+            (Path(__file__).parent.parent / "schema" / "schema_location.json").read_text()
+        )
+        assert schema == Location.model_json_schema()
+        description = schema["$defs"]["Facility"]["properties"]["timeWindow"]["description"]
+        assert "whole scenario" in description

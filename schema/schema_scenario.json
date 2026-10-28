@@ -421,7 +421,7 @@
     },
     "TimeInterval": {
       "additionalProperties": false,
-      "description": "A single time interval, with times in seconds since the epoch.",
+      "description": "A single time interval, in scenario-relative seconds (not since the epoch).",
       "properties": {
         "start": {
           "title": "Start",
