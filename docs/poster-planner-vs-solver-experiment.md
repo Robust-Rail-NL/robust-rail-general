@@ -190,11 +190,8 @@ sshfs -o ro leonplanken@login.delftblue.tudelft.nl:poster-results ~/mnt
   first (tasks dispatch roughly in ascending array index order as slots free
   up, and the manifest's row order happens to group by train count — so the
   earliest-dispatched tasks were disproportionately 1-train cells). Not a
-  property of the scenarios themselves. Being re-measured separately via
-  `poster_planner_timing.json` (planner-only, 1-3 trains, 5 repetitions with
-  `tasks.tsv` shuffled differently each time) — see
-  `__scratch/planner-timing-repeats-steps.md` for that run's own exact
-  steps (gitignored, not in this repo's tracked history).
+  property of the scenarios themselves. Root-caused by a dedicated probe —
+  see "Cold-start root cause" below.
 - **Track 906a**: both tools hit rejections referencing the same track, with
   different wording — planner: `"Track 906a is reserved"`; solver:
   `"Parking is not allowed on track 906a"`. Flagged to the planner team;
@@ -206,3 +203,70 @@ sshfs -o ro leonplanken@login.delftblue.tudelft.nl:poster-results ~/mnt
   planner's own cold-start effect above, which affects both sweeps to
   different degrees (stronger in the 300s sweep: 25/25 of the first-minute
   tasks were slow, vs 7/25 in the 600s sweep).
+
+## Cold-start root cause (2026-10-27)
+
+Root-caused via a dedicated probe (`__scratch/run_cold_start_probe.py`,
+gitignored, not in this repo's tracked history — see
+`__scratch/cold-start-probe-state-of-play.md` for the full build/debug
+history if revisiting this), run against one representative scenario
+(`custom_1_FIFO_0`) from the 300s sweep's own scenario set. Four
+conditions, each gated on an empirically-cold starting state (a single-run
+canary confirmed >=45s wall before the real measurement, matching this
+sweep's own slow/fast split):
+
+- **(a)** one cold run — baseline.
+- **(b)** 25 simultaneous runs reading the `.sif` from the shared staging
+  cache (`~/apptainer-images`), same as a real sweep — `--exclusive`
+  SLURM allocation so each task genuinely owns a whole node (no
+  co-scheduled CPU contention), with SLURM reusing a node sequentially,
+  one task at a time, once a prior task's exclusive allocation on it frees
+  up.
+- **(c)** 25 simultaneous runs, each first copying the `.sif` to
+  node-local storage (`$TMPDIR`) before running from that copy.
+- **(d)** 25 simultaneous runs, each doing one throwaway self-warmup run
+  immediately before its own timed run.
+
+Time to the planner's own `"Planning..."` line / total wall, split by
+whether the task was the first to use its node or reused one an earlier
+task in the same condition had already touched:
+
+| Condition | First use of a node | Later reuse of same node |
+|---|---|---|
+| (a) baseline | 44.6s / 53.0s (1 node) | — |
+| (b) shared storage | 40.2–41.5s / 48.8–49.9s (4 nodes) | avg 11.1s / 19.5s (n=21) |
+| (c) local copy | 9.7s *or* 36.7s / 18.1s *or* 45.1s (2 nodes — see below) | avg 9.8s / 18.1s (n=23) |
+| (d) self-warmup | 9.9–10.1s / 18.0–18.2s (3 nodes, incl. one touched nowhere else in the run) | avg 10.0s / 18.1s (n=22) |
+
+Findings:
+
+- **The slowdown is per physical node, not per condition.** With
+  `--exclusive` isolating each task to its own node, the first task to
+  land on any given node is slow (~40–45s to-planning) regardless of
+  condition, and every later task reusing that same node is fast (~10s
+  to-planning) — a clean ~2.5x gap with no overlap, closely matching the
+  poster sweeps' own early/late split.
+- **Copying the `.sif` to node-local storage (condition c) does not fix
+  it.** A genuinely fresh node (task 10, `cmp205`) was still cold (36.7s)
+  even after the local copy; the one fast "first use" in that condition
+  (`cmp058`, 9.7s) only looks fast because that node had already been
+  warmed moments earlier by condition (b)'s own tasks — the warmth is
+  node-level state that outlives a single condition, not something
+  condition (c)'s fix produced. The copy itself is also fast (0.4–1.9s
+  for the ~430MB image), so shared-storage read latency isn't the
+  bottleneck either.
+- **A throwaway self-warmup run per task (condition d) fully eliminates
+  the cold cost**, even on a node touched nowhere else in the whole run
+  (`cmp044`).
+- **Conclusion**: whatever makes a node's first apptainer invocation slow
+  (most likely OS-level page cache / squashfs loop-mount setup, or
+  something Julia populates against local disk on first use — not pinned
+  down further than that) is populated by *any* apptainer invocation on
+  that node, not specifically by having the `.sif` stored locally. The
+  actionable fix for a real sweep is a cheap warmup run per node before
+  the timed runs, not a node-local `.sif` copy.
+
+Caveats: single run, single scenario, only 2–4 cold (first-node-use)
+observations per condition (one per distinct node visited) — worth
+replicating before treating as final, though the gap is large and
+consistent enough to act on.
