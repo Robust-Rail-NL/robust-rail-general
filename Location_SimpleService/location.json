@@ -171,6 +171,10 @@
                 }
             ],
             "simultaneousUsageCount": 1,
+            "timeWindow": {
+                "start": 0,
+                "end": 100000
+            },
             "relatedTrackPartIDs": [
                 1
             ]
