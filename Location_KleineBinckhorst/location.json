@@ -193,7 +193,7 @@
             "length": 272.0,
             "name": "63",
             "sawMovementAllowed": true,
-            "parkingAllowed": false,
+            "parkingAllowed": true,
             "isElectrified": true
         },
         {
