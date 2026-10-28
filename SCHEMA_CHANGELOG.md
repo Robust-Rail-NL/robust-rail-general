@@ -29,11 +29,13 @@ Description-only change; no `schemaVersion` bump and no wire-format change.
   is available for the whole scenario with no time restriction; a present
   window constrains when service actions at the facility may run, in
   scenario-relative seconds, and `end` is inclusive (an action ending exactly
-  at `end` is accepted). This documents the intended contract: the solver
-  already treats a missing window as always available, and the evaluator
-  currently does not (it reads an unset window as `[0, 0)`, and its
-  `IsAvailable` uses a strict `<` on `end`) until robust-rail-evaluator#47
-  and a follow-up on inclusivity are fixed.
+  at `end` is accepted). The solver already treated a missing window as
+  always available. `robust-rail-evaluator` now matches (PR #48, closing
+  #47, merged into its `main` and `edge` on 2026-10-28): an unset window is
+  `[0, inf)` instead of `[0, 0)`, and `IsAvailable` uses `<=` on `end`. Before
+  that, every service action at a facility without a window was rejected,
+  including in solver plans. Pull a `tors:edge` image built after the merge
+  to get the fix.
 - `TimeInterval` description corrected from "seconds since the epoch" to
   scenario-relative seconds, which is what every fixture uses.
 
