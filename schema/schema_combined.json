@@ -183,7 +183,8 @@
               "type": "null"
             }
           ],
-          "default": null
+          "default": null,
+          "description": "When service actions at this facility may run, in the same scenario-relative seconds as the rest of the scenario. Absent or null means the facility is available for the whole scenario, with no time restriction. A present window [start, end] constrains service actions at the facility to lie within it. `end` is inclusive: an action ending exactly at `end` is accepted."
         }
       },
       "title": "Facility",
@@ -870,7 +871,7 @@
     },
     "TimeInterval": {
       "additionalProperties": false,
-      "description": "A single time interval, with times in seconds since the epoch.",
+      "description": "A single time interval, in scenario-relative seconds (not since the epoch).",
       "properties": {
         "start": {
           "title": "Start",

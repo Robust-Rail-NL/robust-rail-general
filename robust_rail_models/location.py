@@ -83,7 +83,18 @@ class Facility(RailModel):
     task_types: list[TaskType] = Field(default_factory=list, alias="taskTypes")
     simultaneous_usage_count: Optional[int] = Field(None, alias="simultaneousUsageCount")
     # Optional: evaluator/generator only.
-    time_window: Optional[TimeInterval] = Field(None, alias="timeWindow")
+    time_window: Optional[TimeInterval] = Field(
+        None,
+        alias="timeWindow",
+        description=(
+            "When service actions at this facility may run, in the same "
+            "scenario-relative seconds as the rest of the scenario. Absent or "
+            "null means the facility is available for the whole scenario, with "
+            "no time restriction. A present window [start, end] constrains "
+            "service actions at the facility to lie within it. `end` is "
+            "inclusive: an action ending exactly at `end` is accepted."
+        ),
+    )
 
 
 class ResourceKind(str, Enum):

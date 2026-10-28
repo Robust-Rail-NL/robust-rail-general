@@ -21,6 +21,24 @@ below predating the move still say "the generator" where that was
 accurate at the time; only the file's own location was stale, not what it
 says happened.
 
+## Unversioned — 2026-10-28
+
+Description-only change; no `schemaVersion` bump and no wire-format change.
+
+- `Facility.timeWindow` is now documented: absent or null means the facility
+  is available for the whole scenario with no time restriction; a present
+  window constrains when service actions at the facility may run, in
+  scenario-relative seconds, and `end` is inclusive (an action ending exactly
+  at `end` is accepted). The solver already treated a missing window as
+  always available. `robust-rail-evaluator` now matches (PR #48, closing
+  #47, merged into its `main` and `edge` on 2026-10-28): an unset window is
+  `[0, inf)` instead of `[0, 0)`, and `IsAvailable` uses `<=` on `end`. Before
+  that, every service action at a facility without a window was rejected,
+  including in solver plans. Pull a `tors:edge` image built after the merge
+  to get the fix.
+- `TimeInterval` description corrected from "seconds since the epoch" to
+  scenario-relative seconds, which is what every fixture uses.
+
 ## 2 — 2026-09-24
 
 Defined in this repo (the schema source of truth) as of this release.

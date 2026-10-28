@@ -77,7 +77,7 @@ class SchemaVersioned(RailModel):
 
 
 class TimeInterval(RailModel):
-    """A single time interval, with times in seconds since the epoch."""
+    """A single time interval, in scenario-relative seconds (not since the epoch)."""
 
     start: float
     end: float
