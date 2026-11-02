@@ -206,10 +206,9 @@ sshfs -o ro leonplanken@login.delftblue.tudelft.nl:poster-results ~/mnt
 
 ## Cold-start root cause (2026-10-27)
 
-Root-caused via a dedicated probe (`__scratch/run_cold_start_probe.py`,
-gitignored, not in this repo's tracked history — see
-`__scratch/cold-start-probe-state-of-play.md` for the full build/debug
-history if revisiting this), run against one representative scenario
+Root-caused via a dedicated probe
+([scripts/cold_start_probe/run_cold_start_probe.py](../scripts/cold_start_probe/run_cold_start_probe.py)
+and its companion scripts in the same directory), run against one representative scenario
 (`custom_1_FIFO_0`) from the 300s sweep's own scenario set. Four
 conditions, each gated on an empirically-cold starting state (a single-run
 canary confirmed >=45s wall before the real measurement, matching this
