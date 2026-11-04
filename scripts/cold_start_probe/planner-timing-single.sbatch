@@ -25,7 +25,7 @@
 #SBATCH --error=slurm-logs/planner-timing-single_%j.err
 
 module load 2026 cpu
-module load python/3.13.12
+module load python/3.13.18
 
 set -euo pipefail
 
