@@ -286,3 +286,225 @@ def test_both_docker_desktop_mount_race_messages_are_recognised():
     assert _failed_bind_source(old) == Path("/Users/x/results/a")
     assert _failed_bind_source(new) == Path("/Users/x/results/b")
     assert _failed_bind_source("docker: some other error") is None
+
+
+def _planner_spec(tmp_path, planner, tools=("solver", "planner")) -> dict:
+    path = tmp_path / "experiment.json"
+    path.write_text(json.dumps({"name": "demo", "location": LOCATION, "tools": list(tools),
+                                "planner": planner, "scenario_config": {}}))
+    return experiment_spec.load(path)
+
+
+def test_planner_may_be_a_string_or_a_list_of_distinct_known_planners(tmp_path):
+    assert experiment_spec.planners(_planner_spec(tmp_path, "enhsp")) == ["enhsp"]
+    assert experiment_spec.planners(_planner_spec(tmp_path, ["enhsp", "symbolic-rail"])) \
+        == ["enhsp", "symbolic-rail"]
+    for bad in ([], ["enhsp", "enhsp"], ["enhsp", "nope"], "nope", 3):
+        with pytest.raises(experiment_spec.SpecError, match='"planner"'):
+            _planner_spec(tmp_path, bad)
+
+
+def test_a_string_planner_keeps_the_planning_folder_and_a_list_gets_one_each(tmp_path):
+    single = _planner_spec(tmp_path, "enhsp")
+    assert experiment_spec.planner_folder(single, "enhsp") == "planning"
+    several = _planner_spec(tmp_path, ["enhsp", "symbolic-rail"])
+    assert [experiment_spec.planner_folder(several, p) for p in ("enhsp", "symbolic-rail")] \
+        == ["planning-enhsp", "planning-symbolic-rail"]
+    assert experiment_spec.planner_folder(_planner_spec(tmp_path, ["enhsp"]), "enhsp") \
+        == "planning-enhsp"
+
+
+def _fake_attempts(monkeypatch, solved_by: dict):
+    """Replace the tool and evaluator runs; solved_by maps planner impl -> solved."""
+    seen = []
+
+    def fake_tool(tool, location, instance, scenario, tool_dir, version, dry_run, max_duration,
+                  seed, planner_impl, *args, **kwargs):
+        seen.append((tool, planner_impl, tool_dir.name))
+        tool_dir.mkdir(parents=True, exist_ok=True)
+        (tool_dir / "plan.json").write_text('{"actions": []}')
+        result = {"plan_produced": True, "exit_code": 0, "timed_out": False,
+                  "wall_seconds": 1.0, "tool": tool, "planner_impl": planner_impl}
+        (tool_dir / "result.json").write_text(json.dumps(result))
+        return result
+
+    def fake_eval(location, instance, scenario, plan, *args, **kwargs):
+        impl = json.loads((plan.parent / "result.json").read_text())["planner_impl"]
+        ok = solved_by.get(impl, True)
+        result = {"solved": ok, "verdict": "accepted" if ok else "rejected",
+                  "reason": "" if ok else "late departure"}
+        (plan.parent / "eval_result.json").write_text(json.dumps(result))
+        return result
+
+    monkeypatch.setattr(run_experiment, "_run_tool", fake_tool)
+    monkeypatch.setattr(run_experiment, "_run_evaluator", fake_eval)
+    monkeypatch.setattr(run_experiment, "_image_id", lambda engine, image, cache_dir: "id")
+    return seen
+
+
+@pytest.mark.parametrize("planner, folders", [
+    ("enhsp", ["planning"]),
+    (["enhsp", "symbolic-rail"], ["planning-enhsp", "planning-symbolic-rail"]),
+])
+def test_each_planner_runs_in_its_own_folder_and_is_reported_under_it(
+        tmp_path, monkeypatch, planner, folders):
+    from scripts import coverage_analysis, report_results
+    seen = _fake_attempts(monkeypatch, {"enhsp": True, "symbolic-rail": False})
+    spec = _planner_spec(tmp_path, planner)
+    planner_folders = {p: experiment_spec.planner_folder(spec, p)
+                       for p in experiment_spec.planners(spec)}
+    out = tmp_path / "results"
+    (out / "custom_1_FIFO_0").mkdir(parents=True)
+    (out / "custom_1_FIFO_0" / "scenario_custom_1_FIFO_0.json").write_text(
+        json.dumps({"startTime": 0, "endTime": 100}))
+    run_experiment._init_live_csvs(out)
+    all_results = {}
+    run_experiment._run_instance(
+        LOCATION, "custom_1_FIFO_0", spec["tools"], out, "edge", "edge", "edge", False, 60, None,
+        None, None, planner_folders, 0.0, all_results)
+
+    assert sorted(p for t, p, _ in seen if t == "planner") == sorted(planner_folders)
+    assert [f for f in folders if (out / "custom_1_FIFO_0" / f).is_dir()] == folders
+    assert (not (out / "custom_1_FIFO_0" / "planning").exists()) == (len(folders) > 1)
+
+    # The live rows and the full rescan agree, and rows are labelled by folder.
+    labels = {t for t, in (
+        (r["tool"],) for r in report_results.csv.DictReader(open(out / "runs.csv")))}
+    assert labels == {"local_search", *folders}
+    assert {p for p, _ in report_results._tool_dirs(out / "custom_1_FIFO_0")} == {"local_search", *folders}
+    failed = {r["tool"] for r in report_results.csv.DictReader(open(out / "planner_failures.csv"))}
+    assert failed == ({"planning-symbolic-rail"} if len(folders) > 1 else set())
+    assert not list(report_results.csv.DictReader(open(out / "solver_failures.csv")))
+    assert set(all_results["custom_1_FIFO_0"]) == (
+        {"solver", "planner-enhsp", "planner-symbolic-rail"} if len(folders) > 1
+        else {"solver", "planner"})
+
+    report = coverage_analysis._report(sorted(d for d in out.iterdir() if d.is_dir()), folders[-1])
+    assert f"local_search vs. {folders[-1]}" in "\n".join(report)
+    assert f"{folders[-1]} only=" in "\n".join(report)
+
+
+def test_manifest_has_a_task_per_planner_and_the_task_runs_that_planner(tmp_path, monkeypatch):
+    from scripts import slurm_manifest, slurm_run_task
+    experiment = tmp_path / "exp.json"
+    experiment.write_text(json.dumps({
+        "name": "demo", "location": LOCATION, "tools": ["solver", "planner"],
+        "planner": ["enhsp", "symbolic-rail"],
+        "scenario_config": {"number_of_trains": [1], "number_of_instances": 1,
+                            "matchings": ["FIFO"]}}))
+    out = tmp_path / "out"
+    monkeypatch.setattr(sys, "argv", ["slurm_manifest.py", str(experiment), "--output-dir", str(out)])
+    slurm_manifest.main()
+    import csv
+    rows = list(csv.DictReader(open(out / "tasks.tsv"), delimiter="\t"))
+    assert [(r["tool"], r["planner"], r["tool_dir"].split("/", 1)[1]) for r in rows] == [
+        ("solver", "", "local_search"),
+        ("planner", "enhsp", "planning-enhsp"),
+        ("planner", "symbolic-rail", "planning-symbolic-rail")]
+
+    calls = []
+    monkeypatch.setattr(run_experiment, "_run_and_record",
+                        lambda *a, **k: calls.append((a[0], a[4].name, a[11])))
+    for index in (1, 2):
+        monkeypatch.setattr(sys, "argv", ["slurm_run_task.py", "--manifest", str(out / "tasks.tsv"),
+                                          "--experiment", str(experiment), "--output-dir", str(out),
+                                          "--index", str(index)])
+        slurm_run_task.main()
+    assert calls == [("planner", "planning-enhsp", "enhsp"),
+                     ("planner", "planning-symbolic-rail", "symbolic-rail")]
+
+
+def test_a_manifest_without_a_planner_column_runs_the_single_planner(tmp_path, monkeypatch):
+    from scripts import slurm_run_task
+    experiment = tmp_path / "exp.json"
+    experiment.write_text(json.dumps({"name": "demo", "location": LOCATION, "planner": "enhsp"}))
+    manifest = tmp_path / "tasks.tsv"
+    manifest.write_text("index\tinstance\ttool\tseed\ttool_dir\n0\ti1\tplanner\t\ti1/planning\n")
+    calls = []
+    monkeypatch.setattr(run_experiment, "_run_and_record",
+                        lambda *a, **k: calls.append((a[0], a[4].name, a[11], a[14])))
+    monkeypatch.setattr(sys, "argv", ["slurm_run_task.py", "--manifest", str(manifest),
+                                      "--experiment", str(experiment), "--output-dir", str(tmp_path),
+                                      "--index", "0"])
+    slurm_run_task.main()
+    assert calls == [("planner", "planning", "enhsp", "planner")]
+
+
+def test_an_old_manifest_with_several_planners_in_the_spec_must_be_regenerated(tmp_path, monkeypatch):
+    from scripts import slurm_run_task
+    experiment = tmp_path / "exp.json"
+    experiment.write_text(json.dumps({"name": "demo", "location": LOCATION,
+                                      "planner": ["enhsp", "symbolic-rail"]}))
+    manifest = tmp_path / "tasks.tsv"
+    manifest.write_text("index\tinstance\ttool\tseed\ttool_dir\n0\ti1\tplanner\t\ti1/planning\n")
+    calls = []
+    monkeypatch.setattr(run_experiment, "_run_and_record", lambda *a, **k: calls.append(a))
+    monkeypatch.setattr(sys, "argv", ["slurm_run_task.py", "--manifest", str(manifest),
+                                      "--experiment", str(experiment), "--output-dir", str(tmp_path),
+                                      "--index", "0"])
+    with pytest.raises(SystemExit, match="regenerate the manifest"):
+        slurm_run_task.main()
+    assert calls == []
+
+
+def _coverage_tree(root: Path, outcomes: dict) -> list:
+    """Results tree: outcomes maps instance -> {folder: solved}."""
+    for instance, folders in outcomes.items():
+        for folder, solved in folders.items():
+            tool_dir = root / instance / folder
+            tool_dir.mkdir(parents=True)
+            (tool_dir / "result.json").write_text("{}")
+            (tool_dir / "eval_result.json").write_text(json.dumps(
+                {"solved": solved, "verdict": "accepted" if solved else "rejected"}))
+    return sorted(root.iterdir())
+
+
+def test_coverage_compares_solver_to_each_planner_and_the_planners_to_each_other(tmp_path):
+    outcomes = {f"custom_1_FIFO_{i}": {"local_search": i < 4, "planning-a": i < 3,
+                                       "planning-b": 1 < i < 5}
+                for i in range(6)}
+    _coverage_tree(tmp_path, outcomes)
+    out = tmp_path / "coverage.txt"
+    import subprocess
+    subprocess.run([sys.executable, str(ROOT / "scripts" / "coverage_analysis.py"), str(tmp_path),
+                    "--output", str(out)], check=True, capture_output=True)
+    text = out.read_text()
+    assert [l for l in text.splitlines() if l.startswith("RQ1:")] == [
+        "RQ1: Coverage (local_search vs. planning-a)",
+        "RQ1: Coverage (local_search vs. planning-b)",
+        "RQ1: Coverage (planning-a vs. planning-b)"]
+    # planning-a solves 0,1,2 and planning-b 2,3,4: one shared, two and two apart, one neither.
+    section = text.split("RQ1: Coverage (planning-a vs. planning-b)")[1]
+    assert "paired: both=1  planning-a only=2  planning-b only=2  neither=1" in section
+    assert "McNemar exact test (discordant pairs=4): p=1.0000" in section
+    assert "planning-a" in section and "95% CI" in section
+
+
+def test_coverage_without_a_solver_skips_the_solver_comparisons(tmp_path):
+    from scripts import coverage_analysis
+    two = {f"custom_1_FIFO_{i}": {"planning-a": i < 3, "planning-b": i < 2} for i in range(4)}
+    _coverage_tree(tmp_path / "two", two)
+    text = "\n".join(coverage_analysis._report(sorted((tmp_path / "two").iterdir()),
+                                               "planning-b", "planning-a"))
+    assert "local_search" not in text
+
+    import subprocess
+    run = lambda d: subprocess.run([sys.executable, str(ROOT / "scripts" / "coverage_analysis.py"),
+                                    str(d)], check=True, capture_output=True, text=True).stdout
+    assert [l for l in run(tmp_path / "two").splitlines() if l.startswith("RQ1:")] == [
+        "RQ1: Coverage (planning-a vs. planning-b)"]
+    _coverage_tree(tmp_path / "one", {"custom_1_FIFO_0": {"planning": True}})
+    assert "nothing to compare" in run(tmp_path / "one")
+
+
+def test_single_planner_coverage_report_is_unchanged(tmp_path):
+    import subprocess
+    outcomes = {f"custom_1_FIFO_{i}": {"local_search": i < 4, "planning": i < 3} for i in range(6)}
+    _coverage_tree(tmp_path, outcomes)
+    text = subprocess.run([sys.executable, str(ROOT / "scripts" / "coverage_analysis.py"),
+                           str(tmp_path)], check=True, capture_output=True, text=True).stdout
+    assert text.startswith("RQ1: Coverage (local_search vs. planning)\n")
+    assert text.count("RQ1:") == 1
+    assert "  local_search coverage: 4/6 = 0.667  95% CI [0.300, 0.903]" in text
+    assert "  planning     coverage: 3/6 = 0.500  95% CI [0.188, 0.812]" in text
+    assert "paired: both=3  local_search only=1  planning only=0  neither=2" in text
