@@ -74,7 +74,23 @@ def main() -> None:
     seed = int(row["seed"]) if row["seed"] else spec["seed"]
     tool_dir = args.output_dir / row["tool_dir"]
 
-    key = f"solver_seed{seed}" if (tool == "solver" and row["seed"]) else tool
+    planner = row.get("planner") or None
+    if tool == "planner" and planner is None:
+        # A manifest written before the "planner" column existed. That only
+        # means one planner when the file names a single one; with a list, the
+        # task's folder and the planner to run could disagree.
+        if isinstance(spec["planner"], list):
+            sys.exit(f"ERROR: {args.manifest} has no \"planner\" column, but "
+                     f"{args.experiment} lists several planners -- regenerate the manifest "
+                     f"with scripts/slurm_manifest.py.")
+        planner = spec["planner"]
+    # The attempt's name, as run_experiment._tool_units gives it.
+    planner_folders = {planner: experiment_spec.planner_folder(spec, planner)} if planner else {}
+    folder = tool_dir.parent.name if row["seed"] else tool_dir.name
+    key = next(k for t, _, f, k in run_experiment._tool_units([tool], planner_folders)
+               if f == folder)
+    if tool == "solver" and row["seed"]:
+        key = f"solver_seed{seed}"
     print(f"[task {index}] {instance} [{key}] -> {tool_dir}", flush=True)
 
     results = {}
@@ -82,7 +98,7 @@ def main() -> None:
         tool, spec["location"], instance,
         run_experiment._scenario_path(args.output_dir, instance), tool_dir,
         versions["solver"], versions["planner"], versions["evaluator"],
-        False, spec["max_duration"], seed, spec["planner"],
+        False, spec["max_duration"], seed, planner,
         spec["departure_delay_fraction"], results, key,
         "apptainer", args.sif_cache_dir,
     )

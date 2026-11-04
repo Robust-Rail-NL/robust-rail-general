@@ -213,6 +213,15 @@ started.
    cannot, so the array runs every seed (the reports only ask whether any seed
    solved, so the results are the same). Writes `tasks.tsv` and prints the
    generator and `sbatch` commands to run next.
+
+   `"planner"` in the experiment JSON may be a list (`["enhsp",
+   "symbolic-rail"]`) to compare planner implementations. Each planner then
+   gets one task per instance (the manifest's `planner` column) and its own
+   folder, `<output-dir>/<instance>/planning-<impl>/`; the rows of `runs.csv`
+   and `planner_failures.csv` carry that folder name in their `tool` column,
+   and `coverage_analysis.txt` has one local_search-vs-planner section per
+   planner. A plain string keeps the `planning/` folder, so existing results
+   and tools that read that layout are unaffected.
 3. **Generate scenarios**, with the command the manifest step printed:
    `sbatch scripts/slurm/generate_scenarios.sbatch <EXPERIMENT.json>
    <OUTPUT_DIR>`. Runs `run_generator.py --experiment ... --jobs 8` on a

@@ -103,6 +103,23 @@ from scripts.report_results import (  # noqa: E402
 # per-instance output directory is named after the search approach instead.
 FOLDER_NAMES = {"solver": "local_search", "planner": "planning"}
 
+
+def _tool_units(tools: list[str], planner_folders: dict[str, str]):
+    """Yield (tool, planner_impl, folder, key) for each kind of attempt per instance.
+
+    A planner entry becomes one unit per planner implementation. key is the
+    name an attempt goes by in the progress lines and summary: plain "planner"
+    when there is the one planner in the original layout, "planner-<impl>" when
+    the file lists several (their folders then differ).
+    """
+    for tool in tools:
+        if tool != "planner":
+            yield tool, None, FOLDER_NAMES[tool], tool
+            continue
+        for impl, folder in planner_folders.items():
+            yield tool, impl, folder, "planner" if folder == FOLDER_NAMES[tool] else f"planner-{impl}"
+
+
 # Guards the live CSV appends: with --jobs > 1, worker threads finish attempts
 # around the same time and would otherwise interleave each other's rows.
 # all_results needs no such guard — each instance owns a disjoint sub-dict, so
@@ -544,7 +561,7 @@ def _run_and_record(tool: str, location: str, instance: str, scenario: Path, too
                 (tool_dir / EVAL_STAMP).write_text(json.dumps(eval_stamp, indent=2) + "\n")
     results[key] = {"run": run_result, "eval": eval_result}
     wall = run_result.get("wall_seconds")
-    print(f"  {_describe(instance)}  {key:<16}  "
+    print(f"  {_describe(instance)}  {key:<22}  "
           f"{f'{wall:.1f}s' if isinstance(wall, (int, float)) else '':>7}  "
           f"{_status(run_result, eval_result, dry_run)}{' (reused)' if reused else ''}",
           flush=True)
@@ -555,15 +572,15 @@ def _run_instance(location: str, instance: str, tools: list[str], out_dir: Path,
                   solver_version: str, planner_version: str, evaluator_version: str,
                   dry_run: bool, max_duration: int | None,
                   certify_threshold: int | None, seed: int | None, num_seeds: int | None,
-                  planner_impl: str, delay_fraction: float, all_results: dict,
+                  planner_folders: dict[str, str], delay_fraction: float, all_results: dict,
                   engine: str = "docker", cache_dir: Path | None = None) -> None:
     results = all_results.setdefault(instance, {})
     scenario = _scenario_path(out_dir, instance)
-    for tool in tools:
+    for tool, planner_impl, folder, key in _tool_units(tools, planner_folders):
         if tool == "solver" and num_seeds:
             for s in range(1, num_seeds + 1):
-                label = f"{FOLDER_NAMES[tool]}_seed{s}"
-                tool_dir = out_dir / instance / FOLDER_NAMES[tool] / f"seed{s}"
+                label = f"{folder}_seed{s}"
+                tool_dir = out_dir / instance / folder / f"seed{s}"
                 solved = _run_and_record(tool, location, instance, scenario, tool_dir,
                                          solver_version, planner_version, evaluator_version,
                                          dry_run, max_duration, s, planner_impl, delay_fraction,
@@ -577,14 +594,13 @@ def _run_instance(location: str, instance: str, tools: list[str], out_dir: Path,
                 if solved:
                     break
         else:
-            label = FOLDER_NAMES[tool]
-            tool_dir = out_dir / instance / label
+            tool_dir = out_dir / instance / folder
             _run_and_record(tool, location, instance, scenario, tool_dir,
                             solver_version, planner_version, evaluator_version,
                             dry_run, max_duration, seed, planner_impl, delay_fraction,
-                            results, tool, engine, cache_dir)
+                            results, key, engine, cache_dir)
             if not dry_run:
-                _append_attempt(out_dir, instance, label, tool_dir)
+                _append_attempt(out_dir, instance, folder, tool_dir)
 
     # Every tool and seed for this instance has finished, so its feasibility
     # row — the one aggregate of the four, over this instance's attempts only —
@@ -624,6 +640,8 @@ def main() -> None:
     if not loc.is_dir():
         sys.exit(f"No such location: {loc}")
     tools = spec["tools"]
+    planner_folders = {impl: experiment_spec.planner_folder(spec, impl)
+                       for impl in experiment_spec.planners(spec)}
     versions = spec[experiment_spec.VERSIONS_KEY]
     max_duration, certify_threshold = spec["max_duration"], spec["certify_threshold"]
 
@@ -678,9 +696,10 @@ def main() -> None:
                      f"(see scenario_<instance>.err in each instance's directory)")
     instances = _by_size(configs)
 
-    print(f"Running {name}: {len(instances)} instance(s) x {tools} against {loc.name}, "
-          f"smallest first -> {out_dir}\n", flush=True)
-    print(f"  {'instance':<{INSTANCE_WIDTH}}  {'tool':<16}  {'time':>7}  status", flush=True)
+    attempt_keys = [key for _, _, _, key in _tool_units(tools, planner_folders)]
+    print(f"Running {name}: {len(instances)} instance(s) x {attempt_keys} against "
+          f"{loc.name}, smallest first -> {out_dir}\n", flush=True)
+    print(f"  {'instance':<{INSTANCE_WIDTH}}  {'tool':<22}  {'time':>7}  status", flush=True)
 
     all_results = {}
     if not args.dry_run:
@@ -690,7 +709,7 @@ def main() -> None:
         _run_instance(location, instance, tools, out_dir,
                       versions["solver"], versions["planner"], versions["evaluator"],
                       args.dry_run, max_duration, certify_threshold,
-                      spec["seed"], spec["num_seeds"], spec["planner"],
+                      spec["seed"], spec["num_seeds"], planner_folders,
                       spec["departure_delay_fraction"], all_results,
                       args.engine, args.sif_cache_dir)
 
