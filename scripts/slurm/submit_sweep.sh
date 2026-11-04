@@ -11,6 +11,8 @@
 #   DRY=1       only print the commands
 #   SLURM_SITE  which scripts/slurm/site/<name>.env to use: account, partition, python module and
 #               cache directories. Default delftblue. The environment is passed on to the jobs.
+#   ARRAY_MEM_PER_CPU  set by a site file (or by you) to override the array job's --mem-per-cpu;
+#               unset means the sbatch script's own 2G.
 #
 # Stages: manifest (runs here, cheap) -> generate scenarios -> array of tasks -> aggregate.
 # The array starts only if generation succeeded (afterok). The aggregation starts when the array has
@@ -48,6 +50,7 @@ run() {
 
 G=$(run sbatch --parsable scripts/slurm/generate_scenarios.sbatch "$EXP" "$OUT")
 A=$(run sbatch --parsable --dependency=afterok:"$G" --time="$TIME" --array="0-$LAST%$THROTTLE" \
+    ${ARRAY_MEM_PER_CPU:+--mem-per-cpu="$ARRAY_MEM_PER_CPU"} \
     scripts/slurm/run_experiment_array.sbatch "$OUT/tasks.tsv" "$EXP" "$OUT")
 R=$(run sbatch --parsable --dependency=afterany:"$A" scripts/slurm/aggregate.sbatch "$OUT" "$DEST")
 

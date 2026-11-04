@@ -306,16 +306,40 @@ SLURM_SITE=daic scripts/slurm/submit_sweep.sh EXPERIMENT.json \
   output. The Windows home, `~/windowshome`, is separate: 6.5 GiB soft /
   8 GiB hard.
 
+**Smoke test, 2026-11-04** (`composition_smoke.json`, 6 tasks at 120 s, via
+`SLURM_SITE=daic scripts/slurm/submit_sweep.sh`; generate job 98265, array
+98266, aggregate 98267):
+- Staging with `--edge` worked on the login node: 8 images, 1.2 GB in
+  `~/linuxhome/apptainer-images`. The apptainer layer cache and tmp directory
+  added about 2.2 GB more under `~/linuxhome` (3.4 GB in total); they can be
+  deleted after staging.
+- Generate, all 6 array tasks and aggregate finished with exit 0, and the
+  aggregate wrote `runs.csv` and `coverage_analysis.txt`. Queue wait was not
+  measured.
+- `MaxRSS` per task (`sacct`): solver 212–228 MB, symbolic-rail 1.45–1.55 GB,
+  enhsp **2,095,776K–2,095,780K**. That is within 1.4 MiB of
+  `--mem-per-cpu=2G` (2,097,152K), after only 21 s in one case. No task was
+  killed. Whether `sacct` counted page cache or the tasks were close to being
+  OOM-killed is not known. `daic.env` therefore sets `ARRAY_MEM_PER_CPU=8G`,
+  which `submit_sweep.sh` passes to the array job only. 8G is a guess for
+  30-minute runs.
+- The planner image (`planner:edge`, version `0.5.0-edge+20261104.5acc8c1`)
+  contains PR #59 (checked in a local planner clone: `0501a07` is an ancestor
+  of `5acc8c1`). On instance 1, both planners found a plan and the evaluator
+  rejected both ("plan rejected"). Instance 0 timed out for both. The one
+  rejection looked at, `enhsp` on instance 1, gave `Trains's departure
+  mismatch with Action start/end time` (train 2 departing at 6680, action at
+  9100); the `symbolic-rail` rejection was not inspected. This is a planner or
+  evaluator matter, not a cluster one. The evaluator also warned
+  `plan.json: schemaVersion 1 does not match expected 2`.
+
 **Not observed:**
 - Any purge policy on `~/linuxhome`.
-- Whether 30 GiB is enough: four `.sif` images plus two sweeps of 240 tasks
-  are unmeasured. Check `du -sh` after staging and after the smoke test.
+- Whether 30 GiB is enough for the full sweeps (2 × 240 tasks). Check `du -sh`
+  after the first full run.
 - Whether a bare `--mem` is refused as on DelftBlue.
-- Anything about an actual sweep: no `sbatch` array has been run on DAIC yet,
-  memory per task at a 30-minute run is unmeasured on either cluster, and
-  fair-use rules for long arrays are unchecked.
-- Whether the images stage and run on DAIC (generator, solver, planner,
-  evaluator).
+- Memory per task at a 30-minute run, on either cluster, and the fair-use
+  rules for long arrays on DAIC.
 
 ## Known gaps
 

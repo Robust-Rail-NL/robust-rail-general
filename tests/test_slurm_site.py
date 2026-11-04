@@ -28,7 +28,7 @@ def test_default_sif_cache_dir_honours_env(monkeypatch, tmp_path):
 def _source(site: str, tmp_path: Path, **env) -> dict[str, str]:
     """Source a site file in a clean bash and return the variables it exports."""
     names = ["SBATCH_ACCOUNT", "SBATCH_PARTITION", "PYTHON_MODULE", "SIF_CACHE_DIR",
-             "APPTAINER_CACHEDIR", "APPTAINER_TMPDIR", "XDG_CACHE_HOME"]
+             "APPTAINER_CACHEDIR", "APPTAINER_TMPDIR", "XDG_CACHE_HOME", "ARRAY_MEM_PER_CPU"]
     script = f'source "{SITE_DIR / (site + ".env")}"; ' + "; ".join(
         f'echo "{n}=${{{n}-}}"' for n in names)
     out = subprocess.run(["bash", "-c", script], capture_output=True, text=True, check=True,
@@ -42,6 +42,7 @@ def test_delftblue_site_keeps_the_sbatch_script_defaults(tmp_path):
     assert got["SBATCH_PARTITION"] == "compute-p1"
     assert got["PYTHON_MODULE"] == "python/3.13.18"
     assert got["SIF_CACHE_DIR"] == ""  # docker_utils' ~/apptainer-images default applies
+    assert got["ARRAY_MEM_PER_CPU"] == ""  # the array sbatch script's own 2G applies
 
 
 def test_the_sbatch_scripts_carry_the_same_delftblue_defaults_as_the_site_file():
@@ -57,6 +58,7 @@ def test_daic_site_puts_caches_under_linuxhome_not_home(tmp_path):
     assert got["SBATCH_ACCOUNT"] == "daic-eemcs-st-algor"
     assert got["SBATCH_PARTITION"] == "daic-eemcs-st"
     assert got["PYTHON_MODULE"] == "python/3.13.12"
+    assert got["ARRAY_MEM_PER_CPU"] == "8G"
     for name in ("SIF_CACHE_DIR", "APPTAINER_CACHEDIR", "APPTAINER_TMPDIR", "XDG_CACHE_HOME"):
         assert Path(got[name]).is_relative_to(base), name
         assert Path(got[name]).is_dir(), name
