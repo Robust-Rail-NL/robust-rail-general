@@ -69,7 +69,7 @@
 # itself needed no module load on the login node, so nothing is loaded for
 # it here -- if a compute node turns out to differ, add it here too.
 module load 2026 cpu
-module load python/3.13.12
+module load python/3.13.18
 
 set -euo pipefail
 

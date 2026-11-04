@@ -64,7 +64,7 @@
 #SBATCH --error=slurm-logs/planner-timing-array_%A_%a.err
 
 module load 2026 cpu
-module load python/3.13.12
+module load python/3.13.18
 
 set -euo pipefail
 

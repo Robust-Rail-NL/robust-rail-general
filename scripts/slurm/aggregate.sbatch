@@ -48,7 +48,7 @@
 # docs/slurm-apptainer.md's "Prerequisites" for the >=3.12 requirement this
 # is working around.
 module load 2026 cpu
-module load python/3.13.12
+module load python/3.13.18
 
 set -euo pipefail
 
