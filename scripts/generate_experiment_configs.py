@@ -62,11 +62,12 @@ DEFAULTS = {
     # these produce byte-identical configs. Only meaningful with perform_servicing.
     "servicing_ratio": None,
     "tasks_per_train_unit": None,
+    "servicing_per_composition": None,
 }
 
 
 # DEFAULTS keys that go into train_unit_distribution only when set.
-OPTIONAL_DISTRIBUTION_KEYS = ("servicing_ratio", "tasks_per_train_unit")
+OPTIONAL_DISTRIBUTION_KEYS = ("servicing_ratio", "tasks_per_train_unit", "servicing_per_composition")
 
 
 def sweep_configs(params: dict, location: str) -> dict[str, dict]:
@@ -190,6 +191,11 @@ def main() -> None:
     parser.add_argument("--tasks-per-train-unit", type=int, default=default("tasks_per_train_unit"),
                         help="Most servicing tasks a serviced unit gets; only with "
                              "--perform-servicing (default: the generator's, 1).")
+    parser.add_argument("--servicing-per-composition", action=argparse.BooleanOptionalAction,
+                        default=default("servicing_per_composition"),
+                        help="Make --servicing-ratio the fraction of arriving compositions "
+                             "(not units) that are serviced, all their units getting the same "
+                             "tasks; only with --perform-servicing (default: the generator's, off).")
     parser.add_argument("--location", metavar="NAME", default=spec.get("location"),
                         help="Location_* directory name (e.g. Location_KleineBinckhorst) to "
                              "write configs into. Also sets each config's own \"location\" field, "
