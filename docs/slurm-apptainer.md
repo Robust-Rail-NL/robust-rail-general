@@ -300,10 +300,16 @@ SLURM_SITE=daic scripts/slurm/submit_sweep.sh EXPERIMENT.json \
   at `~/linuxhome`, and the repo clone, `--output-dir` and `slurm-logs/` must
   live there too.
 
+- `~/linuxhome` has a quota of 30 GiB soft / 32 GiB hard (`quota -s`, 11 MiB
+  used at the time). `quota -s` lists only filesystems that are mounted at
+  that moment, so access `~/linuxhome` first, or it is missing from the
+  output. The Windows home, `~/windowshome`, is separate: 6.5 GiB soft /
+  8 GiB hard.
+
 **Not observed:**
-- The quota of `~/linuxhome` for this account (other users' lines showed 30 GiB; the
-  Windows home, `~/windowshome`, showed 6.5 GiB soft / 8 GiB hard) and
-  any purge policy.
+- Any purge policy on `~/linuxhome`.
+- Whether 30 GiB is enough: four `.sif` images plus two sweeps of 240 tasks
+  are unmeasured. Check `du -sh` after staging and after the smoke test.
 - Whether a bare `--mem` is refused as on DelftBlue.
 - Anything about an actual sweep: no `sbatch` array has been run on DAIC yet,
   memory per task at a 30-minute run is unmeasured on either cluster, and
