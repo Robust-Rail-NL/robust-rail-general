@@ -1,5 +1,17 @@
 # Release notes
 
+## Unreleased
+
+### `servicing_per_composition` (additive)
+
+`TrainUnitDistribution` gains an optional boolean `servicing_per_composition`
+(`schema_scenario_config.json` regenerated), matching the new generator option
+of the same name. `scripts/generate_experiment_configs.py` accepts it as a
+`scenario_config` key and as `--servicing-per-composition` /
+`--no-servicing-per-composition`; it is written to the generated config only
+when set, so existing sweeps' configs do not change. Without it in this model
+a config carrying the key is rejected.
+
 ## 0.2.0 — 2026-09-25
 
 Defines interchange `schemaVersion: 2`. Full detail, including the
