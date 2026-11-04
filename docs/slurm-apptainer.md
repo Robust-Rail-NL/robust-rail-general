@@ -259,6 +259,58 @@ started.
    `coverage_analysis.py` over `--output-dir`, then `rsync`s the whole tree
    to `<home-dest>` (see "Storage" above).
 
+## Running on DAIC instead of DelftBlue
+
+The same scripts run on either cluster. Cluster-specific values live in
+`scripts/slurm/site/<site>.env` (account, partition, Python module, cache
+directories); the three `.sbatch` scripts and `scripts/slurm/submit_sweep.sh`
+source `site/${SLURM_SITE:-delftblue}.env`. DelftBlue is the default and its
+values are the ones in the `#SBATCH` lines, so nothing changes unless you set
+`SLURM_SITE=daic`. The site file sets `SBATCH_ACCOUNT` / `SBATCH_PARTITION`,
+which `sbatch` reads as `--account` / `--partition` (command-line options still
+win). `docker_utils.DEFAULT_SIF_CACHE_DIR` reads `$SIF_CACHE_DIR` first, then
+falls back to `~/apptainer-images`.
+
+On DAIC, from a clone under `~/linuxhome` (see below):
+```bash
+source scripts/slurm/site/daic.env
+module load 2026 cpu && module load "$PYTHON_MODULE"
+python3 scripts/stage_apptainer_images.py          # on the login node
+SLURM_SITE=daic scripts/slurm/submit_sweep.sh EXPERIMENT.json \
+    ~/linuxhome/runs/sweep1 ~/linuxhome/experiments/sweep1
+```
+
+**Observed, 2026-11-04** (login node `daic01`, compute node `gpu47`, via a
+5-minute `srun` on partition `daic-eemcs-st`, account `daic-eemcs-st-algor`):
+- `/usr/bin/apptainer` (1.5.5) exists on login and compute nodes, no
+  `module load` needed.
+- System `python3` is 3.9.25. `module load 2026 cpu` makes `python/3.13.12`
+  available (found with `module spider python`).
+- `ghcr.io/v2/` answers (HTTP 405, i.e. reachable) from the login and the
+  compute node.
+- `DefMemPerNode` is 1 (MB), so `--mem-per-cpu` must always be set, as the
+  scripts do. This account has `maxjobs=64`, `maxsubmit=1000`; the partition
+  has `MaxTime` 5 days. All nodes are GPU nodes; the `srun` above ran without
+  `--gres`.
+- **`/home/$USER` has a 4096K soft / 5120K hard quota.** Apptainer's default
+  caches (`~/.apptainer`, `~/.cache`) alone exceed it. `~/linuxhome` (a
+  symlink to `/tudelft.net/staff-homes-linux/...`) was writable from the
+  compute node. `/scratch/$USER` does not exist. So `daic.env` points the
+  `.sif` cache, `APPTAINER_CACHEDIR`, `APPTAINER_TMPDIR` and `XDG_CACHE_HOME`
+  at `~/linuxhome`, and the repo clone, `--output-dir` and `slurm-logs/` must
+  live there too.
+
+**Not observed:**
+- The quota of `~/linuxhome` for this account (other users' lines showed 30 GiB; the
+  Windows home, `~/windowshome`, showed 6.5 GiB soft / 8 GiB hard) and
+  any purge policy.
+- Whether a bare `--mem` is refused as on DelftBlue.
+- Anything about an actual sweep: no `sbatch` array has been run on DAIC yet,
+  memory per task at a 30-minute run is unmeasured on either cluster, and
+  fair-use rules for long arrays are unchecked.
+- Whether the images stage and run on DAIC (generator, solver, planner,
+  evaluator).
+
 ## Known gaps
 
 - ~~`scripts/slurm/run_experiment_array.sbatch` and `aggregate.sbatch` have
