@@ -261,6 +261,12 @@ class TestScenarioConfig:
         with pytest.raises(ValidationError):
             TrainUnitDistribution(train_unit_types=["VIRM-4"], inStanding_ratio=0.3)
 
+    def test_servicing_per_composition_is_a_declared_optional_bool(self):
+        assert TrainUnitDistribution(train_unit_types=["VIRM-4"]).servicing_per_composition is None
+        assert TrainUnitDistribution(servicing_per_composition=True).servicing_per_composition is True
+        with pytest.raises(ValidationError):
+            TrainUnitDistribution(servicing_per_composition="sometimes")
+
     def test_intent_is_a_declared_field_not_a_tolerated_extra(self):
         config = TypeAdapter(ScenarioConfig).validate_python(
             {
