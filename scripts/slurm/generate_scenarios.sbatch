@@ -29,18 +29,21 @@
 
 # Before `set -euo pipefail` -- see run_experiment_array.sbatch's own
 # comment on why (Lmod's `module` function vs. set -u).
+#
+# Must be submitted from the repo root -- $SLURM_SUBMIT_DIR is that
+# directory, reliably, unlike deriving it from this script's own path (see
+# run_experiment_array.sbatch's own note on why). The site file selects the
+# cluster (SLURM_SITE, default delftblue); see run_experiment_array.sbatch.
+cd "$SLURM_SUBMIT_DIR"
+source "scripts/slurm/site/${SLURM_SITE:-delftblue}.env"
 module load 2026 cpu
-module load python/3.13.18
+module load "$PYTHON_MODULE"
 
 set -euo pipefail
 
 EXPERIMENT="$1"
 OUTPUT_DIR="$2"
 
-# Must be submitted from the repo root -- $SLURM_SUBMIT_DIR is that
-# directory, reliably, unlike deriving it from this script's own path (see
-# run_experiment_array.sbatch's own note on why).
-cd "$SLURM_SUBMIT_DIR"
 mkdir -p slurm-logs
 
 # The experiment file's own generator version, not a hardcoded guess --
