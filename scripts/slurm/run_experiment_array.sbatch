@@ -21,10 +21,10 @@
 # Versions, max-duration and the rest come from the experiment JSON itself
 # (see scripts/experiment_spec.py), the same file run_experiment.py reads.
 #
-# --sif-cache-dir is not overridable here: scripts/stage_apptainer_images.py
-# and scripts/slurm_run_task.py share the same default
-# (docker_utils.DEFAULT_SIF_CACHE_DIR, ~/apptainer-images) -- override
-# SIF_CACHE_DIR below only if you staged somewhere else.
+# scripts/stage_apptainer_images.py and scripts/slurm_run_task.py share the same
+# default (docker_utils.DEFAULT_SIF_CACHE_DIR: $SIF_CACHE_DIR if set, else
+# ~/apptainer-images). The site file sets SIF_CACHE_DIR where the default does
+# not suit the cluster (DAIC); set it yourself only if you staged elsewhere.
 #
 # --account/--partition/--ntasks are filled in (Léon's own value; compute-p1
 # proven repeatedly; --ntasks=1 and --mem-per-cpu, not --mem, are DelftBlue
@@ -68,8 +68,15 @@
 # compute node via sbatch, not just the login node, 2026-10-14. apptainer
 # itself needed no module load on the login node, so nothing is loaded for
 # it here -- if a compute node turns out to differ, add it here too.
+#
+# Cluster-specific values (python module, cache directories) come from
+# scripts/slurm/site/${SLURM_SITE:-delftblue}.env -- sbatch passes the
+# submitting shell's environment on, so `SLURM_SITE=daic sbatch ...` selects
+# DAIC. DelftBlue stays the default.
+cd "$SLURM_SUBMIT_DIR"
+source "scripts/slurm/site/${SLURM_SITE:-delftblue}.env"
 module load 2026 cpu
-module load python/3.13.18
+module load "$PYTHON_MODULE"
 
 set -euo pipefail
 
@@ -77,7 +84,6 @@ MANIFEST="$1"
 EXPERIMENT="$2"
 OUTPUT_DIR="$3"
 
-cd "$SLURM_SUBMIT_DIR"
 mkdir -p slurm-logs
 
 python3 scripts/slurm_run_task.py \
