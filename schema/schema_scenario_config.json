@@ -425,7 +425,7 @@
     },
     "TrainUnitDistribution": {
       "additionalProperties": false,
-      "description": "How randomly generated material is drawn.\n\nNote the spelling: instanding_ratio and outstanding_ratio, both lowercase.\nscenario_config_test.json carried inStanding_ratio/outStanding_ratio, which\nrandom_generator.py never reads, so those settings had no effect. They were\nboth 0.0 and the no-key fallback is also \"none\", so nothing observable\nchanged \u2014 which is how it survived. This model rejects that spelling.\n\nservicing_ratio, tasks_per_train_unit and servicing_per_composition are\noptional inputs with defaults applied by check_config.py. number_trains_in, number_trains_out and\naverage_servicing_time are deliberately absent: they are derived, and\nsetting them by hand would be a mistake worth reporting.",
+      "description": "How randomly generated material is drawn.\n\nNote the spelling: instanding_ratio and outstanding_ratio, both lowercase.\nscenario_config_test.json carried inStanding_ratio/outStanding_ratio, which\nrandom_generator.py never reads, so those settings had no effect. They were\nboth 0.0 and the no-key fallback is also \"none\", so nothing observable\nchanged \u2014 which is how it survived. This model rejects that spelling.\n\nservicing_ratio, tasks_per_train_unit, servicing_per_composition and\nreject_infeasible are optional inputs with defaults applied by\ncheck_config.py. number_trains_in, number_trains_out and\naverage_servicing_time are deliberately absent: they are derived, and\nsetting them by hand would be a mistake worth reporting.",
       "properties": {
         "train_unit_types": {
           "items": {
@@ -524,6 +524,18 @@
           ],
           "default": null,
           "title": "Servicing Per Composition"
+        },
+        "reject_infeasible": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reject Infeasible"
         }
       },
       "title": "TrainUnitDistribution",
