@@ -267,6 +267,12 @@ class TestScenarioConfig:
         with pytest.raises(ValidationError):
             TrainUnitDistribution(servicing_per_composition="sometimes")
 
+    def test_reject_infeasible_is_a_declared_optional_bool(self):
+        assert TrainUnitDistribution(train_unit_types=["VIRM-4"]).reject_infeasible is None
+        assert TrainUnitDistribution(reject_infeasible=True).reject_infeasible is True
+        with pytest.raises(ValidationError):
+            TrainUnitDistribution(reject_infeasible="sometimes")
+
     def test_intent_is_a_declared_field_not_a_tolerated_extra(self):
         config = TypeAdapter(ScenarioConfig).validate_python(
             {

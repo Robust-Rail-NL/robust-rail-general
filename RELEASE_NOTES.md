@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### `reject_infeasible` (additive)
+
+`TrainUnitDistribution` gains an optional boolean `reject_infeasible`
+(`schema_scenario_config.json` regenerated), matching the generator option of
+the same name (generator 2.5.0): with it on, a drawn scenario that violates a
+necessary servicing bound is redrawn. `scripts/generate_experiment_configs.py`
+accepts it as a `scenario_config` key and as `--reject-infeasible` /
+`--no-reject-infeasible`; it is written to the generated config only when set,
+so existing sweeps' configs do not change. Without it in this model a config
+carrying the key is rejected.
+
 ### `servicing_per_composition` (additive)
 
 `TrainUnitDistribution` gains an optional boolean `servicing_per_composition`

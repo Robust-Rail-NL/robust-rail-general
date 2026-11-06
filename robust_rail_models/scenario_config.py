@@ -51,8 +51,9 @@ class TrainUnitDistribution(RailModel):
     both 0.0 and the no-key fallback is also "none", so nothing observable
     changed — which is how it survived. This model rejects that spelling.
 
-    servicing_ratio, tasks_per_train_unit and servicing_per_composition are
-    optional inputs with defaults applied by check_config.py. number_trains_in, number_trains_out and
+    servicing_ratio, tasks_per_train_unit, servicing_per_composition and
+    reject_infeasible are optional inputs with defaults applied by
+    check_config.py. number_trains_in, number_trains_out and
     average_servicing_time are deliberately absent: they are derived, and
     setting them by hand would be a mistake worth reporting.
     """
@@ -66,6 +67,7 @@ class TrainUnitDistribution(RailModel):
     servicing_ratio: Optional[float] = None
     tasks_per_train_unit: Optional[int] = None
     servicing_per_composition: Optional[bool] = None
+    reject_infeasible: Optional[bool] = None
 
 
 class Gateway(RailModel):
