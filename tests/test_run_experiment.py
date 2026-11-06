@@ -76,6 +76,17 @@ def test_servicing_per_composition_false_is_written_out_not_dropped():
     assert distribution["servicing_per_composition"] is False
 
 
+def test_reject_infeasible_reaches_the_generator_config_when_set_and_is_left_out_otherwise():
+    kwargs = dict(number_of_trains=[2], matchings=["FIFO"], number_of_instances=1, perform_servicing=True)
+    on = sweep_configs(scenario_params(_spec(reject_infeasible=True, **kwargs)), LOCATION)
+    off = sweep_configs(scenario_params(_spec(reject_infeasible=False, **kwargs)), LOCATION)
+    unset = sweep_configs(scenario_params(_spec(**kwargs)), LOCATION)
+
+    assert on["custom_2_FIFO_0"]["train_unit_distribution"]["reject_infeasible"] is True
+    assert off["custom_2_FIFO_0"]["train_unit_distribution"]["reject_infeasible"] is False
+    assert "reject_infeasible" not in unset["custom_2_FIFO_0"]["train_unit_distribution"]
+
+
 def test_old_scenarios_key_is_rejected_with_a_rename_hint(tmp_path):
     path = tmp_path / "exp.json"
     path.write_text(json.dumps({"name": "demo", "location": LOCATION, "scenarios": {}}))
