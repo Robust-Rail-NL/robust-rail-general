@@ -1,0 +1,901 @@
+type-solver,num_trains,servicing,matching-order,instance-num,runtime,expanded-states,solution-length,valid,outcome,reason,timed_out,exit_code,plan_produced,slurm_state,partition,node,maxrss_mb,pddl_conversion_s,search_s,json_conversion_s,pddl_plan_length,json_actions,solver_neighbors,time_to_best_s,solver_feasible,validation_s,planner_process_s,total_s,image_version
+enhsp,1,off,FIFO,0,5.489,5,4,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1168.0,0.287,0.043,0.002,4,5,,,,0.775,2.643,4.715,ghcr.io/robust-rail-nl/planner:edge
+enhsp,1,off,FIFO,1,5.534,5,4,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1169.5,0.282,0.04,0.002,4,5,,,,0.773,2.651,4.718,ghcr.io/robust-rail-nl/planner:edge
+enhsp,1,off,FIFO,2,5.837,6,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1216.0,0.294,0.045,0.003,5,5,,,,0.801,2.927,5.043,ghcr.io/robust-rail-nl/planner:edge
+enhsp,1,off,FIFO,3,5.838,6,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1215.1,0.295,0.047,0.003,5,5,,,,0.809,2.902,5.025,ghcr.io/robust-rail-nl/planner:edge
+enhsp,1,off,FIFO,4,5.796,6,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1228.4,0.294,0.046,0.003,5,5,,,,0.797,2.887,4.99,ghcr.io/robust-rail-nl/planner:edge
+enhsp,1,off,LIFO,0,5.487,5,4,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1165.9,0.289,0.04,0.002,4,5,,,,0.768,2.654,4.721,ghcr.io/robust-rail-nl/planner:edge
+enhsp,1,off,LIFO,1,5.587,5,4,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1165.8,0.284,0.04,0.002,4,5,,,,0.766,2.669,4.742,ghcr.io/robust-rail-nl/planner:edge
+enhsp,1,off,LIFO,2,6.096,6,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1215.9,0.296,0.063,0.004,5,5,,,,0.832,2.952,5.104,ghcr.io/robust-rail-nl/planner:edge
+enhsp,1,off,LIFO,3,5.941,6,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1224.6,0.293,0.047,0.004,5,5,,,,0.821,2.895,5.029,ghcr.io/robust-rail-nl/planner:edge
+enhsp,1,off,LIFO,4,6.037,6,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1217.8,0.293,0.049,0.003,5,5,,,,0.829,2.918,5.063,ghcr.io/robust-rail-nl/planner:edge
+enhsp,1,off,random,0,5.639,5,4,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1162.8,0.285,0.045,0.002,4,5,,,,0.79,2.67,4.766,ghcr.io/robust-rail-nl/planner:edge
+enhsp,1,off,random,1,5.648,5,4,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1166.8,0.288,0.044,0.003,4,5,,,,0.787,2.648,4.746,ghcr.io/robust-rail-nl/planner:edge
+enhsp,1,off,random,2,5.999,6,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1222.2,0.296,0.047,0.003,5,5,,,,0.805,2.911,5.034,ghcr.io/robust-rail-nl/planner:edge
+enhsp,1,off,random,3,5.94,6,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1218.0,0.296,0.047,0.004,5,5,,,,0.82,2.894,5.026,ghcr.io/robust-rail-nl/planner:edge
+enhsp,1,off,random,4,6.04,6,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1219.4,0.298,0.056,0.003,5,5,,,,0.826,2.939,5.091,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,off,FIFO,0,6.086,10,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1280.3,0.291,0.086,0.002,9,10,,,,0.87,3.087,5.269,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,off,FIFO,1,6.737,17,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1544.8,0.317,0.125,0.002,10,10,,,,0.918,3.662,5.92,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,off,FIFO,2,6.741,17,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1544.4,0.315,0.113,0.002,10,10,,,,0.93,3.638,5.908,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,off,FIFO,3,6.693,17,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1540.7,0.311,0.12,0.002,10,10,,,,0.922,3.632,5.884,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,off,FIFO,4,6.035,10,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1281.6,0.298,0.081,0.002,9,10,,,,0.858,3.061,5.239,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,off,LIFO,0,6.082,10,9,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1276.0,0.296,0.068,0.002,9,9,,,,0.871,3.067,5.256,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,off,LIFO,1,6.747,17,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1533.1,0.319,0.12,0.002,10,10,,,,0.925,3.658,5.928,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,off,LIFO,2,6.801,17,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1537.4,0.317,0.124,0.002,10,10,,,,0.934,3.669,5.943,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,off,LIFO,3,6.836,17,10,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1535.5,0.318,0.137,0.002,10,9,,,,0.933,3.69,5.96,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,off,LIFO,4,6.041,10,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1277.2,0.301,0.081,0.002,9,10,,,,0.853,3.076,5.25,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,off,random,0,6.19,10,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1273.6,0.302,0.083,0.002,9,10,,,,0.868,3.208,5.399,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,off,random,1,6.79,17,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1533.1,0.312,0.113,0.002,10,10,,,,0.937,3.666,5.931,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,off,random,2,6.748,17,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1532.0,0.318,0.119,0.002,10,10,,,,0.926,3.631,5.894,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,off,random,3,6.848,17,10,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1537.4,0.317,0.134,0.002,10,9,,,,0.928,3.688,5.956,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,off,random,4,6.043,10,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1277.2,0.298,0.09,0.002,9,10,,,,0.852,3.086,5.256,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,off,FIFO,0,7.043,23,14,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1696.9,0.323,0.178,0.003,14,15,,,,0.978,3.951,6.273,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,off,FIFO,1,8.313,30,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1765.8,0.347,0.187,0.002,15,15,,,,1.086,5.081,7.538,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,off,FIFO,2,8.806,32,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1801.1,0.364,0.357,0.002,15,15,,,,1.141,5.524,8.05,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,off,FIFO,3,7.554,488,14,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1697.9,0.327,0.628,0.003,14,15,,,,0.979,4.423,6.745,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,off,FIFO,4,8.802,30,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1812.4,0.367,0.328,0.002,15,15,,,,1.127,5.571,8.082,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,off,LIFO,0,7.551,409,18,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1697.6,0.325,0.591,0.002,18,16,,,,0.988,4.424,6.753,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,off,LIFO,1,7.893,30,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1755.5,0.348,0.246,0.002,15,15,,,,1.046,4.771,7.191,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,off,LIFO,2,8.492,32,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1801.8,0.36,0.33,0.002,15,15,,,,1.104,5.313,7.81,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,off,LIFO,3,7.796,712,14,False,invalid,"Error in generating action (BeginMove: [1, 0]): The action is invalid. Shunting unit with trains 1-0 not found",False,1,True,COMPLETED,daic-eemcs-st,gpu52,1692.6,0.322,0.718,0.002,14,15,,,,0.988,4.609,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,off,LIFO,4,8.906,32,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1807.9,0.361,0.348,0.003,15,15,,,,1.126,5.653,8.159,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,off,random,0,11.799,,,,crash,,False,1,False,COMPLETED,daic-eemcs-st,gpu52,1707.3,0.324,6.049,,,,,,,,9.864,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,off,random,1,8.552,30,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1771.0,0.342,0.28,0.002,15,15,,,,1.148,5.198,7.708,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,off,random,2,8.292,,,,crash,,False,1,False,COMPLETED,daic-eemcs-st,gpu52,1763.5,0.356,1.304,,,,,,,,6.278,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,off,random,3,7.702,712,14,False,invalid,"Error in generating action (BeginMove: [1, 0]): The action is invalid. Shunting unit with trains 1-0 not found",False,1,True,COMPLETED,daic-eemcs-st,gpu52,1697.0,0.324,0.743,0.002,14,15,,,,0.975,4.557,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,off,random,4,8.945,,,,crash,,False,1,False,COMPLETED,daic-eemcs-st,gpu52,1761.2,0.36,1.853,,,,,,,,6.956,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,off,FIFO,0,12.181,62,19,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1890.2,0.414,0.608,0.003,19,18,,,,1.499,8.219,11.255,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,off,FIFO,1,22.002,3189,23,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1875.3,0.384,10.712,0.002,23,20,,,,1.2,18.674,21.285,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,off,FIFO,2,9.659,692,17,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1762.8,0.342,1.651,0.003,17,19,,,,1.074,6.283,8.732,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,off,FIFO,3,99.901,25136,31,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,2072.6,0.431,86.199,0.003,31,22,,,,1.495,96.13,99.087,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,off,FIFO,4,22.386,3259,23,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1923.5,0.4,10.681,0.003,23,20,,,,1.263,18.938,21.624,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,off,LIFO,0,11.815,64,19,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1906.2,0.406,0.488,0.003,19,19,,,,1.392,8.128,10.954,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,off,LIFO,1,20.558,3695,27,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1886.9,0.386,10.059,0.003,27,21,,,,1.229,17.073,19.717,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,off,LIFO,2,639.751,654771,21,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1953.6,0.346,631.89,0.003,21,20,,,,1.079,636.478,638.932,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,off,LIFO,3,90.242,30261,27,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,2079.2,0.435,76.604,0.003,27,21,,,,1.461,86.549,89.47,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,off,LIFO,4,53.034,14398,27,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1912.7,0.4,41.364,0.003,27,21,,,,1.282,49.518,52.231,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,off,random,0,11.703,67,19,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1925.0,0.412,0.704,0.003,19,19,,,,1.403,8.084,10.935,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,off,random,1,8.74,41,18,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1799.3,0.361,0.514,0.003,18,19,,,,1.167,5.415,7.972,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,off,random,2,159.902,149023,29,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1819.4,0.341,152.3,0.003,29,22,,,,1.032,156.801,159.201,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,off,random,3,72.868,23809,31,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,2067.6,0.437,59.135,0.003,31,22,,,,1.475,69.156,72.097,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,off,random,4,25.131,4418,39,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1932.1,0.396,13.406,0.003,39,24,,,,1.353,21.592,24.37,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,off,FIFO,0,13.666,1257,31,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1897.7,0.428,2.322,0.003,31,26,,,,1.628,9.541,12.758,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,off,FIFO,1,23.301,2754,34,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1959.9,0.394,10.915,0.003,34,27,,,,1.336,19.853,22.598,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,off,FIFO,2,161.491,34886,32,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,2377.7,0.517,141.822,0.003,32,26,,,,1.988,157.261,160.782,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,off,FIFO,3,43.56,24345,35,False,invalid,Track 906a is reserved,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1935.3,0.418,31.891,0.003,35,27,,,,1.522,39.793,42.768,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,off,FIFO,4,1800.032,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2340.4,0.364,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,off,LIFO,0,16.394,3630,35,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1902.7,0.417,5.149,0.003,35,27,,,,1.529,12.644,15.614,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,off,LIFO,1,501.588,236832,42,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,2077.2,0.403,489.17,0.004,42,29,,,,1.393,497.985,500.806,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,off,LIFO,2,91.036,17073,36,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,2351.1,0.522,71.697,0.004,36,27,,,,2.068,86.686,90.298,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,off,LIFO,3,15.454,2553,39,False,invalid,Track 906a is reserved,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1922.9,0.414,4.363,0.003,39,28,,,,1.547,11.738,14.711,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,off,LIFO,4,49.127,38008,47,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1815.4,0.357,39.762,0.003,47,30,,,,1.228,45.812,48.41,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,off,random,0,12.255,119,27,False,invalid,Track 906a is reserved,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1906.1,0.41,1.006,0.003,27,25,,,,1.467,8.648,11.539,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,off,random,1,113.593,26785,42,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1995.1,0.397,101.344,0.004,42,29,,,,1.381,110.067,112.86,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,off,random,2,1800.014,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2982.4,0.532,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,off,random,3,11.805,186,27,False,invalid,Track 906a is reserved,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1903.8,0.411,0.781,0.003,27,25,,,,1.464,8.151,11.05,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,off,random,4,1800.027,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2457.6,0.358,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,off,FIFO,0,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2534.5,0.417,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,off,FIFO,1,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,5207.7,0.706,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,off,FIFO,2,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3466.6,0.549,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,off,FIFO,3,214.671,82896,39,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,2068.5,0.427,201.794,0.004,39,33,,,,1.631,210.397,213.479,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,off,FIFO,4,13.14,332,39,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1926.4,0.44,0.807,0.003,39,32,,,,1.658,8.95,12.11,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,off,LIFO,0,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2571.1,0.42,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,off,LIFO,1,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,5468.7,0.693,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,off,LIFO,2,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3444.3,0.588,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,off,LIFO,3,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2614.9,0.431,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,off,LIFO,4,27.372,13091,43,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1942.9,0.428,14.947,0.003,43,33,,,,1.695,23.326,26.495,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,off,random,0,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2942.2,0.418,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,off,random,1,1800.016,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,4034.1,0.671,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,off,random,2,1800.016,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3542.1,0.547,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,off,random,3,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2369.9,0.443,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,off,random,4,19.545,6802,43,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1927.1,0.452,7.241,0.003,43,33,,,,1.829,15.192,18.638,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,off,FIFO,0,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,7820.7,0.793,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,off,FIFO,1,1513.026,266711,44,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,3656.7,0.585,1487.804,0.004,44,37,,,,2.521,1507.766,1511.89,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,off,FIFO,2,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,2775.3,0.538,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,off,FIFO,3,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,3074.0,0.576,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,off,FIFO,4,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,2533.6,0.427,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,off,LIFO,0,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6864.5,0.786,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,off,LIFO,1,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,3608.2,0.616,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,off,LIFO,2,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,2947.1,0.534,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,off,LIFO,3,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,3166.0,0.569,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,off,LIFO,4,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2502.5,0.423,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,off,random,0,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,6679.5,0.775,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,off,random,1,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3600.5,0.61,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,off,random,2,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2899.5,0.545,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,off,random,3,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,4111.9,0.602,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,off,random,4,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2656.2,0.456,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,off,FIFO,0,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,3613.5,0.642,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,off,FIFO,1,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,2846.4,0.528,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,off,FIFO,2,1800.027,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,3676.0,0.609,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,off,FIFO,3,1800.026,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,3014.4,0.581,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,off,FIFO,4,1800.026,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3113.7,0.543,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,off,LIFO,0,1800.024,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3634.6,0.636,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,off,LIFO,1,1800.024,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2816.0,0.521,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,off,LIFO,2,1800.026,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3664.6,0.614,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,off,LIFO,3,1800.018,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,3041.6,0.588,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,off,LIFO,4,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2887.2,0.561,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,off,random,0,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,3782.8,0.637,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,off,random,1,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,2924.1,0.54,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,off,random,2,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,3709.7,0.615,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,off,random,3,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,2910.6,0.6,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,off,random,4,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,3091.6,0.567,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,off,FIFO,0,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3679.9,0.639,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,off,FIFO,1,1800.024,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,5906.3,0.793,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,off,FIFO,2,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3019.8,0.574,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,off,FIFO,3,1800.018,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2958.4,0.594,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,off,FIFO,4,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,7455.1,0.737,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,off,LIFO,0,1800.025,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,3675.9,0.653,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,off,LIFO,1,1800.027,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6344.2,0.793,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,off,LIFO,2,1800.027,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,3045.8,0.576,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,off,LIFO,3,1800.027,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,2986.4,0.592,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,off,LIFO,4,1800.027,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,7061.3,0.734,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,off,random,0,1800.027,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5403.9,0.687,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,off,random,1,1800.027,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,7185.5,0.788,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,off,random,2,1800.026,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,2953.0,0.582,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,off,random,3,1800.026,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,4891.7,0.643,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,off,random,4,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6827.0,0.733,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,off,FIFO,0,1800.025,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5956.8,0.782,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,off,FIFO,1,1800.028,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,4040.7,0.687,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,off,FIFO,2,1800.028,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6120.2,0.718,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,off,FIFO,3,1800.028,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,11173.1,0.97,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,off,FIFO,4,1800.025,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,2888.5,0.558,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,off,LIFO,0,1800.028,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6073.9,0.814,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,off,LIFO,1,1800.029,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,4131.9,0.706,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,off,LIFO,2,1800.024,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5886.3,0.74,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,off,LIFO,3,1800.026,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,11854.5,0.982,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,off,LIFO,4,1800.027,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,2841.1,0.56,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,off,random,0,1800.028,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6564.4,0.782,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,off,random,1,1800.025,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,4449.2,0.718,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,off,random,2,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,4029.9,0.69,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,off,random,3,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,10653.1,0.956,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,off,random,4,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2926.3,0.555,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+solver,1,off,FIFO,0,1.138,,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,167.3,,,,,5,3,0.58,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,1,off,FIFO,1,1.123,,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,168.4,,,,,5,3,0.60,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,1,off,FIFO,2,1.026,,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,167.6,,,,,5,3,0.58,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,1,off,FIFO,3,1.882,,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,195.7,,,,,5,4,1.32,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,1,off,FIFO,4,1.13,,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,168.5,,,,,5,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,1,off,LIFO,0,1.101,,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,168.2,,,,,5,3,0.60,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,1,off,LIFO,1,1.077,,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,168.6,,,,,5,3,0.58,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,1,off,LIFO,2,1.131,,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,166.8,,,,,5,3,0.59,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,1,off,LIFO,3,1.843,,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,194.3,,,,,5,4,1.31,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,1,off,LIFO,4,1.076,,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,166.6,,,,,5,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,1,off,random,0,1.073,,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,168.3,,,,,5,3,0.59,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,1,off,random,1,1.175,,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,168.3,,,,,5,3,0.59,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,1,off,random,2,1801.094,,10,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,206.9,,,,,10,578844450,0.60,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,1,off,random,3,2.048,,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,196.9,,,,,5,4,1.20,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,1,off,random,4,1801.104,,10,False,invalid,Adding ShuntingUnit-ShuntingUnit-0 to Track 906b exceeds the maximum length (270.620000 > 255.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu52,208.3,,,,,10,614783171,0.00,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,off,FIFO,0,0.97,,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,169.8,,,,,10,28,0.53,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,off,FIFO,1,1.879,,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,194.5,,,,,10,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,off,FIFO,2,1.723,,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,196.2,,,,,10,18,1.27,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,off,FIFO,3,1.023,,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,170.8,,,,,10,36,0.55,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,off,FIFO,4,1.72,,11,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,198.8,,,,,11,1,1.25,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,off,LIFO,0,1.078,,11,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,171.2,,,,,11,2,0.61,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,off,LIFO,1,1.721,,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,196.6,,,,,10,23,1.26,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,off,LIFO,2,1.826,,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,196.6,,,,,10,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,off,LIFO,3,0.97,,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,170.4,,,,,10,17,0.54,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,off,LIFO,4,1.925,,11,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,196.4,,,,,11,4,1.47,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,off,random,0,0.969,,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,172.2,,,,,15,2,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,off,random,1,1801.883,,15,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,208.0,,,,,15,335703534,0.00,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,off,random,2,1801.775,,15,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,205.3,,,,,15,382241846,0.00,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,off,random,3,1801.098,,20,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,206.9,,,,,20,324382422,0.00,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,off,random,4,1.87,,11,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,197.2,,,,,11,1,1.34,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,off,FIFO,0,2.237,,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,196.2,,,,,16,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,off,FIFO,1,2.234,,18,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,195.1,,,,,18,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,off,FIFO,2,2.286,,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,192.8,,,,,16,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,off,FIFO,3,1.923,,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,199.1,,,,,15,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,off,FIFO,4,1.973,,18,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,199.7,,,,,18,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,off,LIFO,0,1.927,,17,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,200.7,,,,,17,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,off,LIFO,1,2.077,,18,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,197.7,,,,,18,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,off,LIFO,2,2.201,,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,196.4,,,,,16,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,off,LIFO,3,2.135,,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,197.9,,,,,15,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,off,LIFO,4,2.133,,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,201.2,,,,,16,8,1.60,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,off,random,0,1803.007,,30,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,238.1,,,,,30,175440531,5.41,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,off,random,1,1802.027,,22,False,invalid,ShuntingUnit-ShuntingUnit-1 cannot leave Track 52 at the A-side to Track Wissel961: blocked,False,0,True,COMPLETED,daic-eemcs-st,gpu52,208.3,,,,,22,261806835,0.00,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,off,random,2,1802.998,,22,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,215.0,,,,,22,177717643,3.65,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,off,random,3,2.131,,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,197.1,,,,,15,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,off,random,4,1802.515,,25,False,invalid,Track 906a is reserved,False,0,True,COMPLETED,daic-eemcs-st,gpu52,214.3,,,,,25,189687913,2.12,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,off,FIFO,0,2.295,,23,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,202.7,,,,,23,91,1.60,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,off,FIFO,1,2.18,,22,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,200.3,,,,,22,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,off,FIFO,2,1.995,,26,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,199.4,,,,,26,22,1.42,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,off,FIFO,3,2.343,,25,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,201.4,,,,,25,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,off,FIFO,4,2.383,,22,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,202.0,,,,,22,2,1.74,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,off,LIFO,0,2.343,,24,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,202.2,,,,,24,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,off,LIFO,1,2.394,,22,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,197.5,,,,,22,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,off,LIFO,2,2.194,,20,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,195.9,,,,,20,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,off,LIFO,3,2.494,,25,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,195.5,,,,,25,25,1.79,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,off,LIFO,4,2.333,,25,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,200.2,,,,,25,33,1.70,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,off,random,0,1802.235,,29,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,220.5,,,,,29,178934341,0.00,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,off,random,1,1802.19,,28,False,invalid,Adding ShuntingUnit-ShuntingUnit-2 to Track 906b exceeds the maximum length (270.620000 > 255.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu52,216.6,,,,,28,201434927,1.62,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,off,random,2,1.929,,29,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,202.2,,,,,29,140,1.39,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,off,random,3,2.182,,25,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,201.5,,,,,25,91,1.60,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,off,random,4,1802.244,,33,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,219.0,,,,,33,166312597,1.99,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,off,FIFO,0,2.747,,30,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,197.1,,,,,30,1,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,off,FIFO,1,2.957,,29,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,195.1,,,,,29,141,2.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,off,FIFO,2,2.378,,34,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,200.4,,,,,34,185,1.72,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,off,FIFO,3,2.18,,30,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,201.0,,,,,30,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,off,FIFO,4,2.686,,30,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,204.3,,,,,30,104,2.03,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,off,LIFO,0,2.328,,27,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,202.2,,,,,27,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,off,LIFO,1,2.349,,30,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,200.1,,,,,30,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,off,LIFO,2,2.556,,26,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,199.8,,,,,26,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,off,LIFO,3,2.342,,30,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,199.5,,,,,30,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,off,LIFO,4,2.29,,31,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,194.9,,,,,31,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,off,random,0,1802.776,,49,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,251.3,,,,,49,88639975,2.84,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,off,random,1,2.391,,33,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,195.2,,,,,33,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,off,random,2,1803.016,,35,False,invalid,Adding ShuntingUnit-ShuntingUnit-2 to Track 56 exceeds the maximum length (325.680000 > 222.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu52,256.0,,,,,35,113513136,2.20,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,off,random,3,4.262,,43,False,invalid,ShuntingUnit-ShuntingUnit-4 cannot leave Track 52. Both sides blocked,False,0,True,COMPLETED,daic-eemcs-st,gpu52,207.9,,,,,43,20768,3.35,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,off,random,4,1802.403,,36,False,invalid,Adding ShuntingUnit-ShuntingUnit-3 to Track 55 exceeds the maximum length (432.680000 > 357.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu52,234.7,,,,,36,142896492,1.77,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,off,FIFO,0,2.698,,33,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,203.5,,,,,33,137,1.86,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,off,FIFO,1,3.097,,38,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,202.5,,,,,38,1,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,off,FIFO,2,3.067,,33,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,202.7,,,,,33,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,off,FIFO,3,2.747,,36,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,200.7,,,,,36,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,off,FIFO,4,2.746,,36,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,202.2,,,,,36,91,1.84,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,off,LIFO,0,3.144,,33,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,204.3,,,,,33,16,2.35,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,off,LIFO,1,3.001,,31,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,202.1,,,,,31,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,off,LIFO,2,3.078,,33,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,196.4,,,,,33,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,off,LIFO,3,3.465,,38,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,204.4,,,,,38,4,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,off,LIFO,4,4.565,,35,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,206.2,,,,,35,153,3.58,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,off,random,0,1803.733,,54,False,invalid,Error in generating action (Wait: [6]): The action is invalid. The ShuntingUnit is already waiting,False,0,True,COMPLETED,daic-eemcs-st,gpu52,236.8,,,,,54,104681840,7.52,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,off,random,1,1803.157,,42,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,216.0,,,,,42,118618515,2.26,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,off,random,2,1804.842,,50,False,invalid,"ShuntingUnit-ShuntingUnit-4 cannot leave Track 104a. One side is blocked by another train, the other side is a Bumper",False,0,True,COMPLETED,daic-eemcs-st,gpu52,506.4,,,,,50,83106523,4.23,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,off,random,3,1803.79,,43,False,invalid,Error in generating action (EndMove: [4]): The action is invalid. The shunting unit ShuntingUnit-3 is already active. Active Actions: Move ShuntingUnit-3 to 53 (route: 104a - Wissel425 - 51b - Wissel952 - 952_kruis2 - Kruis2 - 974_kruis2 - Engels974_975 - 954_975 - Wissel954 - 954_957 - Wissel957 - 53),False,0,True,COMPLETED,daic-eemcs-st,gpu52,267.6,,,,,43,98036693,5.71,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,off,random,4,1802.936,,49,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,234.6,,,,,49,109313901,5.48,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,off,FIFO,0,2.73,,40,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu49,197.4,,,,,40,202,2.19,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,off,FIFO,1,2.531,,36,False,invalid,Adding ShuntingUnit-ShuntingUnit-2 to Track 53 exceeds the maximum length (440.520000 > 431.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu49,200.2,,,,,36,110,1.97,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,off,FIFO,2,2.642,,42,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu49,199.5,,,,,42,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,off,FIFO,3,2.626,,40,False,invalid,Adding ShuntingUnit-ShuntingUnit-4 to Track 53 exceeds the maximum length (449.440000 > 431.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu47,201.8,,,,,40,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,off,FIFO,4,2.224,,40,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,202.5,,,,,40,220,1.73,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,off,LIFO,0,2.724,,48,False,invalid,Adding ShuntingUnit-ShuntingUnit-5 to Track 54 exceeds the maximum length (440.520000 > 387.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu47,200.7,,,,,48,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,off,LIFO,1,3.374,,53,False,invalid,Adding ShuntingUnit-ShuntingUnit-6 to Track 53 exceeds the maximum length (494.020000 > 431.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu47,208.9,,,,,53,267,2.87,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,off,LIFO,2,2.525,,42,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,200.7,,,,,42,10,2.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,off,LIFO,3,3.029,,49,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,209.5,,,,,49,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,off,LIFO,4,2.122,,45,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,202.9,,,,,45,81,1.63,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,off,random,0,1805.092,,55,False,invalid,Error in generating action (Wait: [11]): The action is invalid. The ShuntingUnit is already waiting,False,0,True,COMPLETED,daic-eemcs-st,gpu49,351.3,,,,,55,86884941,4.56,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,off,random,1,1803.608,,69,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,288.3,,,,,69,93322344,7.15,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,off,random,2,1804.154,,58,False,invalid,Error in generating action (Combine: [6] and [3]): The action is invalid. The two shunting units are not next to each other,False,0,True,COMPLETED,daic-eemcs-st,gpu49,247.2,,,,,58,92122079,3.85,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,off,random,3,1805.129,,55,False,invalid,Error in generating action (Wait: [2]): The action is invalid. The ShuntingUnit is already waiting,False,0,True,COMPLETED,daic-eemcs-st,gpu49,271.8,,,,,55,84124794,5.44,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,off,random,4,1802.358,,51,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,626.2,,,,,51,86131276,1.70,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,off,FIFO,0,2.873,,51,False,invalid,Adding ShuntingUnit-ShuntingUnit-0 to Track 52 exceeds the maximum length (538.920000 > 480.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu49,206.1,,,,,51,158,2.40,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,off,FIFO,1,3.372,,52,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu49,202.3,,,,,52,105,2.88,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,off,FIFO,2,2.472,,52,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu49,200.6,,,,,52,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,off,FIFO,3,3.038,,48,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu49,207.6,,,,,48,3,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,off,FIFO,4,3.074,,59,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,210.8,,,,,59,10,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,off,LIFO,0,4.326,,62,False,invalid,"Track 52, id 1 is occupied",False,0,True,COMPLETED,daic-eemcs-st,gpu47,217.3,,,,,62,10,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,off,LIFO,1,2.273,,47,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,202.6,,,,,47,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,off,LIFO,2,2.326,,52,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,204.9,,,,,52,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,off,LIFO,3,2.675,,45,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,204.6,,,,,45,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,off,LIFO,4,2.875,,56,False,invalid,ShuntingUnit-ShuntingUnit-7 cannot leave Track 54 at the B-side to Track Wissel957: blocked,False,0,True,COMPLETED,daic-eemcs-st,gpu47,206.9,,,,,56,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,off,random,0,4.683,,56,False,invalid,ShuntingUnit-ShuntingUnit-2 cannot leave Track 52. Both sides blocked,False,0,True,COMPLETED,daic-eemcs-st,gpu47,219.1,,,,,56,6116,4.13,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,off,random,1,2.733,,50,False,invalid,Error in generating action (Combine: [12] and [6]): The action is invalid. The two shunting units are not facing the same direction,False,0,True,COMPLETED,daic-eemcs-st,gpu49,198.7,,,,,50,312,2.03,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,off,random,2,1804.189,,65,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,958.8,,,,,65,77531893,3.84,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,off,random,3,1803.3,,64,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,396.9,,,,,64,88127479,6.64,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,off,random,4,5.191,,62,False,invalid,Error in generating action (Wait: [3]): The action is invalid. The ShuntingUnit is already waiting,False,0,True,COMPLETED,daic-eemcs-st,gpu49,213.7,,,,,62,1453,4.59,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,off,FIFO,0,4.349,,54,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu49,215.2,,,,,54,1182,3.35,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,off,FIFO,1,4.749,,48,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu49,217.2,,,,,48,1463,3.85,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,off,FIFO,2,3.589,,60,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu49,216.6,,,,,60,213,2.62,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,off,FIFO,3,3.195,,48,False,invalid,"Track 53, id 2 is occupied",False,0,True,COMPLETED,daic-eemcs-st,gpu49,204.6,,,,,48,315,2.25,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,off,FIFO,4,3.193,,53,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu49,205.4,,,,,53,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,off,LIFO,0,2.973,,59,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,205.3,,,,,59,325,2.58,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,off,LIFO,1,2.571,,56,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,202.9,,,,,56,19,2.15,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,off,LIFO,2,2.927,,65,False,invalid,Adding ShuntingUnit-ShuntingUnit-6 to Track 59 exceeds the maximum length (351.220000 > 271.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu47,213.2,,,,,65,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,off,LIFO,3,2.874,,47,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,209.4,,,,,47,1,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,off,LIFO,4,2.729,,48,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,202.9,,,,,48,392,2.18,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,off,random,0,1803.803,,61,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,533.4,,,,,61,78659673,4.04,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,off,random,1,3.878,,70,False,invalid,Error in generating action (Wait: [13]): The action is invalid. The ShuntingUnit is already waiting,False,0,True,COMPLETED,daic-eemcs-st,gpu47,218.6,,,,,70,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,off,random,2,7.085,,68,False,invalid,ShuntingUnit-ShuntingUnit-0 cannot leave Track 55 at the B-side to Track Wissel954: blocked,False,0,True,COMPLETED,daic-eemcs-st,gpu47,233.4,,,,,68,26342,6.55,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,off,random,3,1805.857,,83,False,invalid,Error in generating action (Wait: [4]): The action is invalid. The shunting unit ShuntingUnit-4 is already active. Active Actions: Move ShuntingUnit-4 to 906a (route: 53 - Wissel960 - 960_961 - Wissel961 - 961_963 - Wissel963 - 906a),False,0,True,COMPLETED,daic-eemcs-st,gpu47,285.2,,,,,83,73809460,15.45,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,off,random,4,1805.854,,66,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,259.7,,,,,66,90038882,5.64,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,off,FIFO,0,2.981,,63,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,204.9,,,,,63,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,off,FIFO,1,4.183,,72,False,invalid,ShuntingUnit-ShuntingUnit-6 cannot leave Track 53 at the B-side to Track Wissel957: blocked,False,0,True,COMPLETED,daic-eemcs-st,gpu47,217.6,,,,,72,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,off,FIFO,2,3.641,,62,False,invalid,"Track 54, id 3 is occupied",False,0,True,COMPLETED,daic-eemcs-st,gpu47,212.1,,,,,62,324,2.90,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,off,FIFO,3,3.784,,63,False,invalid,"Track 62, id 11 is occupied",False,0,True,COMPLETED,daic-eemcs-st,gpu47,210.0,,,,,63,7,3.05,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,off,FIFO,4,3.584,,67,False,invalid,"Track 59, id 8 is occupied",False,0,True,COMPLETED,daic-eemcs-st,gpu47,212.4,,,,,67,179,2.84,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,off,LIFO,0,3.936,,65,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,212.4,,,,,65,92,3.18,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,off,LIFO,1,2.936,,55,False,invalid,Adding ShuntingUnit-ShuntingUnit-0 to Track 52 exceeds the maximum length (695.280000 > 480.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu47,204.0,,,,,55,1,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,off,LIFO,2,3.484,,68,False,invalid,"Track 58, id 7 is occupied",False,0,True,COMPLETED,daic-eemcs-st,gpu47,214.4,,,,,68,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,off,LIFO,3,3.779,,57,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,210.9,,,,,57,1,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,off,LIFO,4,3.629,,59,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,215.7,,,,,59,2,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,off,random,0,1805.046,,86,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,374.4,,,,,86,66401606,8.29,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,off,random,1,1805.86,,79,False,invalid,Error in generating action (Wait: [8]): The action is invalid. The ShuntingUnit is already waiting,False,0,True,COMPLETED,daic-eemcs-st,gpu49,418.0,,,,,79,72293256,10.60,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,off,random,2,1807.434,,74,False,invalid,Adding ShuntingUnit-ShuntingUnit-3 to Track 52 exceeds the maximum length (565.420000 > 480.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu49,606.2,,,,,74,73396006,7.27,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,off,random,3,8.672,,77,False,invalid,Error in generating action (Wait: [14]): The action is invalid. The ShuntingUnit is already waiting,False,0,True,COMPLETED,daic-eemcs-st,gpu49,230.1,,,,,77,9001,7.74,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,off,random,4,8.701,,81,False,invalid,"Track 52, id 1 is occupied",False,0,True,COMPLETED,daic-eemcs-st,gpu49,233.4,,,,,81,6835,7.78,true,,,,ghcr.io/robust-rail-nl/hip:edge
+symbolic-rail,1,off,FIFO,0,14.454,10,4,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1237.8,0.277,5.007,0.002,4,5,,,,0.773,11.072,13.151,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,1,off,FIFO,1,14.255,10,4,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1245.4,0.287,4.979,0.012,4,5,,,,0.791,11.2,13.327,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,1,off,FIFO,2,14.258,5,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1253.9,0.284,4.946,0.004,5,5,,,,0.813,11.159,13.288,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,1,off,FIFO,3,14.253,5,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1214.1,0.297,4.942,0.004,5,5,,,,0.814,11.163,13.306,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,1,off,FIFO,4,14.36,5,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1214.8,0.297,4.974,0.004,5,5,,,,0.809,11.174,13.325,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,1,off,LIFO,0,14.51,10,4,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1217.6,0.288,4.956,0.002,4,5,,,,0.785,11.17,13.276,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,1,off,LIFO,1,14.451,10,4,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1207.5,0.289,4.989,0.002,4,5,,,,0.781,11.205,13.31,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,1,off,LIFO,2,14.64,5,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1212.3,0.296,5.17,0.004,5,5,,,,0.817,11.479,13.638,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,1,off,LIFO,3,15.009,5,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1250.1,0.292,5.202,0.003,5,5,,,,0.816,11.633,13.765,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,1,off,LIFO,4,14.553,5,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1215.2,0.297,4.963,0.004,5,5,,,,0.827,11.177,13.329,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,1,off,random,0,14.206,10,4,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1212.5,0.29,4.934,0.002,4,5,,,,0.771,11.177,13.267,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,1,off,random,1,14.312,10,4,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1213.7,0.286,4.945,0.002,4,5,,,,0.773,11.157,13.267,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,1,off,random,2,14.311,5,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1221.2,0.292,4.943,0.003,5,5,,,,0.814,11.158,13.334,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,1,off,random,3,14.153,5,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1215.0,0.292,4.953,0.004,5,5,,,,0.822,11.153,13.305,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,1,off,random,4,14.41,5,5,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1207.4,0.298,4.966,0.003,5,5,,,,0.812,11.197,13.38,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,off,FIFO,0,14.701,11,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1207.7,0.303,4.982,0.002,9,10,,,,0.859,11.204,13.404,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,off,FIFO,1,14.407,16,10,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1201.7,0.314,4.98,0.002,10,9,,,,0.922,11.164,13.472,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,off,FIFO,2,14.46,12,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1199.7,0.318,4.947,0.002,10,10,,,,0.926,11.115,13.414,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,off,FIFO,3,14.657,12,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1212.7,0.314,4.988,0.002,10,10,,,,0.915,11.165,13.416,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,off,FIFO,4,14.404,19,9,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1208.2,0.304,4.991,0.002,9,9,,,,0.866,11.187,13.412,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,off,LIFO,0,15.258,9,9,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1193.7,0.303,5.401,0.002,9,9,,,,0.863,12.11,14.315,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,off,LIFO,1,15.323,16,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1185.4,0.314,5.403,0.002,10,10,,,,0.923,12.1,14.381,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,off,LIFO,2,15.506,12,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1229.1,0.306,5.241,0.002,10,10,,,,0.923,12.066,14.359,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,off,LIFO,3,14.666,12,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1210.4,0.319,5.123,0.002,10,10,,,,0.933,11.391,13.688,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,off,LIFO,4,14.291,11,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1210.3,0.244,4.995,0.002,9,10,,,,0.857,11.185,13.38,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,off,random,0,14.613,11,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1209.9,0.254,5.004,0.002,9,10,,,,0.879,11.194,13.358,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,off,random,1,14.788,16,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1209.4,0.31,5.03,0.002,10,10,,,,0.923,11.244,13.546,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,off,random,2,14.566,12,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1213.0,0.314,5.034,0.002,10,10,,,,0.938,11.282,13.573,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,off,random,3,14.638,12,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1210.9,0.304,5.06,0.002,10,10,,,,0.926,11.292,13.556,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,off,random,4,14.361,19,9,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1214.5,0.299,5.121,0.003,9,9,,,,0.847,11.221,13.405,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,off,FIFO,0,15.765,49,14,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1203.1,0.327,5.915,0.003,14,15,,,,0.977,12.483,14.811,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,off,FIFO,1,15.968,29,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1246.9,0.35,5.862,0.003,15,15,,,,1.104,12.481,14.967,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,off,FIFO,2,16.677,15,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1245.9,0.359,5.751,0.002,15,15,,,,1.329,12.732,15.605,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,off,FIFO,3,16.724,19,14,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1200.3,0.319,5.765,0.003,14,15,,,,0.996,12.901,15.256,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,off,FIFO,4,15.382,22,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1209.2,0.369,5.2,0.002,15,15,,,,1.148,11.465,14.067,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,off,LIFO,0,14.813,46,14,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1209.6,0.324,5.27,0.002,14,15,,,,0.995,11.474,13.831,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,off,LIFO,1,14.97,29,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1252.1,0.351,5.156,0.003,15,15,,,,1.117,11.36,13.863,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,off,LIFO,2,14.834,15,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1249.0,0.358,5.048,0.002,15,15,,,,1.149,11.227,13.77,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,off,LIFO,3,15.045,19,14,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1211.4,0.325,5.062,0.003,14,15,,,,0.996,11.256,13.635,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,off,LIFO,4,15.97,22,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1195.0,0.366,5.753,0.003,15,15,,,,1.144,12.418,14.996,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,off,random,0,1800.011,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3011.6,0.318,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,off,random,1,15.919,21,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1238.4,0.348,5.816,0.003,15,15,,,,1.09,12.404,14.895,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,off,random,2,1800.013,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3049.0,0.342,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,off,random,3,15.481,19,14,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1204.3,0.281,5.62,0.002,14,15,,,,0.979,12.118,14.416,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,off,random,4,1800.012,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3733.6,0.356,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,off,FIFO,0,15.427,44,19,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1214.2,0.411,5.329,0.003,19,19,,,,1.453,11.557,14.458,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,off,FIFO,1,15.477,43,21,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1221.4,0.375,5.534,0.002,21,19,,,,1.251,11.692,14.383,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,off,FIFO,2,14.654,37,17,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1214.5,0.34,5.123,0.003,17,19,,,,1.048,11.234,13.676,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,off,FIFO,3,15.463,27,19,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1215.0,0.429,5.405,0.002,19,19,,,,1.428,11.544,14.456,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,off,FIFO,4,16.013,153,19,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1205.3,0.396,6.352,0.003,19,19,,,,1.253,12.394,15.09,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,off,LIFO,0,15.263,42,19,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1189.3,0.411,5.374,0.003,19,19,,,,1.399,11.413,14.265,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,off,LIFO,1,15.807,137,21,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1198.3,0.379,6.14,0.004,21,19,,,,1.219,12.2,14.833,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,off,LIFO,2,14.419,21,17,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1194.0,0.339,4.966,0.003,17,19,,,,1.057,11.0,13.436,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,off,LIFO,3,15.956,27,19,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1214.5,0.433,5.586,0.003,19,19,,,,1.461,11.862,14.874,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,off,LIFO,4,16.763,163,19,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1216.0,0.399,6.651,0.003,19,19,,,,1.277,12.841,15.67,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,off,random,0,15.47,36,19,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1203.9,0.408,5.241,0.003,19,19,,,,1.408,11.462,14.394,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,off,random,1,15.185,24,18,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1207.1,0.365,5.157,0.003,18,19,,,,1.171,11.384,14.034,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,off,random,2,15.482,23,17,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1196.2,0.346,5.147,0.003,17,19,,,,1.068,11.396,13.844,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,off,random,3,17.52,27,19,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1187.1,0.409,6.347,0.003,19,18,,,,1.44,13.413,16.351,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,off,random,4,17.665,153,19,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1194.5,0.388,7.36,0.003,19,19,,,,1.269,13.951,16.693,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,off,FIFO,0,17.42,68,31,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1193.7,0.412,6.533,0.003,31,26,,,,1.483,13.089,16.174,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,off,FIFO,1,25.338,698,22,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1240.1,0.398,14.785,0.003,22,24,,,,1.282,21.281,24.116,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,off,FIFO,2,19.578,130,24,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1199.7,0.508,7.693,0.003,24,24,,,,1.966,14.549,18.36,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,off,FIFO,3,18.027,118,27,False,invalid,Track 906a is reserved,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1204.0,0.408,6.884,0.003,27,25,,,,1.457,13.592,16.683,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,off,FIFO,4,16.886,42,21,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1202.3,0.358,6.364,0.003,21,24,,,,1.138,12.917,15.744,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,off,LIFO,0,16.271,63,27,False,invalid,Track 906a is reserved,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1217.1,0.414,5.751,0.003,27,25,,,,1.493,11.989,15.061,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,off,LIFO,1,23.131,699,22,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1274.0,0.398,13.116,0.003,22,24,,,,1.299,19.291,22.077,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,off,LIFO,2,17.864,130,24,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1222.9,0.512,6.78,0.003,24,24,,,,2.007,12.993,16.643,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,off,LIFO,3,16.64,120,27,False,invalid,Track 906a is reserved,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1210.4,0.41,6.014,0.003,27,25,,,,1.497,12.202,15.196,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,off,LIFO,4,17.049,33,21,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1196.6,0.358,6.256,0.003,21,24,,,,1.13,13.17,15.692,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,off,random,0,16.704,65,27,False,invalid,Track 906a is reserved,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1192.7,0.414,6.374,0.003,27,25,,,,1.446,12.838,15.738,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,off,random,1,24.825,696,22,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1235.6,0.399,14.447,0.019,22,24,,,,1.294,20.931,23.687,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,off,random,2,24.144,401,42,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1212.7,0.528,12.541,0.012,42,33,,,,2.173,19.201,23.029,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,off,random,3,17.771,152,35,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1192.4,0.415,7.127,0.003,35,27,,,,1.538,13.687,16.711,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,off,random,4,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,4480.2,0.364,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,off,FIFO,0,1800.015,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,5324.3,0.413,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,off,FIFO,1,1800.015,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,4754.1,0.699,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,off,FIFO,2,35.173,1447,28,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1253.3,0.551,24.868,0.003,28,29,,,,2.081,30.635,34.253,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,off,FIFO,3,18.228,202,31,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1235.2,0.427,7.365,0.003,31,30,,,,1.602,13.665,16.861,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,off,FIFO,4,20.298,412,47,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1224.9,0.434,9.274,0.003,47,34,,,,1.729,15.535,18.929,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,off,LIFO,0,1800.015,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,5215.1,0.417,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,off,LIFO,1,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,4993.4,0.709,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,off,LIFO,2,36.172,1440,28,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1258.0,0.539,24.707,0.003,28,29,,,,2.09,30.967,34.832,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,off,LIFO,3,20.059,319,35,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1215.5,0.43,8.535,0.003,35,31,,,,1.612,14.766,17.846,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,off,LIFO,4,31.735,1562,35,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1260.5,0.432,20.936,0.003,35,31,,,,1.632,27.207,30.496,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,off,random,0,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,5382.6,0.413,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,off,random,1,1800.015,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3026.9,0.666,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,off,random,2,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,5034.6,0.542,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,off,random,3,1800.014,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,5004.8,0.425,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,off,random,4,51.12,2791,43,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1217.9,0.428,39.613,0.003,43,33,,,,1.697,46.415,49.933,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,off,FIFO,0,1800.015,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5298.4,0.795,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,off,FIFO,1,19.807,239,36,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1221.8,0.599,8.466,0.004,36,34,,,,2.641,14.645,18.942,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,off,FIFO,2,30.329,973,41,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1266.4,0.541,19.695,0.003,41,35,,,,2.148,25.806,29.537,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,off,FIFO,3,28.321,859,47,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1276.5,0.579,17.148,0.093,47,37,,,,2.415,23.355,27.483,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,off,FIFO,4,19.757,371,33,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1228.5,0.409,9.843,0.003,33,34,,,,1.517,16.005,18.974,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,off,LIFO,0,25.672,375,40,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1239.5,0.744,13.207,0.003,40,34,,,,3.545,19.4,24.734,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,off,LIFO,1,21.023,328,42,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1257.8,0.606,9.607,0.003,42,34,,,,2.729,15.736,20.119,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,off,LIFO,2,17.566,128,35,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1220.9,0.535,6.937,0.003,35,34,,,,2.06,13.045,16.683,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,off,LIFO,3,21.762,462,47,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1226.8,0.551,10.752,0.092,47,37,,,,2.367,16.909,20.965,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,off,LIFO,4,38.084,1678,39,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1321.4,0.429,28.153,0.003,39,35,,,,1.557,34.298,37.327,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,off,random,0,1800.013,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5386.4,0.773,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,off,random,1,1800.015,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5186.3,0.606,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,off,random,2,1800.013,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,6083.9,0.534,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,off,random,3,1800.013,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5396.8,0.603,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,off,random,4,1800.012,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5869.4,0.46,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,off,FIFO,0,1800.014,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,3438.3,0.636,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,off,FIFO,1,1800.013,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5397.0,0.527,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,off,FIFO,2,18.913,171,51,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1221.1,0.62,7.482,0.003,51,42,,,,2.709,13.665,18.038,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,off,FIFO,3,68.584,3549,48,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1459.7,0.591,57.603,0.004,48,42,,,,2.314,63.781,67.728,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,off,FIFO,4,1800.012,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5592.9,0.554,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,off,LIFO,0,1800.015,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2753.9,0.64,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,off,LIFO,1,1800.009,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5221.0,0.528,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,off,LIFO,2,22.273,347,59,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1232.5,0.572,10.291,0.003,59,44,,,,2.809,16.576,20.976,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,off,LIFO,3,77.484,4023,54,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1478.4,0.58,65.603,0.093,54,43,,,,2.374,71.917,76.245,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,off,LIFO,4,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5682.1,0.552,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,off,random,0,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,3820.5,0.63,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,off,random,1,1800.018,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,3139.9,0.543,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,off,random,2,1800.014,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,6406.5,0.625,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,off,random,3,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5201.6,0.584,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,off,random,4,1800.016,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5315.8,0.556,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,off,FIFO,0,1079.055,47164,44,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,4902.2,0.657,1064.903,0.004,44,44,,,,2.676,1072.236,1077.626,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,off,FIFO,1,134.659,5142,64,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1465.0,0.807,119.63,0.003,64,49,,,,3.727,126.618,133.206,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,off,FIFO,2,22.484,157,42,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1231.1,0.618,8.799,0.003,42,44,,,,2.346,15.986,21.006,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,off,FIFO,3,30.415,660,54,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1252.4,0.619,16.579,0.003,54,47,,,,2.537,23.765,28.977,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,off,FIFO,4,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,4311.7,0.757,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,off,LIFO,0,1079.296,47181,46,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,4987.3,0.649,1065.222,0.004,46,45,,,,2.724,1072.457,1077.887,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,off,LIFO,1,1800.011,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,4897.4,0.792,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,off,LIFO,2,22.937,183,42,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1216.6,0.57,10.284,0.003,42,44,,,,2.502,17.885,21.997,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,off,LIFO,3,34.675,740,54,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1215.4,0.6,21.395,0.007,54,47,,,,2.84,29.167,33.689,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,off,LIFO,4,1800.009,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,3341.0,0.829,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,off,random,0,1800.01,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,3871.0,0.707,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,off,random,1,1800.011,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5171.9,0.802,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,off,random,2,1800.011,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5401.3,0.588,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,off,random,3,1800.012,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5332.9,0.65,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,off,random,4,1800.013,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,4951.8,0.725,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,off,FIFO,0,77.552,2380,62,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1425.0,0.746,65.291,0.004,62,51,,,,3.252,71.549,76.57,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,off,FIFO,1,1800.014,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5645.8,0.643,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,off,FIFO,2,1800.012,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,7028.5,0.689,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,off,FIFO,3,1800.014,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5216.4,0.93,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,off,FIFO,4,1045.577,37411,47,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,5312.4,0.534,1034.679,0.005,47,46,,,,2.042,1041.056,1044.653,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,off,LIFO,0,1800.009,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5973.9,0.768,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,off,LIFO,1,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5265.4,0.711,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,off,LIFO,2,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5512.4,0.735,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,off,LIFO,3,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,4122.5,0.973,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,off,LIFO,4,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,4939.9,0.564,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,off,random,0,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5028.0,0.755,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,off,random,1,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5084.2,0.719,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,off,random,2,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,4786.2,0.722,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,off,random,3,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,4871.3,0.928,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,off,random,4,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5529.3,0.584,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,1,on,FIFO,0,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+enhsp,1,on,FIFO,1,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+enhsp,1,on,FIFO,2,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+enhsp,1,on,FIFO,3,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+enhsp,1,on,FIFO,4,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+enhsp,1,on,LIFO,0,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+enhsp,1,on,LIFO,1,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+enhsp,1,on,LIFO,2,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+enhsp,1,on,LIFO,3,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+enhsp,1,on,LIFO,4,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+enhsp,1,on,random,0,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+enhsp,1,on,random,1,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+enhsp,1,on,random,2,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+enhsp,1,on,random,3,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+enhsp,1,on,random,4,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+enhsp,2,on,FIFO,0,10.664,135,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1841.7,0.336,0.779,0.002,10,11,,,,0.903,7.695,9.949,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,on,FIFO,1,8.995,11,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1804.4,0.315,0.21,0.002,9,11,,,,0.864,6.091,8.283,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,on,FIFO,2,13.216,4203,16,False,invalid,"Error in generating action (BeginMove: [0, 1]): The action is invalid. Shunting unit with trains 0-1 not found",False,0,True,COMPLETED,daic-eemcs-st,gpu52,1830.3,0.333,3.473,0.002,16,13,,,,0.949,10.2,12.497,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,on,FIFO,3,12.677,26,11,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1914.8,0.348,0.772,0.004,11,11,,,,0.98,9.622,11.964,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,on,FIFO,4,8.902,10,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1823.3,0.317,0.184,0.002,9,11,,,,0.867,5.995,8.189,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,on,LIFO,0,20.512,5455,12,False,invalid,"Error in generating action (BeginMove: [0, 1]): The action is invalid. Shunting unit with trains 0-1 not found",False,0,True,COMPLETED,daic-eemcs-st,gpu52,1838.7,0.336,10.682,0.002,12,12,,,,0.945,17.477,19.768,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,on,LIFO,1,8.962,10,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1829.2,0.318,0.206,0.002,9,11,,,,0.869,6.031,8.231,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,on,LIFO,2,10.098,72,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1830.3,0.331,0.404,0.002,10,11,,,,0.906,7.122,9.367,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,on,LIFO,3,12.054,75,11,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1896.7,0.346,0.927,0.003,11,11,,,,0.971,9.028,11.353,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,on,LIFO,4,8.993,11,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1817.7,0.319,0.21,0.002,9,11,,,,0.865,6.063,8.261,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,on,random,0,10.711,136,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1844.5,0.33,0.857,0.002,10,11,,,,0.893,7.756,9.993,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,on,random,1,8.755,10,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1814.9,0.323,0.223,0.002,9,11,,,,0.864,5.837,8.036,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,on,random,2,13.022,4203,16,False,invalid,"Error in generating action (BeginMove: [0, 1]): The action is invalid. Shunting unit with trains 0-1 not found",False,0,True,COMPLETED,daic-eemcs-st,gpu52,1830.6,0.33,3.383,0.002,16,13,,,,0.942,10.041,12.325,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,on,random,3,12.179,26,11,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1912.9,0.354,0.705,0.003,11,11,,,,0.982,9.113,11.463,ghcr.io/robust-rail-nl/planner:edge
+enhsp,2,on,random,4,8.95,11,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1817.2,0.318,0.199,0.002,9,11,,,,0.876,6.027,8.234,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,on,FIFO,0,11.56,17,14,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1839.2,0.345,0.576,0.096,14,16,,,,1.029,8.156,10.679,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,on,FIFO,1,12.295,18,14,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1838.4,1.186,0.607,0.098,14,16,,,,1.037,8.051,11.437,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,on,FIFO,2,18.924,443,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,2045.4,0.393,3.771,0.002,16,16,,,,1.318,15.295,18.072,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,on,FIFO,3,20.539,982,20,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,2033.8,0.393,5.776,0.003,20,17,,,,1.271,17.087,19.775,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,on,FIFO,4,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2312.0,0.36,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,on,LIFO,0,11.498,17,14,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1837.8,0.345,0.574,0.097,14,16,,,,1.019,8.1,10.63,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,on,LIFO,1,11.447,16,14,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1835.5,0.345,0.521,0.002,14,16,,,,1.063,8.252,10.683,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,on,LIFO,2,20.093,667,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,2041.2,0.385,4.901,0.004,16,16,,,,1.385,16.355,19.201,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,on,LIFO,3,18.475,499,20,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,2044.2,0.363,3.82,0.003,20,17,,,,1.248,15.141,17.752,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,on,LIFO,4,55.589,13674,19,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1959.0,0.358,42.855,0.003,19,17,,,,1.144,52.327,54.844,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,on,random,0,14.111,230,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1963.6,0.366,1.468,0.003,15,16,,,,1.136,10.885,13.402,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,on,random,1,41.165,6844,34,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1875.0,0.344,30.225,0.003,34,18,,,,1.123,37.97,40.45,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,on,random,2,917.471,,,,crash,,False,1,False,COMPLETED,daic-eemcs-st,gpu47,2011.9,0.366,905.977,,,,,,,,915.379,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,on,random,3,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2135.6,0.348,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,3,on,random,4,11.497,1035,26,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1741.4,0.322,4.454,0.002,26,17,,,,0.978,8.492,10.804,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,on,FIFO,0,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3145.5,0.466,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,on,FIFO,1,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2740.6,0.412,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,on,FIFO,2,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2539.0,0.433,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,on,FIFO,3,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,3194.9,0.467,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,on,FIFO,4,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2340.6,0.35,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,on,LIFO,0,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,3069.6,0.43,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,on,LIFO,1,1800.024,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2762.7,0.411,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,on,LIFO,2,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2599.5,0.43,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,on,LIFO,3,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,3206.1,0.467,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,on,LIFO,4,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2336.2,0.349,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,on,random,0,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,3171.0,0.463,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,on,random,1,506.249,21634,33,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,2574.0,0.463,484.558,0.004,33,24,,,,1.744,502.073,505.328,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,on,random,2,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2771.8,0.425,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,on,random,3,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,3177.7,0.464,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,4,on,random,4,76.647,21752,22,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1895.7,0.354,64.997,0.003,22,22,,,,1.19,73.113,75.71,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,on,FIFO,0,1800.027,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2534.0,0.407,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,on,FIFO,1,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2771.7,0.453,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,on,FIFO,2,1800.025,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2715.0,0.474,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,on,FIFO,3,1800.025,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2465.0,0.451,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,on,FIFO,4,1800.026,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2433.7,0.452,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,on,LIFO,0,1800.014,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2531.0,0.401,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,on,LIFO,1,1800.028,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2748.1,0.393,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,on,LIFO,2,1800.028,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2710.6,0.432,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,on,LIFO,3,1800.027,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2496.7,0.433,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,on,LIFO,4,1800.028,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2483.9,0.416,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,on,random,0,1800.026,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2322.4,0.349,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,on,random,1,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2707.0,0.402,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,on,random,2,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2707.1,0.458,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,on,random,3,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2524.0,0.439,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,5,on,random,4,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2589.4,0.369,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,on,FIFO,0,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2893.2,0.443,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,on,FIFO,1,1800.024,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,4513.8,0.556,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,on,FIFO,2,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2914.1,0.477,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,on,FIFO,3,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,6946.8,0.623,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,on,FIFO,4,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2984.0,0.475,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,on,LIFO,0,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2880.1,0.453,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,on,LIFO,1,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,4389.6,0.565,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,on,LIFO,2,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2774.1,0.48,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,on,LIFO,3,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,6826.4,0.634,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,on,LIFO,4,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2948.2,0.483,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,on,random,0,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3014.8,0.389,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,on,random,1,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3389.0,0.46,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,on,random,2,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,2221.6,0.443,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,on,random,3,1800.024,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,6351.6,0.647,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,6,on,random,4,1800.025,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2947.8,0.481,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,on,FIFO,0,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,9087.3,0.699,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,on,FIFO,1,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,9420.0,0.734,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,on,FIFO,2,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2872.4,0.542,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,on,FIFO,3,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,6418.0,0.638,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,on,FIFO,4,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,11312.9,0.758,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,on,LIFO,0,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,9230.3,0.706,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,on,LIFO,1,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,8572.2,0.729,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,on,LIFO,2,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,2890.0,0.545,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,on,LIFO,3,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6570.4,0.633,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,on,LIFO,4,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,11356.0,0.768,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,on,random,0,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,3765.0,0.52,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,on,random,1,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,6422.5,0.656,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,on,random,2,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5054.1,0.637,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,on,random,3,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,7027.0,0.648,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,7,on,random,4,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,3078.4,0.467,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,on,FIFO,0,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,10294.1,0.704,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,on,FIFO,1,1800.018,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,10490.2,0.751,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,on,FIFO,2,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,3391.8,0.514,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,on,FIFO,3,1800.016,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5940.6,0.634,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,on,FIFO,4,1800.018,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,3171.8,0.493,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,on,LIFO,0,1800.016,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,10266.9,0.706,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,on,LIFO,1,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,10033.9,0.749,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,on,LIFO,2,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,3414.9,0.51,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,on,LIFO,3,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5929.5,0.658,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,on,LIFO,4,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,3193.8,0.495,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,on,random,0,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,10793.0,0.71,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,on,random,1,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,3693.2,0.582,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,on,random,2,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5108.3,0.591,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,on,random,3,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5192.3,0.654,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,8,on,random,4,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,6163.3,0.642,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,on,FIFO,0,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,4633.8,0.643,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,on,FIFO,1,1800.024,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,14002.0,0.887,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,on,FIFO,2,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,19801.8,1.024,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,on,FIFO,3,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,9161.8,0.709,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,on,FIFO,4,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,18768.1,0.985,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,on,LIFO,0,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,4712.8,0.633,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,on,LIFO,1,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,15756.2,0.887,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,on,LIFO,2,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,19789.7,1.036,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,on,LIFO,3,1800.014,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,8083.3,0.71,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,on,LIFO,4,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,18803.6,0.928,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,on,random,0,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,4728.3,0.637,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,on,random,1,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,17127.0,0.853,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,on,random,2,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5202.2,0.619,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,on,random,3,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,6692.3,0.675,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,9,on,random,4,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,19103.3,0.966,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,on,FIFO,0,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,10885.2,0.784,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,on,FIFO,1,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,7724.2,0.697,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,on,FIFO,2,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,7286.9,0.727,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,on,FIFO,3,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,19065.4,0.961,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,on,FIFO,4,1800.015,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,3228.2,0.54,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,on,LIFO,0,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,10344.5,0.772,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,on,LIFO,1,1800.015,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,6664.6,0.698,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,on,LIFO,2,1800.015,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,7149.0,0.718,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,on,LIFO,3,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,18669.1,0.958,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,on,LIFO,4,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,3206.4,0.537,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,on,random,0,1800.018,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,13023.9,0.773,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,on,random,1,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,7955.6,0.724,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,on,random,2,1800.018,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,9418.3,0.746,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,on,random,3,1800.015,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,18362.8,0.968,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+enhsp,10,on,random,4,1800.024,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,4052.6,0.576,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+solver,1,on,FIFO,0,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+solver,1,on,FIFO,1,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+solver,1,on,FIFO,2,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+solver,1,on,FIFO,3,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+solver,1,on,FIFO,4,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+solver,1,on,LIFO,0,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+solver,1,on,LIFO,1,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+solver,1,on,LIFO,2,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+solver,1,on,LIFO,3,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+solver,1,on,LIFO,4,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+solver,1,on,random,0,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+solver,1,on,random,1,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+solver,1,on,random,2,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+solver,1,on,random,3,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+solver,1,on,random,4,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+solver,2,on,FIFO,0,1.291,,11,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,166.4,,,,,11,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,on,FIFO,1,1.124,,12,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,166.5,,,,,12,2,0.61,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,on,FIFO,2,1.078,,12,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,173.2,,,,,12,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,on,FIFO,3,1.877,,13,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,197.4,,,,,13,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,on,FIFO,4,1.195,,12,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,171.2,,,,,12,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,on,LIFO,0,1.076,,13,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,170.5,,,,,13,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,on,LIFO,1,1.434,,12,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,167.1,,,,,12,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,on,LIFO,2,1.128,,12,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,170.9,,,,,12,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,on,LIFO,3,1.942,,11,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,199.0,,,,,11,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,on,LIFO,4,1.234,,13,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,172.1,,,,,13,1,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,on,random,0,1801.544,,21,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,215.3,,,,,21,250253804,0.00,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,on,random,1,1.242,,12,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,169.4,,,,,12,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,on,random,2,1.53,,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,167.0,,,,,16,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,on,random,3,2.899,,20,False,invalid,Error in generating action (Wait: [0]): The action is invalid. The ShuntingUnit is already waiting,False,0,True,COMPLETED,daic-eemcs-st,gpu52,204.6,,,,,20,41,2.30,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,2,on,random,4,1.128,,13,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,172.3,,,,,13,1,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,on,FIFO,0,1.961,,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,192.7,,,,,16,12,1.33,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,on,FIFO,1,2.101,,17,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,192.9,,,,,17,2,1.46,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,on,FIFO,2,2.202,,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,196.8,,,,,16,7,1.57,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,on,FIFO,3,2.254,,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,194.1,,,,,16,5,1.62,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,on,FIFO,4,2.338,,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,196.1,,,,,16,18,1.70,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,on,LIFO,0,2.089,,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,193.5,,,,,16,12,1.45,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,on,LIFO,1,2.26,,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,193.4,,,,,16,2,1.59,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,on,LIFO,2,2.082,,17,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,198.2,,,,,17,20,1.50,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,on,LIFO,3,2.08,,17,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,197.4,,,,,17,17,1.51,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,on,LIFO,4,2.137,,17,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,194.7,,,,,17,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,on,random,0,2.131,,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,196.4,,,,,16,10,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,on,random,1,2.037,,19,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,193.7,,,,,19,2,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,on,random,2,1802.501,,25,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,225.3,,,,,25,184400851,3.33,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,on,random,3,1802.911,,29,False,invalid,"ShuntingUnit-ShuntingUnit-2 cannot leave Track 104a. One side is blocked by another train, the other side is a Bumper",False,0,True,COMPLETED,daic-eemcs-st,gpu52,219.0,,,,,29,207820859,3.77,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,3,on,random,4,1802.212,,21,False,invalid,Error in generating action (Combine: [3] and [2]): The action is invalid. The two shunting units are not facing the same direction,False,0,True,COMPLETED,daic-eemcs-st,gpu52,211.8,,,,,21,241404612,1.57,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,on,FIFO,0,1802.247,,24,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,220.6,,,,,24,218757161,1.55,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,on,FIFO,1,2.334,,28,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,202.0,,,,,28,18,1.71,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,on,FIFO,2,2.908,,25,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,207.7,,,,,25,190,2.08,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,on,FIFO,3,2.193,,26,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,201.2,,,,,26,22,1.59,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,on,FIFO,4,1.983,,23,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,201.8,,,,,23,3,1.35,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,on,LIFO,0,1802.342,,28,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,229.7,,,,,28,176240349,3.63,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,on,LIFO,1,2.399,,27,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,203.3,,,,,27,8,0.00,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,on,LIFO,2,2.15,,24,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,198.6,,,,,24,22,1.52,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,on,LIFO,3,3.245,,27,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,210.6,,,,,27,11987,2.57,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,on,LIFO,4,2.535,,26,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,203.2,,,,,26,232,1.88,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,on,random,0,1802.235,,32,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,213.4,,,,,32,198271844,1.80,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,on,random,1,1802.244,,37,False,invalid,ShuntingUnit-ShuntingUnit-1 cannot leave Track 53 at the A-side to Track Wissel960: blocked,False,0,True,COMPLETED,daic-eemcs-st,gpu52,216.7,,,,,37,180485678,1.76,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,on,random,2,1803.046,,36,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,253.6,,,,,36,179444941,3.33,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,on,random,3,1803.243,,37,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,245.9,,,,,37,139903256,4.34,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,4,on,random,4,1.937,,23,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,203.0,,,,,23,64,1.31,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,on,FIFO,0,1802.201,,38,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,243.7,,,,,38,170615040,5.93,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,on,FIFO,1,1802.031,,36,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,293.2,,,,,36,136753706,0.00,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,on,FIFO,2,1802.381,,35,False,invalid,Track 906a is reserved,False,0,True,COMPLETED,daic-eemcs-st,gpu52,232.4,,,,,35,141331136,2.71,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,on,FIFO,3,2.087,,30,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,200.8,,,,,30,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,on,FIFO,4,1802.263,,41,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,264.3,,,,,41,138649004,5.35,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,on,LIFO,0,1802.179,,33,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,247.8,,,,,33,165010537,1.58,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,on,LIFO,1,2.027,,30,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,199.9,,,,,30,223,1.41,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,on,LIFO,2,1802.392,,34,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,230.5,,,,,34,164081796,3.04,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,on,LIFO,3,2.297,,30,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,200.6,,,,,30,11,1.65,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,on,LIFO,4,1802.244,,34,False,invalid,"ShuntingUnit-ShuntingUnit-3 cannot leave Track 63. One side is blocked by another train, the other side is a Bumper",False,0,True,COMPLETED,daic-eemcs-st,gpu52,241.8,,,,,34,157748179,3.81,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,on,random,0,1802.188,,40,False,invalid,Error in generating action (Combine: [4] and [1]): The action is invalid. The two shunting units are not facing the same direction,False,0,True,COMPLETED,daic-eemcs-st,gpu52,222.1,,,,,40,174074146,2.01,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,on,random,1,1802.867,,49,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,258.6,,,,,49,134551775,3.31,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,on,random,2,1803.223,,53,False,invalid,ShuntingUnit-ShuntingUnit-4 cannot leave Track 104a. Both sides blocked,False,0,True,COMPLETED,daic-eemcs-st,gpu52,288.3,,,,,53,109873327,5.44,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,on,random,3,2.695,,40,False,invalid,Error in generating action (Wait: [4]): The action is invalid. The ShuntingUnit is already waiting,False,0,True,COMPLETED,daic-eemcs-st,gpu52,208.9,,,,,40,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,5,on,random,4,1805.252,,47,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,246.8,,,,,47,126130577,97.96,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,on,FIFO,0,3.502,,40,False,invalid,Adding ShuntingUnit-ShuntingUnit-2 to Track 63 exceeds the maximum length (384.100000 > 272.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu52,201.6,,,,,40,86,2.17,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,on,FIFO,1,1804.246,,40,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,303.2,,,,,40,116032992,3.22,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,on,FIFO,2,3.318,,48,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,200.8,,,,,48,5,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,on,FIFO,3,3.768,,39,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,202.5,,,,,39,2,2.37,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,on,FIFO,4,3.349,,38,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,201.8,,,,,38,1247,2.03,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,on,LIFO,0,3.453,,40,False,invalid,Adding ShuntingUnit-ShuntingUnit-2 to Track 63 exceeds the maximum length (384.100000 > 272.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu52,204.0,,,,,40,348,2.50,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,on,LIFO,1,1803.08,,42,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,264.3,,,,,42,129305623,2.78,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,on,LIFO,2,3.923,,40,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,208.3,,,,,40,0,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,on,LIFO,3,2.732,,41,False,invalid,Adding ShuntingUnit-ShuntingUnit-1 to Track 55 exceeds the maximum length (443.120000 > 357.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu52,196.5,,,,,41,236,2.10,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,on,LIFO,4,2.694,,43,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,202.3,,,,,43,759,1.98,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,on,random,0,1802.839,,46,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,232.4,,,,,46,151756502,2.10,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,on,random,1,1804.14,,50,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,244.2,,,,,50,113093214,3.77,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,on,random,2,1804.058,,57,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,245.2,,,,,57,109190824,8.28,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,on,random,3,5.457,,52,False,invalid,ShuntingUnit-ShuntingUnit-5 cannot leave Track 54 at the B-side to Track Wissel957: blocked,False,0,True,COMPLETED,daic-eemcs-st,gpu52,224.8,,,,,52,18026,4.67,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,6,on,random,4,1804.513,,70,False,invalid,"Error in generating action (Wait: [3, 4]): The action is invalid. The shunting unit ShuntingUnit-2 is already active. Active Actions: Service task Monteur to train (0, SLT-6) of ShuntingUnit-2 at facility Facility 74",False,0,True,COMPLETED,daic-eemcs-st,gpu52,303.8,,,,,70,87733957,8.28,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,on,FIFO,0,1803.001,,54,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,365.6,,,,,54,115053632,4.32,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,on,FIFO,1,1802.801,,52,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,278.7,,,,,52,108306401,6.47,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,on,FIFO,2,1803.143,,53,False,invalid,"ShuntingUnit-ShuntingUnit-4 cannot leave Track 63. One side is blocked by another train, the other side is a Bumper",False,0,True,COMPLETED,daic-eemcs-st,gpu47,314.3,,,,,53,97213350,9.61,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,on,FIFO,3,1803.255,,46,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,586.3,,,,,46,107523619,2.50,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,on,FIFO,4,1803.02,,56,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,389.0,,,,,56,108263793,9.35,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,on,LIFO,0,1803.179,,57,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,526.9,,,,,57,114134563,2.36,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,on,LIFO,1,1802.849,,49,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,479.1,,,,,49,97300001,2.56,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,on,LIFO,2,1803.207,,51,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,434.2,,,,,51,101975626,8.77,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,on,LIFO,3,2.587,,47,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu49,203.1,,,,,47,273,1.85,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,on,LIFO,4,1803.449,,47,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,254.5,,,,,47,127393771,8.51,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,on,random,0,1803.854,,72,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,306.2,,,,,72,88039931,757.20,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,on,random,1,1805.235,,78,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,359.1,,,,,78,92875588,17.47,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,on,random,2,3.374,,72,False,invalid,"Error in generating action (BeginMove: [5, 4]): The action is invalid. The shunting unit ShuntingUnit-6 is already active. Active Actions: Setback ShuntingUnit-6",False,0,True,COMPLETED,daic-eemcs-st,gpu51,210.1,,,,,72,5189,2.92,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,on,random,3,1805.863,,94,False,invalid,"ShuntingUnit-ShuntingUnit-6 cannot leave Track 104a. One side is blocked by another train, the other side is a Bumper",False,0,True,COMPLETED,daic-eemcs-st,gpu51,330.2,,,,,94,64422993,10.30,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,7,on,random,4,1803.665,,67,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,402.4,,,,,67,79308486,9.15,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,on,FIFO,0,1807.843,,61,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,545.4,,,,,61,101267590,9.20,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,on,FIFO,1,3.952,,65,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu51,211.6,,,,,65,7,3.11,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,on,FIFO,2,1802.589,,73,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,829.2,,,,,73,83246814,9.31,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,on,FIFO,3,1803.633,,65,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1038.5,,,,,65,85863751,3.69,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,on,FIFO,4,3.131,,52,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu51,213.7,,,,,52,972,2.67,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,on,LIFO,0,1803.352,,58,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,445.6,,,,,58,87305439,11.43,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,on,LIFO,1,3.928,,69,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,210.7,,,,,69,10,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,on,LIFO,2,1802.696,,61,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,398.2,,,,,61,92051215,7.21,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,on,LIFO,3,1803.971,,66,False,invalid,Adding ShuntingUnit-ShuntingUnit-3 to Track 104a exceeds the maximum length (646.980000 > 475.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu47,1257.9,,,,,66,84910882,4.12,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,on,LIFO,4,2.372,,65,False,invalid,Adding ShuntingUnit-ShuntingUnit-2 to Track 58 exceeds the maximum length (214.200000 > 203.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu49,208.4,,,,,65,616,1.83,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,on,random,0,1804.861,,73,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,622.1,,,,,73,88169465,17.48,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,on,random,1,1803.322,,63,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,868.2,,,,,63,84730349,7.73,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,on,random,2,1804.34,,70,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,399.1,,,,,70,87131170,16.77,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,on,random,3,1807.045,,86,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,440.2,,,,,86,65210419,10.49,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,8,on,random,4,10.939,,74,False,invalid,Error in generating action (Wait: [3]): The action is invalid. The ShuntingUnit is already waiting,False,0,True,COMPLETED,daic-eemcs-st,gpu47,306.8,,,,,74,60281,10.45,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,on,FIFO,0,1805.96,,71,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,754.7,,,,,71,70779209,14.01,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,on,FIFO,1,2.772,,69,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu49,207.1,,,,,69,14,0.00,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,on,FIFO,2,1803.563,,65,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,465.9,,,,,65,83918268,6.09,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,on,FIFO,3,1803.404,,64,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,962.4,,,,,64,76952031,5.97,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,on,FIFO,4,1804.203,,67,False,invalid,Adding ShuntingUnit-ShuntingUnit-3 to Track 62 exceeds the maximum length (270.620000 > 247.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu49,829.1,,,,,67,78914031,11.67,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,on,LIFO,0,1804.042,,68,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,411.4,,,,,68,79622581,10.71,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,on,LIFO,1,4.766,,69,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu51,219.1,,,,,69,4610,3.71,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,on,LIFO,2,1804.4,,64,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,715.4,,,,,64,83572180,9.95,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,on,LIFO,3,5.717,,65,False,invalid,Adding ShuntingUnit-ShuntingUnit-7 to Track 61 exceeds the maximum length (364.600000 > 247.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu51,226.2,,,,,65,12159,4.79,true,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,on,LIFO,4,1804.834,,64,False,invalid,Adding ShuntingUnit-ShuntingUnit-3 to Track 62 exceeds the maximum length (270.620000 > 247.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu51,1598.4,,,,,64,66679693,4.32,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,on,random,0,1805.697,,77,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,439.1,,,,,77,71969763,20.82,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,on,random,1,1806.041,,99,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,800.3,,,,,99,59021362,128.94,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,on,random,2,1807.288,,84,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,579.3,,,,,84,71298580,20.43,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,on,random,3,1807.403,,106,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,502.1,,,,,106,62548000,24.08,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,9,on,random,4,1807.057,,89,False,invalid,"Error in generating action (Wait: [13, 14]): The action is invalid. The shunting unit ShuntingUnit-8 is already active. Active Actions: Move ShuntingUnit-8 to 52 (route: 906a - Wissel963 - 961_963 - Wissel961 - 52)",False,0,True,COMPLETED,daic-eemcs-st,gpu51,378.1,,,,,89,70877554,8.96,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,on,FIFO,0,1804.579,,85,False,invalid,"Track 56, id 5 is occupied",False,0,True,COMPLETED,daic-eemcs-st,gpu51,1684.9,,,,,85,50091370,8.64,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,on,FIFO,1,1804.272,,81,False,invalid,"Track 52, id 1 is occupied",False,0,True,COMPLETED,daic-eemcs-st,gpu51,2208.9,,,,,81,56524761,171.65,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,on,FIFO,2,1804.552,,79,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1007.4,,,,,79,71539122,13.91,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,on,FIFO,3,1805.703,,75,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,457.4,,,,,75,79809494,20.29,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,on,FIFO,4,1804.106,,77,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu51,548.6,,,,,77,69474648,9.62,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,on,LIFO,0,1806.622,,81,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1192.6,,,,,81,71333841,15.32,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,on,LIFO,1,1804.628,,71,False,invalid,Adding ShuntingUnit-ShuntingUnit-0 to Track 62 exceeds the maximum length (324.120000 > 247.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu51,2180.2,,,,,71,63767444,8.66,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,on,LIFO,2,1804.279,,82,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,795.9,,,,,82,72394809,9.26,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,on,LIFO,3,1804.751,,77,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,729.3,,,,,77,78770568,9.56,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,on,LIFO,4,1803.961,,74,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,1790.5,,,,,74,58428484,8.08,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,on,random,0,1806.632,,125,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,483.6,,,,,125,56448998,18.99,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,on,random,1,1804.29,,96,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,527.8,,,,,96,69538469,18.45,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,on,random,2,1804.118,,101,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,578.0,,,,,101,59968016,38.13,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,on,random,3,1803.417,,87,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,465.1,,,,,87,68962013,11.34,false,,,,ghcr.io/robust-rail-nl/hip:edge
+solver,10,on,random,4,1804.182,,95,False,invalid,Adding ShuntingUnit-ShuntingUnit-2 to Track 63 exceeds the maximum length (432.680000 > 272.000000),False,0,True,COMPLETED,daic-eemcs-st,gpu49,470.0,,,,,95,60938803,19.67,false,,,,ghcr.io/robust-rail-nl/hip:edge
+symbolic-rail,1,on,FIFO,0,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+symbolic-rail,1,on,FIFO,1,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+symbolic-rail,1,on,FIFO,2,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+symbolic-rail,1,on,FIFO,3,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+symbolic-rail,1,on,FIFO,4,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+symbolic-rail,1,on,LIFO,0,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+symbolic-rail,1,on,LIFO,1,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+symbolic-rail,1,on,LIFO,2,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+symbolic-rail,1,on,LIFO,3,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+symbolic-rail,1,on,LIFO,4,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+symbolic-rail,1,on,random,0,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+symbolic-rail,1,on,random,1,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+symbolic-rail,1,on,random,2,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+symbolic-rail,1,on,random,3,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+symbolic-rail,1,on,random,4,,,,,no_result,,,,,,,,,,,,,,,,,,,,
+symbolic-rail,2,on,FIFO,0,15.211,53,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1214.5,0.333,5.754,0.002,10,11,,,,0.926,11.888,14.17,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,on,FIFO,1,15.41,88,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1251.1,0.319,6.054,0.002,9,11,,,,0.871,12.183,14.396,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,on,FIFO,2,14.804,17,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1200.7,0.332,5.24,0.002,10,11,,,,0.946,11.398,13.743,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,on,FIFO,3,15.009,17,11,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1213.9,0.35,5.404,0.003,11,11,,,,1.012,11.535,13.92,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,on,FIFO,4,14.853,46,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1247.4,0.319,5.523,0.002,9,11,,,,0.877,11.632,13.844,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,on,LIFO,0,15.152,48,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1229.0,0.333,5.69,0.002,10,11,,,,0.924,11.799,14.083,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,on,LIFO,1,15.062,49,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1250.7,0.313,5.601,0.002,9,11,,,,0.889,11.705,13.937,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,on,LIFO,2,15.153,23,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1207.2,0.319,5.553,0.002,10,11,,,,0.968,11.957,14.309,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,on,LIFO,3,14.249,16,11,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1210.7,0.351,5.102,0.003,11,11,,,,0.93,11.229,13.556,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,on,LIFO,4,15.664,95,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1292.3,0.319,6.096,0.002,9,11,,,,0.926,12.397,14.708,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,on,random,0,15.506,53,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1205.1,0.336,5.896,0.002,10,11,,,,0.972,12.21,14.579,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,on,random,1,13.998,49,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1219.0,0.309,5.175,0.002,9,11,,,,0.856,11.084,13.256,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,on,random,2,13.9,17,10,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1208.8,0.318,4.915,0.002,10,11,,,,0.911,10.868,13.102,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,on,random,3,14.251,17,11,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1203.4,0.339,5.16,0.003,11,11,,,,0.982,11.158,13.488,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,2,on,random,4,14.697,95,9,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1211.0,0.319,5.828,0.002,9,11,,,,0.85,11.759,13.934,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,on,FIFO,0,15.957,31,14,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1207.2,0.34,5.766,0.093,14,16,,,,1.009,12.111,14.707,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,on,FIFO,1,15.807,24,14,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1208.4,0.323,5.752,0.092,14,16,,,,1.024,12.07,14.545,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,on,FIFO,2,16.318,28,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1226.9,0.383,5.891,0.002,16,16,,,,1.323,12.214,14.958,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,on,FIFO,3,15.79,26,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1222.3,0.391,5.544,0.002,16,16,,,,1.24,11.67,14.429,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,on,FIFO,4,15.963,71,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1214.9,0.364,6.072,0.002,15,16,,,,1.136,12.193,14.803,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,on,LIFO,0,15.262,31,14,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1212.8,0.345,5.595,0.077,14,16,,,,0.981,11.746,14.171,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,on,LIFO,1,15.412,35,14,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1232.0,0.341,5.643,0.002,14,16,,,,1.041,11.778,14.267,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,on,LIFO,2,15.476,28,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1213.2,0.385,5.388,0.002,16,16,,,,1.246,11.526,14.362,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,on,LIFO,3,15.733,24,16,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1213.6,0.391,5.545,0.002,16,16,,,,1.246,11.684,14.42,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,on,LIFO,4,15.965,79,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1214.8,0.362,6.129,0.002,15,16,,,,1.144,12.24,14.762,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,on,random,0,15.908,24,15,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1209.9,0.358,5.869,0.002,15,16,,,,1.201,12.229,14.84,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,on,random,1,318.075,22674,24,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1592.6,0.349,308.182,0.003,24,17,,,,1.129,314.516,317.041,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,on,random,2,1800.016,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5360.4,0.364,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,on,random,3,1800.016,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,6435.3,0.354,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,3,on,random,4,1800.016,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5184.6,0.263,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,on,FIFO,0,64.678,2410,31,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1307.4,0.466,54.273,0.003,31,22,,,,1.738,60.51,63.764,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,on,FIFO,1,17.157,109,21,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1219.6,0.409,7.207,0.003,21,21,,,,1.414,13.421,16.289,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,on,FIFO,2,18.773,160,20,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1180.7,0.447,7.581,0.003,20,21,,,,1.647,14.526,17.774,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,on,FIFO,3,18.757,51,21,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1196.2,0.474,7.122,0.003,21,21,,,,1.857,14.309,17.761,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,on,FIFO,4,16.558,62,18,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1187.4,0.347,6.454,0.003,18,21,,,,1.137,13.252,15.767,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,on,LIFO,0,669.508,26634,27,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,2066.4,0.464,658.807,0.004,27,21,,,,1.645,665.593,668.723,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,on,LIFO,1,16.816,90,21,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1215.8,0.412,6.821,0.003,21,21,,,,1.401,13.035,15.887,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,on,LIFO,2,17.66,170,20,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1221.6,0.437,7.533,0.003,20,21,,,,1.486,13.798,16.769,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,on,LIFO,3,16.807,53,21,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1235.4,0.463,6.511,0.003,21,21,,,,1.628,12.764,15.902,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,on,LIFO,4,15.654,56,18,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu52,1210.8,0.351,6.043,0.003,18,21,,,,1.144,12.267,14.81,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,on,random,0,1800.011,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,4849.9,0.459,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,on,random,1,15.802,39,21,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1172.6,0.45,5.747,0.003,21,21,,,,1.551,12.045,15.063,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,on,random,2,1800.01,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,4928.1,0.43,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,on,random,3,17.476,53,21,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1220.0,0.466,6.565,0.002,21,21,,,,1.667,12.931,16.306,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,4,on,random,4,16.506,75,18,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1210.5,0.348,6.388,0.002,18,21,,,,1.184,12.696,15.261,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,on,FIFO,0,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,4805.6,0.429,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,on,FIFO,1,61.605,2251,30,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1509.5,0.458,49.164,0.003,30,27,,,,1.497,56.128,60.195,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,on,FIFO,2,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,4925.8,0.464,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,on,FIFO,3,1800.018,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5011.4,0.452,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,on,FIFO,4,107.07,7840,45,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1679.4,0.451,94.737,0.003,45,30,,,,1.495,101.66,105.718,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,on,LIFO,0,1800.012,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,7064.1,0.4,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,on,LIFO,1,192.094,9266,30,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,2404.7,0.426,181.853,0.003,30,27,,,,1.556,188.118,191.151,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,on,LIFO,2,1800.011,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,4838.0,0.438,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,on,LIFO,3,1800.012,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5548.8,0.438,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,on,LIFO,4,18.208,378,41,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1230.9,0.414,8.656,0.003,41,29,,,,1.453,14.597,17.482,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,on,random,0,1800.013,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5356.0,0.35,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,on,random,1,1800.011,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,4664.7,0.403,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,on,random,2,32.527,925,25,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1306.9,0.463,22.096,0.003,25,26,,,,1.683,28.353,31.557,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,on,random,3,53.01,1977,39,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1416.8,0.415,42.772,0.003,39,32,,,,1.615,49.059,52.152,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,5,on,random,4,1800.01,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,7079.1,0.364,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,on,FIFO,0,1800.01,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu52,5535.5,0.447,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,on,FIFO,1,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,4391.6,0.598,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,on,FIFO,2,27.803,517,33,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1254.2,0.513,14.721,0.003,33,33,,,,1.819,21.799,26.243,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,on,FIFO,3,1800.016,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,3014.7,0.656,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,on,FIFO,4,187.445,6976,33,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,2357.9,0.523,174.272,0.003,33,33,,,,1.839,181.392,185.864,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,on,LIFO,0,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5862.1,0.477,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,on,LIFO,1,1800.018,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,4545.5,0.588,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,on,LIFO,2,29.974,526,33,True,valid,,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1255.1,0.513,16.883,0.003,33,33,,,,1.823,23.953,28.395,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,on,LIFO,3,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,3908.0,0.645,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,on,LIFO,4,58.316,1822,33,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1465.5,0.501,45.12,0.003,33,33,,,,1.847,52.274,56.736,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,on,random,0,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5065.1,0.466,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,on,random,1,1800.018,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5296.5,0.52,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,on,random,2,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,4853.9,0.442,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,on,random,3,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,4670.4,0.671,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,6,on,random,4,32.506,682,33,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu47,1271.1,0.518,19.796,0.003,33,33,,,,1.784,26.691,31.104,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,on,FIFO,0,1800.014,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,4785.7,0.693,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,on,FIFO,1,1800.012,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5728.6,0.739,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,on,FIFO,2,1800.024,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6665.7,0.536,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,on,FIFO,3,1800.024,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6547.1,0.625,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,on,FIFO,4,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,4802.2,0.765,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,on,LIFO,0,1800.024,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,4877.2,0.693,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,on,LIFO,1,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5629.3,0.73,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,on,LIFO,2,1800.024,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6493.7,0.539,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,on,LIFO,3,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6531.6,0.634,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,on,LIFO,4,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,4839.4,0.763,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,on,random,0,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6396.4,0.512,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,on,random,1,120.015,4018,69,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu49,1499.4,0.638,108.154,0.004,69,50,,,,3.006,114.312,118.984,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,on,random,2,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5332.3,0.631,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,on,random,3,1800.023,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6054.0,0.641,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,7,on,random,4,1800.022,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,4588.5,0.467,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,on,FIFO,0,1800.018,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5050.1,0.7,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,on,FIFO,1,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5353.1,0.74,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,on,FIFO,2,1800.015,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6329.8,0.508,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,on,FIFO,3,1800.016,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5389.7,0.633,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,on,FIFO,4,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6737.0,0.496,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,on,LIFO,0,1800.012,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6226.0,0.704,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,on,LIFO,1,1800.014,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5257.3,0.745,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,on,LIFO,2,1800.016,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6312.5,0.51,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,on,LIFO,3,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5525.8,0.644,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,on,LIFO,4,426.135,16180,48,False,invalid,plan rejected,False,0,True,COMPLETED,daic-eemcs-st,gpu51,3774.9,0.489,416.287,0.004,48,44,,,,1.772,422.227,425.473,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,on,random,0,1800.013,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,4669.8,0.697,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,on,random,1,1800.01,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5004.6,0.578,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,on,random,2,1800.01,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,4755.1,0.57,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,on,random,3,1800.01,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5389.6,0.653,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,8,on,random,4,1800.009,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,6015.7,0.616,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,on,FIFO,0,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5141.8,0.629,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,on,FIFO,1,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6823.8,0.868,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,on,FIFO,2,1800.02,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5112.1,1.015,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,on,FIFO,3,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5076.8,0.7,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,on,FIFO,4,1800.011,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,4955.4,0.974,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,on,LIFO,0,1800.009,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,4867.6,0.63,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,on,LIFO,1,1800.012,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5645.1,0.881,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,on,LIFO,2,1800.012,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,4494.8,1.008,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,on,LIFO,3,1800.009,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5620.2,0.709,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,on,LIFO,4,1800.015,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5443.2,0.979,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,on,random,0,1800.01,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,5083.5,0.658,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,on,random,1,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5406.9,0.904,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,on,random,2,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,7416.6,0.624,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,on,random,3,1800.017,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6053.7,0.668,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,9,on,random,4,1800.013,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5124.3,0.969,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,on,FIFO,0,1800.012,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5965.2,0.782,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,on,FIFO,1,1800.013,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5921.0,0.696,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,on,FIFO,2,1800.013,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5824.7,0.68,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,on,FIFO,3,1800.014,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu51,5335.3,0.953,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,on,FIFO,4,1800.011,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu47,6323.4,0.53,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,on,LIFO,0,1800.012,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6581.2,0.755,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,on,LIFO,1,1800.014,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6313.9,0.696,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,on,LIFO,2,1800.018,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6098.2,0.704,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,on,LIFO,3,1800.014,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5245.7,0.945,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,on,LIFO,4,1800.016,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,6080.8,0.532,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,on,random,0,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5325.8,0.798,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,on,random,1,1800.016,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5953.3,0.719,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,on,random,2,1800.019,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5437.9,0.741,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,on,random,3,1800.018,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5637.3,0.967,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
+symbolic-rail,10,on,random,4,1800.021,,,,timeout,,True,,False,COMPLETED,daic-eemcs-st,gpu49,5419.3,0.559,,,,,,,,,,,ghcr.io/robust-rail-nl/planner:edge
