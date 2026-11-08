@@ -5,9 +5,8 @@ progress heuristic) on generated Kleine Binckhorst scenarios: 1 to 10 trains, se
 random matching, a 1800 s budget per run. Requested by Issa; run on DAIC in November 2026. This directory has the
 experiment definitions, the scripts that ran them, the raw results, and the provenance of what ran.
 
-Status: the first pass (5 instances per matching, 900 runs) is complete and in `results/first_grid.csv`. An extension
-with 10 more instances per matching for 3 to 8 trains was prepared (`issa_grid_ext_*.json`); its results are not in this
-directory yet.
+Status: complete. The first pass (5 instances per matching, 900 runs) and the extension (10 more instances per matching for
+3 to 8 trains, 840 runs) are both in `results/issa_grid.csv` (1740 rows). `provenance.md` has the builds and job ids.
 
 ## Contents
 
@@ -21,7 +20,9 @@ directory yet.
 | `summarise_outcomes.py` | Counts outcomes per variant, tool and train count from that CSV. |
 | `submit_pilot.sh`, `pilot_report.sh`, `node_info.sbatch` | The pilot's resource arms (compute-p1, memory, DAIC), its report, and a node description job. |
 | `provenance.md` | Builds, commits, experiment definitions and hardware. Its TODO items can only be read on DAIC. |
-| `results/first_grid.csv`, `results/sacct_first_grid.txt` | The first pass, and the `sacct` dump it was joined with. |
+| `results/issa_grid.csv` | The result: first pass and extension, one row per run (1740). |
+| `results/first_grid.csv` | The first pass alone, built with an earlier version of `extract_csv.py` (no `build` column; its 45 one-train servicing-on rows read `no_result` where `issa_grid.csv` has `no_scenario`). Superseded by `issa_grid.csv`. |
+| `results/sacct_first_grid.txt`, `results/sacct_extension.txt` | The `sacct` dumps the CSV was joined with. |
 
 Tests: `tests/test_issa_grid_scripts.py` (the extraction and the submit script, without a cluster).
 
@@ -102,38 +103,46 @@ Issa's columns come first: `type-solver` (solver, enhsp, symbolic-rail), `num_tr
   at its first feasible plan; otherwise it runs the whole budget, so `runtime` is then the budget.
 - `slurm_state`, `partition`, `node`, `maxrss_mb` from `sacct`; `build` is the version line the tool printed.
 
-`results/first_grid.csv` was built before `build` and `no_scenario` existed in the script: it has no `build` column,
-and its 45 rows for 1 train with servicing on read `no_result` (they are `no_scenario`).
+`no_scenario` rows (45: 1 train, servicing on) have no run, so empty runtime and build.
 
-## First-pass results (900 runs, 5 instances x 3 matchings per cell)
+## Results (1740 rows: 1695 runs and 45 `no_scenario`)
 
-Valid plans per tool and train count, both variants pooled (servicing on has no 1-train cell, so n is 15 there and 30
-elsewhere):
+Cells for 1 to 2 and 9 to 10 trains have 5 instances x 3 matchings per variant, 3 to 8 trains 15 x 3. Valid plans per tool
+and train count, both variants pooled (servicing on has no 1-train cell, so n is 15 there; n is 30 at 2, 9 and 10 trains,
+90 at 3 to 8 trains; ENHSP ran 3 and 4 trains only in the extension):
 
 | trains | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| solver | 13/15 | 25/30 | 23/30 | 21/30 | 16/30 | 17/30 | 7/30 | 11/30 | 10/30 | 6/30 |
-| symbolic-rail | 15/15 | 26/30 | 23/30 | 21/30 | 9/30 | 6/30 | 2/30 | 0/30 | 2/30 | 0/30 |
-| enhsp | 15/15 | 24/30 | 20/30 | 7/30 | 0/30 | 0/30 | 0/30 | 0/30 | 0/30 | 0/30 |
+| solver | 13/15 | 25/30 | 69/90 | 62/90 | 52/90 | 46/90 | 31/90 | 31/90 | 10/30 | 6/30 |
+| symbolic-rail | 15/15 | 26/30 | 75/90 | 53/90 | 24/90 | 9/90 | 12/90 | 1/90 | 2/30 | 0/30 |
+| enhsp | 15/15 | 24/30 | 54/90 | 16/90 | 0/30 | 0/30 | 0/30 | 0/30 | 0/30 | 0/30 |
 
 Paired by instance (solver against symbolic-rail), exact two-sided sign test on the discordant pairs. The three
 matchings of one instance share their arrivals, so the pairs are not independent and the p-values are indicative.
 
-| matching | trains | solver only valid | symbolic-rail only valid | p |
-|---|---|---|---|---|
-| random | 2 to 5 | 3 | 12 | 0.035 |
-| random | 1 to 10 | 3 | 14 | 0.013 |
-| FIFO | 1 to 10 | 30 | 0 | < 0.001 |
-| LIFO | 1 to 10 | 27 | 1 | < 0.001 |
+| matching | trains | pairs | solver only valid | symbolic-rail only valid | p |
+|---|---|---|---|---|---|
+| FIFO | 1 to 10 | 215 | 78 | 1 | < 0.001 |
+| LIFO | 1 to 10 | 215 | 68 | 1 | < 0.001 |
+| random | 1 to 10 | 215 | 12 | 28 | 0.017 |
+| random | 2 to 5 | 100 | 8 | 25 | 0.005 |
+| random | 3 to 8 | 180 | 11 | 21 | 0.11 |
 
-- The solver is clearly better with FIFO and LIFO matching, mostly from 5 trains. The one niche found for a planner is
-  symbolic-rail with random matching at small to medium size. ENHSP has none: against the solver at random matching it is
-  a tie (9 against 6 discordant pairs, p = 0.61).
-- Servicing on lowers the valid rate at 3 to 6 trains: solver 44/60 off against 33/60 on, symbolic-rail 34/60 against
-  25/60, ENHSP 16/60 against 11/60.
-- No run ended out of memory. Peak resident memory: solver 2.2 GB, symbolic-rail 7.2 GB, ENHSP 19.3 GB (at 9 to 10 trains).
-- The solver and the evaluator disagree in 40 of the 285 solver runs that produced a plan: 32 where the solver reports
-  feasible and the evaluator rejects, 8 the other way round. The solver also fails 2 of the 15 one-train servicing-off
-  scenarios that both planners solve.
-- Four ENHSP runs at 3 trains ended with exit code 1 and no plan (`crash`); their logs were not examined.
-- Total compute of the first pass: about 214 CPU-hours.
+- The solver is clearly better with FIFO and LIFO matching. With random matching symbolic-rail is better at small to
+  medium size (2 to 5 trains), and the two are about even from 5 trains. With servicing on, the random-matching
+  difference is 2 against 10 (p = 0.039); with servicing off 10 against 18 (p = 0.18).
+- ENHSP has no niche. It solves nothing from 5 trains. At 3 and 4 trains with random matching it loses to symbolic-rail
+  (1 against 17, p < 0.001) and ties with the solver (10 pairs where only the solver is valid, 7 where only ENHSP is, p = 0.63).
+- Servicing on lowers the valid rate at 3 to 6 trains: solver 132/180 off against 97/180 on, symbolic-rail 89/180
+  against 72/180; ENHSP at 3 and 4 trains 44/90 against 26/90.
+- No run ended out of memory and every task finished (`COMPLETED`). Peak resident memory: solver 2.2 GB, symbolic-rail
+  7.5 GB, ENHSP 19.8 GB.
+- The solver and the evaluator disagree in 82 of its 645 runs: 62 where the solver reports feasible and the evaluator
+  rejects, 20 the other way round. The solver also fails 2 of the 15 one-train servicing-off scenarios that both
+  planners solve.
+- The solver returns a plan in every run, and in 238 of the 645 the solver itself reports infeasible (the budget ran out
+  without a feasible plan; the evaluator then rejects it too). For example, 38 of 45 runs at 8 trains with servicing on.
+  `solver_feasible` and `time_to_best_s` separate these from the 62 where solver and evaluator disagree.
+- Four ENHSP runs at 3 trains with random matching ended with exit code 1 and no plan (`crash`); their logs were not
+  examined.
+- Total wall time of all runs: about 391 CPU-hours.
