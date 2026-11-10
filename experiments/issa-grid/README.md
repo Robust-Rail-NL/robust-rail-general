@@ -28,9 +28,10 @@ Tests: `tests/test_issa_grid_scripts.py` (the extraction and the submit script, 
 
 ## Running it
 
-Everything below runs from the repo root of a checkout on the cluster. DAIC support (the site files under
-`scripts/slurm/site/`, which the sbatch scripts source) is on branch `daic-port`, which was not merged into `main` when
-this was written; the DAIC runs used `daic-port` with `main` merged in locally.
+Everything below runs from the repo root of a checkout on the cluster. DAIC support is the site files under
+`scripts/slurm/site/`, which the sbatch scripts source (see `docs/slurm-apptainer.md`). They come from branch `daic-port`,
+which this branch is based on. The DAIC runs themselves used `daic-port` before it was rebased, with `main` merged in
+locally (see `provenance.md`).
 
 ```bash
 export SLURM_SITE=daic; source scripts/slurm/site/daic.env

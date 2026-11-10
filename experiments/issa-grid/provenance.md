@@ -10,7 +10,7 @@ Written 2026-11-08, after the first pass and the extension had finished. Every r
 | planner, image `ghcr.io/robust-rail-nl/planner:edge` | `robust-rail-planner 0.5.0-edge+20261106.2f2f34b` | `2f2f34b0157a4846762ced82fc925b5218b3fb0f` (robust-rail-planner, branch `edge`, includes PR #60 timing/stats lines and #59) | `sha256:129bbf432bb37812733262827775dc1009d9c209b308604754b150ac806c8125` |
 | generator, image `ghcr.io/robust-rail-nl/generator:latest` | v2.5.0 | `a3271fd0df499353d3234371e5444031b578366f` (tag `v2.5.0`) | `sha256:61b62221ee3ea872658e38189bdfab307b703f1d97010082ab32fca80a6c23e9`; the Apptainer image id of the generation (`sif:45113344:1794038133976907888`) is in every `scenario_<instance>.generator.json` (`generator_image_id`) |
 | evaluator (TORS), image `ghcr.io/robust-rail-nl/tors:edge` | `TORS 2.3.0-edge+20261103.50bc79e` (first line of `local_search/eval.out`) | not recorded | `sha256:bb0dd3d40b3de14d3726242d6f8eac768717f50bb3293ead9ad73b723ef90727` |
-| experiment tooling | robust-rail-general `main` at `8fea78e55a867c515bd6bf4966622e459987bd45` plus branch `daic-port` merged locally on DAIC | | |
+| experiment tooling | robust-rail-general `main` at `8fea78e55a867c515bd6bf4966622e459987bd45` plus branch `daic-port` (tip `430ddf0`, before it was rebased onto `main`; the rebased branch has the same changes) merged locally on DAIC | | |
 
 ## Runs behind the CSVs
 
