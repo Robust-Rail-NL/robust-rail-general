@@ -66,7 +66,7 @@ Things to state next to wall-clock numbers:
   tools. The CPU frequency was at 96 to 100 % of its maximum at the time of the `lscpu` check, i.e. the nodes were not
   throttled.
 - **Absolute times do not transfer to other machines.** In a small pilot (2-train scenarios, same plans and the same
-  numbers of expanded states) a node of TU Delft's DelftBlue cluster was about 1.4 to 1.6 times slower than a DAIC node on
+  numbers of expanded states) a node of TU Delft's DelftBlue cluster (Intel Xeon Gold 6248R at 3.0 GHz base and 4.0 GHz maximum, 48 logical CPUs; `compute-p1` nodes cmp012 and cmp014 with 192 GB, `memory` node mem006 with 768 GB) was about 1.4 to 1.6 times slower than a DAIC node on
   the stable parts of a run (PDDL conversion 0.39 to 0.47 s there against 0.29 to 0.34 s, validation 1.2 to 1.6 s against
   0.8 to 1.1 s). A tool that finds a plan after 1500 s on DAIC may not find it within 1800 s on DelftBlue. The
   comparison between tools on one cluster is not affected. That pilot has 6 tasks per cluster, so the ratio is rough.
