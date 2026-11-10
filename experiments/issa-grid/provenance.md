@@ -26,6 +26,6 @@ The extension (instances 5 to 14, trains 3 to 8, enhsp at 3 and 4 trains only, 4
 
 `issa_grid_servicing_{off,on}.json` (seed 700, trains 1 to 10, 3 matchings, 5 instances, `max_duration` 1800, `reject_infeasible` true) and, for the extension, `issa_grid_ext_servicing_{off,on}.json` (`number_of_instances` 15, instances 5 to 14 run, trains 3 to 8, enhsp trains 3 and 4 only). The scenarios of instances 0 to 4 are identical in both because the generator seeds an instance as `seed*(j+i+1)`.
 
-Hardware: DAIC partition `daic-eemcs-st`, nodes `gpu47`, `gpu48`, `gpu49`, `gpu51`, `gpu52` (per-run node in the CSV column `node`), 1 CPU per task, memory per task 4G (solver), 32G (enhsp), 12G (symbolic-rail), 45 min limit, 1800 s tool budget.
+Hardware: DAIC partition `daic-eemcs-st`, every node an Intel Xeon 6724P (32 CPUs, 4.3 GHz max, about 512 GB; `lscpu` output of jobs 123823 to 123827), nodes `gpu47`, `gpu48`, `gpu49`, `gpu51`, `gpu52` (per-run node in the CSV column `node`), 1 CPU per task, memory per task 4G (solver), 32G (enhsp), 12G (symbolic-rail), 45 min limit, 1800 s tool budget.
 
 Servicing on has no 1-train cell: the generator refuses it (time window 1440, servicing time 300, `min_gap_on_gateway` 480).

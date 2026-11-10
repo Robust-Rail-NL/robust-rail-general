@@ -41,6 +41,38 @@ Two things to watch when you aggregate:
    (`solver_feasible` is `false`, 238 of its 645 runs); it is not necessarily a bug. For "did it solve it", use
    `outcome == valid`.
 
+## Hardware and measurement conditions
+
+For the methods section of a thesis chapter. All 1695 runs ran on DAIC (TU Delft), partition `daic-eemcs-st`, on five
+nodes that are identical in the parts that matter here (output of `lscpu` and `free` on each, jobs 123823 to 123827):
+
+| property | value |
+|---|---|
+| CPU | Intel Xeon 6724P, 32 logical CPUs per node, 800 MHz minimum and 4300 MHz maximum clock, L3 cache 144 MiB (2 instances) |
+| memory | about 512 GB per node (515648 MiB) |
+| nodes used | gpu47 (451 runs), gpu48 (139), gpu49 (255), gpu51 (194), gpu52 (656); the `node` column has the node of every run |
+| allocation per run | 1 CPU and 4 GB (solver), 12 GB (symbolic-rail) or 32 GB (ENHSP); each run in its own Apptainer container |
+| time limits | 1800 s budget per tool, 45 min SLURM limit per task (the limit never hit) |
+
+The nodes are GPU nodes, but no run asked for or used a GPU. A run is one process on one CPU.
+
+Things to state next to wall-clock numbers:
+
+- **The nodes are shared.** Up to 20 tasks per tool ran at once (account limit 64 running jobs), on nodes that other users
+  of the partition also used, so a run may share caches and memory bandwidth with neighbours (the `free` output of the five nodes shows other
+  jobs using 9 to 33 GB at the time). I did not measure the run-to-run spread of identical runs. `runtime` includes container
+  start-up and, for the planners, Julia or JVM start-up; use `planner_process_s` and `time_to_best_s` for the tools' own work.
+- **The five nodes have the same CPU model**, so the `node` column is not a source of systematic differences between
+  tools. The CPU frequency was at 96 to 100 % of its maximum at the time of the `lscpu` check, i.e. the nodes were not
+  throttled.
+- **Absolute times do not transfer to other machines.** In a small pilot (2-train scenarios, same plans and the same
+  numbers of expanded states) a node of TU Delft's DelftBlue cluster was about 1.4 to 1.6 times slower than a DAIC node on
+  the stable parts of a run (PDDL conversion 0.39 to 0.47 s there against 0.29 to 0.34 s, validation 1.2 to 1.6 s against
+  0.8 to 1.1 s). A tool that finds a plan after 1500 s on DAIC may not find it within 1800 s on DelftBlue. The
+  comparison between tools on one cluster is not affected. That pilot has 6 tasks per cluster, so the ratio is rough.
+- The solver's own search is also time-based (its budget is in seconds), so its result depends on CPU speed in the
+  same way as the planners'.
+
 ## Findings
 
 Valid plans, both servicing variants pooled (n is 90 per tool for 3 to 8 trains, 30 for 2, 9 and 10 trains, 15 for 1
