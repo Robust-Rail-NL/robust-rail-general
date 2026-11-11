@@ -1,8 +1,10 @@
 # Release notes
 
-## Unreleased
+## 0.3.0 — 2026-11-11
 
-### `reject_infeasible` (additive)
+Since 0.2.0 this repo gained a way to run the pipeline on SLURM clusters (DelftBlue and DAIC), a single-file description of an experiment, and the solver-versus-planners grid, a comparison of the HIP solver with the ENHSP and symbolic-rail planners with its results. The interchange schema is unchanged: `schemaVersion` stays 2, and the changes to `robust_rail_models` are additive.
+
+### Scenario-config model: `reject_infeasible` (additive)
 
 `TrainUnitDistribution` gains an optional boolean `reject_infeasible`
 (`schema_scenario_config.json` regenerated), matching the generator option of
@@ -11,9 +13,9 @@ necessary servicing bound is redrawn. `scripts/generate_experiment_configs.py`
 accepts it as a `scenario_config` key and as `--reject-infeasible` /
 `--no-reject-infeasible`; it is written to the generated config only when set,
 so existing sweeps' configs do not change. Without it in this model a config
-carrying the key is rejected.
+carrying the key is rejected. (#36)
 
-### `servicing_per_composition` (additive)
+### Scenario-config model: `servicing_per_composition` (additive)
 
 `TrainUnitDistribution` gains an optional boolean `servicing_per_composition`
 (`schema_scenario_config.json` regenerated), matching the new generator option
@@ -21,7 +23,43 @@ of the same name. `scripts/generate_experiment_configs.py` accepts it as a
 `scenario_config` key and as `--servicing-per-composition` /
 `--no-servicing-per-composition`; it is written to the generated config only
 when set, so existing sweeps' configs do not change. Without it in this model
-a config carrying the key is rejected.
+a config carrying the key is rejected. (#34)
+
+### Servicing knobs in an experiment's `scenario_config` (#27)
+
+`servicing_ratio` and `tasks_per_train_unit` are valid generator inputs, but the sweep config generator rejected them as unknown keys and never wrote them, so every servicing sweep ran with the generator's defaults (0.5 and 1). They are now accepted in `scenario_config` and as `--servicing-ratio` / `--tasks-per-train-unit`, and written to `train_unit_distribution` only when set. Existing sweeps generate the same configs as before.
+
+### Running on SLURM clusters
+
+- **Apptainer engine (#18).** `run_generator.py`, `run_solver.py`, `run_planner.py`, `run_evaluator.py` and `run_experiment.py` take `--engine apptainer` and `--sif-cache-dir`, for clusters whose compute nodes have no Docker daemon. Docker stays the default; a normal local run is unchanged. `scripts/stage_apptainer_images.py` stages the images a sweep needs into a shared `.sif` cache from the login node, and `scripts/slurm_manifest.py`, `scripts/slurm_run_task.py` and `scripts/slurm/*.sbatch` turn a sweep into a job array with one attempt per task. Three bugs surfaced on the first cluster runs and are fixed: `apptainer exec` does not run an image's Docker `ENTRYPOINT`; Apptainer uses the host's working directory instead of the image's `WORKDIR` (fixed with `--pwd`); and a `.sif` is read-only, which made the solver's scratch writes crash (fixed with `--writable-tmpfs`). The timeout handling also had a latent bug (`Popen.wait(timeout=...)` does not kill the child), which is fixed. Details and rationale: `docs/slurm-apptainer.md`.
+- **One config file per experiment (#23).** An experiment is one JSON file (name, location, tools, planner variant, time budget, seeds, image versions, departure delay, scenario sweep); see `example_experiment.json`. `python run_experiment.py example_experiment.json` runs it, and the SLURM scripts read the same file, so a local run and an array run produce the same folder layout. Everything a run creates goes under `results/<name>/`. The planner variant can be chosen (`symbolic`, `symbolic-rail` or `enhsp`), and instances run and are evaluated smallest first. The solver configs and all example plans and scenarios were moved to the v2 format.
+- **Stage digest check (#24).** The staged tags (`stable`, `edge`) are floating, so a cached `.sif` did not prove that it still matched the tag. Staging now compares ghcr.io's current manifest digest for the tag with a `<sif>.digest` file written at the last pull, and pulls again when they differ, the file is missing or the registry cannot be reached. `--skip-existing` skips a `.sif` that is already present without asking the registry.
+- **Several planners per experiment (#35).** An experiment's `planner` can be a list, and the sweep runs, reports and array-jobs each of them. The coverage analysis gained planner-versus-planner sections.
+- **Poster experiment (#25).** `poster_planner_vs_solver.json` and the array and aggregate batch scripts for the planner-versus-solver comparison of the poster.
+- **Cold-start probe (#33).** `scripts/cold_start_probe/` holds the scripts that measure how much of a planner run is start-up and how much is search.
+- **DAIC (#37).** The SLURM sweeps also run on DAIC (partition `daic-eemcs-st`) alongside DelftBlue, with per-cluster site files, a `submit_sweep.sh` that chains manifest, generate, array and aggregate jobs, and notes on what was observed on DAIC (home quota, memory per task). See `docs/slurm-apptainer.md`.
+
+### Facility `timeWindow` documented (#32)
+
+Description-only change to the model, no `schemaVersion` bump: an absent or null `Facility.timeWindow` means the facility is available for the whole scenario, a present window constrains when service actions may run, and `end` is inclusive. The evaluator matches this since 2.4.0 (its #47), the solver already did. See `SCHEMA_CHANGELOG.md`, "Unversioned — 2026-10-28".
+
+### Kleine Binckhorst: parking on the wash track (#31)
+
+`Location_KleineBinckhorst/location.json` now sets `parkingAllowed` to true on track 63, the track of the Wasmachine (wash) facility. Before, a unit could not park there.
+
+### The solver-versus-planners grid (#38)
+
+`experiments/issa-grid/` compares the HIP solver, ENHSP and symbolic-rail on generated Kleine Binckhorst scenarios (1 to 10 trains, servicing off and on, FIFO / LIFO / random matching, 5 instances per cell, plus an extension to 15 instances for 3 to 8 trains) with an 1800 s budget per run. It contains the experiment definitions, the scripts that stage, submit and extract, their tests, `provenance.md` (what ran, with image digests and job ids), and `results/` with the CSV (1740 rows) and a README for the reader of the results. The first-pass results, hardware (DAIC and DelftBlue CPU models) and measurement conditions are described there.
+
+Tool versions: the grid ran edge images that correspond to solver 2.3.0, planner 0.6.0, evaluator 2.4.0 and generator 2.5.0 (each release differs from the commit that ran only in version and release-notes files; see `provenance.md`).
+
+### Compatibility
+
+`schemaVersion` 2, unchanged. The model additions are optional keys; existing configs, scenarios and plans stay valid. The scripts' defaults are unchanged: Docker stays the default engine.
+
+### Known gaps found by the solver-versus-planners grid
+
+Four defects found while building the grid are tracked in the sibling repos, not here: robust-rail-planner #61 and #62, robust-rail-evaluator #51, robust-rail-solver #80. The grid's results include the runs affected by them.
 
 ## 0.2.0 — 2026-09-25
 

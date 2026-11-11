@@ -25,7 +25,15 @@ from pathlib import Path
 # Shared by scripts/stage_apptainer_images.py (where it pulls to) and every
 # run_*.py's --sif-cache-dir default (where it reads from) -- one literal
 # instead of five copies that could drift apart.
-DEFAULT_SIF_CACHE_DIR = Path.home() / "apptainer-images"
+#
+# $SIF_CACHE_DIR overrides the default: a cluster whose home directory is too
+# small for the images (DAIC's is 4 MiB) sets it in its scripts/slurm/site/
+# file. Unset or empty, the DelftBlue convention ~/apptainer-images applies.
+def default_sif_cache_dir() -> Path:
+    return Path(os.environ.get("SIF_CACHE_DIR") or Path.home() / "apptainer-images")
+
+
+DEFAULT_SIF_CACHE_DIR = default_sif_cache_dir()
 
 
 def add_engine_args(parser: argparse.ArgumentParser) -> None:
