@@ -1,0 +1,68 @@
+{
+    "location": "Location_KleineBinckhorst",
+    "tools": [
+        "solver",
+        "planner"
+    ],
+    "planner": [
+        "enhsp",
+        "symbolic-rail"
+    ],
+    "max_duration": 1800,
+    "jobs": 1,
+    "versions": {
+        "generator": "edge",
+        "solver": "edge",
+        "planner": "edge",
+        "evaluator": "edge"
+    },
+    "scenario_config": {
+        "number_of_trains": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+        ],
+        "number_of_instances": 15,
+        "matchings": [
+            "FIFO",
+            "LIFO",
+            "random"
+        ],
+        "seed": 700,
+        "time_window_per_train": 1440,
+        "mixed_traffic": false,
+        "min_gap_on_gateway": 480,
+        "train_unit_types": [
+            "VIRM-4",
+            "VIRM-6",
+            "ICM-3",
+            "ICM-4",
+            "SNG-3",
+            "SNG-4",
+            "SLT-4",
+            "SLT-6"
+        ],
+        "super_type_ratio": 0.5,
+        "units_per_composition": [
+            1,
+            2,
+            3
+        ],
+        "instanding_ratio": 0.3,
+        "outstanding_ratio": 0.1,
+        "perform_servicing": true,
+        "servicing_ratio": 0.5,
+        "tasks_per_train_unit": 1,
+        "servicing_per_composition": true,
+        "reject_infeasible": true
+    },
+    "departure_delay_fraction": 0.0,
+    "name": "issa_grid_ext_servicing_on"
+}
