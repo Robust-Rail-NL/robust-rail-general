@@ -2,7 +2,8 @@
 
 For Issa. `issa_grid.csv` has one row per run: 1740 rows, of which 1695 are runs and 45 are cells that cannot exist
 (see "Reading the CSV"). The runs took place on DAIC on 2026-11-07 and 2026-11-08. What ran, with builds and job ids, is
-in `../provenance.md`; how to rerun it is in `../README.md`.
+in `../provenance.md`; how to rerun it is in `../README.md`. The builds that ran were edge builds; they correspond to the
+releases solver 2.3.0, planner 0.6.0, evaluator 2.4.0 and generator 2.5.0 (see "Released versions" in `../provenance.md`).
 
 ## What was run
 

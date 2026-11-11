@@ -12,6 +12,18 @@ Written 2026-11-08, after the first pass and the extension had finished. Every r
 | evaluator (TORS), image `ghcr.io/robust-rail-nl/tors:edge` | `TORS 2.3.0-edge+20261103.50bc79e` (first line of `local_search/eval.out`) | not recorded | `sha256:bb0dd3d40b3de14d3726242d6f8eac768717f50bb3293ead9ad73b723ef90727` |
 | experiment tooling | robust-rail-general `main` at `8fea78e55a867c515bd6bf4966622e459987bd45` plus branch `daic-port` (tip `430ddf0`, before it was rebased onto `main`; the rebased branch has the same changes) merged locally on DAIC | | |
 
+## Released versions
+
+The runs used edge images, which print `-edge+<date>.<commit>` in their version line. The three tools were released afterwards from `main`, and each release tag differs from the commit that was run only in the version and release-notes files (checked 2026-11-11 with `git diff --stat <run commit> <tag>`). The results can therefore be attributed to these releases:
+
+| Tool | Release | Tag commit | Run commit | Files changed between them |
+|---|---|---|---|---|
+| solver (HIP) | v2.3.0 | `75997d7` | `965fd71` | `RELEASE_NOTES.md`, `ServiceSiteScheduling/HIP.csproj` |
+| planner | v0.6.0 | `5969d1b` | `2f2f34b` | `RELEASE_NOTES.md`, `VERSION` |
+| evaluator (TORS) | v2.4.0 | `55a112a` | `50bc79e` | `CMakeLists.txt`, `RELEASE_NOTES.md` |
+
+The generator was already released (v2.5.0). The `build` column of the CSV keeps the edge strings that were actually run. A rerun with the released images has not been done.
+
 ## Runs behind the CSVs
 
 The digests are those of the staged images (`.sif.digest` files, staged 2026-11-07 for the generator, solver and planner, 2026-11-04 for TORS) and were not restaged during the runs. The generator and its scenarios are shared by both passes.
