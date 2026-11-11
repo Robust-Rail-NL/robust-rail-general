@@ -6,6 +6,8 @@ Location_*/scenarios/*.err
 Location_*/plans/*.out
 Location_*/plans/*.err
 Location_*/plans/*.txt
+Location_*/plans/*.html
+Location_*/plans/functions.js
 Location_*/evaluations/*.txt
 Location_*/evaluations/*.out
 Location_*/evaluations/*.err
