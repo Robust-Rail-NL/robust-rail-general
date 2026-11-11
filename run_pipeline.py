@@ -59,6 +59,10 @@ def main() -> None:
                              "eval_<NAME>), so one value selects the same instance throughout. "
                              "Accepts shell-style wildcards; a step that matches nothing fails "
                              "and aborts the pipeline.")
+    parser.add_argument("--single", metavar="NAME",
+                        help="Like --instance, but each step must select exactly one file "
+                             "across all locations, and echoes its tool's stdout/stderr to the "
+                             "console as it runs. Passed on to every step.")
     parser.add_argument("--version", choices=["stable", "stable-assert", "edge", "local"],
                         default="stable",
                         help="Pick a docker image version ('local' is reserved for locally built "
@@ -84,6 +88,8 @@ def main() -> None:
     group.add_argument("--use-planner", action="store_true",
                        help="Shorthand for --steps generator,planner,evaluator.")
     args = parser.parse_args()
+    if args.single and args.instance:
+        parser.error("--single and --instance are mutually exclusive.")
 
     if args.use_planner:
         steps_arg = "generator,planner,evaluator"
@@ -113,6 +119,8 @@ def main() -> None:
         extra += ["--location", args.location]
     if args.instance:
         extra += ["--instance", args.instance]
+    if args.single:
+        extra += ["--single", args.single]
     timeout_extra = ["--timeout", str(args.timeout)] if args.timeout is not None else []
 
     steps_str = " → ".join(steps)
