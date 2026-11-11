@@ -41,7 +41,8 @@ from scripts.docker_utils import (
 )
 from scripts import experiment_spec
 from scripts.generate_experiment_configs import scenario_params, sweep_configs
-from scripts.instance_filter import fail_no_match, instance_of, select
+from scripts.instance_filter import (add_single_arg, apply_single, ensure_single, fail_no_match,
+                                      instance_of, select)
 
 ROOT = Path(__file__).parent
 INSTANCE_PREFIX = "scenario_config_"
@@ -66,7 +67,8 @@ def _instance_name(path: Path) -> str:
 
 def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bool,
                 config_dir: Path | None = None, engine: str = "docker",
-                cache_dir: Path | None = None, instance_dir: Path | None = None) -> bool:
+                cache_dir: Path | None = None, instance_dir: Path | None = None,
+                tee: bool = False) -> bool:
     """Generate one config's scenario.
 
     instance_dir (--experiment): write the scenario and its .out/.err there,
@@ -107,7 +109,7 @@ def _run_config(docker_image: str, location_dir: Path, config: Path, dry_run: bo
     out_file = scenarios_dir / f"scenario_{name}.out"
     err_file = scenarios_dir / f"scenario_{name}.err"
 
-    returncode, _ = run_container(cmd, cname, out_file, err_file, None, engine)
+    returncode, _ = run_container(cmd, cname, out_file, err_file, None, engine, tee)
     ok = returncode == 0
 
     footer = f"--- exit: {returncode if returncode is not None else 'error'}"
@@ -234,6 +236,7 @@ def main() -> None:
                         help="Restrict to a single configurations/scenario_config_<NAME>.json "
                              "(a pasted filename works too). Accepts shell-style wildcards; exits "
                              "non-zero if it matches nothing.")
+    add_single_arg(parser, "configurations/scenario_config_<NAME>.json")
     parser.add_argument("--config-dir", metavar="DIR", type=Path,
                         help="Use scenario_config_*.json files from this directory instead of "
                              "<location>/configurations/ (requires --location). This is how "
@@ -269,7 +272,10 @@ def main() -> None:
                              "images).")
     add_engine_args(parser)
     args = parser.parse_args()
+    apply_single(parser, args)
 
+    if args.single and args.experiment:
+        parser.error("--single runs one config; --experiment generates a whole sweep.")
     if args.experiment and (args.location or args.config_dir):
         parser.error("--experiment takes its location from the file, and is its own config: "
                      "drop --location/--config-dir.")
@@ -302,6 +308,12 @@ def main() -> None:
         return
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
+    if args.single:
+        ensure_single((c for loc in locations if loc.is_dir()
+                       for c in (sorted(args.config_dir.glob("scenario_config_*.json"))
+                                 if args.config_dir
+                                 else loc.glob("configurations/scenario_config_*.json"))),
+                      args.single, INSTANCE_PREFIX)
 
     total, errors = 0, 0
     available: list[str] = []
@@ -325,7 +337,8 @@ def main() -> None:
         for config in configs:
             total += 1
             if not _run_config(DOCKER_IMAGE_VERSIONS[args.version], loc, config, args.dry_run,
-                               args.config_dir, args.engine, args.sif_cache_dir):
+                               args.config_dir, args.engine, args.sif_cache_dir,
+                               tee=args.tee):
                 errors += 1
 
     if args.instance and total == 0:

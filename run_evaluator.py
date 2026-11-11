@@ -18,7 +18,8 @@ from scripts.docker_utils import (
     finish_capture,
     run_container,
 )
-from scripts.instance_filter import fail_no_match, instance_of, select
+from scripts.instance_filter import (add_single_arg, apply_single, ensure_single, fail_no_match,
+                                      instance_of, select)
 
 ROOT = Path(__file__).parent
 INSTANCE_PREFIX = "plan_"
@@ -54,7 +55,7 @@ def _delay_arg(departure_delay: int | None) -> list[str]:
 
 def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool,
               departure_delay: int | None = None, engine: str = "docker",
-              cache_dir: Path | None = None) -> bool:
+              cache_dir: Path | None = None, tee: bool = False) -> bool:
     name = _instance_name(plan)
     scenario = location_dir / "scenarios" / f"scenario_{name}.json"
 
@@ -91,7 +92,7 @@ def _run_plan(docker_image: str, location_dir: Path, plan: Path, dry_run: bool,
         print(f"    [dry-run] {' '.join(cmd)}")
         return True
 
-    returncode, _ = run_container(cmd, cname, out_file, err_file, None, engine)
+    returncode, _ = run_container(cmd, cname, out_file, err_file, None, engine, tee)
     ok = returncode == 0
 
     footer = f"--- exit: {returncode if returncode is not None else 'error'}"
@@ -128,7 +129,7 @@ def _classify_verdict(out_text: str, err_text: str, txt_text: str) -> tuple[str,
 def _run_plan_single(docker_image: str, location_dir: Path, plan: Path, scenario: Path,
                      version: str, dry_run: bool, departure_delay: int | None = None,
                      engine: str = "docker", cache_dir: Path | None = None,
-                     outside_location: bool = False) -> dict:
+                     outside_location: bool = False, tee: bool = False) -> dict:
     """Evaluate one plan, writing eval.* and eval_result.json beside it.
 
     outside_location (--scenario): the scenario file is mounted from wherever it
@@ -164,7 +165,7 @@ def _run_plan_single(docker_image: str, location_dir: Path, plan: Path, scenario
     out_file, err_file = plan_dir / "eval.out", plan_dir / "eval.err"
     txt_file = plan_dir / "eval.txt"
     start, start_iso = time.monotonic(), datetime.now(timezone.utc).isoformat()
-    returncode, _ = run_container(cmd, cname, out_file, err_file, None, engine)
+    returncode, _ = run_container(cmd, cname, out_file, err_file, None, engine, tee)
 
     def _read(path: Path) -> str:
         return path.read_text(errors="replace") if path.exists() else ""
@@ -209,6 +210,7 @@ def main() -> None:
                         help="Restrict to a single plans/plan_<NAME>.json (a pasted filename works "
                              "too). Accepts shell-style wildcards; exits non-zero if it matches "
                              "nothing.")
+    add_single_arg(parser, "plans/plan_<NAME>.json")
     parser.add_argument("--plan", metavar="FILE", type=Path,
                         help="Evaluate this one plan file wherever it lives — typically a "
                              "plan.json under a run_solver.py/run_planner.py --output-dir. "
@@ -237,6 +239,7 @@ def main() -> None:
                              "images).")
     add_engine_args(parser)
     args = parser.parse_args()
+    apply_single(parser, args)
 
     if args.scenario and not args.plan:
         parser.error("--scenario requires --plan.")
@@ -261,7 +264,7 @@ def main() -> None:
         record = _run_plan_single(DOCKER_IMAGE_VERSIONS[args.version], ROOT / args.location,
                                   args.plan, args.scenario, args.version, args.dry_run,
                                   args.departure_delay, args.engine, args.sif_cache_dir,
-                                  outside_location=True)
+                                  outside_location=True, tee=args.tee)
         sys.exit(0 if (not record or record.get("verdict") != "error") else 1)
 
     if args.plan:
@@ -284,10 +287,14 @@ def main() -> None:
             sys.exit(f"ERROR: no matching scenario for --instance {args.instance!r}: {scenario}")
         record = _run_plan_single(DOCKER_IMAGE_VERSIONS[args.version], loc, args.plan, scenario,
                                   args.version, args.dry_run, args.departure_delay,
-                                  args.engine, args.sif_cache_dir)
+                                  args.engine, args.sif_cache_dir, tee=args.tee)
         sys.exit(0 if (not record or record.get("verdict") != "error") else 1)
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
+    if args.single and not args.plan:
+        ensure_single((p for loc in locations if loc.is_dir()
+                       for p in loc.glob("plans/plan_*.json")),
+                      args.single, INSTANCE_PREFIX)
 
     total, errors = 0, 0
     available: list[str] = []
@@ -304,7 +311,8 @@ def main() -> None:
         for plan in plans:
             total += 1
             if not _run_plan(DOCKER_IMAGE_VERSIONS[args.version], loc, plan, args.dry_run,
-                             args.departure_delay, args.engine, args.sif_cache_dir):
+                             args.departure_delay, args.engine, args.sif_cache_dir,
+                             tee=args.tee):
                 errors += 1
 
     if args.instance and total == 0:
