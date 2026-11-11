@@ -47,17 +47,20 @@
 # comment on why (Lmod's `module` function vs. set -u) and
 # docs/slurm-apptainer.md's "Prerequisites" for the >=3.12 requirement this
 # is working around.
+#
+# Must be submitted from the repo root -- see run_experiment_array.sbatch's
+# own comment on why this is $SLURM_SUBMIT_DIR, not `dirname "$0"`. The site
+# file selects the cluster (SLURM_SITE, default delftblue) -- same file too.
+cd "$SLURM_SUBMIT_DIR"
+source "scripts/slurm/site/${SLURM_SITE:-delftblue}.env"
 module load 2026 cpu
-module load python/3.13.18
+module load "$PYTHON_MODULE"
 
 set -euo pipefail
 
 OUTPUT_DIR="$1"
 HOME_DEST="$2"
 
-# Must be submitted from the repo root -- see run_experiment_array.sbatch's
-# own comment on why this is $SLURM_SUBMIT_DIR, not `dirname "$0"`.
-cd "$SLURM_SUBMIT_DIR"
 mkdir -p slurm-logs
 
 python3 scripts/report_results.py "$OUTPUT_DIR" \

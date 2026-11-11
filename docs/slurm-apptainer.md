@@ -259,6 +259,88 @@ started.
    `coverage_analysis.py` over `--output-dir`, then `rsync`s the whole tree
    to `<home-dest>` (see "Storage" above).
 
+## Running on DAIC instead of DelftBlue
+
+The same scripts run on either cluster. Cluster-specific values live in
+`scripts/slurm/site/<site>.env` (account, partition, Python module, cache
+directories); the three `.sbatch` scripts and `scripts/slurm/submit_sweep.sh`
+source `site/${SLURM_SITE:-delftblue}.env`. DelftBlue is the default and its
+values are the ones in the `#SBATCH` lines, so nothing changes unless you set
+`SLURM_SITE=daic`. The site file sets `SBATCH_ACCOUNT` / `SBATCH_PARTITION`,
+which `sbatch` reads as `--account` / `--partition` (command-line options still
+win). `docker_utils.DEFAULT_SIF_CACHE_DIR` reads `$SIF_CACHE_DIR` first, then
+falls back to `~/apptainer-images`.
+
+On DAIC, from a clone under `~/linuxhome` (see below):
+```bash
+source scripts/slurm/site/daic.env
+module load 2026 cpu && module load "$PYTHON_MODULE"
+python3 scripts/stage_apptainer_images.py          # on the login node
+SLURM_SITE=daic scripts/slurm/submit_sweep.sh EXPERIMENT.json \
+    ~/linuxhome/runs/sweep1 ~/linuxhome/experiments/sweep1
+```
+
+**Observed, 2026-11-04** (login node `daic01`, compute node `gpu47`, via a
+5-minute `srun` on partition `daic-eemcs-st`, account `daic-eemcs-st-algor`):
+- `/usr/bin/apptainer` (1.5.5) exists on login and compute nodes, no
+  `module load` needed.
+- System `python3` is 3.9.25. `module load 2026 cpu` makes `python/3.13.12`
+  available (found with `module spider python`).
+- `ghcr.io/v2/` answers (HTTP 405, i.e. reachable) from the login and the
+  compute node.
+- `DefMemPerNode` is 1 (MB), so `--mem-per-cpu` must always be set, as the
+  scripts do. This account has `maxjobs=64`, `maxsubmit=1000`; the partition
+  has `MaxTime` 5 days. All nodes are GPU nodes; the `srun` above ran without
+  `--gres`.
+- **`/home/$USER` has a 4096K soft / 5120K hard quota.** Apptainer's default
+  caches (`~/.apptainer`, `~/.cache`) alone exceed it. `~/linuxhome` (a
+  symlink to `/tudelft.net/staff-homes-linux/...`) was writable from the
+  compute node. `/scratch/$USER` does not exist. So `daic.env` points the
+  `.sif` cache, `APPTAINER_CACHEDIR`, `APPTAINER_TMPDIR` and `XDG_CACHE_HOME`
+  at `~/linuxhome`, and the repo clone, `--output-dir` and `slurm-logs/` must
+  live there too.
+
+- `~/linuxhome` has a quota of 30 GiB soft / 32 GiB hard (`quota -s`, 11 MiB
+  used at the time). `quota -s` lists only filesystems that are mounted at
+  that moment, so access `~/linuxhome` first, or it is missing from the
+  output. The Windows home, `~/windowshome`, is separate: 6.5 GiB soft /
+  8 GiB hard.
+
+**Smoke test, 2026-11-04** (`composition_smoke.json`, 6 tasks at 120 s, via
+`SLURM_SITE=daic scripts/slurm/submit_sweep.sh`; generate job 98265, array
+98266, aggregate 98267):
+- Staging with `--edge` worked on the login node: 8 images, 1.2 GB in
+  `~/linuxhome/apptainer-images`. The apptainer layer cache and tmp directory
+  added about 2.2 GB more under `~/linuxhome` (3.4 GB in total); they can be
+  deleted after staging.
+- Generate, all 6 array tasks and aggregate finished with exit 0, and the
+  aggregate wrote `runs.csv` and `coverage_analysis.txt`. Queue wait was not
+  measured.
+- `MaxRSS` per task (`sacct`): solver 212–228 MB, symbolic-rail 1.45–1.55 GB,
+  enhsp **2,095,776K–2,095,780K**. That is within 1.4 MiB of
+  `--mem-per-cpu=2G` (2,097,152K), after only 21 s in one case. No task was
+  killed. Whether `sacct` counted page cache or the tasks were close to being
+  OOM-killed is not known. `daic.env` therefore sets `ARRAY_MEM_PER_CPU=8G`,
+  which `submit_sweep.sh` passes to the array job only. 8G is a guess for
+  30-minute runs.
+- The planner image (`planner:edge`, version `0.5.0-edge+20261104.5acc8c1`)
+  contains PR #59 (checked in a local planner clone: `0501a07` is an ancestor
+  of `5acc8c1`). On instance 1, both planners found a plan and the evaluator
+  rejected both ("plan rejected"). Instance 0 timed out for both. The one
+  rejection looked at, `enhsp` on instance 1, gave `Trains's departure
+  mismatch with Action start/end time` (train 2 departing at 6680, action at
+  9100); the `symbolic-rail` rejection was not inspected. This is a planner or
+  evaluator matter, not a cluster one. The evaluator also warned
+  `plan.json: schemaVersion 1 does not match expected 2`.
+
+**Not observed:**
+- Any purge policy on `~/linuxhome`.
+- Whether 30 GiB is enough for the full sweeps (2 × 240 tasks). Check `du -sh`
+  after the first full run.
+- Whether a bare `--mem` is refused as on DelftBlue.
+- Memory per task at a 30-minute run, on either cluster, and the fair-use
+  rules for long arrays on DAIC.
+
 ## Known gaps
 
 - ~~`scripts/slurm/run_experiment_array.sbatch` and `aggregate.sbatch` have
