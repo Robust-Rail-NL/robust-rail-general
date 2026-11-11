@@ -28,7 +28,8 @@ from scripts.docker_utils import (
     finish_capture,
     run_container,
 )
-from scripts.instance_filter import fail_no_match, instance_of, select
+from scripts.instance_filter import (add_single_arg, apply_single, ensure_single, fail_no_match,
+                                      instance_of, select)
 
 ROOT = Path(__file__).parent
 CONTAINER_DB = "/app/database"
@@ -57,7 +58,7 @@ def _instance_name(path: Path) -> str:
 
 def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner: str,
                   dry_run: bool, timeout: int, engine: str = "docker",
-                  cache_dir: Path | None = None) -> bool:
+                  cache_dir: Path | None = None, tee: bool = False) -> bool:
     name = _instance_name(scenario)
     plan_name = f"plan_{name}.json"
     cname = container_name("planner", name)
@@ -82,7 +83,7 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner
     out_file = plans_dir / f"plan_{name}.out"
     err_file = plans_dir / f"plan_{name}.err"
 
-    returncode, timed_out = run_container(cmd, cname, out_file, err_file, timeout, engine)
+    returncode, timed_out = run_container(cmd, cname, out_file, err_file, timeout, engine, tee)
     ok = returncode == 0
 
     footer = (f"--- timeout: killed after {timeout}s (container {cname})" if timed_out
@@ -102,7 +103,8 @@ def _run_scenario(docker_image: str, location_dir: Path, scenario: Path, planner
 def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, planner: str,
                          output_dir: Path, version: str, dry_run: bool,
                          timeout: int | None = None, engine: str = "docker",
-                         cache_dir: Path | None = None, outside_location: bool = False) -> dict:
+                         cache_dir: Path | None = None, outside_location: bool = False,
+                         tee: bool = False) -> dict:
     """Plan one scenario into output_dir.
 
     outside_location (--scenario): the scenario file is mounted from wherever it
@@ -135,7 +137,7 @@ def _run_scenario_single(docker_image: str, location_dir: Path, scenario: Path, 
 
     out_file, err_file = output_dir / "planner.out", output_dir / "planner.err"
     start, start_iso = time.monotonic(), datetime.now(timezone.utc).isoformat()
-    returncode, timed_out = run_container(cmd, cname, out_file, err_file, timeout, engine)
+    returncode, timed_out = run_container(cmd, cname, out_file, err_file, timeout, engine, tee)
 
     plan_produced = plan_path.exists() and plan_path.stat().st_size > 0
     record = {
@@ -178,6 +180,7 @@ def main() -> None:
                         help="Restrict to a single scenarios/scenario_<NAME>.json (a pasted "
                              "filename works too). Accepts shell-style wildcards; exits non-zero "
                              "if it matches nothing.")
+    add_single_arg(parser, "scenarios/scenario_<NAME>.json")
     parser.add_argument("--no-pull", action="store_true",
                         help="Skip the up-front 'docker pull'. For a driver like "
                              "run_experiment.py that invokes this script once per attempt and "
@@ -213,6 +216,7 @@ def main() -> None:
                              f"run_experiment.py can pass one flag name to both tools.")
     add_engine_args(parser)
     args = parser.parse_args()
+    apply_single(parser, args)
 
     if args.scenario:
         if args.instance:
@@ -234,10 +238,14 @@ def main() -> None:
         record = _run_scenario_single(DOCKER_IMAGE_VERSIONS[args.version], ROOT / args.location,
                                       args.scenario, args.planner, args.output_dir, args.version,
                                       args.dry_run, args.timeout, args.engine, args.sif_cache_dir,
-                                      outside_location=True)
+                                      outside_location=True, tee=args.tee)
         sys.exit(1 if record and not record.get("plan_produced") else 0)
 
     locations = [ROOT / args.location] if args.location else sorted(ROOT.glob("Location_*/"))
+    if args.single:
+        ensure_single((s for loc in locations if loc.is_dir()
+                       for s in loc.glob("scenarios/scenario_*.json")),
+                      args.single, INSTANCE_PREFIX)
 
     total, errors = 0, 0
     available: list[str] = []
@@ -257,7 +265,8 @@ def main() -> None:
             total += 1
             record = _run_scenario_single(DOCKER_IMAGE_VERSIONS[args.version], loc, scenarios[0],
                                           args.planner, args.output_dir, args.version,
-                                          args.dry_run, args.timeout, args.engine, args.sif_cache_dir)
+                                          args.dry_run, args.timeout, args.engine, args.sif_cache_dir,
+                                          tee=args.tee)
             if record and not record.get("plan_produced"):
                 errors += 1
             continue
@@ -266,7 +275,7 @@ def main() -> None:
             total += 1
             if not _run_scenario(DOCKER_IMAGE_VERSIONS[args.version], loc, scenario,
                                  args.planner, args.dry_run, args.timeout, args.engine,
-                                 args.sif_cache_dir):
+                                 args.sif_cache_dir, tee=args.tee):
                 errors += 1
 
     if args.instance and total == 0:

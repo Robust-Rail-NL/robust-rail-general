@@ -17,6 +17,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import threading
 import urllib.error
 import urllib.request
 import uuid
@@ -440,8 +441,14 @@ def _failed_bind_source(stderr: str) -> Path | None:
 
 
 def run_container(cmd: list[str], name: str, out_file: Path, err_file: Path,
-                  timeout: int | None, engine: str = "docker") -> tuple[int | None, bool]:
+                  timeout: int | None, engine: str = "docker",
+                  tee: bool = False) -> tuple[int | None, bool]:
     """Run one container invocation, capturing stdout/stderr to files.
+
+    tee: also echo the container's stdout/stderr to this process's own, as it
+    arrives. The files are written either way -- finish_capture, the result
+    records and run_experiment all read them -- so this is an addition to the
+    capture, never a replacement for it.
 
     Returns (returncode, timed_out); returncode is None if the run raised
     rather than exiting, in which case the exception is reported here.
@@ -462,7 +469,7 @@ def run_container(cmd: list[str], name: str, out_file: Path, err_file: Path,
     retry because the container never started: nothing ran, nothing was
     written, and both output files are reopened truncated.
     """
-    returncode, timed_out = _run_once(cmd, name, out_file, err_file, timeout, engine)
+    returncode, timed_out = _run_once(cmd, name, out_file, err_file, timeout, engine, tee)
     if engine == "docker" and returncode == MOUNT_RACE_EXIT and not timed_out:
         stderr = err_file.read_text(errors="replace") if err_file.exists() else ""
         source = _failed_bind_source(stderr)
@@ -470,7 +477,8 @@ def run_container(cmd: list[str], name: str, out_file: Path, err_file: Path,
             print(f"    docker cannot see {source}, which exists on disk — refreshing its "
                   f"parent directories and retrying", file=sys.stderr)
             warm_bind(source, _image_of(cmd))
-            returncode, timed_out = _run_once(cmd, name, out_file, err_file, timeout, engine)
+            returncode, timed_out = _run_once(cmd, name, out_file, err_file, timeout, engine,
+                                              tee)
             if returncode == MOUNT_RACE_EXIT:
                 print("    still unusable. A directory on that path was most likely deleted "
                       "and recreated; mount it once by hand to clear it, e.g.\n"
@@ -497,18 +505,85 @@ def _image_of(cmd: list[str]) -> str:
     return "alpine"
 
 
+# Console color for echoed stderr (bright red). Only the console copy is colored;
+# the .err file always gets the raw bytes.
+STDERR_COLOR = b"\x1b[91m"
+COLOR_RESET = b"\x1b[0m"
+
+
+def _wants_color(console) -> bool:
+    """Color only a real terminal, and honour NO_COLOR (no-color.org) and TERM=dumb."""
+    try:
+        return (console.isatty() and not os.environ.get("NO_COLOR")
+                and os.environ.get("TERM") != "dumb")
+    except (OSError, ValueError, AttributeError):
+        return False
+
+
+def _pump(source, file, console, color: bytes | None = None) -> None:
+    """Copy a pipe to `file` and `console` until EOF, flushing each chunk.
+
+    color: ANSI start sequence wrapped around each console chunk (reset after
+    it, so a chunk ending mid-line cannot leak color into the next write by
+    the other stream). Applies to the console copy only, and only if the
+    console is a terminal.
+
+    Chunks come from os.read, which returns whatever has arrived rather than
+    waiting to fill a buffer, so a slow tool still shows up as it goes (subject
+    to the tool's own buffering of its stdout). Bytes all the way: a chunk can
+    end mid-way through a UTF-8 sequence, and decoding it per chunk would mangle
+    that character in the echo.
+    """
+    sink = getattr(console, "buffer", None)
+    if color is not None and not _wants_color(console):
+        color = None
+    fd = source.fileno()
+    while True:
+        chunk = os.read(fd, 65536)
+        if not chunk:
+            return
+        file.write(chunk)
+        file.flush()
+        shown = color + chunk + COLOR_RESET if color else chunk
+        try:
+            if sink is not None:
+                sink.write(shown)
+            else:
+                console.write(shown.decode(errors="replace"))
+            console.flush()
+        except (OSError, ValueError):
+            # Console went away (closed pipe, e.g. `| head`): keep capturing.
+            console = open(os.devnull, "w")
+            sink = None
+
+
 def _run_once(cmd: list[str], name: str, out_file: Path, err_file: Path,
-              timeout: int | None, engine: str = "docker") -> tuple[int | None, bool]:
+              timeout: int | None, engine: str = "docker",
+              tee: bool = False) -> tuple[int | None, bool]:
     returncode, timed_out = None, False
     try:
-        with open(out_file, "w") as fout, open(err_file, "w") as ferr:
+        # Binary when teeing, because _pump moves raw bytes; text mode is only
+        # ever the plain redirect, where the child writes the file directly.
+        with open(out_file, "wb" if tee else "w") as fout, \
+                open(err_file, "wb" if tee else "w") as ferr:
             # start_new_session so a timeout can kill this local client's
             # whole process group, not just the client itself -- unlike
             # subprocess.run's own timeout (which kills its direct child
             # automatically), a bare Popen.wait(timeout=...) leaves the
             # process running on TimeoutExpired, so that kill has to be done
             # by hand below for both engines, not just apptainer's.
-            proc = subprocess.Popen(cmd, stdout=fout, stderr=ferr, start_new_session=True)
+            if tee:
+                proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                        start_new_session=True)
+                pumps = [threading.Thread(target=_pump, args=(proc.stdout, fout, sys.stdout),
+                                          daemon=True),
+                         threading.Thread(target=_pump, args=(proc.stderr, ferr, sys.stderr, STDERR_COLOR),
+                                          daemon=True)]
+                for pump in pumps:
+                    pump.start()
+            else:
+                proc = subprocess.Popen(cmd, stdout=fout, stderr=ferr, start_new_session=True)
+                pumps = []
             try:
                 returncode = proc.wait(timeout=timeout)
             except subprocess.TimeoutExpired:
@@ -527,6 +602,14 @@ def _run_once(cmd: list[str], name: str, out_file: Path, err_file: Path,
                     subprocess.run(["docker", "kill", name],
                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 proc.wait()
+            # The pipes reach EOF once the client and anything it spawned have
+            # closed them; the join bound only guards a stray grandchild that
+            # kept one open, so it cannot wedge the run.
+            for pump in pumps:
+                pump.join(timeout=5)
+            if pumps and not any(pump.is_alive() for pump in pumps):
+                proc.stdout.close()
+                proc.stderr.close()
     except Exception as exc:
         print(f"    ERROR: {exc}", file=sys.stderr)
     return returncode, timed_out
