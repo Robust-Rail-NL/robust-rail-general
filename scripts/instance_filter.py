@@ -107,7 +107,7 @@ def ensure_single(candidates: Iterable[Path], instance: str, prefix: str,
 
 def add_single_arg(parser, what: str) -> None:
     """Add --single to a run_*.py parser; `what` names the file it selects."""
-    parser.add_argument("--single", metavar="NAME",
+    parser.add_argument("-s", "--single", metavar="NAME",
                         help=f"Like --instance, but must select exactly one {what} across all "
                              f"locations (fails before running anything otherwise), and echoes "
                              f"the tool's stdout/stderr to the console as it runs, in addition "

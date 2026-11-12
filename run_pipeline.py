@@ -59,7 +59,7 @@ def main() -> None:
                              "eval_<NAME>), so one value selects the same instance throughout. "
                              "Accepts shell-style wildcards; a step that matches nothing fails "
                              "and aborts the pipeline.")
-    parser.add_argument("--single", metavar="NAME",
+    parser.add_argument("-s", "--single", metavar="NAME",
                         help="Like --instance, but each step must select exactly one file "
                              "across all locations, and echoes its tool's stdout/stderr to the "
                              "console as it runs. Passed on to every step.")

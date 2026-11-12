@@ -63,6 +63,11 @@ def test_apply_single_folds_into_instance_and_tees():
     assert (args.instance, args.tee) == ("foo", True)
 
 
+def test_short_flag_is_an_alias_of_single():
+    args = _parsed(["-s", "foo"])
+    assert (args.single, args.instance, args.tee) == ("foo", "foo", True)
+
+
 def test_apply_single_absent_leaves_instance_quiet():
     args = _parsed(["--instance", "foo"])
     assert (args.instance, args.tee) == ("foo", False)
@@ -141,7 +146,19 @@ def test_scripts_refuse_a_single_that_matches_nothing_before_running(script):
     assert "--single 'no_such_instance_xyz' matched no files" in result.stderr
 
 
+@pytest.mark.parametrize("script", ["run_solver.py", "run_planner.py", "run_generator.py",
+                                    "run_evaluator.py", "run_pipeline.py"])
+def test_scripts_accept_s_as_short_for_single(script):
+    result = subprocess.run(
+        [sys.executable, str(ROOT / script), "-s", "no_such_instance_xyz", "--dry-run"],
+        capture_output=True, text=True, cwd=ROOT)
+    assert result.returncode == 1
+    assert "--single 'no_such_instance_xyz' matched no files" in result.stderr
+
+
 def test_script_refuses_a_single_that_matches_several():
+    if len(list(ROOT.glob("Location_*/scenarios/scenario_*.json"))) < 2:
+        pytest.skip("needs at least two scenario fixtures in the checkout")
     result = subprocess.run(
         [sys.executable, str(ROOT / "run_solver.py"), "--single", "*", "--dry-run"],
         capture_output=True, text=True, cwd=ROOT)
