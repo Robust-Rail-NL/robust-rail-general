@@ -59,10 +59,12 @@ case "$1" in
 esac
 # END SHARED BLOCK: bump-semver
 
+# BEGIN SHARED BLOCK: bump-tag-exists (identical in every repo's bump-version.sh; edit all copies — checked by robust-rail-general/scripts/check_push_script_sync.py)
 if git rev-parse -q --verify "refs/tags/v$NEW" >/dev/null; then
     echo "Tag v$NEW already exists" >&2
     exit 1
 fi
+# END SHARED BLOCK: bump-tag-exists
 
 sed -i "s#^version = \"$CURRENT\"\$#version = \"$NEW\"#" "$PYPROJECT"
 uv lock
