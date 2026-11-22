@@ -55,7 +55,7 @@ into `main` would, so a fix picked up early is at least validated early too
 `-planner`, `-solver` and `-generator` share some logic (the `-f` flag, the
 release / edge safety guards, the ghcr.io login, the buildx builder setup), and
 the `bump-version.sh` scripts (those four plus this repo's) share the clean-tree
-check, usage, semver arithmetic and the commit/tag step.
+check, usage, the existing-tag guard, semver arithmetic and the commit/tag step.
 It is deliberately copied into each script rather than sourced from here:
 every repo must stay publishable from a standalone clone, and a release
 script must behave exactly as committed at its tag.

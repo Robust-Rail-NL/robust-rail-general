@@ -4,7 +4,7 @@
 The push scripts (docker-push.sh, docker-push-edge.sh) in robust-rail-evaluator, -planner, -solver and
 -generator share some logic: the -f flag, the release / edge safety guards, the ghcr.io login and the
 buildx builder setup. The bump-version.sh scripts (those four plus this repo) share the clean-tree check,
-usage, semver arithmetic and the commit/tag step. Each repo has to stay publishable from a standalone clone, and a release script
+usage, the existing-tag guard, semver arithmetic and the commit/tag step. Each repo has to stay publishable from a standalone clone, and a release script
 must run exactly as committed at its tag, so the logic is copied into each script rather than sourced
 from here. Copies drift, so each copy is wrapped in marker lines:
 
@@ -34,7 +34,7 @@ END = "# END SHARED BLOCK: "
 
 RELEASE_BLOCKS = ("release-flags", "release-guards", "ghcr-login", "buildx-builder")
 EDGE_BLOCKS = ("edge-guards", "ghcr-login", "buildx-builder")
-BUMP_BLOCKS = ("bump-clean-tree", "bump-usage", "bump-commit-tag")
+BUMP_BLOCKS = ("bump-clean-tree", "bump-usage", "bump-tag-exists", "bump-commit-tag")
 # The evaluator keeps its release and prerelease suffix in two separate CMake variables, so its bump-version.sh
 # has its own arithmetic; the other four derive both from a single version string.
 BUMP_SEMVER_BLOCKS = (*BUMP_BLOCKS, "bump-semver")
