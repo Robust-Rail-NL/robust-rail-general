@@ -52,6 +52,7 @@ SCRIPTS = [
     ("robust-rail-evaluator/docker-push-edge.sh", EDGE_BLOCKS),
     ("robust-rail-planner/docker-push-edge.sh", EDGE_BLOCKS),
     ("robust-rail-solver/ServiceSiteScheduling/docker-push-edge.sh", EDGE_BLOCKS),
+    ("robust-rail-generator/docker-push-edge.sh", EDGE_BLOCKS),
     ("robust-rail-evaluator/bump-version.sh", BUMP_BLOCKS),
     ("robust-rail-planner/bump-version.sh", BUMP_SEMVER_BLOCKS),
     ("robust-rail-solver/ServiceSiteScheduling/bump-version.sh", BUMP_SEMVER_BLOCKS),
