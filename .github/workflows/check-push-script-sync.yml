@@ -1,0 +1,74 @@
+name: Check shared script blocks
+
+# docker-push.sh, docker-push-edge.sh and bump-version.sh share some logic
+# across robust-rail-evaluator, -planner, -solver, -generator and this repo.
+# It is copied into each script (so each repo stays publishable from a
+# standalone clone, and a release script behaves exactly as committed at its
+# tag) rather than sourced; scripts/check_push_script_sync.py compares the
+# copies between their BEGIN/END SHARED BLOCK markers. See CONTRIBUTING.md.
+#
+# This is informational, not a gate: the check spans five repos, so a PR in
+# one of them cannot be blocked by a workflow living here. It runs weekly and
+# on demand, plus when the checker itself changes, and a red run means "the
+# copies have drifted — fix them" (or, mid-rollout of a change across the
+# repos, "not all of the PRs have landed yet").
+on:
+  schedule:
+    - cron: "17 5 * * 1"   # Mondays, 05:17 UTC
+  push:
+    branches: [ "main", "edge" ]
+    paths:
+      - ".github/workflows/check-push-script-sync.yml"
+      - "scripts/check_push_script_sync.py"
+      - "bump-version.sh"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        ref: [ main, edge ]
+    name: Shared blocks identical (${{ matrix.ref }})
+    steps:
+    # The checker resolves this repo from its own location and the siblings
+    # from --root (default: the directory above this repo), so check them all
+    # out side by side under the workspace.
+    - uses: actions/checkout@v5
+      with:
+        ref: ${{ matrix.ref }}
+        path: robust-rail-general
+
+    - uses: actions/checkout@v5
+      with:
+        repository: Robust-Rail-NL/robust-rail-evaluator
+        ref: ${{ matrix.ref }}
+        path: robust-rail-evaluator
+
+    - uses: actions/checkout@v5
+      with:
+        repository: Robust-Rail-NL/robust-rail-planner
+        ref: ${{ matrix.ref }}
+        path: robust-rail-planner
+
+    - uses: actions/checkout@v5
+      with:
+        repository: Robust-Rail-NL/robust-rail-solver
+        ref: ${{ matrix.ref }}
+        path: robust-rail-solver
+
+    - uses: actions/checkout@v5
+      with:
+        repository: Robust-Rail-NL/robust-rail-generator
+        ref: ${{ matrix.ref }}
+        path: robust-rail-generator
+
+    # Standard library only, so no Python or uv setup is needed beyond the
+    # runner's python3.
+    - name: Compare the shared blocks
+      run: python3 robust-rail-general/scripts/check_push_script_sync.py --root "$GITHUB_WORKSPACE"
