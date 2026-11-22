@@ -81,4 +81,20 @@ def test_malformed_markers_are_reported(tmp_path, text, fragment):
 
 def test_real_script_list_covers_all_repos():
     repos = {rel.split("/")[0] for rel, _ in mod.SCRIPTS}
-    assert repos == {"robust-rail-evaluator", "robust-rail-planner", "robust-rail-solver", "robust-rail-generator"}
+    assert repos == {
+        "robust-rail-evaluator",
+        "robust-rail-planner",
+        "robust-rail-solver",
+        "robust-rail-generator",
+        "robust-rail-general",
+    }
+
+
+def test_own_repo_is_resolved_against_self_root_not_root(tmp_path):
+    root, own = tmp_path / "root", tmp_path / "checkout-with-another-name"
+    write(root, "a/push.sh", script())
+    write(own, "push.sh", script())
+    scripts = [("a/push.sh", ("one", "two")), (f"{mod.SELF_REPO}/push.sh", ("one", "two"))]
+    assert mod.check(root, scripts, self_root=own) == []
+    write(own, "push.sh", script(two="echo CHANGED"))
+    assert "'two' differs" in mod.check(root, scripts, self_root=own)[0]
