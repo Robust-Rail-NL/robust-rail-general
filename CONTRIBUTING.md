@@ -49,6 +49,26 @@ trigger on `main` and `edge`. A push to `edge` runs the same checks a PR
 into `main` would, so a fix picked up early is at least validated early too
 — it just hasn't been reviewed yet.
 
+## Push and bump scripts shared across the sibling repos
+
+`docker-push.sh` and `docker-push-edge.sh` in `robust-rail-evaluator`,
+`-planner`, `-solver` and `-generator` share some logic (the `-f` flag, the
+release / edge safety guards, the ghcr.io login, the buildx builder setup), and
+the `bump-version.sh` scripts (those four plus this repo's) share the clean-tree
+check, usage, the existing-tag guard, semver arithmetic and the commit/tag step.
+It is deliberately copied into each script rather than sourced from here:
+every repo must stay publishable from a standalone clone, and a release
+script must behave exactly as committed at its tag.
+
+Each copy sits between `# BEGIN SHARED BLOCK: <name>` / `# END SHARED BLOCK:
+<name>` markers. After changing one, change the others, then run
+
+```sh
+python scripts/check_push_script_sync.py   # --root DIR if the repos are not siblings of this one
+```
+
+which compares the working copies of the sibling repos and fails on any drift.
+
 ## Retired: the `dev` branch
 
 `dev` predated the 2.0.0 schema unification and tracked the old
