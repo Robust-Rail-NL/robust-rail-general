@@ -12,7 +12,7 @@ different things depending on the repo, and all five also run an
 | `robust-rail-solver` | `main`, `edge` | `edge` is a floating `hip:edge` **image** channel (`stable`/`edge` docker tags) for running an unreviewed fix ahead of review; see its own `CONTRIBUTING.md` |
 | `robust-rail-evaluator` | `main`, `edge` | same model as the solver, `tors:edge` image |
 | `robust-rail-general` (this repo) | `main`, `edge` | `edge` is a **branch** channel, not an image one — this repo publishes no artifact of its own; see [CONTRIBUTING.md](CONTRIBUTING.md) |
-| `robust-rail-planner` | `main`, `edge` | same model as the solver, `planner:edge` image (added 2026-09-11; first image build in progress) |
+| `robust-rail-planner` | `main`, `edge` | same model as the solver, `planner:edge` image (added 2026-09-11) |
 
 The five `edge`s share a name and a branch-flow convention (feature branch →
 PR into `main`, optionally merged early into `edge` too via `git merge
