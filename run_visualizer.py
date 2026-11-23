@@ -19,6 +19,7 @@ import sys
 import webbrowser
 from pathlib import Path
 
+from scripts.cli_args import add_location_arg
 from scripts.instance_filter import ensure_single, instance_of, select
 
 ROOT = Path(__file__).parent
@@ -41,9 +42,8 @@ def main() -> None:
     parser.add_argument("instance", nargs="?", metavar="NAME",
                         help="Instance to visualise: plans/plan_<NAME>.json (a pasted filename or "
                              "a wildcard works, but it must select exactly one plan).")
-    parser.add_argument("--single", metavar="NAME", help="Same as the positional NAME.")
-    parser.add_argument("--location", metavar="NAME",
-                        help="Restrict to a single Location_* directory.")
+    parser.add_argument("-s", "--single", metavar="NAME", help="Same as the positional NAME.")
+    add_location_arg(parser)
     parser.add_argument("--layout", type=Path, metavar="FILE",
                         help="Visualizer layout JSON (default: <visualizer-dir>/layouts/"
                              "<location in snake_case>.json).")
