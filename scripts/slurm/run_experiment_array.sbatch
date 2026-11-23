@@ -33,8 +33,8 @@
 #
 # --cpus-per-task/--mem-per-cpu/--time below come from a single real
 # measurement (2026-10-14, /usr/bin/time -v over scripts/slurm_run_task.py,
-# one planner attempt, 5 trains, max_duration 300, via __scratch/
-# cluster-smoke-test-planner.json): 72.37s elapsed, 83% of one core, 452568
+# one planner attempt, 5 trains, max_duration 300, from a throwaway
+# experiment file that is no longer kept): 72.37s elapsed, 83% of one core, 452568
 # KB peak RSS. That run didn't time out (evaluator rejected the plan at
 # 68.9s, well under budget), so it bounds typical-case cost, not the
 # worst case -- a full 300s timeout's own memory/cpu footprint hasn't been
