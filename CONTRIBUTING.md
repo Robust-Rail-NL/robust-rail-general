@@ -42,6 +42,25 @@ Mirrors the convention `robust-rail-solver` established for its own `edge`:
   would have it. Treated as a reasonable tradeoff for a fast-moving branch;
   revisit only if that actually causes a real problem.
 
+### Git hooks
+
+Tracked hooks live under [`.githooks/`](.githooks/). Git never runs a repo's
+tracked hooks without an opt-in, so enable them once per clone:
+
+```sh
+git config core.hooksPath .githooks
+```
+
+- `pre-commit` refuses a direct commit to `edge`, but lets a
+  `git merge --no-ff` finish, including a conflicted one concluded with
+  `git commit` (git sets `MERGE_HEAD` for that commit).
+- `pre-push` refuses a direct push to `main`.
+
+`core.hooksPath` replaces git's hook directory wholesale, so it does not
+fall back to `.git/hooks/`; any hook you want enforced has to live in
+`.githooks/`. `--no-verify` skips both hooks: they are a backstop, not a
+guarantee. The edge guard is shared with the sibling repos (see below).
+
 ### CI
 
 Both `.github/workflows/validate-fixtures.yml` and `pipeline-smoke.yml`
@@ -49,13 +68,17 @@ trigger on `main` and `edge`. A push to `edge` runs the same checks a PR
 into `main` would, so a fix picked up early is at least validated early too
 — it just hasn't been reviewed yet.
 
-## Push and bump scripts shared across the sibling repos
+## Push, bump and hook scripts shared across the sibling repos
 
 `docker-push.sh` and `docker-push-edge.sh` in `robust-rail-evaluator`,
 `-planner`, `-solver` and `-generator` share some logic (the `-f` flag, the
 release / edge safety guards, the ghcr.io login, the buildx builder setup), and
 the `bump-version.sh` scripts (those four plus this repo's) share the clean-tree
 check, usage, the existing-tag guard, semver arithmetic and the commit/tag step.
+The edge-commit guard (refuse a direct commit to `edge`, allow a `git merge
+--no-ff` to finish) is shared by the pre-commit hooks of all five repos
+(`.githooks/pre-commit`; in the generator, `.githooks/edge-commit-guard.sh`,
+run from its `.pre-commit-config.yaml`).
 It is deliberately copied into each script rather than sourced from here:
 every repo must stay publishable from a standalone clone, and a release
 script must behave exactly as committed at its tag.
