@@ -8,7 +8,7 @@ different things depending on the repo, and all five also run an
 
 | Repo | Branches that matter | Model |
 |---|---|---|
-| `robust-rail-generator` | `main`, `edge` | same model as the solver, `generator:edge` image; `docker-push-edge.sh` publishes it manually, see its own `CONTRIBUTING.md`. `run_generator.py --version edge` still uses `generator:latest`, so pipeline runs do not pick it up yet |
+| `robust-rail-generator` | `main`, `edge` | same model as the solver, `generator:edge` image; `docker-push-edge.sh` publishes it manually, see its own `CONTRIBUTING.md` |
 | `robust-rail-solver` | `main`, `edge` | `edge` is a floating `hip:edge` **image** channel (`stable`/`edge` docker tags) for running an unreviewed fix ahead of review; see its own `CONTRIBUTING.md` |
 | `robust-rail-evaluator` | `main`, `edge` | same model as the solver, `tors:edge` image |
 | `robust-rail-general` (this repo) | `main`, `edge` | `edge` is a **branch** channel, not an image one — this repo publishes no artifact of its own; see [CONTRIBUTING.md](CONTRIBUTING.md) |
