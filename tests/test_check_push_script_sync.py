@@ -98,3 +98,8 @@ def test_own_repo_is_resolved_against_self_root_not_root(tmp_path):
     assert mod.check(root, scripts, self_root=own) == []
     write(own, "push.sh", script(two="echo CHANGED"))
     assert "'two' differs" in mod.check(root, scripts, self_root=own)[0]
+
+
+def test_real_script_list_covers_the_edge_commit_guard_in_every_repo():
+    guarded = {rel.split("/")[0] for rel, blocks in mod.SCRIPTS if "edge-commit-guard" in blocks}
+    assert guarded == {rel.split("/")[0] for rel, _ in mod.SCRIPTS}

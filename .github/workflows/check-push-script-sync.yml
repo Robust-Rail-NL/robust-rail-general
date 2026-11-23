@@ -1,6 +1,7 @@
 name: Check shared script blocks
 
-# docker-push.sh, docker-push-edge.sh and bump-version.sh share some logic
+# docker-push.sh, docker-push-edge.sh, bump-version.sh and the pre-commit
+# hook's edge-commit guard share some logic
 # across robust-rail-evaluator, -planner, -solver, -generator and this repo.
 # It is copied into each script (so each repo stays publishable from a
 # standalone clone, and a release script behaves exactly as committed at its
@@ -21,6 +22,7 @@ on:
       - ".github/workflows/check-push-script-sync.yml"
       - "scripts/check_push_script_sync.py"
       - "bump-version.sh"
+      - ".githooks/pre-commit"
   workflow_dispatch:
 
 permissions:
