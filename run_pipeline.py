@@ -12,6 +12,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from scripts.cli_args import add_dry_run_arg, add_location_arg
 from scripts.docker_utils import load_image_versions
 
 ROOT = Path(__file__).parent
@@ -49,16 +50,18 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Run the full generator → solver → evaluator pipeline."
     )
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Pass --dry-run to each step.")
-    parser.add_argument("--location", metavar="NAME",
-                        help="Restrict to a single Location_* directory.")
+    add_dry_run_arg(parser, help="Pass --dry-run to each step.")
+    add_location_arg(parser)
     parser.add_argument("--instance", metavar="NAME",
                         help="Restrict to a single instance, passed on to every step. All four "
                              "steps share one naming suffix (scenario_<NAME> -> plan_<NAME> -> "
                              "eval_<NAME>), so one value selects the same instance throughout. "
                              "Accepts shell-style wildcards; a step that matches nothing fails "
                              "and aborts the pipeline.")
+    parser.add_argument("-s", "--single", metavar="NAME",
+                        help="Like --instance, but each step must select exactly one file "
+                             "across all locations, and echoes its tool's stdout/stderr to the "
+                             "console as it runs. Passed on to every step.")
     parser.add_argument("--version", choices=["stable", "stable-assert", "edge", "local"],
                         default="stable",
                         help="Pick a docker image version ('local' is reserved for locally built "
@@ -84,6 +87,8 @@ def main() -> None:
     group.add_argument("--use-planner", action="store_true",
                        help="Shorthand for --steps generator,planner,evaluator.")
     args = parser.parse_args()
+    if args.single and args.instance:
+        parser.error("--single and --instance are mutually exclusive.")
 
     if args.use_planner:
         steps_arg = "generator,planner,evaluator"
@@ -113,6 +118,8 @@ def main() -> None:
         extra += ["--location", args.location]
     if args.instance:
         extra += ["--instance", args.instance]
+    if args.single:
+        extra += ["--single", args.single]
     timeout_extra = ["--timeout", str(args.timeout)] if args.timeout is not None else []
 
     steps_str = " → ".join(steps)
