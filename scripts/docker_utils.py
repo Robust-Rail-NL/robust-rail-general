@@ -71,8 +71,8 @@ def sif_filename(image: str) -> str:
     Both staging (apptainer_pull) and lookup (ensure_sif_present) derive the
     filename the same way from the image ref itself, not from whatever
     --version name resolved to it, so e.g. the generator's stable/
-    stable-assert/edge -- three version names, one identical image -- share a
-    single cached .sif instead of three copies of it.
+    stable-assert -- two version names, one identical image -- share a
+    single cached .sif instead of two copies of it.
     """
     return image.replace("/", "_").replace(":", "_") + ".sif"
 

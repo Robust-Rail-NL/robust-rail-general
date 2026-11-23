@@ -40,4 +40,6 @@ The extension (instances 5 to 14, trains 3 to 8, enhsp at 3 and 4 trains only, 4
 
 Hardware: DAIC partition `daic-eemcs-st`, every node an Intel Xeon 6724P (32 CPUs, 4.3 GHz max, about 512 GB; `lscpu` output of jobs 123823 to 123827), nodes `gpu47`, `gpu48`, `gpu49`, `gpu51`, `gpu52` (per-run node in the CSV column `node`), 1 CPU per task, memory per task 4G (solver), 32G (enhsp), 12G (symbolic-rail), 45 min limit, 1800 s tool budget.
 
+The experiment JSONs pin `"generator": "stable"`. They said `"edge"` when the grid ran, which `run_generator.py` then resolved to `generator:latest`, the image recorded above. `generator:edge` has been a separate image since generator#32, so the JSONs now say `stable`, which resolves to the same `generator:latest`.
+
 Servicing on has no 1-train cell: the generator refuses it (time window 1440, servicing time 300, `min_gap_on_gateway` 480).
