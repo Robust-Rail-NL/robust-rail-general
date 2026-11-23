@@ -8,7 +8,6 @@ engine take an explicit `engine` argument rather than reading a global, and
 default to "docker" so every existing call site keeps working unchanged.
 """
 
-import argparse
 import importlib.util
 import json
 import os
@@ -35,21 +34,6 @@ def default_sif_cache_dir() -> Path:
 
 
 DEFAULT_SIF_CACHE_DIR = default_sif_cache_dir()
-
-
-def add_engine_args(parser: argparse.ArgumentParser) -> None:
-    """Add the --engine/--sif-cache-dir pair every run_*.py and
-    run_experiment.py takes, so the choices, help text and default cache dir
-    live in one place instead of five near-identical copies.
-    """
-    parser.add_argument("--engine", choices=["docker", "apptainer"], default="docker",
-                        help="Container engine to run images under (default: docker). "
-                             "'apptainer' is for a SLURM cluster with no docker daemon -- "
-                             "scripts/stage_apptainer_images.py must be run first (on a host "
-                             "with internet access) to populate --sif-cache-dir.")
-    parser.add_argument("--sif-cache-dir", type=Path, default=DEFAULT_SIF_CACHE_DIR, metavar="DIR",
-                        help=f"Where apptainer images are cached (default: {DEFAULT_SIF_CACHE_DIR}). "
-                             "Ignored under --engine docker.")
 
 
 def ensure_pulled(image: str) -> None:

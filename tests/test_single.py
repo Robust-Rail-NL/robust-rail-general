@@ -13,7 +13,8 @@ import pytest
 
 from scripts import docker_utils
 from scripts.docker_utils import _pump, run_container
-from scripts.instance_filter import add_single_arg, apply_single, ensure_single
+from scripts.cli_args import add_instance_args, apply_single
+from scripts.instance_filter import ensure_single
 
 ROOT = Path(__file__).resolve().parent.parent
 PY_BOTH = [sys.executable, "-c",
@@ -51,8 +52,7 @@ def test_ensure_single_rejects_several_and_lists_them(tmp_path, capsys):
 
 def _parsed(argv: list[str]):
     parser = argparse.ArgumentParser()
-    parser.add_argument("--instance")
-    add_single_arg(parser, "scenario")
+    add_instance_args(parser, "scenario")
     args = parser.parse_args(argv)
     apply_single(parser, args)
     return args

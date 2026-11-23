@@ -103,26 +103,3 @@ def ensure_single(candidates: Iterable[Path], instance: str, prefix: str,
             print(f"  {hit}", file=sys.stderr)
         print("Narrow it down, or use --instance to run all of them.", file=sys.stderr)
         sys.exit(1)
-
-
-def add_single_arg(parser, what: str) -> None:
-    """Add --single to a run_*.py parser; `what` names the file it selects."""
-    parser.add_argument("-s", "--single", metavar="NAME",
-                        help=f"Like --instance, but must select exactly one {what} across all "
-                             f"locations (fails before running anything otherwise), and echoes "
-                             f"the tool's stdout/stderr to the console as it runs, in addition "
-                             f"to the .out/.err files. For watching one instance run.")
-
-
-def apply_single(parser, args) -> None:
-    """Fold --single into --instance, and set args.tee for the container run.
-
-    Everything --instance already does (the filter, the checks that other
-    options need one, --output-dir's single-match rule) then applies unchanged.
-    The exactly-one check across locations is separate: see ensure_single.
-    """
-    args.tee = args.single is not None
-    if args.single is not None:
-        if args.instance is not None:
-            parser.error("--single and --instance are mutually exclusive.")
-        args.instance = args.single

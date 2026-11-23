@@ -10,7 +10,6 @@ from itertools import chain
 from pathlib import Path
 
 from scripts.docker_utils import (
-    add_engine_args,
     build_run_cmd,
     container_name,
     ensure_pulled,
@@ -18,8 +17,10 @@ from scripts.docker_utils import (
     finish_capture,
     run_container,
 )
-from scripts.instance_filter import (add_single_arg, apply_single, ensure_single, fail_no_match,
-                                      instance_of, select)
+from scripts.cli_args import (add_dry_run_arg, add_engine_args, add_instance_args,
+                              add_location_arg, add_no_pull_arg, add_version_arg,
+                              apply_single)
+from scripts.instance_filter import ensure_single, fail_no_match, instance_of, select
 
 ROOT = Path(__file__).parent
 INSTANCE_PREFIX = "plan_"
@@ -202,15 +203,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Run the TORS evaluator on all plans that have a matching scenario."
     )
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Print docker commands without executing them.")
-    parser.add_argument("--location", metavar="NAME",
-                        help="Restrict to a single Location_* directory.")
-    parser.add_argument("--instance", metavar="NAME",
-                        help="Restrict to a single plans/plan_<NAME>.json (a pasted filename works "
-                             "too). Accepts shell-style wildcards; exits non-zero if it matches "
-                             "nothing.")
-    add_single_arg(parser, "plans/plan_<NAME>.json")
+    add_dry_run_arg(parser)
+    add_location_arg(parser)
+    add_instance_args(parser, "plans/plan_<NAME>.json")
     parser.add_argument("--plan", metavar="FILE", type=Path,
                         help="Evaluate this one plan file wherever it lives — typically a "
                              "plan.json under a run_solver.py/run_planner.py --output-dir. "
@@ -229,14 +224,8 @@ def main() -> None:
                              "which is why a plan one second over its deadline is rejected "
                              "outright. Meant for rounding, not for excusing a scenario whose "
                              "window is too short to be met at all.")
-    parser.add_argument("--no-pull", action="store_true",
-                        help="Skip the up-front 'docker pull'. For a driver like "
-                             "run_experiment.py that invokes this script once per attempt and "
-                             "pulls each image once itself — without it, every invocation would "
-                             "re-check the registry for an image that cannot change mid-run.")
-    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default="stable",
-                        help="Pick a docker image version ('local' is reserved for locally built "
-                             "images).")
+    add_no_pull_arg(parser)
+    add_version_arg(parser, DOCKER_IMAGE_VERSIONS.keys(), mentions_edge=False)
     add_engine_args(parser)
     args = parser.parse_args()
     apply_single(parser, args)
