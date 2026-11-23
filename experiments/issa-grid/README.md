@@ -71,6 +71,36 @@ Notes that cost time to find:
   row); `SKIP_GENERATE=1` reuses it for that reason.
 - The submit script checks the partitions exist. Without `SLURM_SITE=daic` it defaults to DelftBlue's `compute-p1`.
 
+## Before submitting: check and freeze the images
+
+`edge` is a floating tag, so a push in the middle of a grid would change the images between tasks. Before stage 1, check
+which builds the staged images are, and record the digests:
+
+```bash
+head -1 <pilot or earlier output>/<instance>/local_search/solver.out     # HIP version line, e.g. HIP 2.2.0-edge+20261106.965fd71
+head -1 <pilot or earlier output>/<instance>/planning-enhsp/planner.err  # e.g. robust-rail-planner 0.5.0-edge+20261106.2f2f34b
+cat $SIF_CACHE_DIR/*.digest > ~/linuxhome/issa/image_digests_$(date +%F).txt
+```
+
+If an image is older than the build you want, restage first (`python3 scripts/stage_apptainer_images.py --edge`). Do not
+restage while a grid is running.
+
+## Look before an extension (stage 2, or more instances)
+
+Before spending the larger sizes' compute, build the CSV from the finished stage and tabulate `outcome` by
+`type-solver`, `servicing` and `num_trains` (`summarise_outcomes.py`). If a tool already fails at every instance of a
+size, larger sizes will fail too, and running them only records that. Whether that is worth up to about 180 tasks x 30 min
+per variant is the requester's decision.
+
+## Resubmitting failed tasks
+
+A task killed by the out-of-memory killer leaves no `result.json`, so resubmitting just those indices with more memory
+re-runs them (the run stamp does not skip a task without a result). Get the indices from
+`sacct -j <array id> -X -P -n -o JobID,State | grep OUT_OF_MEMORY` and submit them with
+`sbatch --array=<list> --mem-per-cpu=<more> ... scripts/slurm/run_experiment_array.sbatch <tasks.tsv> <experiment.json> <output dir>`.
+A rerun with different memory is a different resource budget: note which tasks were rerun. (No task ran out of memory in
+the grid itself; this is from the pilot design.)
+
 ## Building the CSV
 
 ```bash
