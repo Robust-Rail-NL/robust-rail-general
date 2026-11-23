@@ -67,8 +67,8 @@ def add_version_arg(parser: argparse.ArgumentParser, versions: Iterable[str],
                     mentions_edge: bool = True) -> None:
     """Add --version over `versions` (the script's DOCKER_IMAGE_VERSIONS keys).
 
-    mentions_edge: whether the help explains 'edge'. run_solver/run_planner do;
-    run_generator/run_evaluator historically did not.
+    mentions_edge: whether the help explains 'edge'. run_solver, run_planner and
+    run_generator do; run_evaluator historically did not.
     """
     edge = ("; 'edge' tracks the newest not-yet-vetted push to the edge branch"
             if mentions_edge else "")

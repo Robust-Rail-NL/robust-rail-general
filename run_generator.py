@@ -50,7 +50,7 @@ INSTANCE_PREFIX = "scenario_config_"
 DOCKER_IMAGE_VERSIONS = {
     "stable": "ghcr.io/robust-rail-nl/generator:latest",
     "stable-assert": "ghcr.io/robust-rail-nl/generator:latest",
-    "edge": "ghcr.io/robust-rail-nl/generator:latest",
+    "edge": "ghcr.io/robust-rail-nl/generator:edge",
     "local": "generator:latest",
 }
 CONTAINER_DB = "/app/database"
@@ -258,7 +258,7 @@ def main() -> None:
                              "keep it modest rather than maxing out cores; run generation as its "
                              "own sbatch/srun job on a compute node instead for heavier parallelism.")
     add_no_pull_arg(parser)
-    add_version_arg(parser, DOCKER_IMAGE_VERSIONS.keys(), mentions_edge=False)
+    add_version_arg(parser, DOCKER_IMAGE_VERSIONS.keys(), mentions_edge=True)
     add_engine_args(parser)
     args = parser.parse_args()
     apply_single(parser, args)
