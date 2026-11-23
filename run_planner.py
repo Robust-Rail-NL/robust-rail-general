@@ -20,7 +20,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from scripts.docker_utils import (
-    add_engine_args,
     build_run_cmd,
     container_name,
     ensure_pulled,
@@ -28,8 +27,10 @@ from scripts.docker_utils import (
     finish_capture,
     run_container,
 )
-from scripts.instance_filter import (add_single_arg, apply_single, ensure_single, fail_no_match,
-                                      instance_of, select)
+from scripts.cli_args import (add_dry_run_arg, add_engine_args, add_instance_args,
+                              add_location_arg, add_no_pull_arg, add_version_arg,
+                              apply_single)
+from scripts.instance_filter import ensure_single, fail_no_match, instance_of, select
 
 ROOT = Path(__file__).parent
 CONTAINER_DB = "/app/database"
@@ -172,24 +173,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Run the planner on all scenario_*.json files."
     )
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Print docker commands without executing them.")
-    parser.add_argument("--location", metavar="NAME",
-                        help="Restrict to a single Location_* directory.")
-    parser.add_argument("--instance", metavar="NAME",
-                        help="Restrict to a single scenarios/scenario_<NAME>.json (a pasted "
-                             "filename works too). Accepts shell-style wildcards; exits non-zero "
-                             "if it matches nothing.")
-    add_single_arg(parser, "scenarios/scenario_<NAME>.json")
-    parser.add_argument("--no-pull", action="store_true",
-                        help="Skip the up-front 'docker pull'. For a driver like "
-                             "run_experiment.py that invokes this script once per attempt and "
-                             "pulls each image once itself — without it, every invocation would "
-                             "re-check the registry for an image that cannot change mid-run.")
-    parser.add_argument("--version", choices=DOCKER_IMAGE_VERSIONS.keys(), default="stable",
-                        help="Pick a docker image version ('local' is reserved for locally built "
-                             "images; 'edge' tracks the newest not-yet-vetted push to the edge "
-                             "branch).")
+    add_dry_run_arg(parser)
+    add_location_arg(parser)
+    add_instance_args(parser, "scenarios/scenario_<NAME>.json")
+    add_no_pull_arg(parser)
+    add_version_arg(parser, DOCKER_IMAGE_VERSIONS.keys(), mentions_edge=True)
     parser.add_argument("--planner", choices=["symbolic", "symbolic-rail", "enhsp"],
                         default="symbolic-rail",
                         help="Planner implementation to use inside the container. 'symbolic-rail' "

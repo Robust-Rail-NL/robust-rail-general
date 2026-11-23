@@ -12,6 +12,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from scripts.cli_args import add_dry_run_arg, add_location_arg
 from scripts.docker_utils import load_image_versions
 
 ROOT = Path(__file__).parent
@@ -49,10 +50,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Run the full generator → solver → evaluator pipeline."
     )
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Pass --dry-run to each step.")
-    parser.add_argument("--location", metavar="NAME",
-                        help="Restrict to a single Location_* directory.")
+    add_dry_run_arg(parser, help="Pass --dry-run to each step.")
+    add_location_arg(parser)
     parser.add_argument("--instance", metavar="NAME",
                         help="Restrict to a single instance, passed on to every step. All four "
                              "steps share one naming suffix (scenario_<NAME> -> plan_<NAME> -> "

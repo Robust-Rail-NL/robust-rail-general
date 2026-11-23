@@ -85,8 +85,9 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 from scripts import experiment_spec  # noqa: E402
 from scripts.generate_experiment_configs import scenario_params, sweep_configs  # noqa: E402
+from scripts.cli_args import add_engine_args  # noqa: E402
 from scripts.docker_utils import (  # noqa: E402
-    add_engine_args, ensure_pulled, ensure_runtime_ready, image_identity, load_image_versions,
+    ensure_pulled, ensure_runtime_ready, image_identity, load_image_versions,
 )
 from scripts.report_results import (  # noqa: E402
     DEFAULT_CERTIFY_THRESHOLD,
