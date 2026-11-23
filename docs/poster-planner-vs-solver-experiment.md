@@ -160,6 +160,46 @@ directory read-only for browsing:
 sshfs -o ro leonplanken@login.delftblue.tudelft.nl:poster-results ~/mnt
 ```
 
+## Results of the 300s sweep
+
+Copied from the first-results summary written on 2026-10-15, straight after
+the sweep finished; the numbers were not re-derived from the raw files when
+this section was written. There is no equivalent summary for the 600s sweep.
+
+### Coverage
+
+All 300 scenarios (1-5 trains x FIFO/LIFO/random, 20 instances per cell), both
+tools on the identical set, 300s budget each. Overall the two tools are level:
+the planner is valid on 79.7% of all 300 scenarios against 78.7% for the solver
+(90.2% against 89.1% on the 265 "known-feasible" subset), which is not
+significant (McNemar p = 0.79).
+
+The difference is in the split by matching:
+
+| Matching | Planner | Solver | Significance |
+|---|---|---|---|
+| random | 65% | 42% | p < 0.0001; 26 scenarios only the planner solves, 3 only the solver |
+| FIFO | 87% | 97% | p = 0.013 |
+| LIFO | 87% | 97% | p = 0.006 |
+
+### Failure causes
+
+The counts below are failures per tool, of the solver's 64 and the planner's 61.
+"Interpretation conventions" explains why 33 of each fall into the generic
+`"plan rejected"` bucket.
+
+- **Solver, length exceeded:** 20 of 64 are `"exceeds the maximum length"`.
+  The overfill is substantial, 7 to 134 units over (for example
+  `270.62 > 255.00`), so this is a real packing failure, not the exact-length
+  rounding fix. The solver tries to park a composition on a track that is too
+  short for it.
+- **Solver, `Combine`:** 9 of 64 are `"Error in generating action (Combine...)"`,
+  an internal error (shunting units not on the same track, or not facing the
+  same direction).
+- **Track 906a:** both tools hit it, worded differently. Planner:
+  `"Track 906a is reserved"` (2 failures); solver:
+  `"Parking is not allowed on track 906a"` (1 failure).
+
 ## Interpretation conventions
 
 - **Feasibility denominator**: `feasibility.csv`'s `classification` column
