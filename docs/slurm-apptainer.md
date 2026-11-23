@@ -351,8 +351,8 @@ SLURM_SITE=daic scripts/slurm/submit_sweep.sh EXPERIMENT.json \
   array job and `aggregate.sbatch`'s own lighter, unmeasured-but-reasoned
   `--time=00:20:00`/`--mem-per-cpu=2G`. The array job's own values come from
   one real measurement: `/usr/bin/time -v` over `scripts/slurm_run_task.py`
-  running one planner attempt (5 trains, `max_duration: 300`, via
-  `__scratch/cluster-smoke-test-planner.json`) on a real DelftBlue compute
+  running one planner attempt (5 trains, `max_duration: 300`, from a
+  throwaway experiment file that is no longer kept) on a real DelftBlue compute
   node — 72.37s elapsed (well under the 300s budget; this attempt didn't time
   out, the evaluator rejected the plan at 68.9s), 83% of one core, 452568 KB
   peak RSS. `--time=00:08:00` is reasoned margin above that and above the
@@ -388,7 +388,7 @@ SLURM_SITE=daic scripts/slurm/submit_sweep.sh EXPERIMENT.json \
   invoked from, which SLURM sets reliably) — both scripts must now be
   submitted from the repo root, which every instruction here already assumed
   anyway. Not caught by the 2026-10-14 sizing measurement above, since that
-  used a separate one-off script (`__scratch/sizing-planner.sbatch`) with no
+  used a separate one-off script (no longer kept) with no
   such `cd` at all, relying on `sbatch`'s own default working directory
   instead.
 - Still genuinely untried: an actual `sbatch --array` submission that
