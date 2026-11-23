@@ -11,7 +11,7 @@
     "max_duration": 1800,
     "jobs": 1,
     "versions": {
-        "generator": "edge",
+        "generator": "stable",
         "solver": "edge",
         "planner": "edge",
         "evaluator": "edge"

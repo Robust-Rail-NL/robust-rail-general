@@ -14,7 +14,7 @@ Mirrors run_experiment.py's own _pull_once: images are resolved from each
 run_*.py's own DOCKER_IMAGE_VERSIONS (the single source of truth for what a
 --version name means) and de-duplicated by image ref before pulling, since
 several version names can resolve to the identical image -- e.g. the
-generator's stable/stable-assert/edge all do.
+generator's stable and stable-assert do.
 
 No --version local equivalent: decided against one (see docs/
 slurm-apptainer.md) since only registry images matter for a cluster run.

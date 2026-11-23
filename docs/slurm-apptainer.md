@@ -135,7 +135,7 @@ also a hard requirement.
 It resolves `--<tool>-version` (comma-separated) through each `run_*.py`'s
 own `DOCKER_IMAGE_VERSIONS`, de-duplicates by resolved image before pulling
 (several version names can share one image — e.g. the generator's
-`stable`/`stable-assert`/`edge` all do), and pulls each distinct one into
+`stable`/`stable-assert` both do), and pulls each distinct one into
 `--cache-dir` as `<sanitized-image-ref>.sif`
 (`docker_utils.sif_filename`/`sif_path`). Defaults to the set a normal sweep
 needs: generator/solver/planner `stable`, evaluator `stable` *and*
@@ -309,7 +309,8 @@ SLURM_SITE=daic scripts/slurm/submit_sweep.sh EXPERIMENT.json \
 **Smoke test, 2026-11-04** (`composition_smoke.json`, 6 tasks at 120 s, via
 `SLURM_SITE=daic scripts/slurm/submit_sweep.sh`; generate job 98265, array
 98266, aggregate 98267):
-- Staging with `--edge` worked on the login node: 8 images, 1.2 GB in
+- Staging with `--edge` worked on the login node: 8 images (before
+  `generator:edge` existed as a separate image; it is 9 now), 1.2 GB in
   `~/linuxhome/apptainer-images`. The apptainer layer cache and tmp directory
   added about 2.2 GB more under `~/linuxhome` (3.4 GB in total); they can be
   deleted after staging.

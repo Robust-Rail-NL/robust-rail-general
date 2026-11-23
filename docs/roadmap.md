@@ -141,7 +141,7 @@ the solver/evaluator verification generalizes unchecked.
 - **`edge-main-divergence-check`** — a weekly scheduled Claude Code cloud
   routine (Mondays 06:00 UTC) checking whether `edge` and `main` have
   diverged in a way suggesting the same fix was written twice, across all
-  four repos with an `edge` branch. Read-only; run log at
+  five repos with an `edge` branch. Read-only; run log at
   `https://claude.ai/code/routines/trig_01QF8sv8BLkJPXwxwXVHSkXq`.
 - The `stable`/`edge` channel model itself (image channel for solver,
   evaluator, planner; branch channel for this repo) is still fairly new

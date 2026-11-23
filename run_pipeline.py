@@ -67,8 +67,8 @@ def main() -> None:
                         help="Pick a docker image version ('local' is reserved for locally built "
                              "images; 'stable-assert' runs the evaluator with assertions enabled "
                              "for integration testing, and is not for baseline comparison; 'edge' "
-                             "runs the solver/planner and evaluator from their not-yet-vetted edge "
-                             "branch builds while generator stays on stable).")
+                             "runs the generator, solver/planner and evaluator from their "
+                             "not-yet-vetted edge builds).")
     parser.add_argument("--timeout", type=int, default=None, metavar="SECONDS",
                         help="Wall-clock budget for whichever of solver/planner runs: the "
                              "container is killed once it expires. Passed only to those two "
