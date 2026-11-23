@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Check that the shared blocks in the sibling repos' docker-push*.sh and bump-version.sh scripts have not drifted apart.
+"""Check that the shared blocks in the sibling repos' docker-push*.sh, bump-version.sh and edge-commit hook scripts have not drifted apart.
 
 The push scripts (docker-push.sh, docker-push-edge.sh) in robust-rail-evaluator, -planner, -solver and
 -generator share some logic: the -f flag, the release / edge safety guards, the ghcr.io login and the
 buildx builder setup. The bump-version.sh scripts (those four plus this repo) share the clean-tree check,
-usage, the existing-tag guard, semver arithmetic and the commit/tag step. Each repo has to stay publishable from a standalone clone, and a release script
+usage, the existing-tag guard, semver arithmetic and the commit/tag step. The edge-commit guard (refuse a direct commit to edge, allow a `git merge --no-ff`
+to finish) is shared by the git hooks of all five repos. Each repo has to stay publishable from a standalone clone, and a release script
 must run exactly as committed at its tag, so the logic is copied into each script rather than sourced
 from here. Copies drift, so each copy is wrapped in marker lines:
 
@@ -34,6 +35,7 @@ END = "# END SHARED BLOCK: "
 
 RELEASE_BLOCKS = ("release-flags", "release-guards", "ghcr-login", "buildx-builder")
 EDGE_BLOCKS = ("edge-guards", "ghcr-login", "buildx-builder")
+EDGE_COMMIT_BLOCKS = ("edge-commit-guard",)
 BUMP_BLOCKS = ("bump-clean-tree", "bump-usage", "bump-tag-exists", "bump-commit-tag")
 # The evaluator keeps its release and prerelease suffix in two separate CMake variables, so its bump-version.sh
 # has its own arithmetic; the other four derive both from a single version string.
@@ -58,6 +60,13 @@ SCRIPTS = [
     ("robust-rail-solver/ServiceSiteScheduling/bump-version.sh", BUMP_SEMVER_BLOCKS),
     ("robust-rail-generator/bump-version.sh", BUMP_SEMVER_BLOCKS),
     (f"{SELF_REPO}/bump-version.sh", BUMP_SEMVER_BLOCKS),
+    # The guard that refuses a direct commit to edge but lets a `git merge --no-ff` finish. The generator's is
+    # a script run by its pre-commit config; the others are the pre-commit hook itself.
+    ("robust-rail-evaluator/.githooks/pre-commit", EDGE_COMMIT_BLOCKS),
+    ("robust-rail-planner/.githooks/pre-commit", EDGE_COMMIT_BLOCKS),
+    ("robust-rail-solver/.githooks/pre-commit", EDGE_COMMIT_BLOCKS),
+    ("robust-rail-generator/.githooks/edge-commit-guard.sh", EDGE_COMMIT_BLOCKS),
+    (f"{SELF_REPO}/.githooks/pre-commit", EDGE_COMMIT_BLOCKS),
 ]
 
 
