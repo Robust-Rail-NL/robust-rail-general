@@ -412,13 +412,13 @@
             "trainUnits": [
                 {
                     "typePrefix": "SNG",
-                    "carriages": 3,
+                    "carriages": 4,
                     "id": null,
                     "tasks": null
                 },
                 {
                     "typePrefix": "SNG",
-                    "carriages": 4,
+                    "carriages": 3,
                     "id": null,
                     "tasks": null
                 }

@@ -84,6 +84,17 @@ scenario being hard.
 These predate the seed-sweep work and are `trains_given` or single-seed, so they
 have a verdict rather than a rate.
 
+**Unit order (2026-11-24).** The scenario files in this repo were migrated to the head-first unit-order
+convention ([#50](https://github.com/Robust-Rail-NL/robust-rail-general/issues/50),
+[`unit-order-convention.md`](unit-order-convention.md)) with `scripts/migrate_unit_order.py`: the departing
+unit lists were reversed where a train leaves at the end of the yard its units arrived at. The verdicts
+below, and the plan and eval files next to the migrated scenarios, were produced for the old reading and
+are not re-measured yet. Two files were migrated by hand because they have standing trains:
+`scenario_example2` (departing train 4001 reversed) and `scenario_random_distribution2` (departing trains
+14, 15 and 16 reversed; 10 and 11 left as they were, because the file does not say whether their units
+came from a standing or an arriving train). `scenario_example1` was left as it was: its only multi-unit
+departure is built from two standing units.
+
 | scenario | outcome | note |
 |---|---|---|
 | `10t_random_42s_distribution1` | infeasible | Gateway `906a` widened 255→326 m 2026-09-16 (see "Measured rates" above) invalidated the old "arrival train 270.62 m > 255 m" reason, but the scenario is still a proof under the new limit: departure train 432.68 m > 326 m gateway (track id 15). Re-verified 2026-09-16. |

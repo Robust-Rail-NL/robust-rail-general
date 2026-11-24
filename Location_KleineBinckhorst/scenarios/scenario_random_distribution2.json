@@ -552,13 +552,13 @@
             "trainUnits": [
                 {
                     "typePrefix": "SLT",
-                    "carriages": 4,
+                    "carriages": 6,
                     "id": null,
                     "tasks": null
                 },
                 {
                     "typePrefix": "SLT",
-                    "carriages": 6,
+                    "carriages": 4,
                     "id": null,
                     "tasks": null
                 }
@@ -574,13 +574,13 @@
             "trainUnits": [
                 {
                     "typePrefix": "SLT",
-                    "carriages": 6,
+                    "carriages": 4,
                     "id": null,
                     "tasks": null
                 },
                 {
                     "typePrefix": "SLT",
-                    "carriages": 4,
+                    "carriages": 6,
                     "id": null,
                     "tasks": null
                 }
@@ -596,13 +596,13 @@
             "trainUnits": [
                 {
                     "typePrefix": "SLT",
-                    "carriages": 4,
+                    "carriages": 6,
                     "id": null,
                     "tasks": null
                 },
                 {
                     "typePrefix": "SLT",
-                    "carriages": 6,
+                    "carriages": 4,
                     "id": null,
                     "tasks": null
                 }
