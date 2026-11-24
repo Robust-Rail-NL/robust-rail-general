@@ -99,12 +99,24 @@ have a verdict rather than a rate.
 convention ([#50](https://github.com/Robust-Rail-NL/robust-rail-general/issues/50),
 [`unit-order-convention.md`](unit-order-convention.md)) with `scripts/migrate_unit_order.py`: the departing
 unit lists were reversed where a train leaves at the end of the yard its units arrived at. The verdicts
-below, and the plan and eval files next to the migrated scenarios, were produced for the old reading and
-are not re-measured yet. Two files were migrated by hand because they have standing trains:
+below were produced for the old reading, except where this paragraph says otherwise. Two files were migrated by hand because they have standing trains:
 `scenario_example2` (departing train 4001 reversed) and `scenario_random_distribution2` (departing trains
 14, 15 and 16 reversed; 10 and 11 left as they were, because the file does not say whether their units
 came from a standing or an arriving train). `scenario_example1` was left as it was: its only multi-unit
 departure is built from two standing units.
+
+Re-run 2026-11-24 with `hip:latest` (`a0cf724a0d42`) and `tors:latest` (`f67f0e0a73da`), one solver run each
+(a single run is not a rate). Controls: the same images on the old-reading files:
+
+| scenario | old reading | head-first (migrated) |
+|---|---|---|
+| `8t_custom_example2` | valid | **not valid**: `Tracked Train: 4001`, departure 4350 against 4200 (the plan is late) |
+| `10t_random_42s_distribution1` | not valid (`Tracked Train: 12`) | not valid (`Tracked Train: 11`, departure mismatch, 5280 against 5100) |
+| `10t_random_42s_distribution2` | not valid (`Tracked Train: 17`, 5674 against 5400) | not valid (`Tracked Train: 17`, 5460 against 5400) |
+
+So `8t_custom_example2` went from valid to not valid with the migration: under head-first the same-order departure
+needs a turnaround or a split and recombine, and the solver did not find a plan in time. The other two fail on a
+departure mismatch both ways. The `marginal_length` re-sweep is under "Measured rates" above.
 
 | scenario | outcome | note |
 |---|---|---|
