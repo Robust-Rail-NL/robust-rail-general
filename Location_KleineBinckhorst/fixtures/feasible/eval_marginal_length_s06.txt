@@ -1,4 +1,4 @@
-[last 40 of 665 lines; regenerate the full trace by evaluating the scenario and plan beside this file]
+[last 40 of 858 lines; regenerate the full trace by evaluating the scenario and plan beside this file]
 Execute immediate events (2 events queued)
 Next event at T=8100: Outgoing train
 All shunting units are still active, but still 2 events available at T7920.
@@ -14,7 +14,7 @@ ShuntingUnit-1:
 	moving		=	1
 	begin moving	=	0
 	in neutral	=	0
-	front train	=	(0, VIRM-4)
+	front train	=	(1, VIRM-4)
 	position	=	906a
 	previous	=	Wissel963
 	active actions	=	None
@@ -22,7 +22,7 @@ ShuntingUnit-1:
 	> (1, VIRM-4): no tasks.
 
 Track occupations:
-	906a	|  A <-- SU-1( 0 - 1 ) --- [-No action-] -> B --- Front train(0, VIRM-4)
+	906a	|  A <-- SU-1( 1 - 0 ) --- [-No action-] -> B --- Front train(1, VIRM-4)
 
 
 No events in the Event Queue

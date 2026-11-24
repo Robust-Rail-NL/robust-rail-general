@@ -1,10 +1,10 @@
-[last 40 of 675 lines; regenerate the full trace by evaluating the scenario and plan beside this file]
+[last 40 of 970 lines; regenerate the full trace by evaluating the scenario and plan beside this file]
 Execute immediate events (2 events queued)
 Next event at T=9000: Outgoing train
 All shunting units are still active, but still 2 events available at T8760.
 Execute immediate events (1 events queued)
-Next event at T=9000: Finish action Move ShuntingUnit-0 to 906a (route: 54 - Wissel959 - 959_960 - Wissel960 - 960_961 - Wissel961 - 961_963 - Wissel963 - 906a)
-	Finishing action Move ShuntingUnit-0 to 906a (route: 54 - Wissel959 - 959_960 - Wissel960 - 960_961 - Wissel961 - 961_963 - Wissel963 - 906a)
+Next event at T=9000: Finish action Move ShuntingUnit-0 to 906a (route: 52 - Wissel961 - 961_963 - Wissel963 - 906a)
+	Finishing action Move ShuntingUnit-0 to 906a (route: 52 - Wissel961 - 961_963 - Wissel963 - 906a)
 Step done.
 |---------------------------|
 |   State at T9000          |
@@ -18,8 +18,8 @@ ShuntingUnit-0:
 	position	=	906a
 	previous	=	Wissel963
 	active actions	=	None
-	> (2, VIRM-4): no tasks.
 	> (0, VIRM-6): no tasks.
+	> (2, VIRM-4): no tasks.
 
 Track occupations:
 	906a	|  A <-- SU-0( 2 - 0 ) --- [-No action-] -> B --- Front train(2, VIRM-4)
@@ -30,10 +30,10 @@ No events in the Event Queue
 No arrivals
 
 Departures:
-	T9000: 	ShuntingUnit-2 ((****, VIRM-4)(****, VIRM-6)) at 906a to Sein70
+	T9000: 	ShuntingUnit-2 ((****, VIRM-6)(****, VIRM-4)) at 906a to Sein70
 
 **********************************************************ACTION**********************************************************
-Applying action Exit: [0, 2] at T9000 [9000-9000]
+Applying action Exit: [2, 0] at T9000 [9000-9000]
 **************************************************************************************************************************
 Execute immediate events (1 events queued)
 Next event at T=9000: Finish action Exit from ShuntingUnit-0 at 906a at T9000

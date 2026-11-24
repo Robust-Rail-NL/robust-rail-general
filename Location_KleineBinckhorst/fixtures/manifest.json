@@ -784,7 +784,7 @@
         "plan": "plan_marginal_length_s01.json",
         "evaluation": "eval_marginal_length_s01.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -804,7 +804,7 @@
         "plan": "plan_marginal_length_s02.json",
         "evaluation": "eval_marginal_length_s02.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -824,7 +824,7 @@
         "plan": "plan_marginal_length_s03.json",
         "evaluation": "eval_marginal_length_s03.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -836,15 +836,15 @@
     "marginal_length_s04": {
       "config": "marginal_length",
       "seed": 4,
-      "outcome": "feasible",
-      "reason": "solver plan unviolating, evaluator confirms valid",
-      "directory": "feasible",
+      "outcome": "unknown",
+      "reason": "ShuntingUnit-ShuntingUnit-1 cannot leave Track 52 at the A-side to Track Wissel961: blocked",
+      "directory": "unresolved",
       "files": {
         "scenario": "scenario_marginal_length_s04.json",
         "plan": "plan_marginal_length_s04.json",
         "evaluation": "eval_marginal_length_s04.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -864,7 +864,7 @@
         "plan": "plan_marginal_length_s05.json",
         "evaluation": "eval_marginal_length_s05.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -884,7 +884,7 @@
         "plan": "plan_marginal_length_s06.json",
         "evaluation": "eval_marginal_length_s06.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -904,7 +904,7 @@
         "plan": "plan_marginal_length_s07.json",
         "evaluation": "eval_marginal_length_s07.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -924,7 +924,7 @@
         "plan": "plan_marginal_length_s08.json",
         "evaluation": "eval_marginal_length_s08.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -944,7 +944,7 @@
         "plan": "plan_marginal_length_s09.json",
         "evaluation": "eval_marginal_length_s09.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -956,15 +956,15 @@
     "marginal_length_s10": {
       "config": "marginal_length",
       "seed": 10,
-      "outcome": "feasible",
-      "reason": "solver plan unviolating, evaluator confirms valid",
-      "directory": "feasible",
+      "outcome": "unknown",
+      "reason": "ShuntingUnit-ShuntingUnit-1 cannot leave Track 52 at the A-side to Track Wissel961: blocked",
+      "directory": "unresolved",
       "files": {
         "scenario": "scenario_marginal_length_s10.json",
         "plan": "plan_marginal_length_s10.json",
         "evaluation": "eval_marginal_length_s10.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -984,7 +984,7 @@
         "plan": "plan_marginal_length_s11.json",
         "evaluation": "eval_marginal_length_s11.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -1004,7 +1004,7 @@
         "plan": "plan_marginal_length_s12.json",
         "evaluation": "eval_marginal_length_s12.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -1024,7 +1024,7 @@
         "plan": "plan_marginal_length_s13.json",
         "evaluation": "eval_marginal_length_s13.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -1044,7 +1044,7 @@
         "plan": "plan_marginal_length_s14.json",
         "evaluation": "eval_marginal_length_s14.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -1064,7 +1064,7 @@
         "plan": "plan_marginal_length_s15.json",
         "evaluation": "eval_marginal_length_s15.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -1084,7 +1084,7 @@
         "plan": "plan_marginal_length_s16.json",
         "evaluation": "eval_marginal_length_s16.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -1104,7 +1104,7 @@
         "plan": "plan_marginal_length_s17.json",
         "evaluation": "eval_marginal_length_s17.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -1124,7 +1124,7 @@
         "plan": "plan_marginal_length_s18.json",
         "evaluation": "eval_marginal_length_s18.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -1144,7 +1144,7 @@
         "plan": "plan_marginal_length_s19.json",
         "evaluation": "eval_marginal_length_s19.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",
@@ -1164,7 +1164,7 @@
         "plan": "plan_marginal_length_s20.json",
         "evaluation": "eval_marginal_length_s20.txt"
       },
-      "measured": "2026-09-16",
+      "measured": "2026-11-24",
       "images": {
         "generator": "generator:latest",
         "solver": "hip:latest",

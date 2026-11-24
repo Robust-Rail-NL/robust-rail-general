@@ -1,5 +1,5 @@
 {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "trainUnitTypes": [
         {
             "typePrefix": "VIRM",
@@ -276,14 +276,14 @@
         {
             "entryTrackPart": 42,
             "firstParkingTrackPart": 15,
-            "arrival": 0,
-            "departure": 0,
+            "arrival": 2700,
+            "departure": 2700,
             "id": 0,
             "members": [
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 4,
-                    "id": 1,
+                    "carriages": 6,
+                    "id": 0,
                     "tasks": []
                 }
             ],
@@ -298,13 +298,13 @@
             "members": [
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 4,
-                    "id": 0,
+                    "carriages": 6,
+                    "id": 1,
                     "tasks": []
                 },
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 6,
+                    "carriages": 4,
                     "id": 2,
                     "tasks": []
                 }
@@ -317,13 +317,13 @@
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
-            "arrival": 8100,
-            "departure": 8100,
+            "arrival": 7200,
+            "departure": 7200,
             "id": 2,
             "trainUnits": [
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 4,
+                    "carriages": 6,
                     "id": null,
                     "tasks": null
                 }
@@ -333,19 +333,19 @@
         {
             "leaveTrackPart": 42,
             "lastParkingTrackPart": 15,
-            "arrival": 7200,
-            "departure": 7200,
+            "arrival": 5400,
+            "departure": 5400,
             "id": 3,
             "trainUnits": [
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 6,
+                    "carriages": 4,
                     "id": null,
                     "tasks": null
                 },
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 4,
+                    "carriages": 6,
                     "id": null,
                     "tasks": null
                 }

@@ -1,0 +1,41 @@
+[last 40 of 723 lines; regenerate the full trace by evaluating the scenario and plan beside this file]
+	moving		=	1
+	begin moving	=	1
+	in neutral	=	0
+	front train	=	(2, VIRM-4)
+	position	=	52
+	previous	=	Engels974_975
+	active actions	=	None
+	> (1, VIRM-6): no tasks.
+	> (2, VIRM-4): no tasks.
+ShuntingUnit-0: 
+	waiting		=	1
+	moving		=	0
+	begin moving	=	0
+	in neutral	=	0
+	front train	=	(0, VIRM-6)
+	position	=	52
+	previous	=	Wissel961
+	active actions	=	None
+	> (0, VIRM-6): no tasks.
+
+Track occupations:
+	52	|  A <-- SU-0( 0 ) --- [-No action-] -> B --- Front train(0, VIRM-6)
+			|  A <-- SU-1( 2 - 1 ) --- [-No action-] -> B --- Front train(2, VIRM-4)
+
+
+Next event at T5400: Outgoing train
+3 remaining events.
+
+No arrivals
+
+Departures:
+	T7200: 	ShuntingUnit-2 ((****, VIRM-6)) at 906a to Sein70
+	T5400: 	ShuntingUnit-3 ((****, VIRM-6)(****, VIRM-4)) at 906a to Sein70
+
+**********************************************************ACTION**********************************************************
+Applying action Move: [2, 1] along path 1 - 58 - 24 - 59 - 15 at T5160 [5160-5400]
+**************************************************************************************************************************
+------------------------------------RESULT------------------------------------
+Scenario failed. Invalid action: The action is invalid. ShuntingUnit-ShuntingUnit-1 cannot leave Track 52 at the A-side to Track Wissel961: blocked..
+------------------------------------------------------------------------------

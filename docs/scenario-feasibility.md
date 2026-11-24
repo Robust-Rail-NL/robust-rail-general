@@ -31,7 +31,7 @@ generator `0597a6a`, solver `c913c91`, evaluator `e8c3c91`, solver
 | location | configuration | seeds | feasible | infeasible | unknown |
 |---|---|---|---|---|---|
 | KleineBinckhorst | `feasible_small` | 1–20 | 20 (100%) | 0 | 0 |
-| KleineBinckhorst | `marginal_length` | 1–20 | 20 (100%) | 0 | 0 |
+| KleineBinckhorst | `marginal_length` | 1–20 | 18 (90%) | 0 | 2 (10%) |
 | KleineBinckhorst | `marginal_congestion` | 1–20 | 7 (35%) | 0 | 13 (65%) |
 
 `feasible_small` and `marginal_congestion` are still the 2026-08-07 measurement.
@@ -41,6 +41,17 @@ widened from 255 m to 326 m (`Location_KleineBinckhorst/location.json`) and now
 clears every seed. Fixture files and `measured`/`images` in
 `fixtures/manifest.json` were refreshed to match; nothing else in this table
 changed. The same widening also affects the "Fixed-scenario fixtures" below.
+
+`marginal_length` was re-swept again 2026-11-24 for the head-first unit order
+([#50](https://github.com/Robust-Rail-NL/robust-rail-general/issues/50)), with
+a local generator built from `robust-rail-generator` `fb89edf` (departing unit
+lists reversed where a train leaves at the end it arrived at), `hip:latest`
+(`a0cf724a0d42`) and `tors:latest` (`f67f0e0a73da`), solver `MaxDuration: 15`.
+Seeds 4 and 10 are now `unknown` (the evaluator reports `cannot leave Track 52
+at the A-side to Track Wissel961: blocked`) where they were feasible under the
+old reading; the other 18 stay feasible. The generated scenarios are identical
+to the ones `scripts/migrate_unit_order.py` produced from the old files, apart
+from `schemaVersion` (1 to 2), which the generator now writes.
 
 The two marginal configurations used to fail in quite different ways, and the
 difference was the point.

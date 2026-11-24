@@ -1,5 +1,5 @@
 {
-	"schemaVersion": 1,
+	"schemaVersion": 2,
 	"actions": [
 		{
 			"startTime": 0,
@@ -27,7 +27,7 @@
 		},
 		{
 			"startTime": 0,
-			"endTime": 210,
+			"endTime": 540,
 			"taskType": {
 				"predefined": "Move",
 				"other": null
@@ -65,13 +65,85 @@
 				},
 				{
 					"kind": "trackPart",
-					"id": 2
+					"id": 22
+				},
+				{
+					"kind": "trackPart",
+					"id": 56
+				},
+				{
+					"kind": "trackPart",
+					"id": 20
+				},
+				{
+					"kind": "trackPart",
+					"id": 55
+				},
+				{
+					"kind": "trackPart",
+					"id": 21
+				},
+				{
+					"kind": "trackPart",
+					"id": 66
+				},
+				{
+					"kind": "trackPart",
+					"id": 31
+				},
+				{
+					"kind": "trackPart",
+					"id": 65
+				},
+				{
+					"kind": "trackPart",
+					"id": 5
+				},
+				{
+					"kind": "trackPart",
+					"id": 70
+				},
+				{
+					"kind": "trackPart",
+					"id": 34
+				},
+				{
+					"kind": "trackPart",
+					"id": 49
+				},
+				{
+					"kind": "trackPart",
+					"id": 35
+				},
+				{
+					"kind": "trackPart",
+					"id": 62
+				},
+				{
+					"kind": "trackPart",
+					"id": 29
+				},
+				{
+					"kind": "trackPart",
+					"id": 63
+				},
+				{
+					"kind": "trackPart",
+					"id": 17
+				},
+				{
+					"kind": "trackPart",
+					"id": 52
+				},
+				{
+					"kind": "trackPart",
+					"id": 9
 				}
 			]
 		},
 		{
-			"startTime": 210,
-			"endTime": 9690,
+			"startTime": 540,
+			"endTime": 8820,
 			"taskType": {
 				"predefined": "Wait",
 				"other": null
@@ -85,7 +157,7 @@
 				"parentIDs": [],
 				"childIDs": []
 			},
-			"location": 2,
+			"location": 9,
 			"resources": []
 		},
 		{
@@ -223,7 +295,26 @@
 			]
 		},
 		{
-			"startTime": 9690,
+			"startTime": 8820,
+			"endTime": 9300,
+			"taskType": {
+				"predefined": "Reverse",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 0,
+				"memberIDs": [
+					2,
+					1
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 9,
+			"resources": []
+		},
+		{
+			"startTime": 9300,
 			"endTime": 9900,
 			"taskType": {
 				"predefined": "Move",
@@ -238,8 +329,80 @@
 				"parentIDs": [],
 				"childIDs": []
 			},
-			"location": 2,
+			"location": 9,
 			"resources": [
+				{
+					"kind": "trackPart",
+					"id": 52
+				},
+				{
+					"kind": "trackPart",
+					"id": 17
+				},
+				{
+					"kind": "trackPart",
+					"id": 63
+				},
+				{
+					"kind": "trackPart",
+					"id": 29
+				},
+				{
+					"kind": "trackPart",
+					"id": 62
+				},
+				{
+					"kind": "trackPart",
+					"id": 35
+				},
+				{
+					"kind": "trackPart",
+					"id": 49
+				},
+				{
+					"kind": "trackPart",
+					"id": 34
+				},
+				{
+					"kind": "trackPart",
+					"id": 70
+				},
+				{
+					"kind": "trackPart",
+					"id": 5
+				},
+				{
+					"kind": "trackPart",
+					"id": 65
+				},
+				{
+					"kind": "trackPart",
+					"id": 31
+				},
+				{
+					"kind": "trackPart",
+					"id": 66
+				},
+				{
+					"kind": "trackPart",
+					"id": 21
+				},
+				{
+					"kind": "trackPart",
+					"id": 55
+				},
+				{
+					"kind": "trackPart",
+					"id": 20
+				},
+				{
+					"kind": "trackPart",
+					"id": 56
+				},
+				{
+					"kind": "trackPart",
+					"id": 22
+				},
 				{
 					"kind": "trackPart",
 					"id": 57
@@ -290,5 +453,9 @@
 				}
 			]
 		}
-	]
+	],
+	"feasibility": "Feasible",
+	"origin": "robust-rail-solver 2.3.1",
+	"cost": 0.08495,
+	"costDetails": "Cost = 0.0 : 0.08 | cr=0, dd=0, da=0, tlv=0, sm=4, rd=495.00, cd=0, um=0, oo=0"
 }

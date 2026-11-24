@@ -1,5 +1,5 @@
 {
-	"schemaVersion": 1,
+	"schemaVersion": 2,
 	"actions": [
 		{
 			"startTime": 2700,
@@ -61,7 +61,7 @@
 		},
 		{
 			"startTime": 2880,
-			"endTime": 7920,
+			"endTime": 5220,
 			"taskType": {
 				"predefined": "Wait",
 				"other": null
@@ -102,7 +102,7 @@
 		},
 		{
 			"startTime": 4500,
-			"endTime": 4680,
+			"endTime": 4710,
 			"taskType": {
 				"predefined": "Move",
 				"other": null
@@ -131,13 +131,21 @@
 				},
 				{
 					"kind": "trackPart",
-					"id": 1
+					"id": 23
+				},
+				{
+					"kind": "trackPart",
+					"id": 57
+				},
+				{
+					"kind": "trackPart",
+					"id": 2
 				}
 			]
 		},
 		{
-			"startTime": 4680,
-			"endTime": 5220,
+			"startTime": 4710,
+			"endTime": 7406,
 			"taskType": {
 				"predefined": "Wait",
 				"other": null
@@ -150,7 +158,7 @@
 				"parentIDs": [],
 				"childIDs": []
 			},
-			"location": 1,
+			"location": 2,
 			"resources": []
 		},
 		{
@@ -161,9 +169,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": 1,
+				"id": 0,
 				"memberIDs": [
-					0
+					1
 				],
 				"parentIDs": [],
 				"childIDs": []
@@ -196,9 +204,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": 1,
+				"id": 0,
 				"memberIDs": [
-					0
+					1
 				],
 				"parentIDs": [],
 				"childIDs": []
@@ -212,22 +220,48 @@
 			]
 		},
 		{
-			"startTime": 7920,
+			"startTime": 7406,
+			"endTime": 7830,
+			"taskType": {
+				"predefined": "Reverse",
+				"other": null
+			},
+			"shuntingUnit": {
+				"id": 1,
+				"memberIDs": [
+					0
+				],
+				"parentIDs": [],
+				"childIDs": []
+			},
+			"location": 2,
+			"resources": []
+		},
+		{
+			"startTime": 7830,
 			"endTime": 8100,
 			"taskType": {
 				"predefined": "Move",
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": 0,
+				"id": 1,
 				"memberIDs": [
-					1
+					0
 				],
 				"parentIDs": [],
 				"childIDs": []
 			},
-			"location": 1,
+			"location": 2,
 			"resources": [
+				{
+					"kind": "trackPart",
+					"id": 57
+				},
+				{
+					"kind": "trackPart",
+					"id": 23
+				},
 				{
 					"kind": "trackPart",
 					"id": 58
@@ -254,9 +288,9 @@
 				"other": null
 			},
 			"shuntingUnit": {
-				"id": 0,
+				"id": 1,
 				"memberIDs": [
-					1
+					0
 				],
 				"parentIDs": [],
 				"childIDs": []
@@ -269,5 +303,9 @@
 				}
 			]
 		}
-	]
+	],
+	"feasibility": "Feasible",
+	"origin": "robust-rail-solver 2.3.1",
+	"cost": 0.08316,
+	"costDetails": "Cost = 0.0 : 0.08 | cr=0, dd=0, da=0, tlv=0, sm=4, rd=316.00, cd=0, um=0, oo=0"
 }

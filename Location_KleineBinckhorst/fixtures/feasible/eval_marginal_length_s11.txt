@@ -1,10 +1,10 @@
-[last 40 of 675 lines; regenerate the full trace by evaluating the scenario and plan beside this file]
+[last 40 of 933 lines; regenerate the full trace by evaluating the scenario and plan beside this file]
 Execute immediate events (2 events queued)
 Next event at T=9000: Outgoing train
 All shunting units are still active, but still 2 events available at T8490.
 Execute immediate events (1 events queued)
-Next event at T=9000: Finish action Move ShuntingUnit-0 to 906a (route: 61 - Engels966_967 - 967_kruis1 - Kruis1 - 968_kruis1 - Engels968_969 - 969_979 - Wissel979 - 59 - Wissel978 - 958_978 - Wissel958 - 958_959 - Wissel959 - 959_960 - Wissel960 - 960_961 - Wissel961 - 961_963 - Wissel963 - 906a)
-	Finishing action Move ShuntingUnit-0 to 906a (route: 61 - Engels966_967 - 967_kruis1 - Kruis1 - 968_kruis1 - Engels968_969 - 969_979 - Wissel979 - 59 - Wissel978 - 958_978 - Wissel958 - 958_959 - Wissel959 - 959_960 - Wissel960 - 960_961 - Wissel961 - 961_963 - Wissel963 - 906a)
+Next event at T=9000: Finish action Move ShuntingUnit-0 to 906a (route: 62 - Engels966_967 - 967_kruis1 - Kruis1 - 968_kruis1 - Engels968_969 - 969_979 - Wissel979 - 59 - Wissel978 - 958_978 - Wissel958 - 958_959 - Wissel959 - 959_960 - Wissel960 - 960_961 - Wissel961 - 961_963 - Wissel963 - 906a)
+	Finishing action Move ShuntingUnit-0 to 906a (route: 62 - Engels966_967 - 967_kruis1 - Kruis1 - 968_kruis1 - Engels968_969 - 969_979 - Wissel979 - 59 - Wissel978 - 958_978 - Wissel958 - 958_959 - Wissel959 - 959_960 - Wissel960 - 960_961 - Wissel961 - 961_963 - Wissel963 - 906a)
 Step done.
 |---------------------------|
 |   State at T9000          |
