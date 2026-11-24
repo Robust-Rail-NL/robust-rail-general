@@ -561,13 +561,13 @@
             "trainUnits": [
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 6,
+                    "carriages": 4,
                     "id": null,
                     "tasks": null
                 },
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 4,
+                    "carriages": 6,
                     "id": null,
                     "tasks": null
                 }
@@ -583,13 +583,13 @@
             "trainUnits": [
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 4,
+                    "carriages": 6,
                     "id": null,
                     "tasks": null
                 },
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 6,
+                    "carriages": 4,
                     "id": null,
                     "tasks": null
                 }
@@ -605,13 +605,13 @@
             "trainUnits": [
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 6,
+                    "carriages": 4,
                     "id": null,
                     "tasks": null
                 },
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 4,
+                    "carriages": 6,
                     "id": null,
                     "tasks": null
                 }
@@ -655,13 +655,13 @@
             "trainUnits": [
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 4,
+                    "carriages": 6,
                     "id": null,
                     "tasks": null
                 },
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 6,
+                    "carriages": 4,
                     "id": null,
                     "tasks": null
                 }
@@ -677,13 +677,13 @@
             "trainUnits": [
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 6,
+                    "carriages": 4,
                     "id": null,
                     "tasks": null
                 },
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 4,
+                    "carriages": 6,
                     "id": null,
                     "tasks": null
                 }
@@ -699,13 +699,13 @@
             "trainUnits": [
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 6,
+                    "carriages": 4,
                     "id": null,
                     "tasks": null
                 },
                 {
                     "typePrefix": "VIRM",
-                    "carriages": 4,
+                    "carriages": 6,
                     "id": null,
                     "tasks": null
                 }
