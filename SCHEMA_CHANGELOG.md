@@ -22,6 +22,20 @@ below predating the move still say "the generator" where that was
 accurate at the time; only the file's own location was stale, not what it
 says happened.
 
+## Unversioned — 2026-11-26
+
+Generator configuration (`ScenarioConfig`), not the interchange files; no
+`schemaVersion` bump.
+
+- `GeneratedTrainsConfig.matching` takes `"FIFO"`, `"random"` or `"LIFO"`
+  instead of `0`, `1` or `2`. The integers stay accepted for one release (the
+  generator warns that they are deprecated); after that the schema drops them.
+  The meaning is unchanged: `"FIFO"` the same compositions in the same order,
+  `"random"` regenerated compositions (the default), `"LIFO"` the trains in the
+  reverse of their arrival order. A bool is not accepted as `0` or `1`.
+- Configs in this repo still use the integers; they move to the names once a
+  generator release accepts them.
+
 ## Unversioned — 2026-11-25
 
 Description-only change; no `schemaVersion` bump and no wire-format change.

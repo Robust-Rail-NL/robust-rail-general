@@ -288,6 +288,32 @@ class TestScenarioConfig:
         assert config.intent.designed_for == "domain"
         assert config.intent.notes == ["a", "b"]
 
+    @staticmethod
+    def _generated(**extra):
+        return TypeAdapter(ScenarioConfig).validate_python(
+            {
+                "location": "loc",
+                "start_time": 0,
+                "end_time": 3600,
+                "use_default_material": True,
+                "perform_servicing": False,
+                "trains_given": False,
+                **extra,
+            }
+        )
+
+    @pytest.mark.parametrize("value", ["FIFO", "random", "LIFO", 0, 1, 2])
+    def test_matching_takes_a_name_or_a_deprecated_integer(self, value):
+        assert self._generated(matching=value).matching == value
+
+    @pytest.mark.parametrize("value", ["fifo", "reverse", 3, -1, True, 1.5])
+    def test_matching_refuses_anything_else(self, value):
+        with pytest.raises(ValidationError):
+            self._generated(matching=value)
+
+    def test_matching_is_optional(self):
+        assert self._generated().matching is None
+
 
 class TestFacilityTimeWindowDocs:
     def test_absent_time_window_is_null(self):

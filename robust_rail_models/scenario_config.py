@@ -18,6 +18,7 @@ these configurations are not part of the camelCase interchange format.
 
 from __future__ import annotations
 
+from enum import Enum
 from typing import Optional, Union
 
 from pydantic import Field
@@ -40,6 +41,14 @@ class Intent(RailModel):
     expectation: Optional[str] = None
     exercises: Optional[str] = None
     notes: list[str] = Field(default_factory=list)
+
+
+class Matching(str, Enum):
+    """How departing trains are derived from arriving ones (see GeneratedTrainsConfig.matching)."""
+
+    FIFO = "FIFO"
+    RANDOM = "random"
+    LIFO = "LIFO"
 
 
 class TrainUnitDistribution(RailModel):
@@ -128,7 +137,15 @@ class GeneratedTrainsConfig(_ScenarioConfigBase):
     number_of_trains: Optional[int] = None
     train_unit_distribution: Optional[TrainUnitDistribution] = None
     gateway: Optional[Gateway] = None
-    matching: Optional[int] = None
+    matching: Optional[Union[Matching, Annotated[int, Field(strict=True, ge=0, le=2)]]] = Field(
+        None,
+        description=(
+            'How the departing trains are derived from the arriving ones. "FIFO": the same train compositions, in the same order. '
+            '"random": the sequences and numbers of units per train are regenerated, which can change the number of trains (the default). '
+            '"LIFO": the trains leave in the reverse of their arrival order. '
+            'The integers 0, 1 and 2 (for "FIFO", "random" and "LIFO") are deprecated: still accepted, to be dropped in a later release.'
+        ),
+    )
     min_time_in_yard: Optional[int] = None
     mixed_traffic: Optional[bool] = None
     seed: Optional[int] = None

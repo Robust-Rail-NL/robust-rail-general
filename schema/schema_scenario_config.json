@@ -315,6 +315,11 @@
         "matching": {
           "anyOf": [
             {
+              "$ref": "#/$defs/Matching"
+            },
+            {
+              "maximum": 2,
+              "minimum": 0,
               "type": "integer"
             },
             {
@@ -322,6 +327,7 @@
             }
           ],
           "default": null,
+          "description": "How the departing trains are derived from the arriving ones. \"FIFO\": the same train compositions, in the same order. \"random\": the sequences and numbers of units per train are regenerated, which can change the number of trains (the default). \"LIFO\": the trains leave in the reverse of their arrival order. The integers 0, 1 and 2 (for \"FIFO\", \"random\" and \"LIFO\") are deprecated: still accepted, to be dropped in a later release.",
           "title": "Matching"
         },
         "min_time_in_yard": {
@@ -422,6 +428,16 @@
       },
       "title": "Intent",
       "type": "object"
+    },
+    "Matching": {
+      "description": "How departing trains are derived from arriving ones (see GeneratedTrainsConfig.matching).",
+      "enum": [
+        "FIFO",
+        "random",
+        "LIFO"
+      ],
+      "title": "Matching",
+      "type": "string"
     },
     "TrainUnitDistribution": {
       "additionalProperties": false,
