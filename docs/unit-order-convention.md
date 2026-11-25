@@ -2,6 +2,12 @@
 
 Date: 2026-11-24. Status: investigation, no code changed. Sources: the five repos (solver at v2.3.0, evaluator at v2.4.0, planner at v0.6.0, generator v2.5.0, visualizer and this repo as checked out), Roel van den Broek's thesis and paper (`~/Papers/`), and the results of Issa's grid experiment.
 
+**Decision, 2026-11-24 (Léon): head-first** (index 0 = the head), for arriving and departing trains. Standing trains
+(`inStanding`, `outStanding`) stay along the track; which end such a list starts at is still to be defined. The schema
+descriptions say this since 2026-11-25 (see `SCHEMA_CHANGELOG.md`); scenario fixtures and the generator were migrated.
+The evaluator, planner and solver changes are still to do. The text below is the investigation that led to it, written
+before the decision, so "Proposal" reads as a proposal.
+
 ## Why this came up
 
 In the grid experiment the solver fails 14 of 17 scenarios in which a train arrives as, say, [4,6] and has to depart as [6,4] (symbolic-rail solves all 17, ENHSP 11). The planners and the evaluator accept the reversed order; the solver does not. An expert at NS has since answered that a mirrored departure order is not allowed. Looking for the cause showed that the components do not share one definition of what the order of a unit list means.

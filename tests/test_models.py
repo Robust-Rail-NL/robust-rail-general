@@ -304,3 +304,19 @@ class TestFacilityTimeWindowDocs:
         assert schema == Location.model_json_schema()
         description = schema["$defs"]["Facility"]["properties"]["timeWindow"]["description"]
         assert "whole scenario" in description
+
+
+def test_unit_order_fields_document_the_head_first_convention():
+    """members, trainUnits and memberIDs say that index 0 is the head (robust-rail-general#50)."""
+    from robust_rail_models import Scenario
+    from robust_rail_models.plan import Plan
+
+    scenario = Scenario.model_json_schema()["$defs"]
+    plan = Plan.model_json_schema()["$defs"]
+    descriptions = [
+        scenario["IncomingTrain"]["properties"]["members"]["description"],
+        scenario["TrainRequest"]["properties"]["trainUnits"]["description"],
+        plan["ShuntingUnit"]["properties"]["memberIDs"]["description"],
+    ]
+    for text in descriptions:
+        assert "index 0 is the head" in text

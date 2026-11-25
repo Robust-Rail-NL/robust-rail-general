@@ -111,7 +111,14 @@ class IncomingTrain(RailModel):
     arrival: Optional[int] = None
     departure: Optional[int] = None
     id: Optional[int] = None
-    members: list[IncomingTrainUnit] = Field(default_factory=list)
+    members: list[IncomingTrainUnit] = Field(
+        default_factory=list,
+        description=(
+            'The order of the units of a train, from the head of the train to its tail (index 0 is the head). For an arriving train the head is the unit that leads the train into the yard. '
+            'Reversing the direction of a train (a Reverse) swaps which end is the head, so it reverses the order as read from the head. Units that are not coupled keep no order. '
+            'Exception: for a train in inStanding the units are listed along the track, not from a head, because a standing train has no direction of travel. Which end of the track the list starts at is not yet defined (robust-rail-general#50).'
+        ),
+    )
     # Required and mutually distinct within inStanding groups sharing a
     # track (a given fact about the initial state); see the "Standing order"
     # decision in unified-schema-design.md. Enforced by Scenario's
@@ -138,7 +145,15 @@ class TrainRequest(RailModel):
     # train_units, as (type_prefix, carriages).
     id: Optional[int] = None
     # If a TrainUnit's id is None, any unit of the matching type is acceptable.
-    train_units: list[TrainUnit] = Field(default_factory=list, alias="trainUnits")
+    train_units: list[TrainUnit] = Field(
+        default_factory=list,
+        alias="trainUnits",
+        description=(
+            'The order of the units of a train, from the head of the train to its tail (index 0 is the head). For a departing train the head is the unit that leads the train out of the yard. '
+            'Reversing the direction of a train (a Reverse) swaps which end is the head, so it reverses the order as read from the head. Units that are not coupled keep no order. '
+            'Exception: for a train in outStanding the units are listed along the track, not from a head, because a standing train has no direction of travel. Which end of the track the list starts at is not yet defined (robust-rail-general#50).'
+        ),
+    )
     # Optional within outStanding: null means no preference. See the
     # "Standing order" decision in unified-schema-design.md.
     standing_index: Optional[NonNegativeInt] = Field(None, alias="standingIndex")
@@ -159,7 +174,15 @@ class ShuntingUnit(RailModel):
     """
 
     id: Optional[int] = None
-    member_ids: list[int] = Field(default_factory=list, alias="memberIDs")
+    member_ids: list[int] = Field(
+        default_factory=list,
+        alias="memberIDs",
+        description=(
+            "The IDs of the units of this shunting unit, from the head to the tail (index 0 is the head) "
+            "at the time of the action. A Reverse swaps which end is the head, so the order read from the "
+            "head is reversed by it. Units that are not coupled keep no order."
+        ),
+    )
     parent_ids: list[int] = Field(default_factory=list, alias="parentIDs")
     child_ids: list[int] = Field(default_factory=list, alias="childIDs")
 

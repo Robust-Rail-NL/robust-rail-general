@@ -21,6 +21,29 @@ below predating the move still say "the generator" where that was
 accurate at the time; only the file's own location was stale, not what it
 says happened.
 
+## Unversioned — 2026-11-25
+
+Description-only change; no `schemaVersion` bump and no wire-format change.
+
+- The order of a unit list is now documented, on `IncomingTrain.members`,
+  `TrainRequest.trainUnits` and `ShuntingUnit.memberIDs`: from the head of the
+  train to its tail, index 0 being the head. For an arriving train the head
+  is the unit that leads it into the yard, for a departing train the unit
+  that leads it out, and a `Reverse` swaps which end is the head. Standing
+  trains (`inStanding`, `outStanding`) are the exception: their units are
+  listed along the track, because a standing train has no direction of
+  travel. Which end of the track such a list starts at is not yet defined.
+  Decision and evidence: robust-rail-general#50 and `docs/unit-order-convention.md`.
+- This clarifies a convention the tools read differently so far; it does not
+  change what a valid file looks like. Behaviour changes in the tools
+  (the evaluator's input reading and a directional exit check, the
+  planner's `Reverse`, the solver's matching) follow per repo. Whether the
+  clarification warrants a `schemaVersion` bump once the evaluator changes
+  land is still open.
+- The scenario fixtures and the generator were migrated to the convention: a
+  departing train that leaves at the end of the yard its units arrived at is
+  listed in reverse (`scripts/migrate_unit_order.py`, generator `fb89edf`).
+
 ## Unversioned — 2026-10-28
 
 Description-only change; no `schemaVersion` bump and no wire-format change.
