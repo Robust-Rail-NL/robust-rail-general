@@ -120,10 +120,8 @@ class IncomingTrain(RailModel):
         ),
     )
     # Required and mutually distinct within inStanding groups sharing a
-    # track (a given fact about the initial state); see the "Standing order"
-    # decision recorded (as of 2.0.0) in the generator's
-    # unified-schema-design.md. Enforced by Scenario's cross-record
-    # validator, not by this field's own type.
+    # track (a given fact about the initial state; solver#17/#18). Enforced
+    # by Scenario's cross-record validator, not by this field's own type.
     standing_index: Optional[NonNegativeInt] = Field(None, alias="standingIndex")
 
 
@@ -155,9 +153,9 @@ class TrainRequest(RailModel):
             'Exception: for a train in outStanding the units are listed along the track, not from a head, because a standing train has no direction of travel: index 0 is the unit nearest the A side of the track the train stands on (lastParkingTrackPart).'
         ),
     )
-    # Optional within outStanding: null means no preference. See the
-    # "Standing order" decision recorded (as of 2.0.0) in the generator's
-    # unified-schema-design.md.
+    # Optional within outStanding: null means no preference. outStanding is a
+    # requirement on the final state at the end of the horizon, not a given
+    # fact about the initial state like inStanding (solver#17/#18).
     standing_index: Optional[NonNegativeInt] = Field(None, alias="standingIndex")
 
 

@@ -350,7 +350,7 @@ Generator:
   `EvaluatorScenario` shape, then `create_solver_format_scenario()` manually
   converts it, field by field, into the `Scenario` shape actually written to
   `scenario_*.json`. Kept in sync by hand, not by construction. Already
-  tracked as "Next steps" item 6 in `unified-schema-design.md`; purely
+  tracked as generator issue #12; purely
   internal to the generator, doesn't touch the interchange schema.
 
 Solver / HIP:

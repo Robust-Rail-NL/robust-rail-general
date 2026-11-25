@@ -1,6 +1,5 @@
 """Tests for the typePrefix/carriages identity rename and TaskSpec.optional
-(Phase 2 of the 2.0.0 roadmap; the generator's unified-schema-design.md is the
-2.0.0-era design record)."""
+(Phase 2 of the 2.0.0 roadmap)."""
 
 import logging
 
@@ -150,7 +149,7 @@ def _request(track, standing_index, id_):
 
 
 class TestStandingOrder:
-    """solver#17/#18 and unified-schema-design.md's "Standing order" section:
+    """solver#17/#18:
     inStanding order is a given fact and must be fully, unambiguously
     specified wherever a track has more than one standing unit; outStanding
     order is an optional terminal requirement, where "no preference" (all
