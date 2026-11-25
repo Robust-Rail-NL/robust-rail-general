@@ -1,5 +1,6 @@
 """Tests for the typePrefix/carriages identity rename and TaskSpec.optional
-(Phase 2 of the 2.0.0 roadmap, see unified-schema-design.md)."""
+(Phase 2 of the 2.0.0 roadmap; the generator's unified-schema-design.md is the
+2.0.0-era design record)."""
 
 import logging
 

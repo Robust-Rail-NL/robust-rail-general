@@ -121,8 +121,9 @@ class IncomingTrain(RailModel):
     )
     # Required and mutually distinct within inStanding groups sharing a
     # track (a given fact about the initial state); see the "Standing order"
-    # decision in unified-schema-design.md. Enforced by Scenario's
-    # cross-record validator, not by this field's own type.
+    # decision recorded (as of 2.0.0) in the generator's
+    # unified-schema-design.md. Enforced by Scenario's cross-record
+    # validator, not by this field's own type.
     standing_index: Optional[NonNegativeInt] = Field(None, alias="standingIndex")
 
 
@@ -155,7 +156,8 @@ class TrainRequest(RailModel):
         ),
     )
     # Optional within outStanding: null means no preference. See the
-    # "Standing order" decision in unified-schema-design.md.
+    # "Standing order" decision recorded (as of 2.0.0) in the generator's
+    # unified-schema-design.md.
     standing_index: Optional[NonNegativeInt] = Field(None, alias="standingIndex")
 
 

@@ -1,9 +1,10 @@
 # Schema changelog
 
 Tracks changes to the shared interchange `schemaVersion`, carried on
-`Location`, `Scenario`, and `Plan` (see `unified-schema-design.md` in
-`robust-rail-generator`). This is independent of the tool release versions
-(`generator`, `hip`, `tors`) — it increments only on breaking changes to the
+`Location`, `Scenario`, and `Plan` (`unified-schema-design.md` in
+`robust-rail-generator` records the 2.0.0-era design; this file and the
+models here are the current reference). This is independent of the tool
+release versions (`generator`, `hip`, `tors`) — it increments only on breaking changes to the
 wire format, and all three repos bump their local `EXPECTED_SCHEMA_VERSION`
 together when it does.
 
