@@ -3,7 +3,7 @@
 Date: 2026-11-24. Status: investigation, no code changed. Sources: the five repos (solver at v2.3.0, evaluator at v2.4.0, planner at v0.6.0, generator v2.5.0, visualizer and this repo as checked out), Roel van den Broek's thesis and paper (`~/Papers/`), and the results of Issa's grid experiment.
 
 **Decision, 2026-11-24 (Léon): head-first** (index 0 = the head), for arriving and departing trains. Standing trains
-(`inStanding`, `outStanding`) stay along the track; which end such a list starts at is still to be defined. The schema
+(`inStanding`, `outStanding`) stay along the track, starting at the end nearest the A side of the track they stand on. The schema
 descriptions say this since 2026-11-25 (see `SCHEMA_CHANGELOG.md`); scenario fixtures and the generator were migrated.
 The evaluator, planner and solver changes are still to do. The text below is the investigation that led to it, written
 before the decision, so "Proposal" reads as a proposal.

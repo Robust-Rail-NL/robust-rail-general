@@ -145,7 +145,7 @@
           "title": "Id"
         },
         "memberIDs": {
-          "description": "The IDs of the units of this shunting unit, from the head to the tail (index 0 is the head) at the time of the action. A Reverse swaps which end is the head, so the order read from the head is reversed by it. Units that are not coupled keep no order.",
+          "description": "The IDs of the units of this shunting unit, from the head to the tail (index 0 is the head) at the time of the action. A Reverse swaps which end is the head, so the order read from the head is reversed by it.",
           "items": {
             "type": "integer"
           },

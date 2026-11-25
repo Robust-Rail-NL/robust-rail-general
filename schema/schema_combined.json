@@ -249,7 +249,7 @@
           "title": "Id"
         },
         "members": {
-          "description": "The order of the units of a train, from the head of the train to its tail (index 0 is the head). For an arriving train the head is the unit that leads the train into the yard. Reversing the direction of a train (a Reverse) swaps which end is the head, so it reverses the order as read from the head. Units that are not coupled keep no order. Exception: for a train in inStanding the units are listed along the track, not from a head, because a standing train has no direction of travel. Which end of the track the list starts at is not yet defined (robust-rail-general#50).",
+          "description": "The order of the units of a train, from the head of the train to its tail (index 0 is the head). For an arriving train the head is the unit that leads the train into the yard. Reversing the direction of a train (a Reverse) swaps which end is the head, so it reverses the order as read from the head. Exception: for a train in inStanding the units are listed along the track, not from a head, because a standing train has no direction of travel: index 0 is the unit nearest the A side of the track the train stands on (firstParkingTrackPart).",
           "items": {
             "$ref": "#/$defs/IncomingTrainUnit"
           },
@@ -772,7 +772,7 @@
           "title": "Id"
         },
         "memberIDs": {
-          "description": "The IDs of the units of this shunting unit, from the head to the tail (index 0 is the head) at the time of the action. A Reverse swaps which end is the head, so the order read from the head is reversed by it. Units that are not coupled keep no order.",
+          "description": "The IDs of the units of this shunting unit, from the head to the tail (index 0 is the head) at the time of the action. A Reverse swaps which end is the head, so the order read from the head is reversed by it.",
           "items": {
             "type": "integer"
           },
@@ -1051,7 +1051,7 @@
           "title": "Id"
         },
         "trainUnits": {
-          "description": "The order of the units of a train, from the head of the train to its tail (index 0 is the head). For a departing train the head is the unit that leads the train out of the yard. Reversing the direction of a train (a Reverse) swaps which end is the head, so it reverses the order as read from the head. Units that are not coupled keep no order. Exception: for a train in outStanding the units are listed along the track, not from a head, because a standing train has no direction of travel. Which end of the track the list starts at is not yet defined (robust-rail-general#50).",
+          "description": "The order of the units of a train, from the head of the train to its tail (index 0 is the head). For a departing train the head is the unit that leads the train out of the yard. Reversing the direction of a train (a Reverse) swaps which end is the head, so it reverses the order as read from the head. Exception: for a train in outStanding the units are listed along the track, not from a head, because a standing train has no direction of travel: index 0 is the unit nearest the A side of the track the train stands on (lastParkingTrackPart).",
           "items": {
             "$ref": "#/$defs/TrainUnit"
           },

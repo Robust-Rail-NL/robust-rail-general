@@ -32,7 +32,8 @@ Description-only change; no `schemaVersion` bump and no wire-format change.
   that leads it out, and a `Reverse` swaps which end is the head. Standing
   trains (`inStanding`, `outStanding`) are the exception: their units are
   listed along the track, because a standing train has no direction of
-  travel. Which end of the track such a list starts at is not yet defined.
+  travel: index 0 is the unit nearest the A side of the track the train
+  stands on.
   Decision and evidence: robust-rail-general#50 and `docs/unit-order-convention.md`.
 - This clarifies a convention the tools read differently so far; it does not
   change what a valid file looks like. Behaviour changes in the tools
