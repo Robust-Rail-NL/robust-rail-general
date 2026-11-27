@@ -93,7 +93,7 @@
           "title": "Id"
         },
         "members": {
-          "description": "The order of the units of a train, from the head of the train to its tail (index 0 is the head). For an arriving train the head is the unit that leads the train into the yard. Reversing the direction of a train (a Reverse) swaps which end is the head, so it reverses the order as read from the head. Exception: for a train in inStanding the units are listed along the track, not from a head, because a standing train has no direction of travel: index 0 is the unit nearest the A side of the track the train stands on (firstParkingTrackPart).",
+          "description": "The order of the units of a train, from the head of the train to its tail (index 0 is the head), in a scenario of schemaVersion 3 or later; older scenarios list the units along the track. For an arriving train the head is the unit that leads the train into the yard. Reversing the direction of a train (a Reverse) swaps which end is the head, so it reverses the order as read from the head. Exception: for a train in inStanding the units are listed along the track, not from a head, because a standing train has no direction of travel: index 0 is the unit nearest the A side of the track the train stands on (firstParkingTrackPart).",
           "items": {
             "$ref": "#/$defs/IncomingTrainUnit"
           },
@@ -489,7 +489,7 @@
           "title": "Id"
         },
         "trainUnits": {
-          "description": "The order of the units of a train, from the head of the train to its tail (index 0 is the head). For a departing train the head is the unit that leads the train out of the yard. Reversing the direction of a train (a Reverse) swaps which end is the head, so it reverses the order as read from the head. Exception: for a train in outStanding the units are listed along the track, not from a head, because a standing train has no direction of travel: index 0 is the unit nearest the A side of the track the train stands on (lastParkingTrackPart).",
+          "description": "The order of the units of a train, from the head of the train to its tail (index 0 is the head), in a scenario of schemaVersion 3 or later; older scenarios list the units along the track. For a departing train the head is the unit that leads the train out of the yard. Reversing the direction of a train (a Reverse) swaps which end is the head, so it reverses the order as read from the head. Exception: for a train in outStanding the units are listed along the track, not from a head, because a standing train has no direction of travel: index 0 is the unit nearest the A side of the track the train stands on (lastParkingTrackPart).",
           "items": {
             "$ref": "#/$defs/TrainUnit"
           },
@@ -700,7 +700,7 @@
   "description": "The daily-varying part of the problem specification: which trains\narrive, depart, or remain in the shunting yard.\n\nTODO: decide whether train_unit_types belongs here (normalized, referenced\nby name from TrainUnit) or embedded in each TrainUnit. Current decision:\nhere.",
   "properties": {
     "schemaVersion": {
-      "default": 2,
+      "default": 3,
       "title": "Schemaversion",
       "type": "integer"
     },

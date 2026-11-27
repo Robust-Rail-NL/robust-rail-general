@@ -5,7 +5,7 @@ Tracks changes to the shared interchange `schemaVersion`, carried on
 `robust-rail-generator` records the 2.0.0-era design; this file and the
 models here are the current reference). This is independent of the tool
 release versions (`generator`, `hip`, `tors`) — it increments only on breaking changes to the
-wire format, and all three repos bump their local `EXPECTED_SCHEMA_VERSION`
+wire format or to what a field means, and all three repos bump their local `EXPECTED_SCHEMA_VERSION`
 together when it does.
 
 Mismatch behaviour is warn-and-continue: a missing or unexpected
@@ -36,29 +36,40 @@ Generator configuration (`ScenarioConfig`), not the interchange files; no
 - Configs in this repo still use the integers; they move to the names once a
   generator release accepts them.
 
-## Unversioned — 2026-11-25
+## 3 — 2026-11-27
 
-Description-only change; no `schemaVersion` bump and no wire-format change.
+The order of a unit list now has a defined meaning, and a file declares which
+meaning it uses. This is a semantic change to what `members`, `trainUnits` and
+`memberIDs` say, not a change of shape: a version 2 file still validates.
 
-- The order of a unit list is now documented, on `IncomingTrain.members`,
-  `TrainRequest.trainUnits` and `ShuntingUnit.memberIDs`: from the head of the
-  train to its tail, index 0 being the head. For an arriving train the head
-  is the unit that leads it into the yard, for a departing train the unit
-  that leads it out, and a `Reverse` swaps which end is the head. Standing
-  trains (`inStanding`, `outStanding`) are the exception: their units are
-  listed along the track, because a standing train has no direction of
-  travel: index 0 is the unit nearest the A side of the track the train
-  stands on.
-  Decision and evidence: robust-rail-general#50 and `docs/unit-order-convention.md`.
-- This clarifies a convention the tools read differently so far; it does not
-  change what a valid file looks like. Behaviour changes in the tools
-  (the evaluator's input reading and a directional exit check, the
-  planner's `Reverse`, the solver's matching) follow per repo. Whether the
-  clarification warrants a `schemaVersion` bump once the evaluator changes
-  land is still open.
-- The scenario fixtures and the generator were migrated to the convention: a
-  departing train that leaves at the end of the yard its units arrived at is
-  listed in reverse (`scripts/migrate_unit_order.py`, generator `fb89edf`).
+- A scenario of `schemaVersion` 3 or later lists the units of a train from its
+  head to its tail, index 0 being the head, in `IncomingTrain.members`,
+  `TrainRequest.trainUnits` and (for the plan that follows it)
+  `ShuntingUnit.memberIDs`. For an arriving train the head is the unit that
+  leads it into the yard, for a departing train the unit that leads it out, and
+  a `Reverse` swaps which end is the head. A train that leaves through the gateway
+  it entered by therefore leaves with its units listed in the reverse of their
+  arrival order, or with an explicit `Reverse` or a split and combine in the plan.
+  Standing trains (`inStanding`, `outStanding`) are the exception: their units
+  are listed along the track, because a standing train has no direction of
+  travel: index 0 is the unit nearest the A side of the track the train stands
+  on (`firstParkingTrackPart` for `inStanding`, `lastParkingTrackPart` for
+  `outStanding`).
+- A scenario of `schemaVersion` 2 or earlier, or one with no version, lists the
+  units along the track, as the tools before this change read them (the
+  evaluator took the last element as the head). Tools read such a file the way
+  they always did. The files were not converted; a file that is to be read
+  head-first has to be written that way and declare 3
+  (`scripts/migrate_unit_order.py` does this for the fixtures here, and the
+  generator now writes 3 and the departing lists head-first).
+- `robust-rail-evaluator` reads the convention from the scenario's version, not
+  from the plan's: at 3 or later it takes the head of an arriving unit from
+  index 0 and rejects an Exit in the mirrored order; below 3 it behaves as
+  before (with a note on stderr). The planner and the solver follow in their
+  own repos (robust-rail-planner#65, robust-rail-solver#84 and #87).
+- `EXPECTED_SCHEMA_VERSION` is 3. A file that declares 2 gets the usual
+  warn-and-continue mismatch message; nothing is rejected for it.
+- Decision and evidence: robust-rail-general#50 and `docs/unit-order-convention.md`.
 
 ## Unversioned — 2026-10-28
 

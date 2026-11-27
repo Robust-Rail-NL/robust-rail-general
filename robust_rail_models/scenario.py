@@ -114,7 +114,7 @@ class IncomingTrain(RailModel):
     members: list[IncomingTrainUnit] = Field(
         default_factory=list,
         description=(
-            'The order of the units of a train, from the head of the train to its tail (index 0 is the head). For an arriving train the head is the unit that leads the train into the yard. '
+            'The order of the units of a train, from the head of the train to its tail (index 0 is the head), in a scenario of schemaVersion 3 or later; older scenarios list the units along the track. For an arriving train the head is the unit that leads the train into the yard. '
             'Reversing the direction of a train (a Reverse) swaps which end is the head, so it reverses the order as read from the head. '
             'Exception: for a train in inStanding the units are listed along the track, not from a head, because a standing train has no direction of travel: index 0 is the unit nearest the A side of the track the train stands on (firstParkingTrackPart).'
         ),
@@ -148,7 +148,7 @@ class TrainRequest(RailModel):
         default_factory=list,
         alias="trainUnits",
         description=(
-            'The order of the units of a train, from the head of the train to its tail (index 0 is the head). For a departing train the head is the unit that leads the train out of the yard. '
+            'The order of the units of a train, from the head of the train to its tail (index 0 is the head), in a scenario of schemaVersion 3 or later; older scenarios list the units along the track. For a departing train the head is the unit that leads the train out of the yard. '
             'Reversing the direction of a train (a Reverse) swaps which end is the head, so it reverses the order as read from the head. '
             'Exception: for a train in outStanding the units are listed along the track, not from a head, because a standing train has no direction of travel: index 0 is the unit nearest the A side of the track the train stands on (lastParkingTrackPart).'
         ),
@@ -180,7 +180,8 @@ class ShuntingUnit(RailModel):
         description=(
             "The IDs of the units of this shunting unit, from the head to the tail (index 0 is the head) "
             "at the time of the action. A Reverse swaps which end is the head, so the order read from the "
-            "head is reversed by it."
+            "head is reversed by it. This is how a plan for a scenario of schemaVersion 3 or later reads; for an "
+            "older scenario the units are listed along the track."
         ),
     )
     parent_ids: list[int] = Field(default_factory=list, alias="parentIDs")

@@ -3,10 +3,13 @@
 Date: 2026-11-24. Status: investigation, no code changed. Sources: the five repos (solver at v2.3.0, evaluator at v2.4.0, planner at v0.6.0, generator v2.5.0, visualizer and this repo as checked out), Roel van den Broek's thesis and paper (`~/Papers/`), and the results of Issa's grid experiment.
 
 **Decision, 2026-11-24 (Léon): head-first** (index 0 = the head), for arriving and departing trains. Standing trains
-(`inStanding`, `outStanding`) stay along the track, starting at the end nearest the A side of the track they stand on. The schema
-descriptions say this since 2026-11-25 (see `SCHEMA_CHANGELOG.md`); scenario fixtures and the generator were migrated.
-The evaluator, planner and solver changes are still to do. The text below is the investigation that led to it, written
-before the decision, so "Proposal" reads as a proposal.
+(`inStanding`, `outStanding`) stay along the track, starting at the end nearest the A side of the track they stand on. The
+schema descriptions say this, and a file declares it with `schemaVersion` 3 (decided 2026-11-27; see `SCHEMA_CHANGELOG.md`):
+a scenario of version 3 or later is head-first, an older one is read along the track as before, and the evaluator reads
+the convention from the scenario's version. Scenario fixtures and the generator were migrated (the fixtures that were
+migrated, and the ones re-swept, declare 3). The evaluator is done; the planner (robust-rail-planner#65) and the solver
+(#84, #87) are still to do. The text below is the investigation that led to the decision, written before it, so
+"Proposal" reads as a proposal.
 
 ## Why this came up
 
