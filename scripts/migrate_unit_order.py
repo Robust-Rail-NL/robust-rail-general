@@ -18,9 +18,12 @@ Every other scenario is reported as needing a manual decision and left alone. Pl
 evaluation outputs next to a migrated scenario describe the old reading and have to be produced
 again; they are listed, not touched.
 
-The script is NOT idempotent: running it twice on a file undoes the migration. It is a dry run
-unless --write is given, and --write refuses to touch a file with uncommitted changes, so git
-history is the record of what was migrated.
+A migrated scenario is stamped with schemaVersion 3, which declares the head-first reading
+(SCHEMA_CHANGELOG.md). A scenario that already declares 3 or later is left alone, so running the
+script twice does not undo the migration. (Fixtures migrated before the stamp existed were
+stamped by hand; the script cannot tell them from unmigrated ones.) It is a dry run unless
+--write is given, and --write refuses to touch a file with uncommitted changes, so git history is
+the record of what was migrated.
 
     python3 scripts/migrate_unit_order.py              # dry run over all tracked scenario files
     python3 scripts/migrate_unit_order.py --write
@@ -34,6 +37,7 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+HEAD_FIRST_SCHEMA_VERSION = 3
 
 
 def gateway_end(parts: dict, gateway_id: int, bumper_id: int) -> tuple:
@@ -104,6 +108,10 @@ def main() -> int:
             print(f"skip    {rel}: not formatted as json.dumps(indent=4); rewriting would churn the file")
             counts["skipped"] += 1
             continue
+        if scenario.get("schemaVersion", 0) >= HEAD_FIRST_SCHEMA_VERSION:
+            print(f"done    {rel}: already declares schemaVersion {scenario['schemaVersion']}")
+            counts["skipped"] += 1
+            continue
         action, detail = plan(scenario, parts)
         counts[action] += 1
         if action != "reverse":
@@ -117,6 +125,7 @@ def main() -> int:
             counts["nothing"] += 1
             print(f"nothing {rel}: reversing changes no departing list (units of one type)")
             continue
+        scenario["schemaVersion"] = HEAD_FIRST_SCHEMA_VERSION
         print(f"reverse {rel}: {len(detail)} departing train(s)")
         if args.write:
             if has_uncommitted_changes(path):

@@ -61,3 +61,50 @@ def test_two_ended_scenario_with_multi_unit_departures_is_left_to_a_human():
 def test_standing_trains_are_left_to_a_human():
     sc = scenario([train_in(2, 11)], [train_out(2, 11)], in_standing=[{}])
     assert mod.plan(sc, PARTS)[0] == "manual"
+
+
+def _repo_with_scenario(tmp_path, version):
+    """A git repo with one single-ended location and one scenario that has a mixed departure."""
+    import subprocess
+
+    loc = tmp_path / "Location_X"
+    loc.mkdir()
+    (loc / "location.json").write_text(json.dumps({"trackParts": list(PARTS.values())}, indent=4) + "\n")
+    sc = {
+        "trainUnitTypes": [],
+        "in": [{"firstParkingTrackPart": 2, "entryTrackPart": 11, "members": [{"id": 1}, {"id": 2}]}],
+        "out": [{"lastParkingTrackPart": 2, "leaveTrackPart": 11, "trainUnits": [{"typePrefix": "A"}, {"typePrefix": "B"}]}],
+        "inStanding": [],
+        "outStanding": [],
+    }
+    if version is not None:
+        sc["schemaVersion"] = version
+    path = loc / "scenario_x.json"
+    path.write_text(json.dumps(sc, indent=4) + "\n")
+    for cmd in (["init", "-q"], ["add", "."], ["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "x"]):
+        subprocess.check_call(["git", *cmd], cwd=tmp_path)
+    return path
+
+
+def test_write_reverses_the_departure_and_declares_schema_version_3(tmp_path, monkeypatch):
+    path = _repo_with_scenario(tmp_path, version=2)
+    monkeypatch.setattr(mod, "REPO", tmp_path)
+    monkeypatch.setattr("sys.argv", ["migrate_unit_order.py", "--write", str(path)])
+    mod.main()
+    migrated = json.loads(path.read_text())
+    assert [u["typePrefix"] for u in migrated["out"][0]["trainUnits"]] == ["B", "A"]
+    assert migrated["schemaVersion"] == 3
+
+
+def test_running_it_again_does_not_undo_the_migration(tmp_path, monkeypatch):
+    import subprocess
+
+    path = _repo_with_scenario(tmp_path, version=2)
+    monkeypatch.setattr(mod, "REPO", tmp_path)
+    monkeypatch.setattr("sys.argv", ["migrate_unit_order.py", "--write", str(path)])
+    mod.main()
+    subprocess.check_call(["git", "add", "."], cwd=tmp_path)
+    subprocess.check_call(["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "migrated"], cwd=tmp_path)
+    once = path.read_text()
+    mod.main()
+    assert path.read_text() == once
