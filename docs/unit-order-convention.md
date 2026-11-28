@@ -1,6 +1,6 @@
 # What does the order of train units mean? A convention for the whole pipeline
 
-Date: 2026-11-24. Status: investigation, no code changed. Sources: the five repos (solver at v2.3.0, evaluator at v2.4.0, planner at v0.6.0, generator v2.5.0, visualizer and this repo as checked out), Roel van den Broek's thesis and paper (`~/Papers/`), and the results of Issa's grid experiment.
+Date: 2026-11-24. Status: investigation, no code changed. Sources: the five repos (solver at v2.3.0, evaluator at v2.4.0, planner at v0.6.0, generator v2.5.0, visualizer and this repo as checked out), Roel van den Broek's thesis [1] and paper [2] (see References), and the results of Issa's grid experiment.
 
 **Decision, 2026-11-24 (Léon): head-first** (index 0 = the head), for arriving and departing trains. Standing trains
 (`inStanding`, `outStanding`) stay along the track, starting at the end nearest the A side of the track they stand on. The
@@ -89,3 +89,10 @@ The expert's answer (a mirrored departure order is not allowed, "SNG-3 vooraan")
 ## Not established
 
 How the original TORS documentation defined the order (not checked); whether the physical order at departure is right in solver plans (guarded only indirectly, and the evaluator cannot tell); whether other parts of the solver assume a fixed direction; the cause of the evaluator's five "unexpected error" crashes (`State.cpp:368`, `State.h:178`); how often each tool's plans would change under the proposal.
+
+## References
+
+Page numbers in this document ("thesis p.24", "paper p.13", ...) refer to the thesis PDF and to the arXiv-style preprint of the paper dated 20 January 2021; the published version has different pagination.
+
+1. R. W. van den Broek. *Train Shunting and Service Scheduling: an integrated local search approach.* Master's thesis, Utrecht University, August 2016. https://studenttheses.uu.nl/handle/20.500.12932/24118
+2. R. van den Broek, H. Hoogeveen, M. van den Akker and B. Huisman. A Local Search Algorithm for Train Unit Shunting with Service Scheduling. *Transportation Science*, 2022. https://doi.org/10.1287/trsc.2021.1090
